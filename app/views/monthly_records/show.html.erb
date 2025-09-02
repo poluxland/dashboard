@@ -1,0 +1,16 @@
+
+<!-- app/views/monthly_records/show.html.erb -->
+<h1 class="h3 mb-3">Registro <%= @monthly_record.period.strftime("%Y-%m") %></h1>
+<dl class="row">
+  <% @monthly_record.attributes.slice(
+      "nomina","hh","dp","actp","astp","iap","acreditacion","salud","recepcion",
+      "tiempo","soplado","uso_jetin","servicios","despacho"
+    ).each do |k,v| %>
+    <dt class="col-sm-3"><%= k.humanize %></dt>
+    <dd class="col-sm-9"><%= v %></dd>
+  <% end %>
+</dl>
+<div class="d-flex gap-2">
+  <%= link_to "Editar", edit_monthly_record_path(@monthly_record), class: "btn btn-primary" %>
+  <%= link_to "Volver", monthly_records_path, class: "btn btn-outline-secondary" %>
+</div>

@@ -1,0 +1,71 @@
+<!-- app/views/monthly_records/index.html.erb -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h3 mb-0">Registros Mensuales</h1>
+  <%= link_to "Nuevo", new_monthly_record_path, class: "btn btn-primary" %>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <%= form_with url: monthly_records_path, method: :get, local: true, class: "row g-2" do |f| %>
+      <div class="col-auto">
+        <label class="form-label mb-0">Mes</label>
+        <%= month_field_tag :month, params[:month], class: "form-control" %>
+      </div>
+      <div class="col-auto align-self-end">
+        <%= submit_tag "Filtrar", class: "btn btn-outline-secondary" %>
+        <%= link_to "Limpiar", monthly_records_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Mes</th>
+        <th>Nomina</th>
+        <th>HH</th>
+        <th>DP</th>
+        <th>ACTP</th>
+        <th>ASTP</th>
+        <th>IAP</th>
+        <th>Acreditación</th>
+        <th>Salud</th>
+        <th>Recepción</th>
+        <th>Tiempo</th>
+        <th>Soplado</th>
+        <th>Uso Jetin</th>
+        <th>Servicios</th>
+        <th>Despacho</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @monthly_records.each do |r| %>
+        <tr>
+          <td><%= r.period.strftime("%Y-%m") %></td>
+          <td><%= r.nomina %></td>
+          <td><%= r.hh %></td>
+          <td><%= r.dp %></td>
+          <td><%= r.actp %></td>
+          <td><%= r.astp %></td>
+          <td><%= r.iap %></td>
+          <td><%= r.acreditacion %></td>
+          <td><%= r.salud %></td>
+          <td><%= r.recepcion %></td>
+          <td><%= r.tiempo %></td>
+          <td><%= r.soplado %></td>
+          <td><%= r.uso_jetin %></td>
+          <td><%= r.servicios %></td>
+          <td><%= r.despacho %></td>
+          <td class="text-nowrap">
+            <%= link_to "Ver", r, class: "btn btn-sm btn-outline-secondary" %>
+            <%= link_to "Editar", edit_monthly_record_path(r), class: "btn btn-sm btn-outline-primary" %>
+            <%= link_to "Eliminar", r, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar?" }, class: "btn btn-sm btn-outline-danger" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

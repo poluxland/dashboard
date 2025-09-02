@@ -1,0 +1,35 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  period: 2025-09-01
+  nomina: 1
+  hh: 1
+  dp: 1
+  actp: 1
+  astp: 1
+  iap: 1
+  acreditacion: 1
+  salud: 1
+  recepcion: 1
+  tiempo: 1
+  soplado: 1
+  uso_jetin: 1
+  servicios: 1
+  despacho: 1
+
+two:
+  period: 2025-09-01
+  nomina: 1
+  hh: 1
+  dp: 1
+  actp: 1
+  astp: 1
+  iap: 1
+  acreditacion: 1
+  salud: 1
+  recepcion: 1
+  tiempo: 1
+  soplado: 1
+  uso_jetin: 1
+  servicios: 1
+  despacho: 1
