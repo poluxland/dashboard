@@ -61,15 +61,30 @@ end
     end
   end
 
-  # -------- Planilla mensual --------
-  def matrix
-    @month = params[:month].presence && Date.strptime("#{params[:month]}-01", "%Y-%m-%d") rescue Date.current.beginning_of_month
-    existing = IndicatorReading.where(period: @month.beginning_of_month..@month.end_of_month)
-                               .pluck(:person_id, :cuasi, :lvs, :cc, :hh)
-    @by_person = existing.each_with_object(Hash.new { |h, k| h[k] = {} }) do |(pid, cu, lv, cc, hh), h|
-      h[pid] = { cuasi: cu, lvs: lv, cc: cc, hh: hh }
+# -------- Planilla mensual --------
+# app/controllers/indicator_readings_controller.rb
+def matrix
+  @month =
+    begin
+      if params[:month].present?
+        Date.strptime("#{params[:month]}-01", "%Y-%m-%d")
+      else
+        Date.current.beginning_of_month
+      end
+    rescue ArgumentError
+      Date.current.beginning_of_month
     end
+
+  range = @month.beginning_of_month..@month.end_of_month
+
+  existing = IndicatorReading.where(period: range)
+                             .pluck(:person_id, :cuasi, :lvs, :cc, :hh)
+
+  @by_person = existing.each_with_object(Hash.new { |h, k| h[k] = {} }) do |(pid, cu, lv, cc, hh), h|
+    h[pid] = { cuasi: cu, lvs: lv, cc: cc, hh: hh }
   end
+end
+
 
   def matrix_save
     month = Date.strptime("#{params[:month]}-01", "%Y-%m-%d") rescue nil
