@@ -1,0 +1,62 @@
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h3 mb-0">Planilla mensual</h1>
+  <%= link_to "Volver", indicator_readings_path, class: "btn btn-outline-secondary" %>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <%= form_with url: matrix_indicator_readings_path, method: :get, local: true, class: "row g-2" do %>
+      <div class="col-auto">
+        <label class="form-label mb-0">Mes</label>
+        <%= month_field_tag :month, (params[:month] || Date.current.strftime("%Y-%m")), class: "form-control" %>
+      </div>
+      <div class="col-auto align-self-end">
+        <%= submit_tag "Aplicar", class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%= form_with url: matrix_save_indicator_readings_path, method: :post, local: true do %>
+  <%= hidden_field_tag :month, (params[:month] || Date.current.strftime("%Y-%m")) %>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Persona</th>
+              <th class="text-end">Cuasi %</th>
+              <th class="text-end">LVS %</th>
+              <th class="text-end">CC %</th>
+              <th class="text-end">HH %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @people.each do |p| %>
+              <% vals = @by_person[p.id] || {} %>
+              <tr>
+                <td><%= p.name %></td>
+                <% [:cuasi, :lvs, :cc, :hh].each do |k| %>
+                  <td>
+                    <div class="input-group input-group-sm justify-content-end" style="max-width: 180px; margin-left:auto;">
+                      <%= text_field_tag "rows[#{p.id}][#{k}]", (vals[k]&.to_f || nil),
+                          class: "form-control text-end", inputmode: "decimal", placeholder: "ej: 100" %>
+                      <span class="input-group-text">%</span>
+                    </div>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= submit_tag "Guardar planilla", class: "btn btn-primary" %>
+        <%= link_to "Cancelar", matrix_indicator_readings_path(month: params[:month]), class: "btn btn-outline-secondary" %>
+      </div>
+    </div>
+  </div>
+<% end %>

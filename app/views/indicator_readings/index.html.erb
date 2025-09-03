@@ -1,0 +1,167 @@
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h3 mb-0">Lecturas</h1>
+  <div class="d-flex gap-2">
+    <%= link_to "Planilla", matrix_indicator_readings_path, class: "btn btn-outline-primary" %>
+    <%= link_to "Nueva lectura", new_indicator_reading_path, class: "btn btn-primary" %>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <%= form_with url: indicator_readings_path, method: :get, local: true, class: "row g-2" do %>
+      <div class="col-auto">
+        <label class="form-label mb-0">Persona</label>
+        <%= select_tag :person_id, options_from_collection_for_select(@people, :id, :name, params[:person_id]),
+                       include_blank: "Todas", class: "form-select" %>
+      </div>
+      <div class="col-auto">
+        <label class="form-label mb-0">Mes</label>
+        <%= month_field_tag :month, params[:month], class: "form-control" %>
+      </div>
+      <div class="col-auto align-self-end">
+        <%= submit_tag "Filtrar", class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Mes</th>
+        <th>Persona</th>
+        <th class="text-end">Cuasi %</th>
+        <th class="text-end">LVS %</th>
+        <th class="text-end">CC %</th>
+        <th class="text-end">HH %</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @readings.each do |r| %>
+        <tr>
+          <td><%= r.period.strftime("%Y-%m") %></td>
+          <td><%= r.person.name %></td>
+          <td class="text-end"><%= number_with_precision(r.cuasi, precision: 0) %></td>
+          <td class="text-end"><%= number_with_precision(r.lvs, precision: 0) %></td>
+          <td class="text-end"><%= number_with_precision(r.cc, precision: 0) %></td>
+          <td class="text-end"><%= number_with_precision(r.hh, precision: 0) %></td>
+          <td class="text-nowrap">
+            <%= link_to "Editar", edit_indicator_reading_path(r), class: "btn btn-sm btn-outline-primary" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== Gráficos ===== -->
+<div class="row g-3 mt-2">
+  <div class="col-12">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Tendencia mensual (promedio por indicador)</h2>
+        <div style="height:340px"><canvas id="trendChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <% if @month.present? %>
+    <div class="col-12">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Comparativa por persona — <%= @month.strftime("%Y-%m") %></h2>
+          <div style="height:380px"><canvas id="barsChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Cargar Chart.js (si no lo cargas en el layout) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+
+<%= javascript_tag nonce: true do %>
+  let _trendChart, _barsChart;
+
+  function ensureChartJsLoaded(cb){
+    if (window.Chart) return cb();
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
+    s.crossOrigin="anonymous";
+    s.onload=cb;
+    document.head.appendChild(s);
+  }
+
+  function renderIndicatorCharts(){
+    ensureChartJsLoaded(function(){
+      // Paleta consistente
+      const colorMap = {
+        "Cuasi": "#2563eb",
+        "LVS":   "#16a34a",
+        "CC":    "#f59e0b",
+        "HH":    "#ef4444"
+      };
+
+      // ----- Línea: tendencia mensual -----
+      const trendEl = document.getElementById("trendChart");
+      if (trendEl) {
+        if (_trendChart) _trendChart.destroy();
+        const labels   = <%= raw(@trend_labels.to_json) %>;
+        const datasets = <%= raw(@trend_datasets.to_json) %>.map(ds => {
+          const c = colorMap[ds.label] || "#64748b";
+          return {
+            label: ds.label,
+            data: ds.data,
+            borderColor: c,
+            backgroundColor: c,
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.25,
+            fill: false
+          };
+        });
+
+        _trendChart = new Chart(trendEl, {
+          type: "line",
+          data: { labels, datasets },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" }, tooltip: { mode: "index", intersect: false } },
+            interaction: { mode: "nearest", axis: "x", intersect: false },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+      }
+
+      // ----- Barras por persona (mes filtrado) -----
+      const barsEl = document.getElementById("barsChart");
+      <% if @month.present? %>
+        if (barsEl) {
+          if (_barsChart) _barsChart.destroy();
+          const labels   = <%= raw(@bar_labels.to_json) %>;
+          const datasets = <%= raw(@bar_datasets.to_json) %>.map(ds => {
+            const c = colorMap[ds.label] || "#64748b";
+            return { label: ds.label, data: ds.data, borderColor: c, backgroundColor: c, borderWidth: 1 };
+          });
+
+          _barsChart = new Chart(barsEl, {
+            type: "bar",
+            data: { labels, datasets },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { position: "bottom" }, tooltip: { mode: "index", intersect: false } },
+              interaction: { mode: "index", intersect: false },
+              scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+          });
+        }
+      <% end %>
+    });
+  }
+
+  // Importante para Turbo
+  document.addEventListener("turbo:load", renderIndicatorCharts);
+  document.addEventListener("DOMContentLoaded", renderIndicatorCharts);
+<% end %>

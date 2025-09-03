@@ -1,0 +1,30 @@
+<%= form_with model: @reading, local: true do |f| %>
+  <% if @reading.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% @reading.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :person_id, "Persona", class: "form-label" %>
+    <%= f.collection_select :person_id, @people, :id, :name, {}, class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :period, "Mes", class: "form-label" %>
+    <%= f.month_field :period, value: (@reading.period&.strftime("%Y-%m") || Date.current.strftime("%Y-%m")), class: "form-control" %>
+  </div>
+
+  <% [:cuasi, :lvs, :cc, :hh].each do |attr| %>
+    <div class="mb-3">
+      <%= f.label attr, "#{attr.to_s.upcase} (%)", class: "form-label" %>
+      <%= f.number_field attr, step: 0.01, min: 0, class: "form-control" %>
+    </div>
+  <% end %>
+
+  <%= f.submit "Guardar", class: "btn btn-primary" %>
+<% end %>
