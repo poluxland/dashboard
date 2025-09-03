@@ -1,0 +1,14 @@
+<div class="card mb-3">
+  <div class="card-body">
+    <%= form_with url: monthly_records_path, method: :get, data: { turbo: false }, local: true, class: "row g-2" do |f| %>
+      <div class="col-auto">
+        <label class="form-label mb-0">Mes</label>
+        <%= month_field_tag :month, params[:month], class: "form-control" %>
+      </div>
+      <div class="col-auto align-self-end">
+        <%= submit_tag "Filtrar", class: "btn btn-outline-secondary" %>
+        <%= link_to "Limpiar", monthly_records_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+</div>

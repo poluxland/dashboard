@@ -1,0 +1,21 @@
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Desglose <%= params[:month] %></h2>
+    <div style="height:320px"><canvas id="donutChart"></canvas></div>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true do %>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.Chart) return;
+    const labels = <%= raw(@breakdown.keys.to_json) %>;
+    const data   = <%= raw(@breakdown.values.to_json) %>;
+    const ctx = document.getElementById("donutChart");
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: "doughnut",
+      data: { labels, datasets: [{ data, borderWidth: 1 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, cutout: "60%" }
+    });
+  });
+<% end %>
