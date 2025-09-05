@@ -18,6 +18,8 @@ def index
     # @monthly_records = MonthlyRecord.last_12_months.ordered
   end
 
+
+
   # Gráfico general (todos los parámetros)
   @chart_labels, @chart_datasets = MonthlyRecord.chart_data(@monthly_records)
 
@@ -33,6 +35,14 @@ def index
       .index_with { |m| r.public_send(m) }
       .transform_keys { |k| k.to_s.humanize }
   end
+
+# Gráfico de barras solo Recepción
+@recepcion_labels, recepcion_datasets = MonthlyRecord.chart_data(
+  @monthly_records,
+  only: %i[recepcion]
+)
+# Chart.js espera un array, así que tomo el primero
+@recepcion_dataset = recepcion_datasets.first
 end
 
 

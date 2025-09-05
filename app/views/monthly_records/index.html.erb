@@ -5,25 +5,38 @@
 
 <%= render "filter_form" %>
 <%= render "table" %>
+
 <div class="row g-3">
+  <!-- Gráfico específico de Recepción -->
   <div class="col-12 col-lg-6">
-    <%= render "charts_stacked" %>
+    <%= render "recepcion_chart" %>
   </div>
+
+  <!-- Gráfico de parámetros Core -->
   <div class="col-12 col-lg-6">
     <%= render "chart_lines_core" %>
   </div>
 </div>
 
 <div class="row g-3 mt-0">
-  <% if @breakdown.present? %>
-    <div class="col-12 col-lg-6">
-      <%= render "chart_donut" %>
-    </div>
-  <% end %>
+  <!-- Gráfico global stacked -->
+  <div class="col-12 col-lg-6">
+    <%= render "charts_stacked" %>
+  </div>
+
+  <!-- Gráfico global de todas las métricas -->
   <div class="col-12 col-lg-6">
     <%= render "chart_lines_all" %>
   </div>
 </div>
 
+<% if @breakdown.present? %>
+  <div class="row g-3 mt-0">
+    <!-- Donut con desglose del mes -->
+    <div class="col-12">
+      <%= render "chart_donut" %>
+    </div>
+  </div>
+<% end %>
 
 

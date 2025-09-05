@@ -1,0 +1,48 @@
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Recepción (barras)</h2>
+    <div style="height:380px">
+      <canvas id="recepcionChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true do %>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.Chart) return;
+
+    const labels = <%= raw(@recepcion_labels.to_json) %>;
+    const dataset = <%= raw(@recepcion_dataset.to_json) %>;
+
+    const ctx = document.getElementById("recepcionChart");
+    if (!ctx) return;
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: dataset.label,
+          data: dataset.data,
+          backgroundColor: "rgba(75, 192, 192, 0.6)",
+          borderColor: "rgba(75, 192, 192, 1)",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom" }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 }
+          }
+        }
+      }
+    });
+  });
+<% end %>
+
