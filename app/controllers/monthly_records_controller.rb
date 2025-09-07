@@ -14,27 +14,27 @@ def index
     end
   else
     @monthly_records = MonthlyRecord.ordered
-    # Si prefieres limitar por defecto:
-    # @monthly_records = MonthlyRecord.last_12_months.ordered
   end
 
-  # === Gráfico de líneas (solo métricas principales) ===
-  lines_only = %i[nomina hh dp actp astp iap acreditacion salud]
-  @chart_labels, @chart_datasets = MonthlyRecord.chart_data(@monthly_records, only: lines_only)
-
-  # === Gráfico stacked (operación) ===
-  @stacked_labels, @stacked_datasets = MonthlyRecord.chart_data(
+  # 👉 Tu view usa @chart_labels / @chart_datasets. Alimentémoslos con SOLO:
+  # Recepción, Tiempo, Soplado, Uso Jetin, Servicios, Despacho
+  @chart_labels, @chart_datasets = MonthlyRecord.chart_data(
     @monthly_records,
     only: %i[recepcion tiempo soplado uso_jetin servicios despacho]
   )
 
-  # Donut del mes filtrado (si aplica)
+  # Si no ocupas estos otros, puedes borrarlos:
+  # @core_labels, @core_datasets = ...
+  # @recepcion_labels, recepcion_datasets = ...
+  # @recepcion_dataset = recepcion_datasets.first
+
   if params[:month].present? && (r = @monthly_records.first)
     @breakdown = MonthlyRecord::METRICS
       .index_with { |m| r.public_send(m) }
       .transform_keys { |k| k.to_s.humanize }
   end
 end
+
 
 
   def update
