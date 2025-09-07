@@ -18,15 +18,14 @@ def index
     # @monthly_records = MonthlyRecord.last_12_months.ordered
   end
 
+  # === Gráfico de líneas (solo métricas principales) ===
+  lines_only = %i[nomina hh dp actp astp iap acreditacion salud]
+  @chart_labels, @chart_datasets = MonthlyRecord.chart_data(@monthly_records, only: lines_only)
 
-
-  # Gráfico general (todos los parámetros)
-  @chart_labels, @chart_datasets = MonthlyRecord.chart_data(@monthly_records)
-
-  # >>> Gráfico solo DP, ACTP, ASTP, IAP <<<
-  @core_labels, @core_datasets = MonthlyRecord.chart_data(
+  # === Gráfico stacked (operación) ===
+  @stacked_labels, @stacked_datasets = MonthlyRecord.chart_data(
     @monthly_records,
-    only: %i[dp actp astp iap]
+    only: %i[recepcion tiempo soplado uso_jetin servicios despacho]
   )
 
   # Donut del mes filtrado (si aplica)
@@ -35,33 +34,8 @@ def index
       .index_with { |m| r.public_send(m) }
       .transform_keys { |k| k.to_s.humanize }
   end
-
-# Gráfico de barras solo Recepción
-@recepcion_labels, recepcion_datasets = MonthlyRecord.chart_data(
-  @monthly_records,
-  only: %i[recepcion]
-)
-# Chart.js espera un array, así que tomo el primero
-@recepcion_dataset = recepcion_datasets.first
 end
 
-
-  def show; end
-
-  def new
-    @monthly_record = MonthlyRecord.new
-  end
-
-  def edit; end
-
-  def create
-    @monthly_record = MonthlyRecord.new(safe_params_with_period)
-    if @monthly_record.save
-      redirect_to @monthly_record, notice: "Registro mensual creado."
-    else
-      render :new, status: :unprocessable_entity
-    end
-  end
 
   def update
     if @monthly_record.update(safe_params_with_period)
