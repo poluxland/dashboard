@@ -15,7 +15,7 @@
     const ctx = document.getElementById("allParamsChart");
     if (!ctx || !labels.length || !datasets.length) return;
     new Chart(ctx, {
-      type: "line",
+      type: "bar",
       data: { labels, datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
