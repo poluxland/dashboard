@@ -3,38 +3,93 @@ class IndicatorReadingsController < ApplicationController
   before_action :set_reading, only: [ :edit, :update ]
   before_action :load_people, only: [ :index, :new, :edit, :matrix ]
 
-  def index
-    @month = params[:month].presence && Date.strptime("#{params[:month]}-01", "%Y-%m-%d") rescue nil
-    scope = IndicatorReading.includes(:person).order(period: :desc)
-    scope = scope.where(period: @month.beginning_of_month..@month.end_of_month) if @month
-    scope = scope.where(person_id: params[:person_id]) if params[:person_id].present?
-    @readings = scope
-# ---- Tendencia mensual (promedio por indicador) ----
-trend_rows = IndicatorReading
-  .group(:period)
-  .select("period, AVG(cuasi) AS cuasi, AVG(lvs) AS lvs, AVG(cc) AS cc, AVG(hh) AS hh")
-  .order(:period)
+def index
+  @month = params[:month].presence && Date.strptime("#{params[:month]}-01", "%Y-%m-%d") rescue nil
 
-@trend_labels = trend_rows.map { |r| r.period.strftime("%Y-%m") }
-@trend_datasets = [
-  { label: "Cuasi", data: trend_rows.map { |r| r.cuasi.to_f } },
-  { label: "LVS",   data: trend_rows.map { |r| r.lvs.to_f } },
-  { label: "CC",    data: trend_rows.map { |r| r.cc.to_f } },
-  { label: "HH",    data: trend_rows.map { |r| r.hh.to_f } }
-]
+  # ---- Listado con filtros (OK con includes porque no restringimos select) ----
+  scope = IndicatorReading.includes(:person).order(period: :desc)
+  scope = scope.where(period: @month.beginning_of_month..@month.end_of_month) if @month
+  scope = scope.where(person_id: params[:person_id]) if params[:person_id].present?
+  @readings = scope
 
-# ---- Barras por persona (cuando hay mes filtrado) ----
-if @month
-  month_scope = IndicatorReading.for_month(@month).includes(:person).order("people.name")
-  @bar_labels = month_scope.map { |r| r.person.name }
-  @bar_datasets = [
-    { label: "Cuasi", data: month_scope.map { |r| r.cuasi.to_f } },
-    { label: "LVS",   data: month_scope.map { |r| r.lvs.to_f } },
-    { label: "CC",    data: month_scope.map { |r| r.cc.to_f } },
-    { label: "HH",    data: month_scope.map { |r| r.hh.to_f } }
+  # --------------------------------------------------------------------------
+  # Tendencia mensual (promedio por indicador)  -> series: Cuasi, LVS, CC, HH
+  # Usamos pluck para evitar instanciar registros con columnas parciales.
+  # --------------------------------------------------------------------------
+  trend_scope = IndicatorReading
+  trend_scope = trend_scope.where(person_id: params[:person_id]) if params[:person_id].present?
+
+  trend_rows = trend_scope
+                 .group(:period)
+                 .order(:period)
+                 .pluck(
+                   :period,
+                   Arel.sql("AVG(cuasi)"),
+                   Arel.sql("AVG(lvs)"),
+                   Arel.sql("AVG(cc)"),
+                   Arel.sql("AVG(hh)")
+                 )
+
+  @trend_labels   = trend_rows.map { |period, *_| period.strftime("%Y-%m") }
+  cuasi_series    = trend_rows.map { |_, cu, _, _, _| cu.to_f }
+  lvs_series      = trend_rows.map { |_, _, lv, _, _| lv.to_f }
+  cc_series       = trend_rows.map { |_, _, _, c, _| c.to_f }
+  hh_series       = trend_rows.map { |_, _, _, _, h| h.to_f }
+
+  @trend_datasets = [
+    { label: "Cuasi", data: cuasi_series },
+    { label: "LVS",   data: lvs_series   },
+    { label: "CC",    data: cc_series    },
+    { label: "HH",    data: hh_series    }
   ]
-end
+
+  # ---------------------------------------------------------------------------------
+  # Evolución del PROMEDIO por persona (una serie por persona a través de los meses)
+  # promedio = (cuasi + lvs + cc + hh) / 4. Usamos pluck y agrupamos en Ruby.
+  # ---------------------------------------------------------------------------------
+  avg_base = IndicatorReading.order(:period)
+  avg_base = avg_base.where(person_id: params[:person_id]) if params[:person_id].present?
+
+  periods = avg_base.distinct.order(:period).pluck(:period)
+  @avg_people_labels = periods.map { |d| d.strftime("%Y-%m") }
+
+  rows = avg_base.pluck(
+    :person_id,
+    :period,
+    Arel.sql("((COALESCE(cuasi,0)+COALESCE(lvs,0)+COALESCE(cc,0)+COALESCE(hh,0))/4.0)")
+  )
+  # rows => [[person_id, period, avg_person], ...]
+
+  person_ids = rows.map(&:first).uniq
+  names = Person.where(id: person_ids).pluck(:id, :name).to_h
+
+  grouped = rows.group_by { |pid, _period, _avg| pid }
+  @avg_people_datasets = grouped.map do |pid, arr|
+    # Hash periodo -> promedio
+    values_by_period = arr.each_with_object({}) { |(_pid, per, avg), h| h[per] = avg.to_f }
+    {
+      label: names[pid] || "ID #{pid}",
+      data: periods.map { |p| values_by_period[p] || nil } # alineado a labels; permite gaps
+    }
   end
+
+  # --------------------------------------------------------------------------
+  # Barras por persona (solo si hay mes filtrado) -> series: Cuasi, LVS, CC, HH
+  # Aquí sí usamos includes(:person) porque NO restringimos select.
+  # --------------------------------------------------------------------------
+  if @month
+    month_scope = IndicatorReading.for_month(@month).includes(:person).order("people.name")
+    @bar_labels = month_scope.map { |r| r.person.name }
+    @bar_datasets = [
+      { label: "Cuasi", data: month_scope.map { |r| r.cuasi.to_f } },
+      { label: "LVS",   data: month_scope.map { |r| r.lvs.to_f } },
+      { label: "CC",    data: month_scope.map { |r| r.cc.to_f } },
+      { label: "HH",    data: month_scope.map { |r| r.hh.to_f } }
+    ]
+  end
+end
+
+
 
   def new
     @reading = IndicatorReading.new(period: Date.current.beginning_of_month)

@@ -21,6 +21,11 @@ class IndicatorReading < ApplicationRecord
   def cc_string;    cc&.to_f;    end
   def hh_string;    hh&.to_f;    end
 
+
+    def avg_pct
+    (cuasi.to_f + lvs.to_f + cc.to_f + hh.to_f) / 4.0
+  end
+
   private
 
   def normalize_period_to_month_start
