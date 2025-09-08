@@ -16,23 +16,24 @@ def index
     @monthly_records = MonthlyRecord.ordered
   end
 
-  # 👉 Tu view usa @chart_labels / @chart_datasets. Alimentémoslos con SOLO:
-  # Recepción, Tiempo, Soplado, Uso Jetin, Servicios, Despacho
-  @chart_labels, @chart_datasets = MonthlyRecord.chart_data(
-    @monthly_records,
-    only: %i[recepcion tiempo soplado uso_jetin servicios despacho]
-  )
+# Gráfico de líneas (Nómina, HH, DP, ACTP, ASTP, IAP, Acreditación, Salud)
+@chart_labels, @chart_datasets = MonthlyRecord.chart_data(
+  @monthly_records,
+  only: %i[nomina hh dp actp astp iap acreditacion salud]
+)
 
-  # Si no ocupas estos otros, puedes borrarlos:
-  # @core_labels, @core_datasets = ...
-  # @recepcion_labels, recepcion_datasets = ...
-  # @recepcion_dataset = recepcion_datasets.first
+# Gráfico stacked (Recepción, Tiempo, Soplado, Uso Jetin, Servicios, Despacho)
+@stacked_labels, @stacked_datasets = MonthlyRecord.chart_data(
+  @monthly_records,
+  only: %i[recepcion tiempo soplado uso_jetin servicios despacho]
+)
 
-  if params[:month].present? && (r = @monthly_records.first)
-    @breakdown = MonthlyRecord::METRICS
-      .index_with { |m| r.public_send(m) }
-      .transform_keys { |k| k.to_s.humanize }
-  end
+# Donut (si filtras por month)
+if params[:month].present? && (r = @monthly_records.first)
+  @breakdown = MonthlyRecord::METRICS
+    .index_with { |m| r.public_send(m) }
+    .transform_keys { |k| k.to_s.humanize }
+end
 end
 
 

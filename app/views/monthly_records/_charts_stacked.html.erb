@@ -5,21 +5,23 @@
   </div>
 </div>
 
+<%# Si Chart.js ya se carga en el layout, elimina la línea de abajo %>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+
 <%= javascript_tag nonce: true do %>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("turbo:load", function () {
     if (!window.Chart) return;
-    const labels   = <%= raw(@chart_labels.to_json) %>;
-    const datasets = <%= raw(@chart_datasets.to_json) %>.map(ds => ({
-      label: ds.label, data: ds.data, borderWidth: 1
-    }));
+    const labels   = <%= raw((@stacked_labels || []).to_json) %>;
+    const datasets = <%= raw((@stacked_datasets || []).to_json) %>;
     const ctx = document.getElementById("stackedChart");
-    if (!ctx) return;
+    if (!ctx || !labels.length || !datasets.length) return;
+
     new Chart(ctx, {
       type: "bar",
       data: { labels, datasets },
       options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: { legend: { position: "bottom" }, tooltip: { mode: "index", intersect: false } },
         scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } }
       }

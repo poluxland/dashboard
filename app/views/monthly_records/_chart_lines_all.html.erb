@@ -6,14 +6,14 @@
 </div>
 
 <%= javascript_tag nonce: true do %>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("turbo:load", function () {
     if (!window.Chart) return;
-    const labels   = <%= raw(@chart_labels.to_json) %>;
-    const datasets = <%= raw(@chart_datasets.to_json) %>.map(ds => ({
+    const labels   = <%= raw((@chart_labels || []).to_json) %>;
+    const datasets = <%= raw((@chart_datasets || []).to_json) %>.map(ds => ({
       label: ds.label, data: ds.data, borderWidth: 2, tension: 0.25, fill: false, pointRadius: 2
     }));
     const ctx = document.getElementById("allParamsChart");
-    if (!ctx) return;
+    if (!ctx || !labels.length || !datasets.length) return;
     new Chart(ctx, {
       type: "line",
       data: { labels, datasets },
