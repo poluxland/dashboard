@@ -18,11 +18,19 @@
       type: "bar",
       data: { labels, datasets },
       options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, 
+        maintainAspectRatio: false,
         interaction: { mode: "nearest", axis: "x", intersect: false },
-        plugins: { legend: { position: "bottom" }, tooltip: { mode: "index", intersect: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        plugins: { 
+          legend: { position: "bottom" }, 
+          tooltip: { mode: "index", intersect: false } 
+        },
+        scales: { 
+          x: { stacked: true },
+          y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } 
+        }
       }
     });
   });
 <% end %>
+
