@@ -107,7 +107,6 @@
     </div>
   <% end %>
 </div>
-
 <!-- Cargar Chart.js (si no lo cargas en el layout) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 
@@ -125,19 +124,6 @@
 
   function renderIndicatorCharts(){
     ensureChartJsLoaded(function(){
-      // Paleta consistente por indicador
-      const colorMap = {
-        "Cuasi": "#2563eb",
-        "LVS":   "#16a34a",
-        "CC":    "#f59e0b",
-        "HH":    "#ef4444"
-      };
-
-      // Paleta por serie de persona
-      const palette = (i) => {
-        const base = ["#2563eb","#16a34a","#f59e0b","#ef4444","#8b5cf6","#0ea5e9","#22c55e","#fb7185","#a3e635","#f472b6","#14b8a6","#f97316"];
-        return base[i % base.length];
-      };
 
       // ===== 1) Tendencia mensual (promedio por indicador) =====
       const trendEl = document.getElementById("trendChart");
@@ -146,8 +132,7 @@
 
         const labelsTrend   = <%= raw((@trend_labels || []).to_json) %>;
         const datasetsTrend = <%= raw((@trend_datasets || []).to_json) %>.map(ds => {
-          const c = colorMap[ds.label] || "#64748b";
-          return { label: ds.label, data: ds.data, borderColor: c, backgroundColor: c, borderWidth: 2, pointRadius: 2, tension: 0.25, fill: false };
+          return { label: ds.label, data: ds.data, borderWidth: 2, pointRadius: 2, tension: 0.25, fill: false };
         });
 
         if (labelsTrend.length && datasetsTrend.length) {
@@ -170,9 +155,8 @@
         if (_avgPeopleTrend) _avgPeopleTrend.destroy();
 
         const labelsAvg   = <%= raw((@avg_people_labels || []).to_json) %>;
-        const datasetsAvg = <%= raw((@avg_people_datasets || []).to_json) %>.map((ds, i) => {
-          const c = palette(i);
-          return { label: ds.label, data: ds.data, borderColor: c, backgroundColor: c, borderWidth: 2, pointRadius: 1.5, tension: 0.2, spanGaps: true, fill: false };
+        const datasetsAvg = <%= raw((@avg_people_datasets || []).to_json) %>.map((ds) => {
+          return { label: ds.label, data: ds.data, borderWidth: 2, pointRadius: 1.5, tension: 0.2, spanGaps: true, fill: false };
         });
 
         if (labelsAvg.length && datasetsAvg.length) {
@@ -197,8 +181,7 @@
 
         const labelsBars   = <%= raw((@bar_labels || []).to_json) %>;
         const datasetsBars = <%= raw((@bar_datasets || []).to_json) %>.map(ds => {
-          const c = colorMap[ds.label] || "#64748b";
-          return { label: ds.label, data: ds.data, borderColor: c, backgroundColor: c, borderWidth: 1 };
+          return { label: ds.label, data: ds.data, borderWidth: 1 };
         });
 
         if (labelsBars.length && datasetsBars.length) {
@@ -223,8 +206,7 @@
 
         const labelsPlants   = <%= raw((@plants_labels || []).to_json) %>;
         const datasetsPlants = <%= raw((@plants_datasets || []).to_json) %>.map(ds => {
-          const c = colorMap[ds.label] || "#64748b";
-          return { label: ds.label, data: ds.data, borderColor: c, backgroundColor: c, borderWidth: 1 };
+          return { label: ds.label, data: ds.data, borderWidth: 1 };
         });
 
         if (labelsPlants.length && datasetsPlants.length) {
