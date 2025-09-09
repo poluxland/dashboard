@@ -1,0 +1,7 @@
+<!-- app/views/people/show.html.erb -->
+<h1 class="h3 mb-3"><%= @person.name %></h1>
+<p><strong>Planta:</strong> <%= @person.planta.presence || "-" %></p>
+<div class="d-flex gap-2">
+  <%= link_to "Editar", edit_person_path(@person), class: "btn btn-primary" %>
+  <%= link_to "Volver", people_path, class: "btn btn-outline-secondary" %>
+</div>

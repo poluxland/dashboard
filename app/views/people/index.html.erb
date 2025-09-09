@@ -1,0 +1,28 @@
+<!-- app/views/people/index.html.erb -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h3 mb-0">Personas</h1>
+  <%= link_to "Nueva Persona", new_person_path, class: "btn btn-primary" %>
+</div>
+
+<table class="table table-sm align-middle">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Planta</th>
+      <th class="text-end">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @people.each do |p| %>
+      <tr>
+        <td><%= p.name %></td>
+        <td><%= p.planta.presence || "-" %></td>
+        <td class="text-end">
+          <%= link_to "Editar", edit_person_path(p), class: "btn btn-sm btn-outline-secondary" %>
+          <%= link_to "Eliminar", p, class: "btn btn-sm btn-outline-danger ms-1",
+                data: { turbo_method: :delete, turbo_confirm: "¿Eliminar a #{p.name}?" } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

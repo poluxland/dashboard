@@ -5,10 +5,11 @@ Rails.application.routes.draw do
 
   resources :indicator_readings, only: [ :index, :new, :create, :edit, :update ] do
     collection do
-      get  :matrix       # planilla por mes/indicador
-      post :matrix_save  # guarda planilla
+      get  :matrix
+      post :matrix_save
     end
   end
 
-  resources :people, only: [ :index, :new, :create ]  # para cargar personas rápido
+  # habilita CRUD completo
+  resources :people   # (o: only: [:index, :new, :create, :edit, :update, :destroy, :show])
 end

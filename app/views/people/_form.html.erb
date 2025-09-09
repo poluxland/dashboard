@@ -1,0 +1,30 @@
+<!-- app/views/people/_form.html.erb -->
+<%= form_with(model: person, class: "needs-validation") do |f| %>
+  <% if person.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% person.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :name, class: "form-label" %>
+    <%= f.text_field :name, class: "form-control", autofocus: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :planta, class: "form-label" %>
+    <%= f.select :planta,
+          [["LCA", "LCA"], ["PTM", "PTM"], ["VTS", "VTS"]],
+          { include_blank: "Selecciona planta" },
+          class: "form-select" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Volver", people_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>
