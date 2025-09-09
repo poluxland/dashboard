@@ -87,6 +87,34 @@ def index
       { label: "HH",    data: month_scope.map { |r| r.hh.to_f } }
     ]
   end
+
+  people = Person.arel_table
+
+scope = IndicatorReading.joins(:person)
+scope = scope.where(period: @month.all_month) if @month.present?
+
+rows = scope
+  .group(people[:planta]) # equivale a GROUP BY people.planta
+  .pluck(
+    Arel.sql("COALESCE(people.planta, '-')"),             # etiqueta
+    Arel.sql("AVG(indicator_readings.cuasi)"),
+    Arel.sql("AVG(indicator_readings.lvs)"),
+    Arel.sql("AVG(indicator_readings.cc)"),
+    Arel.sql("AVG(indicator_readings.hh)")
+  )
+
+@plants_labels = rows.map { |pl, *_| pl }
+cuasi_data = rows.map { |_, a, *_| a.to_f.round(0) }
+lvs_data   = rows.map { |_, _, b, *_| b.to_f.round(0) }
+cc_data    = rows.map { |_, _, _, c, _| c.to_f.round(0) }
+hh_data    = rows.map { |_, _, _, _, d| d.to_f.round(0) }
+
+@plants_datasets = [
+  { label: "Cuasi", data: cuasi_data },
+  { label: "LVS",   data: lvs_data   },
+  { label: "CC",    data: cc_data    },
+  { label: "HH",    data: hh_data    }
+]
 end
 
 

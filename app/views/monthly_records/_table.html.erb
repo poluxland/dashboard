@@ -23,7 +23,7 @@
     <tbody>
       <% @monthly_records.each do |r| %>
         <tr>
-          <td><%= r.period.strftime("%Y-%m") %></td>
+          <td><%= I18n.l(r.period, format: "%B %Y").capitalize %></td>
           <td><%= r.nomina %></td>
           <td><%= r.hh %></td>
           <td><%= r.dp %></td>
