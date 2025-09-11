@@ -1,0 +1,20 @@
+<%# app/views/indicator_readings/_filters.html.erb %>
+<div class="card mb-3">
+  <div class="card-body">
+    <%= form_with url: indicator_readings_path, method: :get, local: true, class: "row g-2" do %>
+      <div class="col-auto">
+        <label class="form-label mb-0">Persona</label>
+        <%= select_tag :person_id,
+              options_from_collection_for_select(people, :id, :name, params[:person_id]),
+              include_blank: "Todas", class: "form-select" %>
+      </div>
+      <div class="col-auto">
+        <label class="form-label mb-0">Mes</label>
+        <%= month_field_tag :month, params[:month], class: "form-control" %>
+      </div>
+      <div class="col-auto align-self-end">
+        <%= submit_tag "Filtrar", class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

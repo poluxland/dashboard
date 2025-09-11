@@ -1,0 +1,33 @@
+<%# app/views/indicator_readings/_table.html.erb %>
+<table class="table table-sm table-striped align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>Persona</th>
+      <th>Mes</th>
+      <th>Planta</th>
+      <th class="text-end">Cuasi %</th>
+      <th class="text-end">LVS %</th>
+      <th class="text-end">CC %</th>
+      <th class="text-end">HH %</th>
+      <th class="text-end">Promedio %</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% readings.each do |r| %>
+      <tr>
+        <td><%= r.person.name %></td>
+        <td><%= I18n.l(r.period, format: "%B %Y").capitalize %></td>
+        <td><%= r.person.planta %></td>
+        <td class="text-end"><%= number_with_precision(r.cuasi, precision: 0) %></td>
+        <td class="text-end"><%= number_with_precision(r.lvs, precision: 0) %></td>
+        <td class="text-end"><%= number_with_precision(r.cc, precision: 0) %></td>
+        <td class="text-end"><%= number_with_precision(r.hh, precision: 0) %></td>
+        <td class="text-end"><%= number_with_precision(r.avg_pct, precision: 0) %></td>
+        <td class="text-nowrap">
+          <%= link_to "Editar", edit_indicator_reading_path(r), class: "btn btn-sm btn-outline-primary" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
