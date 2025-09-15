@@ -1,0 +1,60 @@
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Todos los indicadores (barras apiladas)</h2>
+    <div style="height:480px">
+      <canvas id="allMetricsStackedChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true do %>
+  document.addEventListener("turbo:load", function () {
+    if (!window.Chart) return;
+
+    const labels   = <%= raw((@all_labels || []).to_json) %>;
+    const datasets = <%= raw((@all_datasets || []).to_json) %>.map(ds => ({
+      type: "bar",
+      label: ds.label,
+      data: ds.data,
+      stack: "all_metrics",
+      borderWidth: 1,
+      borderSkipped: false
+    }));
+
+    const el = document.getElementById("allMetricsStackedChart");
+    if (!el || !labels.length || !datasets.length) return;
+
+    function totalAt(index) {
+      return datasets.reduce((sum, ds) => sum + (Number(ds.data[index]) || 0), 0);
+    }
+
+    new Chart(el, {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", axis: "x", intersect: false },
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: {
+            mode: "index",
+            intersect: false,
+            callbacks: {
+              footer: (items) => {
+                if (!items || !items.length) return "";
+                const idx = items[0].dataIndex;
+                return "Total: " + totalAt(idx);
+              }
+            }
+          },
+          title: { display: false }
+        },
+        scales: {
+          x: { stacked: true, ticks: { maxRotation: 0, autoSkip: true } },
+          y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+  });
+<% end %>
