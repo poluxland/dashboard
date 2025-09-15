@@ -29,10 +29,7 @@ class MonthlyRecordsController < ApplicationController
       only: %i[recepcion tiempo soplado uso_jetin servicios despacho]
     )
 
-    @all_labels, @all_datasets = MonthlyRecord.chart_data(
-  @monthly_records,
-  only: MonthlyRecord::METRICS  # => todos los campos (asegúrate de que METRICS incluya todos)
-)
+
 
     # Donut (si filtras por month)
     if params[:month].present? && (r = @monthly_records.first)
