@@ -1,0 +1,101 @@
+<%# app/views/ots/index.html.erb %>
+<% content_for :title, "OTs" %>
+
+<%# --- Mensajes --- %>
+<% if notice.present? %>
+  <div style="padding:.5rem 1rem; background:#e8f7ee; border:1px solid #b6e2c1; color:#216e39; border-radius:6px; margin-bottom:12px;">
+    <%= notice %>
+  </div>
+<% end %>
+<% if alert.present? %>
+  <div style="padding:.5rem 1rem; background:#fdecea; border:1px solid #f5c2c7; color:#842029; border-radius:6px; margin-bottom:12px;">
+    <%= alert %>
+  </div>
+<% end %>
+
+<h1 style="margin:0 0 12px;">OTs</h1>
+
+
+<%= form_with url: import_ots_path, method: :post, html: { multipart: true, data: { turbo: false } } do %>
+  <div class="field" style="margin-bottom:8px;">
+    <label for="file"><strong>Archivo</strong> (.xlsx / .xls / .csv)</label><br>
+    <%= file_field_tag :file, accept: ".xlsx,.xls,.csv" %>
+  </div>
+  <div class="actions">
+    <%= submit_tag "Importar", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<div style="margin-top:10px; margin-bottom:12px;">
+  <%= link_to "Nueva OT", new_ot_path, class: "btn btn-primary" %>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <div style="opacity:.7;">Total registros: <%= @ots.size %></div>
+</div>
+
+<% if @ots.any? %>
+  <div style="overflow:auto; border:1px solid #e5e7eb; border-radius:8px;">
+    <table style="width:100%; border-collapse:separate; border-spacing:0;">
+      <thead style="position:sticky; top:0; z-index:1; background:#f8fafc;">
+        <tr>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">OT asignada</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Semana</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Item</th>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">Área</th>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">Código</th>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">Actividad</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Cant.</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Unitario</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Repuestos</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Servicio</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Total</th>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">Responsable</th>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">Contratista</th>
+          <th style="text-align:left;  padding:.5rem; border-bottom:1px solid #e5e7eb;">Tipo OT</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Estado</th>
+          <th style="text-align:right; padding:.5rem; border-bottom:1px solid #e5e7eb;">Sem. ejec.</th>
+          <th style="text-align:center; padding:.5rem; border-bottom:1px solid #e5e7eb;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @ots.each do |ot| %>
+          <tr>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9;"><%= ot.ot_asignada %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= ot.semana %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= ot.item %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9;"><%= ot.area %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9;"><%= ot.codigo %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="<%= ot.actividad_semanal %>"><%= ot.actividad_semanal %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= ot.cantidad %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= number_to_currency(ot.unitario, unit: "$", precision: 0, delimiter: ".") %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= number_to_currency(ot.repuestos, unit: "$", precision: 0, delimiter: ".") %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= number_to_currency(ot.servicio, unit: "$", precision: 0, delimiter: ".") %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right; font-weight:600;"><%= number_to_currency(ot.total, unit: "$", precision: 0, delimiter: ".") %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9;"><%= ot.responsable %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9;"><%= ot.contratista %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9;"><%= ot.tipo_ot %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= ot.estado %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:right;"><%= ot.sem_ejec %></td>
+            <td style="padding:.5rem; border-bottom:1px solid #f1f5f9; text-align:center; white-space:nowrap;">
+              <%= link_to "Ver", ot, class: "btn" %>
+              <%= link_to "Editar", edit_ot_path(ot), class: "btn" %>
+              <%= link_to "Eliminar", ot, method: :delete, data: { turbo_confirm: "¿Eliminar OT #{ot.ot_asignada}?" }, class: "btn" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="8" style="padding:.5rem; border-top:1px solid #e5e7eb; text-align:right; font-weight:600;">Totales:</td>
+          <td style="padding:.5rem; border-top:1px solid #e5e7eb; text-align:right; font-weight:600;"><%= number_to_currency(@ots.sum(:repuestos), unit: "$", precision: 0, delimiter: ".") %></td>
+          <td style="padding:.5rem; border-top:1px solid #e5e7eb; text-align:right; font-weight:600;"><%= number_to_currency(@ots.sum(:servicio), unit: "$", precision: 0, delimiter: ".") %></td>
+          <td style="padding:.5rem; border-top:1px solid #e5e7eb; text-align:right; font-weight:800;"><%= number_to_currency(@ots.sum(:total), unit: "$", precision: 0, delimiter: ".") %></td>
+          <td colspan="5" style="border-top:1px solid #e5e7eb;"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+<% else %>
+  <p style="opacity:.7;">No hay OTs cargadas.</p>
+<% end %>

@@ -1,0 +1,132 @@
+<%= form_with(model: ot) do |form| %>
+  <% if ot.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(ot.errors.count, "error") %> prohibited this ot from being saved:</h2>
+
+      <ul>
+        <% ot.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :semana, style: "display: block" %>
+    <%= form.number_field :semana %>
+  </div>
+
+  <div>
+    <%= form.label :item, style: "display: block" %>
+    <%= form.number_field :item %>
+  </div>
+
+  <div>
+    <%= form.label :area, style: "display: block" %>
+    <%= form.text_field :area %>
+  </div>
+
+  <div>
+    <%= form.label :codigo, style: "display: block" %>
+    <%= form.text_field :codigo %>
+  </div>
+
+  <div>
+    <%= form.label :actividad_semanal, style: "display: block" %>
+    <%= form.text_field :actividad_semanal %>
+  </div>
+
+  <div>
+    <%= form.label :esp, style: "display: block" %>
+    <%= form.text_field :esp %>
+  </div>
+
+  <div>
+    <%= form.label :frecuencia, style: "display: block" %>
+    <%= form.number_field :frecuencia %>
+  </div>
+
+  <div>
+    <%= form.label :cod_rep, style: "display: block" %>
+    <%= form.number_field :cod_rep %>
+  </div>
+
+  <div>
+    <%= form.label :cantidad, style: "display: block" %>
+    <%= form.number_field :cantidad %>
+  </div>
+
+  <div>
+    <%= form.label :unitario, style: "display: block" %>
+    <%= form.number_field :unitario %>
+  </div>
+
+  <div>
+    <%= form.label :servicio, style: "display: block" %>
+    <%= form.number_field :servicio %>
+  </div>
+
+  <div>
+    <%= form.label :cotizacion, style: "display: block" %>
+    <%= form.number_field :cotizacion %>
+  </div>
+
+  <div>
+    <%= form.label :cc, style: "display: block" %>
+    <%= form.text_field :cc %>
+  </div>
+
+  <div>
+    <%= form.label :responsable, style: "display: block" %>
+    <%= form.text_field :responsable %>
+  </div>
+
+  <div>
+    <%= form.label :contratista, style: "display: block" %>
+    <%= form.text_field :contratista %>
+  </div>
+
+  <div>
+    <%= form.label :tipo_ot, style: "display: block" %>
+    <%= form.text_field :tipo_ot %>
+  </div>
+
+  <div>
+    <%= form.label :estado, style: "display: block" %>
+    <%= form.number_field :estado %>
+  </div>
+
+  <div>
+    <%= form.label :sem_ejec, style: "display: block" %>
+    <%= form.number_field :sem_ejec %>
+  </div>
+
+  <div>
+    <%= form.label :n_personas, style: "display: block" %>
+    <%= form.number_field :n_personas %>
+  </div>
+
+  <div>
+    <%= form.label :duracion_hr, style: "display: block" %>
+    <%= form.number_field :duracion_hr %>
+  </div>
+
+  <div>
+    <%= form.label :hh, style: "display: block" %>
+    <%= form.number_field :hh %>
+  </div>
+
+  <div>
+    <%= form.label :causa, style: "display: block" %>
+    <%= form.text_field :causa %>
+  </div>
+
+  <div>
+    <%= form.label :comentarios, style: "display: block" %>
+    <%= form.textarea :comentarios %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_09_021256) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_13_014406) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,6 +45,38 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_021256) do
     t.integer "despacho"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "ots", force: :cascade do |t|
+    t.integer "semana"
+    t.integer "item"
+    t.string "area"
+    t.string "codigo"
+    t.string "actividad_semanal"
+    t.string "esp"
+    t.integer "frecuencia"
+    t.integer "cod_rep"
+    t.integer "cantidad"
+    t.integer "unitario"
+    t.integer "servicio"
+    t.integer "cotizacion"
+    t.string "cc"
+    t.string "responsable"
+    t.string "contratista"
+    t.string "tipo_ot"
+    t.integer "estado"
+    t.integer "sem_ejec"
+    t.integer "n_personas"
+    t.integer "duracion_hr"
+    t.integer "hh"
+    t.string "causa"
+    t.text "comentarios"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "repuestos"
+    t.integer "total"
+    t.integer "ot_asignada"
+    t.index ["ot_asignada"], name: "index_ots_on_ot_asignada", unique: true
   end
 
   create_table "people", force: :cascade do |t|

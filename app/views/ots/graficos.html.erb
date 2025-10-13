@@ -1,0 +1,80 @@
+<%# app/views/ots/graficos.html.erb %>
+<% content_for :title, "OTs · Gráficos" %>
+
+<h1 class="h3 mb-3">Gráficos de OTs</h1>
+<p><%= link_to "← Volver a OTs", ots_path, class: "btn btn-sm btn-outline-secondary" %></p>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Tipo OT (porcentaje)</h2>
+    <div style="height:340px"><canvas id="tipoOtDonut"></canvas></div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Estado (porcentaje)</h2>
+    <div style="height:340px"><canvas id="estadoDonut"></canvas></div>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true do %>
+(function(){
+  const tipoLabels   = <%= raw(@tipo_labels.to_json) %>;
+  const tipoValues   = <%= raw(@tipo_values.to_json) %>;
+  const estadoLabels = <%= raw(@estado_labels.to_json) %>;
+  const estadoValues = <%= raw(@estado_values.to_json) %>;
+
+  function ensureChartJsLoaded(cb){
+    if (window.Chart) return cb();
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
+    s.crossOrigin = "anonymous";
+    s.onload = cb;
+    document.head.appendChild(s);
+  }
+
+  function render(){
+    // Donut Tipo OT
+    const tipoCtx = document.getElementById("tipoOtDonut");
+    if (tipoCtx && tipoLabels.length && tipoValues.length) {
+      if (window.__charts?.tipoOtDonut) window.__charts.tipoOtDonut.destroy();
+      window.__charts = window.__charts || {};
+      window.__charts.tipoOtDonut = new Chart(tipoCtx, {
+        type: "doughnut",
+        data: { labels: tipoLabels, datasets: [{ data: tipoValues, borderWidth: 1 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: "60%",
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed}%` } }
+          }
+        }
+      });
+    }
+
+    // Donut Estado
+    const estadoCtx = document.getElementById("estadoDonut");
+    if (estadoCtx && estadoLabels.length && estadoValues.length) {
+      if (window.__charts?.estadoDonut) window.__charts.estadoDonut.destroy();
+      window.__charts.estadoDonut = new Chart(estadoCtx, {
+        type: "doughnut",
+        data: { labels: estadoLabels, datasets: [{ data: estadoValues, borderWidth: 1 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: "60%",
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed}%` } }
+          }
+        }
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => ensureChartJsLoaded(render));
+  } else {
+    ensureChartJsLoaded(render);
+  }
+})();
+<% end %>

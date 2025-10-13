@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @ot %>
+
+<div>
+  <%= link_to "Edit this ot", edit_ot_path(@ot) %> |
+  <%= link_to "Back to ots", ots_path %>
+
+  <%= button_to "Destroy this ot", @ot, method: :delete %>
+</div>

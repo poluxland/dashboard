@@ -1,15 +1,27 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  # OTs + import
+  # config/routes.rb
+resources :ots do
+  collection do
+    post :import          # POST /ots/import  -> import_ots_path
+    get  :graficos        # GET  /ots/graficos -> graficos_ots_path
+  end
+end
+
+
+  # MonthlyRecords + home
   resources :monthly_records
   root "monthly_records#index"
 
-  resources :indicator_readings, only: [ :index, :new, :create, :edit, :update ] do
+  # IndicatorReadings con acciones de colección
+  resources :indicator_readings, only: [:index, :new, :create, :edit, :update] do
     collection do
       get  :matrix
       post :matrix_save
     end
   end
 
-  # habilita CRUD completo
-  resources :people   # (o: only: [:index, :new, :create, :edit, :update, :destroy, :show])
+  # CRUD completo de personas
+  resources :people
 end
