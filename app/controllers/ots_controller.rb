@@ -8,33 +8,75 @@ class OtsController < ApplicationController
 
 
 
-    
+
 
   def graficos
     scope = Ot.all
 
     # --- Tipo OT (%)
-    tipo_counts = scope.group(:tipo_ot).count
-    total_tipos = tipo_counts.values.sum.nonzero? || 1
+    tipo_counts  = scope.group(:tipo_ot).count
+    total_tipos  = tipo_counts.values.sum.nonzero? || 1
     @tipo_labels = tipo_counts.keys.map { |k| k.presence || "Sin tipo" }
     @tipo_values = tipo_counts.values.map { |v| ((v.to_f / total_tipos) * 100).round(1) }
 
     # --- Estado (%)
-    estado_counts = scope.group(:estado).count
-    total_estados = estado_counts.values.sum.nonzero? || 1
+    estado_counts  = scope.group(:estado).count
+    total_estados  = estado_counts.values.sum.nonzero? || 1
     @estado_labels = estado_counts.keys.map { |k| k.presence || "Sin estado" }
     @estado_values = estado_counts.values.map { |v| ((v.to_f / total_estados) * 100).round(1) }
+
+    # --- Cumplimientos por especialidad (MM/ME/MI)
+    calc_pct = ->(rel) do
+      counts = rel.group(:estado).count
+      labels = counts.keys.map { |k| k.presence || "Sin estado" }
+      tot    = counts.values.sum.nonzero? || 1
+      values = counts.values.map { |v| ((v.to_f / tot) * 100).round(1) }
+      [ labels, values ]
+    end
+    @mm_labels, @mm_values = calc_pct.call(scope.where(esp: "MM"))
+    @me_labels, @me_values = calc_pct.call(scope.where(esp: "ME"))
+    @mi_labels, @mi_values = calc_pct.call(scope.where(esp: "MI"))
+
+    # --- NUEVO: Total por semana (suma de :total agrupada por :semana)
+    weekly_hash       = scope.group(:semana).sum(:total)          # { semana => total }
+    semanas_ordenadas = weekly_hash.keys.compact.sort
+    @semana_labels    = semanas_ordenadas
+    @semana_totales   = semanas_ordenadas.map { |s| weekly_hash[s].to_i }
+
+# --- KPIs en texto ---
+scope = Ot.all
+
+# Estados
+@count_estado_70     = scope.where(estado: 70).count
+@count_estado_80_85  = scope.where(estado: [ 80, 85 ]).count
+@backlog_ratio       = @count_estado_80_85.zero? ? nil : (@count_estado_70.to_f / @count_estado_80_85)
+
+# Correctivas (F + C)
+@ot_correctiva = scope.where(tipo_ot: %w[F C]).count
+
+# Totales (U + A + C + F + I)
+@ot_totales_uacfi = scope.where(tipo_ot: %w[U A C F I]).count
+
+# % Correctiva sobre TODOS los registros
+@ot_total_all          = scope.count
+@pct_correctiva_all    = @ot_total_all.zero? ? 0.0 : ((@ot_correctiva.to_f / @ot_total_all) * 100).round(1)
+
+# % Correctiva sobre U+A+C+F+I
+@pct_correctiva_uacfi  = @ot_totales_uacfi.zero? ? 0.0 : ((@ot_correctiva.to_f / @ot_totales_uacfi) * 100).round(1)
   end
 
 
-  
-
-    
 
 
 
 
-  
+
+
+
+
+
+
+
   # POST /ots/import
   def import
     file = params[:file]

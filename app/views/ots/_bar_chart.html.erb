@@ -1,0 +1,58 @@
+<%# app/views/ots/_bar_chart.html.erb %>
+<div class="card h-100">
+  <div class="card-body">
+    <h2 class="h6 mb-3"><%= (local_assigns[:title] || "Gráfico") %></h2>
+    <div style="height:360px"><canvas id="<%= canvas_id %>"></canvas></div>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true do %>
+(function(){
+  const labels = <%= raw(labels.to_json) %>;
+  const values = <%= raw(values.to_json) %>;
+  const elId   = "<%= canvas_id %>";
+
+  function ensureChartJsLoaded(cb){
+    if (window.Chart) return cb();
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
+    s.crossOrigin = "anonymous"; s.onload = cb; document.head.appendChild(s);
+  }
+
+  function render(){
+    const el = document.getElementById(elId);
+    if (!el || !labels.length || !values.length) return;
+
+    window.__charts = window.__charts || {};
+    if (window.__charts[elId]) window.__charts[elId].destroy();
+
+    window.__charts[elId] = new Chart(el, {
+      type: "bar",
+      data: { labels, datasets: [{ label: "Total semanal", data: values, borderWidth: 1 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: {
+            label: (ctx) => "$" + Number(ctx.parsed.y).toLocaleString("es-CL")
+          }}
+        },
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: (v) => "$" + Number(v).toLocaleString("es-CL") }
+          },
+          x: { ticks: { precision: 0 } }
+        }
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => ensureChartJsLoaded(render));
+  } else {
+    ensureChartJsLoaded(render);
+  }
+})();
+<% end %>

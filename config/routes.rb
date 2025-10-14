@@ -1,7 +1,7 @@
 # config/routes.rb
 Rails.application.routes.draw do
-  # OTs + import
-  # config/routes.rb
+# OTs + import
+# config/routes.rb
 resources :ots do
   collection do
     post :import          # POST /ots/import  -> import_ots_path
@@ -15,7 +15,7 @@ end
   root "monthly_records#index"
 
   # IndicatorReadings con acciones de colección
-  resources :indicator_readings, only: [:index, :new, :create, :edit, :update] do
+  resources :indicator_readings, only: [ :index, :new, :create, :edit, :update ] do
     collection do
       get  :matrix
       post :matrix_save

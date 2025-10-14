@@ -42,7 +42,7 @@ class OtsImporter
 
     ActiveRecord::Base.transaction do
       (2..sheet.last_row).each do |i|
-        row_hash = Hash[[header, sheet.row(i)].transpose]
+        row_hash = Hash[[ header, sheet.row(i) ].transpose]
         attrs    = map_row(row_hash, header_map)
 
         # Tipos / normalizaciones

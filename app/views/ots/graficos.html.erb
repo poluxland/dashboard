@@ -4,77 +4,57 @@
 <h1 class="h3 mb-3">Gráficos de OTs</h1>
 <p><%= link_to "← Volver a OTs", ots_path, class: "btn btn-sm btn-outline-secondary" %></p>
 
-<div class="card mb-3">
-  <div class="card-body">
-    <h2 class="h5 mb-3">Tipo OT (porcentaje)</h2>
-    <div style="height:340px"><canvas id="tipoOtDonut"></canvas></div>
+<div class="row g-3">
+  <%# ----- Fila 1: Tipo OT, Estado ----- %>
+  <div class="col-md-6 col-xl-4">
+    <%= render "donut_chart",
+        title: "Tipo OT (porcentaje)",
+        canvas_id: "tipoOtDonut",
+        labels: @tipo_labels,
+        values: @tipo_values %>
+  </div>
+
+  <div class="col-md-6 col-xl-4">
+    <%= render "donut_chart",
+        title: "Estado (porcentaje)",
+        canvas_id: "estadoDonut",
+        labels: @estado_labels,
+        values: @estado_values %>
+  </div>
+
+  <%# ----- Fila 2: Cumplimientos por especialidad (MM/ME/MI) ----- %>
+  <div class="col-md-6 col-xl-4">
+    <%= render "donut_chart",
+        title: "Cumplimiento Mecánico (MM)",
+        canvas_id: "cumplimientoMM",
+        labels: @mm_labels,
+        values: @mm_values %>
+  </div>
+
+  <div class="col-md-6 col-xl-4">
+    <%= render "donut_chart",
+        title: "Cumplimiento Eléctrico (ME)",
+        canvas_id: "cumplimientoME",
+        labels: @me_labels,
+        values: @me_values %>
+  </div>
+
+  <div class="col-md-6 col-xl-4">
+    <%= render "donut_chart",
+        title: "Cumplimiento Instrumentación (MI)",
+        canvas_id: "cumplimientoMI",
+        labels: @mi_labels,
+        values: @mi_values %>
+  </div>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-12">
+    <%= render "bar_chart",
+        title: "Gasto total por semana",
+        canvas_id: "gastoSemanalBar",
+        labels: @semana_labels,
+        values: @semana_totales %>
   </div>
 </div>
 
-<div class="card mb-3">
-  <div class="card-body">
-    <h2 class="h5 mb-3">Estado (porcentaje)</h2>
-    <div style="height:340px"><canvas id="estadoDonut"></canvas></div>
-  </div>
-</div>
-
-<%= javascript_tag nonce: true do %>
-(function(){
-  const tipoLabels   = <%= raw(@tipo_labels.to_json) %>;
-  const tipoValues   = <%= raw(@tipo_values.to_json) %>;
-  const estadoLabels = <%= raw(@estado_labels.to_json) %>;
-  const estadoValues = <%= raw(@estado_values.to_json) %>;
-
-  function ensureChartJsLoaded(cb){
-    if (window.Chart) return cb();
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
-    s.crossOrigin = "anonymous";
-    s.onload = cb;
-    document.head.appendChild(s);
-  }
-
-  function render(){
-    // Donut Tipo OT
-    const tipoCtx = document.getElementById("tipoOtDonut");
-    if (tipoCtx && tipoLabels.length && tipoValues.length) {
-      if (window.__charts?.tipoOtDonut) window.__charts.tipoOtDonut.destroy();
-      window.__charts = window.__charts || {};
-      window.__charts.tipoOtDonut = new Chart(tipoCtx, {
-        type: "doughnut",
-        data: { labels: tipoLabels, datasets: [{ data: tipoValues, borderWidth: 1 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: "60%",
-          plugins: {
-            legend: { position: "bottom" },
-            tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed}%` } }
-          }
-        }
-      });
-    }
-
-    // Donut Estado
-    const estadoCtx = document.getElementById("estadoDonut");
-    if (estadoCtx && estadoLabels.length && estadoValues.length) {
-      if (window.__charts?.estadoDonut) window.__charts.estadoDonut.destroy();
-      window.__charts.estadoDonut = new Chart(estadoCtx, {
-        type: "doughnut",
-        data: { labels: estadoLabels, datasets: [{ data: estadoValues, borderWidth: 1 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: "60%",
-          plugins: {
-            legend: { position: "bottom" },
-            tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed}%` } }
-          }
-        }
-      });
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => ensureChartJsLoaded(render));
-  } else {
-    ensureChartJsLoaded(render);
-  }
-})();
-<% end %>
+<%= render "kpis" %>

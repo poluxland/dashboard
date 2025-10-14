@@ -1,0 +1,49 @@
+<%# app/views/shared/_donut_chart.html.erb %>
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5 mb-3"><%= title %></h2>
+    <div style="height:340px"><canvas id="<%= canvas_id %>"></canvas></div>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true do %>
+(function(){
+  const labels = <%= raw(labels.to_json) %>;
+  const values = <%= raw(values.to_json) %>;
+  const elId   = "<%= canvas_id %>";
+
+  function ensureChartJsLoaded(cb){
+    if (window.Chart) return cb();
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
+    s.crossOrigin = "anonymous"; s.onload = cb;
+    document.head.appendChild(s);
+  }
+
+  function render(){
+    const ctx = document.getElementById(elId);
+    if (!ctx || !labels.length || !values.length) return;
+
+    window.__charts = window.__charts || {};
+    if (window.__charts[elId]) window.__charts[elId].destroy();
+
+    window.__charts[elId] = new Chart(ctx, {
+      type: "doughnut",
+      data: { labels, datasets: [{ data: values, borderWidth: 1 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: "60%",
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: { callbacks: { label: (c) => `${c.label}: ${c.parsed}%` } }
+        }
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => ensureChartJsLoaded(render));
+  } else {
+    ensureChartJsLoaded(render);
+  }
+})();
+<% end %>

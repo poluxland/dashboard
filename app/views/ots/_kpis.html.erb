@@ -1,0 +1,34 @@
+<%# app/views/ots/_kpis.html.erb %>
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h6 mb-3">Indicadores</h2>
+    <ul class="mb-0" style="line-height:1.7;">
+      <li>
+        Número total de OT en 70:
+        <strong><%= number_with_delimiter(@count_estado_70) %></strong>
+      </li>
+      <li>
+        Número total de OT en 80 y 85:
+        <strong><%= number_with_delimiter(@count_estado_80_85) %></strong>
+      </li>
+      <li>
+        Back Log (70 / (80 + 85)):
+        <strong>
+          <%= @backlog_ratio.nil? ? "N/A" : number_with_precision(@backlog_ratio, precision: 2) %>
+        </strong>
+      </li>
+      <li>
+        % OT Correctiva [F + C] (sobre todos):
+        <strong><%= number_with_precision(@pct_correctiva_all, precision: 1) %>%</strong>
+      </li>
+      <li>
+        OT Totales [U + A + C + F + I]:
+        <strong><%= number_with_delimiter(@ot_totales_uacfi) %></strong>
+      </li>
+      <li>
+        % OT Correctiva [F + C] / OT Totales [U + A + C + F + I]:
+        <strong><%= number_with_precision(@pct_correctiva_uacfi, precision: 1) %>%</strong>
+      </li>
+    </ul>
+  </div>
+</div>
