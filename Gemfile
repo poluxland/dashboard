@@ -27,8 +27,8 @@ gem "jbuilder"
 
 gem "roo"
 gem "pagy"
-gem 'caxlsx'        # fork mantenido de axlsx
-gem 'axlsx_rails'   # templates .xlsx.axlsx
+gem "caxlsx"        # fork mantenido de axlsx
+gem "axlsx_rails"   # templates .xlsx.axlsx
 
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

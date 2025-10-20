@@ -1,35 +1,35 @@
 class OtsController < ApplicationController
   before_action :set_ot, only: %i[ show edit update destroy ]
-  
+
   # GET /ots
-  
-  
- 
+
+
+
   def index
     @q = params[:q].to_s.strip
     estados = Array(params[:estado]).reject(&:blank?)
     tipos   = Array(params[:tipo_ot]).reject(&:blank?)
-  
+
     scope = Ot.search(@q)
     scope = scope.where(estado: estados.map(&:to_i)) if estados.any?
-    scope = scope.where('LOWER(tipo_ot) IN (?)', tipos.map { |t| t.to_s.downcase }) if tipos.any?
+    scope = scope.where("LOWER(tipo_ot) IN (?)", tipos.map { |t| t.to_s.downcase }) if tipos.any?
     scope = scope.order(created_at: :desc)
-  
+
     @pagy, @ots = pagy(scope, items: (params[:per]&.to_i.presence || 20))
-  
+
     respond_to do |format|
       format.html
       format.xlsx do
         @ots_xlsx = scope # exporta con los filtros aplicados
-        response.headers['Content-Disposition'] =
+        response.headers["Content-Disposition"] =
           "attachment; filename=ots_#{Time.zone.now.strftime('%Y%m%d_%H%M')}.xlsx"
       end
     end
   end
-  
 
-  
-  
+
+
+
 
 
 

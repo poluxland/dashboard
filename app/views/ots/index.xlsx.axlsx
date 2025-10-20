@@ -1,18 +1,19 @@
 # frozen_string_literal: true
+
 wb = xlsx_package.workbook
 
 styles = wb.styles
-header = styles.add_style b: true, alignment: { horizontal: :center }, bg_color: 'DDDDDD'
+header = styles.add_style b: true, alignment: { horizontal: :center }, bg_color: "DDDDDD"
 money  = styles.add_style format_code: '#,##0\ [$-$es-CL]$'  # miles con $ al final
-int    = styles.add_style format_code: '0'
+int    = styles.add_style format_code: "0"
 text   = styles.add_style alignment: { wrap_text: true }
 
 wb.add_worksheet(name: "OTs") do |sheet|
   # Encabezados
   sheet.add_row [
-    "OT asignada","Semana","Item","Área","Código","Actividad",
-    "Cant.","Unitario","Repuestos","Servicio","Total",
-    "Responsable","Contratista","Tipo OT","Estado","Sem. ejec."
+    "OT asignada", "Semana", "Item", "Área", "Código", "Actividad",
+    "Cant.", "Unitario", "Repuestos", "Servicio", "Total",
+    "Responsable", "Contratista", "Tipo OT", "Estado", "Sem. ejec."
   ], style: header
 
   # Filas
@@ -34,7 +35,7 @@ wb.add_worksheet(name: "OTs") do |sheet|
       ot.tipo_ot,
       ot.estado,
       ot.sem_ejec
-    ], styles: [int,int,int,text,text,text,int,money,money,money,money,text,text,text,int,int]
+    ], styles: [ int, int, int, text, text, text, int, money, money, money, money, text, text, text, int, int ]
   end
 
   # Congelar encabezado y autoajustar
@@ -46,7 +47,7 @@ wb.add_worksheet(name: "OTs") do |sheet|
 
   # Auto ancho de columnas (simple)
   sheet.column_info.each_with_index do |col, i|
-    max = ([15] + sheet.rows.map { |r| (r.cells[i]&.value.to_s || '').length }).max
-    col.width = [[max, 60].min, 10].max
+    max = ([ 15 ] + sheet.rows.map { |r| (r.cells[i]&.value.to_s || "").length }).max
+    col.width = [ [ max, 60 ].min, 10 ].max
   end
 end
