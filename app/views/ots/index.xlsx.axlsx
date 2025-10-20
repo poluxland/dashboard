@@ -1,0 +1,52 @@
+# frozen_string_literal: true
+wb = xlsx_package.workbook
+
+styles = wb.styles
+header = styles.add_style b: true, alignment: { horizontal: :center }, bg_color: 'DDDDDD'
+money  = styles.add_style format_code: '#,##0\ [$-$es-CL]$'  # miles con $ al final
+int    = styles.add_style format_code: '0'
+text   = styles.add_style alignment: { wrap_text: true }
+
+wb.add_worksheet(name: "OTs") do |sheet|
+  # Encabezados
+  sheet.add_row [
+    "OT asignada","Semana","Item","Área","Código","Actividad",
+    "Cant.","Unitario","Repuestos","Servicio","Total",
+    "Responsable","Contratista","Tipo OT","Estado","Sem. ejec."
+  ], style: header
+
+  # Filas
+  @ots_xlsx.find_each do |ot|
+    sheet.add_row [
+      ot.ot_asignada,
+      ot.semana,
+      ot.item,
+      ot.area,
+      ot.codigo,
+      ot.actividad_semanal,
+      ot.cantidad,
+      ot.unitario,
+      ot.repuestos,
+      ot.servicio,
+      ot.total,
+      ot.responsable,
+      ot.contratista,
+      ot.tipo_ot,
+      ot.estado,
+      ot.sem_ejec
+    ], styles: [int,int,int,text,text,text,int,money,money,money,money,text,text,text,int,int]
+  end
+
+  # Congelar encabezado y autoajustar
+  sheet.sheet_view.pane do |p|
+    p.top_left_cell = "A2"
+    p.state = :frozen
+    p.y_split = 1
+  end
+
+  # Auto ancho de columnas (simple)
+  sheet.column_info.each_with_index do |col, i|
+    max = ([15] + sheet.rows.map { |r| (r.cells[i]&.value.to_s || '').length }).max
+    col.width = [[max, 60].min, 10].max
+  end
+end

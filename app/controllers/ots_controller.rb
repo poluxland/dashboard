@@ -1,10 +1,33 @@
 class OtsController < ApplicationController
   before_action :set_ot, only: %i[ show edit update destroy ]
-
+  
   # GET /ots
-  def index
-    @ots = Ot.order(created_at: :desc)
-  end
+  
+  
+ 
+    def index
+      @q = params[:q].to_s.strip
+      scope = Ot.search(@q).order(created_at: :desc)
+  
+      # paginado para HTML
+      @pagy, @ots = pagy(scope, items: (params[:per]&.to_i.presence || 20))
+  
+      respond_to do |format|
+        format.html
+        format.xlsx do
+          # colección completa para el Excel (sin paginar)
+          @ots_xlsx = scope
+          response.headers['Content-Disposition'] =
+            "attachment; filename=ots_#{Time.zone.now.strftime('%Y%m%d_%H%M')}.xlsx"
+        end
+      end
+    end
+
+  
+  
+
+
+
 
 
 def compact
