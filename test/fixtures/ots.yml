@@ -1,6 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  ot_asignada: 11111111
   semana: 1
   item: 1
   area: MyString
@@ -16,8 +17,8 @@ one:
   cc: MyString
   responsable: MyString
   contratista: MyString
-  tipo_ot: MyString
-  estado: 1
+  tipo_ot: F
+  estado: 80
   sem_ejec: 1
   n_personas: 1
   duracion_hr: 1
@@ -26,6 +27,7 @@ one:
   comentarios: MyText
 
 two:
+  ot_asignada: 22222222
   semana: 1
   item: 1
   area: MyString
@@ -34,15 +36,15 @@ two:
   esp: MyString
   frecuencia: 1
   cod_rep: 1
-  cantidad: 1
-  unitario: 1
-  servicio: 1
+  cantidad: 2
+  unitario: 3
+  servicio: 4
   cotizacion: 1
   cc: MyString
   responsable: MyString
   contratista: MyString
-  tipo_ot: MyString
-  estado: 1
+  tipo_ot: C
+  estado: 85
   sem_ejec: 1
   n_personas: 1
   duracion_hr: 1

@@ -16,12 +16,21 @@ class OtsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create ot" do
-    assert_difference("Ot.count") do
-      post ots_url, params: { ot: { actividad_semanal: @ot.actividad_semanal, area: @ot.area, cantidad: @ot.cantidad, causa: @ot.causa, cc: @ot.cc, cod_rep: @ot.cod_rep, codigo: @ot.codigo, comentarios: @ot.comentarios, contratista: @ot.contratista, cotizacion: @ot.cotizacion, duracion_hr: @ot.duracion_hr, esp: @ot.esp, estado: @ot.estado, frecuencia: @ot.frecuencia, hh: @ot.hh, item: @ot.item, n_personas: @ot.n_personas, responsable: @ot.responsable, sem_ejec: @ot.sem_ejec, semana: @ot.semana, servicio: @ot.servicio, tipo_ot: @ot.tipo_ot, unitario: @ot.unitario } }
+    new_ot_asignada = (Ot.maximum(:ot_asignada) || 0) + 1  # garantiza unicidad
+  
+    assert_difference("Ot.count", +1) do
+      post ots_url, params: {
+        ot: {
+          ot_asignada: new_ot_asignada  # <-- mínimo requerido por tu validación
+          # puedes agregar opcionalmente:
+          # estado: 80, tipo_ot: "F"
+        }
+      }
     end
-
+  
     assert_redirected_to ot_url(Ot.last)
   end
+  
 
   test "should show ot" do
     get ot_url(@ot)
