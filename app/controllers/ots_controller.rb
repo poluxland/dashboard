@@ -7,7 +7,9 @@ class OtsController < ApplicationController
   end
 
 
-
+def compact
+  @ots = Ot.order(created_at: :desc)
+end
 
 
   def graficos
