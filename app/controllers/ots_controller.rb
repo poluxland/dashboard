@@ -5,23 +5,28 @@ class OtsController < ApplicationController
   
   
  
-    def index
-      @q = params[:q].to_s.strip
-      scope = Ot.search(@q).order(created_at: :desc)
+  def index
+    @q = params[:q].to_s.strip
+    estados = Array(params[:estado]).reject(&:blank?)
+    tipos   = Array(params[:tipo_ot]).reject(&:blank?)
   
-      # paginado para HTML
-      @pagy, @ots = pagy(scope, items: (params[:per]&.to_i.presence || 20))
+    scope = Ot.search(@q)
+    scope = scope.where(estado: estados.map(&:to_i)) if estados.any?
+    scope = scope.where('LOWER(tipo_ot) IN (?)', tipos.map { |t| t.to_s.downcase }) if tipos.any?
+    scope = scope.order(created_at: :desc)
   
-      respond_to do |format|
-        format.html
-        format.xlsx do
-          # colección completa para el Excel (sin paginar)
-          @ots_xlsx = scope
-          response.headers['Content-Disposition'] =
-            "attachment; filename=ots_#{Time.zone.now.strftime('%Y%m%d_%H%M')}.xlsx"
-        end
+    @pagy, @ots = pagy(scope, items: (params[:per]&.to_i.presence || 20))
+  
+    respond_to do |format|
+      format.html
+      format.xlsx do
+        @ots_xlsx = scope # exporta con los filtros aplicados
+        response.headers['Content-Disposition'] =
+          "attachment; filename=ots_#{Time.zone.now.strftime('%Y%m%d_%H%M')}.xlsx"
       end
     end
+  end
+  
 
   
   
