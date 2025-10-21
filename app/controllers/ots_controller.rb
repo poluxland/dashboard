@@ -10,9 +10,13 @@ class OtsController < ApplicationController
     estados = Array(params[:estado]).reject(&:blank?)
     tipos   = Array(params[:tipo_ot]).reject(&:blank?)
 
+    # NUEVO: semanas sueltas separadas por coma (sin rangos)
+    semanas = parse_semanas_sin_rangos(params[:semanas].to_s)
+
     scope = Ot.search(@q)
     scope = scope.where(estado: estados.map(&:to_i)) if estados.any?
     scope = scope.where("LOWER(tipo_ot) IN (?)", tipos.map { |t| t.to_s.downcase }) if tipos.any?
+    scope = scope.where(semana: semanas) if semanas.any?  # ← filtro de semanas
     scope = scope.order(created_at: :desc)
 
     @pagy, @ots = pagy(scope, items: (params[:per]&.to_i.presence || 20))
@@ -20,7 +24,7 @@ class OtsController < ApplicationController
     respond_to do |format|
       format.html
       format.xlsx do
-        @ots_xlsx = scope # exporta con los filtros aplicados
+        @ots_xlsx = scope # exporta con los filtros aplicados (incluye semanas)
         response.headers["Content-Disposition"] =
           "attachment; filename=ots_#{Time.zone.now.strftime('%Y%m%d_%H%M')}.xlsx"
       end
@@ -35,12 +39,15 @@ class OtsController < ApplicationController
 
 
 
+
+
+
 def compact
   @ots = Ot.order(created_at: :desc)
 end
 
 def backlog
-  @ots = Ot.where(estado: [70, 30]).order(created_at: :desc)
+  @ots = Ot.where(estado: [ 70, 30 ]).order(created_at: :desc)
 end
 
 
@@ -195,5 +202,16 @@ scope = Ot.all
       :estado, :sem_ejec, :n_personas, :duracion_hr, :hh,
       :causa, :comentarios
     )
+  end
+
+
+
+  # Acepta solo semanas individuales separadas por coma: "32", "32, 34, 40"
+  # Ignora tokens no numéricos. Si quieres limitar a 1..53, descomenta el select.
+  def parse_semanas_sin_rangos(str)
+    str.split(",").map { |t| Integer(t.strip) rescue nil }
+       .compact
+       # .select { |w| (1..53).include?(w) }
+       .uniq
   end
 end

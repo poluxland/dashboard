@@ -1,0 +1,134 @@
+<%# app/views/ots/index.html.erb %>
+<% content_for :title, "OTs" %>
+
+<%# --- Mensajes --- %>
+<% if notice.present? %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= notice %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+<% end %>
+
+<% if alert.present? %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= alert %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+<% end %>
+
+<%# =========================
+    CARD UNIFICADO CABECERA + IMPORT + FILTROS
+    ========================= %>
+<div class="card mb-3">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <h1 class="h4 mb-0">OTs</h1>
+    <div class="d-flex align-items-center gap-2">
+      <%= link_to "Exportar XLSX",
+        ots_path(format: :xlsx,
+                 q: params[:q],
+                 estado: params[:estado],
+                 tipo_ot: params[:tipo_ot],
+                 semanas: params[:semanas]),
+        class: "btn btn-outline-success btn-sm" %>
+      <%= link_to "Nueva OT", new_ot_path, class: "btn btn-primary btn-sm" %>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <%# ---- Importar archivo (fila compacta) ---- %>
+    <div class="row g-3 align-items-end mb-2">
+      <div class="col-12 col-md-8 col-lg-6">
+        <%= form_with url: import_ots_path, method: :post, html: { multipart: true, data: { turbo: false } }, class: "row g-2 align-items-end" do %>
+          <div class="col-12 col-sm-8">
+            <label for="file" class="form-label mb-1">Archivo (.xlsx / .xls / .csv)</label>
+            <%= file_field_tag :file, accept: ".xlsx,.xls,.csv", class: "form-control form-control-sm", id: "file" %>
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label mb-1 d-block">&nbsp;</label>
+            <%= submit_tag "Importar", class: "btn btn-secondary btn-sm w-100" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <hr class="my-3">
+
+    <%# ---- Filtros (todo junto, bien alineado y responsivo) ---- %>
+    <%= form_with url: ots_path, method: :get, local: true, class: "row gy-3 gx-3 align-items-end" do %>
+      <%# q %>
+      <div class="col-12 col-lg-4">
+  <label for="q" class="form-label mb-1">Buscar</label>
+  <div class="input-group input-group-sm">
+    <%= text_field_tag :q, params[:q], id: "q", class: "form-control",
+          placeholder: "OT, código, actividad, responsable, contratista, área, estado…" %>
+  </div>
+  <% if params[:q].present? %>
+    <small class="text-muted">Filtro aplicado: “<%= h params[:q] %>”</small>
+  <% end %>
+</div>
+
+
+      <%# Semanas (solo lista separada por comas) %>
+      <div class="col-12 col-sm-6 col-lg-4">
+        <label for="semanas" class="form-label mb-1">Semanas</label>
+        <%= text_field_tag :semanas, params[:semanas], id: "semanas",
+              class: "form-control form-control-sm",
+              placeholder: "p.ej. 32, 34, 40",
+              pattern: "[0-9,\\s]*",
+              inputmode: "numeric" %>
+        <% if params[:semanas].present? %>
+          <small class="text-muted">Semanas: “<%= h params[:semanas] %>”</small>
+        <% end %>
+      </div>
+
+      <%# Selector de items por página (opcional, ayuda a no apilar botones) %>
+      <div class="col-12 col-sm-6 col-lg-4">
+        <label for="per" class="form-label mb-1">Items por página</label>
+        <%= number_field_tag :per, (params[:per].presence || 20), min: 5, max: 200, step: 5,
+              class: "form-control form-control-sm", id: "per" %>
+      </div>
+
+      <%# Corte de línea claro para agrupar checks debajo en pantallas medianas/grandes %>
+      <div class="w-100 d-none d-md-block"></div>
+
+      <%# Estado (check grid estable, no se monta) %>
+      <div class="col-12 col-md-6">
+        <label class="form-label mb-1 d-block">Estado</label>
+        <div class="d-flex flex-wrap gap-2">
+          <% [["70","70"],["80","80"],["85","85"],["90","90"],["30","30"]].each do |label, val| %>
+            <div class="form-check form-check-inline check-pill">
+              <%= check_box_tag "estado[]", val, Array(params[:estado]).include?(val),
+                    id: "estado_#{val}", class: "form-check-input" %>
+              <label class="form-check-label" for="estado_<%= val %>"><%= label %></label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Tipo OT (check grid estable) %>
+      <div class="col-12 col-md-6">
+        <label class="form-label mb-1 d-block">Tipo OT</label>
+        <div class="d-flex flex-wrap gap-2">
+          <% [["U","U"],["A","A"],["C","C"],["F","F"],["I","I"]].each do |label, val| %>
+            <div class="form-check form-check-inline check-pill">
+              <%= check_box_tag "tipo_ot[]", val, Array(params[:tipo_ot]).include?(val),
+                    id: "tipo_#{val}", class: "form-check-input" %>
+              <label class="form-check-label" for="tipo_<%= val %>"><%= label %></label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Botones secundarios al pie (se mantienen compactos) %>
+      <div class="col-12 d-flex gap-2 justify-content-end">
+  <button class="btn btn-primary btn-sm" type="submit">
+    <i class="bi bi-search"></i> Buscar
+  </button>
+  <%= link_to "Limpiar", ots_path, class: "btn btn-outline-secondary btn-sm" %>
+</div>
+
+    <% end %>
+  </div>
+</div>
+
+

@@ -17,7 +17,7 @@ class OtsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create ot" do
     new_ot_asignada = (Ot.maximum(:ot_asignada) || 0) + 1  # garantiza unicidad
-  
+
     assert_difference("Ot.count", +1) do
       post ots_url, params: {
         ot: {
@@ -27,10 +27,10 @@ class OtsControllerTest < ActionDispatch::IntegrationTest
         }
       }
     end
-  
+
     assert_redirected_to ot_url(Ot.last)
   end
-  
+
 
   test "should show ot" do
     get ot_url(@ot)

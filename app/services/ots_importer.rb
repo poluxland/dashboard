@@ -88,10 +88,10 @@ class OtsImporter
   def self.normalize_int(v)
     s = v.to_s.strip
     return nil if s.empty?
-  
+
     # quita espacios
     s = s.gsub(/\s+/, "")
-  
+
     if s.include?(",")
       # Formato CL/ES: miles con punto, decimales con coma
       s = s.split(",").first  # elimina todo después de la coma
@@ -101,12 +101,12 @@ class OtsImporter
       s = s.gsub(",", "")     # quita separadores de miles
       s = s.split(".").first  # elimina decimales
     end
-  
+
     # conserva dígitos y posible signo
     s = s.gsub(/[^\d-]/, "")
     s.empty? ? nil : s.to_i
   end
-  
+
 
   def self.normalize_money(v)
     return 0 if v.to_s.strip == "$-"
