@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_13_014406) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_21_002833) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,7 +55,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_014406) do
     t.string "actividad_semanal"
     t.string "esp"
     t.integer "frecuencia"
-    t.integer "cod_rep"
+    t.string "cod_rep"
     t.integer "cantidad"
     t.integer "unitario"
     t.integer "servicio"

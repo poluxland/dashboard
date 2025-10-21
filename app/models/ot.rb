@@ -9,9 +9,9 @@ class Ot < ApplicationRecord
   before_save :calcular_repuestos_y_total, if: :insumos_cambiaron?
 
   # --- BÚSQUEDA ---
-  TEXT_COLS    = %w[codigo actividad_semanal area esp cc responsable contratista tipo_ot causa comentarios].freeze
+  TEXT_COLS    = %w[codigo actividad_semanal area esp cc responsable contratista tipo_ot causa comentarios cod_rep].freeze
   NUMERIC_COLS = %w[
-    semana item frecuencia cod_rep cantidad unitario servicio cotizacion
+    semana item frecuencia cantidad unitario servicio cotizacion
     estado sem_ejec n_personas duracion_hr hh repuestos total ot_asignada
   ].freeze
 

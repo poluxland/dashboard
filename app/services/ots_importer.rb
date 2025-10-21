@@ -50,7 +50,6 @@ class OtsImporter
         next if attrs[:ot_asignada].blank?
 
         attrs[:frecuencia]  = normalize_int(attrs[:frecuencia])
-        attrs[:cod_rep]     = normalize_int(attrs[:cod_rep])
         attrs[:cantidad]    = normalize_int(attrs[:cantidad])
         attrs[:unitario]    = normalize_money(attrs[:unitario])   # "$-" => 0
         attrs[:servicio]    = normalize_money(attrs[:servicio])
@@ -87,9 +86,27 @@ class OtsImporter
   end
 
   def self.normalize_int(v)
-    return nil if v.nil? || v.to_s.strip.empty?
-    v.to_s.tr(".", "").tr(",", "").gsub(/[^\d\-]/, "").to_i
+    s = v.to_s.strip
+    return nil if s.empty?
+  
+    # quita espacios
+    s = s.gsub(/\s+/, "")
+  
+    if s.include?(",")
+      # Formato CL/ES: miles con punto, decimales con coma
+      s = s.split(",").first  # elimina todo después de la coma
+      s = s.gsub(".", "")     # quita separadores de miles
+    else
+      # Formato US: miles con coma, decimales con punto
+      s = s.gsub(",", "")     # quita separadores de miles
+      s = s.split(".").first  # elimina decimales
+    end
+  
+    # conserva dígitos y posible signo
+    s = s.gsub(/[^\d-]/, "")
+    s.empty? ? nil : s.to_i
   end
+  
 
   def self.normalize_money(v)
     return 0 if v.to_s.strip == "$-"
