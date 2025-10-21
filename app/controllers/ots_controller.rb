@@ -40,8 +40,9 @@ def compact
 end
 
 def backlog
-  @ots = Ot.where(estado: 70).order(created_at: :desc)
+  @ots = Ot.where(estado: [70, 30]).order(created_at: :desc)
 end
+
 
 
 
