@@ -7,6 +7,7 @@ resources :ots do
     post :import          # POST /ots/import  -> import_ots_path
     get  :graficos        # GET  /ots/graficos -> graficos_ots_path
     get :compact        # GET  /ots/compact  -> compact_ots_path
+    get :backlog
   end
 end
 

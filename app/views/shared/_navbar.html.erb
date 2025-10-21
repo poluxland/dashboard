@@ -17,17 +17,18 @@
             OTs
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="otsDropdown">
-            <li>
-              <%= link_to "Resumen", compact_ots_path, class: "dropdown-item", data: { turbo: false } %>
+          <li>
+              <%= link_to "OTs", ots_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>  
+          <li>
+              <%= link_to "Compacta", compact_ots_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
-            <li>
-              <%= link_to "Tabla", ots_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
+            
             <li>
               <%= link_to "Gráficos", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
             <li>
-              <%= link_to "Backlog", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %>
+              <%= link_to "Backlog", backlog_ots_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
           </ul>
         </li>

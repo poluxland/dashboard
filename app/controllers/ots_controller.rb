@@ -39,6 +39,11 @@ def compact
   @ots = Ot.order(created_at: :desc)
 end
 
+def backlog
+  @ots = Ot.where(estado: 70).order(created_at: :desc)
+end
+
+
 
   def graficos
     scope = Ot.all
