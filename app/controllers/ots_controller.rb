@@ -19,7 +19,8 @@ class OtsController < ApplicationController
     scope = scope.where(semana: semanas) if semanas.any?  # ← filtro de semanas
     scope = scope.order(created_at: :desc)
 
-    @pagy, @ots = pagy(scope, items: (params[:per]&.to_i.presence || 20))
+    @pagy, @ots = pagy(scope)   # sin :items ni :per
+
 
     respond_to do |format|
       format.html

@@ -81,12 +81,7 @@
         <% end %>
       </div>
 
-      <%# Selector de items por página (opcional, ayuda a no apilar botones) %>
-      <div class="col-12 col-sm-6 col-lg-4">
-        <label for="per" class="form-label mb-1">Items por página</label>
-        <%= number_field_tag :per, (params[:per].presence || 20), min: 5, max: 200, step: 5,
-              class: "form-control form-control-sm", id: "per" %>
-      </div>
+   
 
       <%# Corte de línea claro para agrupar checks debajo en pantallas medianas/grandes %>
       <div class="w-100 d-none d-md-block"></div>
