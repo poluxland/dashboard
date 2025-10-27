@@ -7,46 +7,54 @@
 
 <%= javascript_tag nonce: true do %>
 (function(){
-  const labels = <%= raw(labels.to_json) %>;
-  const values = <%= raw(values.to_json) %>;
-  const elId   = "<%= canvas_id %>";
-  const format = "<%= (local_assigns[:format] || :count).to_s %>"; // :count por defecto
+  const labels   = <%= raw(labels.to_json) %>;
+  const datasets = <%= raw((local_assigns[:datasets] || []).to_json) %>;
+  const elId     = "<%= canvas_id %>";
 
   function ensureChartJsLoaded(cb){
     if (window.Chart) return cb();
     const s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
-    s.crossOrigin = "anonymous"; s.onload = cb; document.head.appendChild(s);
+    s.crossOrigin = "anonymous";
+    s.onload = cb;
+    document.head.appendChild(s);
   }
 
   function toCLP(n){ return "$" + Number(n||0).toLocaleString("es-CL"); }
-  function toInt(n){ return Number(n||0).toLocaleString("es-CL"); }
 
   function render(){
     const el = document.getElementById(elId);
-    if (!el || !labels.length || !values.length) return;
+    if (!el || !labels.length || !datasets.length) return;
 
-    const yTick = (v) => format === "currency" ? toCLP(v) : toInt(v);
-    const tip   = (y) => format === "currency" ? toCLP(y) : toInt(y);
+    // Asegura estructura para Chart.js
+    const ds = datasets.map(function(d){ return {
+      label: d.label || "",
+      data: (d.data || []).map(Number),
+      borderWidth: 1
+    };});
 
     window.__charts = window.__charts || {};
     if (window.__charts[elId]) window.__charts[elId].destroy();
 
     window.__charts[elId] = new Chart(el, {
       type: "bar",
-      data: { labels, datasets: [{ label: "", data: values, borderWidth: 1 }] },
+      data: { labels, datasets: ds },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { display: false },
           tooltip: { callbacks: {
-            label: (ctx) => tip(ctx.parsed.y)
-          }}
+            label: (ctx) => `${ctx.dataset.label}: ` + toCLP(ctx.parsed.y)
+          }},
+          legend: { display: true }
         },
         interaction: { mode: "index", intersect: false },
         scales: {
-          y: { beginAtZero: true, ticks: { callback: yTick } },
-          x: { ticks: { precision: 0 } }
+          x: { stacked: true, ticks: { precision: 0 } },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            ticks: { callback: (v) => toCLP(v) }
+          }
         }
       }
     });

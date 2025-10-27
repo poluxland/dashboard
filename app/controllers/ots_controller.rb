@@ -87,6 +87,31 @@ end
     @semana_labels    = semanas_ordenadas
     @semana_totales   = semanas_ordenadas.map { |s| weekly_hash[s].to_i }
 
+  
+    
+      # ===== NUEVOS GRÁFICOS =====
+    
+      # 1) Cantidad de OT en estado 70 por semana
+      estado70_counts      = scope.where(estado: 70).group(:semana).count # { semana => cantidad }
+      @semana_labels_70    = estado70_counts.keys.compact.sort
+      @semana_cant_70      = @semana_labels_70.map { |w| estado70_counts[w].to_i }
+    
+      # 2) Cantidad de OT tipo A por semana
+      tipoA_counts         = scope.where(tipo_ot: "A").group(:semana).count
+      @semana_labels_tipoA = tipoA_counts.keys.compact.sort
+      @semana_cant_tipoA   = @semana_labels_tipoA.map { |w| tipoA_counts[w].to_i }
+    
+      # 3) Gasto por semana: separa estado 85 vs el resto
+      sum_85   = scope.where(estado: 85).group(:semana).sum(:total)     # { semana => total }
+      sum_rest = scope.where.not(estado: 85).group(:semana).sum(:total) # { semana => total }
+      
+      semanas_split              = (sum_85.keys | sum_rest.keys).compact.sort
+      @semana_labels_gasto_split = semanas_split
+      @gasto_85                  = semanas_split.map { |w| sum_85[w].to_i }
+      @gasto_rest                = semanas_split.map { |w| sum_rest[w].to_i }
+      
+
+
 # --- KPIs en texto ---
 scope = Ot.all
 
