@@ -1,6 +1,6 @@
 <div class="card h-100">
   <div class="card-body">
-    <h2 class="h6 mb-3"><%= (local_assigns[:title] || "Gráfico") %></h2>
+    <h2 class="h6 mb-3"><%= (local_assigns[:title] || "Gráfico apilado") %></h2>
     <div style="height:360px"><canvas id="<%= canvas_id %>"></canvas></div>
   </div>
 </div>
@@ -8,53 +8,52 @@
 <%= javascript_tag nonce: true do %>
 (function(){
   const labels   = <%= raw(labels.to_json) %>;
-  const datasets = <%= raw((local_assigns[:datasets] || []).to_json) %>;
+  const datasets = <%= raw(datasets.to_json) %>; // [{label, data}, ...]
   const elId     = "<%= canvas_id %>";
+  const format   = "<%= (local_assigns[:format] || :count).to_s %>"; // :count por defecto (sin $)
 
   function ensureChartJsLoaded(cb){
     if (window.Chart) return cb();
     const s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
-    s.crossOrigin = "anonymous";
-    s.onload = cb;
-    document.head.appendChild(s);
+    s.crossOrigin = "anonymous"; s.onload = cb; document.head.appendChild(s);
   }
 
   function toCLP(n){ return "$" + Number(n||0).toLocaleString("es-CL"); }
+  function toInt(n){ return Number(n||0).toLocaleString("es-CL"); }
+  const yTick = (v) => format === "currency" ? toCLP(v) : toInt(v);
+  const tip   = (y) => format === "currency" ? toCLP(y) : toInt(y);
 
   function render(){
     const el = document.getElementById(elId);
     if (!el || !labels.length || !datasets.length) return;
-
-    // Asegura estructura para Chart.js
-    const ds = datasets.map(function(d){ return {
-      label: d.label || "",
-      data: (d.data || []).map(Number),
-      borderWidth: 1
-    };});
 
     window.__charts = window.__charts || {};
     if (window.__charts[elId]) window.__charts[elId].destroy();
 
     window.__charts[elId] = new Chart(el, {
       type: "bar",
-      data: { labels, datasets: ds },
+      data: {
+        labels,
+        datasets: datasets.map(d => ({
+          label: d.label || "",
+          data: d.data || [],
+          borderWidth: 1,
+          // sin colores fijos; Chart.js asigna por defecto
+        }))
+      },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-          tooltip: { callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ` + toCLP(ctx.parsed.y)
-          }},
-          legend: { display: true }
+          legend: { display: true },
+          tooltip: {
+            callbacks: { label: (ctx) => `${ctx.dataset.label}: ${tip(ctx.parsed.y)}` }
+          }
         },
         interaction: { mode: "index", intersect: false },
         scales: {
           x: { stacked: true, ticks: { precision: 0 } },
-          y: {
-            stacked: true,
-            beginAtZero: true,
-            ticks: { callback: (v) => toCLP(v) }
-          }
+          y: { stacked: true, beginAtZero: true, ticks: { callback: yTick } }
         }
       }
     });

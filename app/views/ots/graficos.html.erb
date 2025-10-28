@@ -59,34 +59,48 @@
 
 <div class="row g-3 mb-3">
   <div class="col-md-6">
-    <%= render "bar_chart",
-      title: "OT en estado 70 por semana",
-      canvas_id: "otEstado70PorSemana",
-      labels: @semana_labels_70,
-      values: @semana_cant_70 %>
+    <%= render "stacked_bar_chart",
+      title: "OT por semana: Estado 70 vs Otros estados",
+      canvas_id: "otEstado70VsRestoPorSemana",
+      labels: @semana_labels_70split,
+      datasets: [
+        { label: "Estado 70", data: @cant_70_por_semana },
+        { label: "Otros estados",     data: @cant_resto_por_semana }
+      ],
+      format: :count %>
   </div>
 
   <div class="col-md-6">
-    <%= render "bar_chart",
-      title: "OT tipo A por semana",
-      canvas_id: "otTipoAPorSemana",
-      labels: @semana_labels_tipoA,
-      values: @semana_cant_tipoA %>
-  </div>
+  <%= render "stacked_bar_chart",
+    title: "OT por semana: A+C+F vs U+I",
+    canvas_id: "otGruposPorSemana",
+    labels: @semana_labels_tipo,
+    datasets: [
+      { label: "A+C+F", data: @cant_acf_por_semana },
+      { label: "U+I",   data: @cant_ui_por_semana }
+    ],
+    format: :count %>
 </div>
+
+</div>
+
 
 <div class="row g-3 mb-3">
   <div class="col-12">
-  <%= render "stacked_bar_chart",
-  title: "Gasto por semana: estado 85 vs resto",
-  canvas_id: "gastoSplitPorSemana",
-  labels: @semana_labels_gasto_split,
-  datasets: [
-    { label: "Estado 85", data: @gasto_85 },
-    { label: "Resto",     data: @gasto_rest }
-  ] %>
-
+    <%= render "stacked_bar_chart",
+      title: "Gasto por semana (Servicio 85/≠85 y Repuestos ≥57/<57)",
+      canvas_id: "gasto4CategoriasPorSemana",
+      labels: @semana_labels_gasto4,
+      datasets: [
+        { label: "Servicio (Estado 85)",   data: @gasto_svc_85 },
+        { label: "Servicio (Estado ≠85)",  data: @gasto_svc_not_85 },
+        { label: "Repuestos (Estado ≥57)", data: @gasto_rep_ge_57 },
+        { label: "Repuestos (Estado <57)", data: @gasto_rep_lt_57 }
+      ],
+      format: :currency %>
   </div>
+</div>
+
 </div>
 
 

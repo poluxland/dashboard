@@ -89,27 +89,40 @@ end
 
 
 
-      # ===== NUEVOS GRÁFICOS =====
+# ===== NUEVOS GRÁFICOS =====
 
-      # 1) Cantidad de OT en estado 70 por semana
-      estado70_counts      = scope.where(estado: 70).group(:semana).count # { semana => cantidad }
-      @semana_labels_70    = estado70_counts.keys.compact.sort
-      @semana_cant_70      = @semana_labels_70.map { |w| estado70_counts[w].to_i }
+# 1) Cantidad de OT en estado 70 vs resto por semana (barras apiladas)
+counts_70   = scope.where(estado: 70).group(:semana).count          # { semana => cant }
+counts_rest = scope.where.not(estado: 70).group(:semana).count      # { semana => cant }
 
-      # 2) Cantidad de OT tipo A por semana
-      tipoA_counts         = scope.where(tipo_ot: "A").group(:semana).count
-      @semana_labels_tipoA = tipoA_counts.keys.compact.sort
-      @semana_cant_tipoA   = @semana_labels_tipoA.map { |w| tipoA_counts[w].to_i }
+semanas_split_counts   = (counts_70.keys | counts_rest.keys).compact.sort
+@semana_labels_70split = semanas_split_counts
+@cant_70_por_semana    = semanas_split_counts.map { |w| counts_70[w].to_i }
+@cant_resto_por_semana = semanas_split_counts.map { |w| counts_rest[w].to_i }
 
-      # 3) Gasto por semana: separa estado 85 vs el resto
-      sum_85   = scope.where(estado: 85).group(:semana).sum(:total)     # { semana => total }
-      sum_rest = scope.where.not(estado: 85).group(:semana).sum(:total) # { semana => total }
 
-      semanas_split              = (sum_85.keys | sum_rest.keys).compact.sort
-      @semana_labels_gasto_split = semanas_split
-      @gasto_85                  = semanas_split.map { |w| sum_85[w].to_i }
-      @gasto_rest                = semanas_split.map { |w| sum_rest[w].to_i }
+# 2) Cantidad de OT por semana: A+C+F vs U+I (barras apiladas)
+group_acf = scope.where(tipo_ot: %w[A C F]).group(:semana).count
+group_ui  = scope.where(tipo_ot: %w[U I]).group(:semana).count
 
+semanas_tipo           = (group_acf.keys | group_ui.keys).compact.sort
+@semana_labels_tipo    = semanas_tipo
+@cant_acf_por_semana   = semanas_tipo.map { |w| group_acf[w].to_i }
+@cant_ui_por_semana    = semanas_tipo.map { |w| group_ui[w].to_i }
+
+
+# 3) Gasto por semana (4 categorías que cubren todos los casos)
+svc_85      = scope.where(estado: 85).group(:semana).sum(:servicio)   # servicio con estado = 85
+svc_not_85  = scope.where.not(estado: 85).group(:semana).sum(:servicio) # servicio con estado != 85
+rep_ge_57   = scope.where("estado >= 57").group(:semana).sum(:repuestos) # repuestos con estado >= 57
+rep_lt_57   = scope.where("estado < 57").group(:semana).sum(:repuestos)  # repuestos con estado < 57
+
+semanas_all = (svc_85.keys | svc_not_85.keys | rep_ge_57.keys | rep_lt_57.keys).compact.sort
+@semana_labels_gasto4 = semanas_all
+@gasto_svc_85         = semanas_all.map  { |w| (svc_85[w]     || 0).to_i }
+@gasto_svc_not_85     = semanas_all.map  { |w| (svc_not_85[w] || 0).to_i }
+@gasto_rep_ge_57      = semanas_all.map  { |w| (rep_ge_57[w]  || 0).to_i }
+@gasto_rep_lt_57      = semanas_all.map  { |w| (rep_lt_57[w]  || 0).to_i }
 
 
 # --- KPIs en texto ---
