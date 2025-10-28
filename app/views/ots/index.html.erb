@@ -112,3 +112,6 @@
     No hay OTs cargadas<%= " para “#{h params[:q]}”" if params[:q].present? %>.
   </div>
 <% end %>
+<div class="d-flex justify-content-center mt-3">
+  <%= pagy_bootstrap_nav(@pagy).html_safe %>
+</div>

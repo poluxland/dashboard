@@ -160,23 +160,27 @@ scope = Ot.all
 
 
   # POST /ots/import
-  def import
-    file = params[:file]
-    unless file.present?
-      return redirect_to ots_path, alert: "Selecciona un archivo .xlsx o .csv"
-    end
+def import
+  file = params[:file]
+  return redirect_to ots_path, alert: "Selecciona un archivo .xlsx o .csv" unless file.present?
 
-    created = 0
-    Dir.mktmpdir do |dir|
-      path = File.join(dir, file.original_filename)
-      File.open(path, "wb") { |f| f.write(file.read) }
-      created = OtsImporter.call(path)
-    end
+  # Endurecimiento básico
+  allowed_ct = %w[
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    application/vnd.ms-excel
+    text/csv
+    application/csv
+  ]
+  return redirect_to ots_path, alert: "Tipo de archivo no permitido" unless allowed_ct.include?(file.content_type)
+  return redirect_to ots_path, alert: "Archivo muy grande" if file.size.to_i > 20.megabytes
 
-    redirect_to ots_path, notice: "Importadas #{created} filas."
-  rescue => e
-    redirect_to ots_path, alert: "Error al importar: #{e.message}"
-  end
+  created = OtsImporter.call(file.tempfile.path)  # ← sin usar original_filename
+
+  redirect_to ots_path, notice: "Importadas #{created} filas."
+rescue => e
+  redirect_to ots_path, alert: "Error al importar: #{e.message}"
+end
+
 
   # GET /ots/1
   def show; end
