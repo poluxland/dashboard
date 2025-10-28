@@ -18,20 +18,21 @@ class Ot < ApplicationRecord
   scope :search, ->(q) {
   return all if q.blank?
 
-  s    = q.to_s.strip
+  s = q.to_s.strip
   like = "%#{ActiveRecord::Base.sanitize_sql_like(s)}%"
-  conn = connection
+  table = arel_table
 
-  text_sql = TEXT_COLS.map { |c| "#{conn.quote_column_name(c)} ILIKE :like" }.join(" OR ")
+  text_conditions = TEXT_COLS.map { |col| table[col].matches(like) }
+  condition = text_conditions.inject { |memo, expr| memo.or(expr) }
+
   if (num = Integer(s) rescue nil)
-    num_sql = NUMERIC_COLS.map { |c| "#{conn.quote_column_name(c)} = :num" }.join(" OR ")
-    # brakeman:ignore[SQL] ← Ignora el falso positivo
-    where("(#{text_sql}) OR (#{num_sql})", like: like, num: num)
-  else
-    # brakeman:ignore[SQL]
-    where(text_sql, like: like)
+    num_conditions = NUMERIC_COLS.map { |col| table[col].eq(num) }
+    condition = condition.or(num_conditions.inject { |memo, expr| memo.or(expr) })
   end
+
+  where(condition)
 }
+
 
 
 
