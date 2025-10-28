@@ -16,22 +16,21 @@ class Ot < ApplicationRecord
   ].freeze
 
   scope :search, ->(q) {
-    if q.present?
-      s    = q.to_s.strip
-      like = "%#{ActiveRecord::Base.sanitize_sql_like(s)}%"
+  return all if q.blank?
 
-      text_sql = TEXT_COLS.map { |c| "#{c} ILIKE :like" }.join(" OR ")
+  s    = q.to_s.strip
+  like = "%#{sanitize_sql_like(s)}%"
+  conn = connection
 
-      if (num = Integer(s) rescue nil)
-        num_sql = NUMERIC_COLS.map { |c| "#{c} = :num" }.join(" OR ")
-        where("(#{text_sql}) OR (#{num_sql})", like:, num:)
-      else
-        where(text_sql, like:)
-      end
-    else
-      all
-    end
-  }
+  text_sql = TEXT_COLS.map { |c| "#{conn.quote_column_name(c)} ILIKE :like" }.join(" OR ")
+  if (num = Integer(s) rescue nil)
+    num_sql = NUMERIC_COLS.map { |c| "#{conn.quote_column_name(c)} = :num" }.join(" OR ")
+    where("(#{text_sql}) OR (#{num_sql})", like: like, num: num)
+  else
+    where(text_sql, like: like)
+  end
+}
+
 
   private
 
