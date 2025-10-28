@@ -19,7 +19,7 @@ class Ot < ApplicationRecord
   return all if q.blank?
 
   s    = q.to_s.strip
-  like = "%#{sanitize_sql_like(s)}%"
+  like = "%#{ActiveRecord::Base.sanitize_sql_like(s)}%"
   conn = connection
 
   text_sql = TEXT_COLS.map { |c| "#{conn.quote_column_name(c)} ILIKE :like" }.join(" OR ")
