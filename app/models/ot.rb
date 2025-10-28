@@ -25,11 +25,14 @@ class Ot < ApplicationRecord
   text_sql = TEXT_COLS.map { |c| "#{conn.quote_column_name(c)} ILIKE :like" }.join(" OR ")
   if (num = Integer(s) rescue nil)
     num_sql = NUMERIC_COLS.map { |c| "#{conn.quote_column_name(c)} = :num" }.join(" OR ")
+    # brakeman:ignore[SQL] ← Ignora el falso positivo
     where("(#{text_sql}) OR (#{num_sql})", like: like, num: num)
   else
+    # brakeman:ignore[SQL]
     where(text_sql, like: like)
   end
 }
+
 
 
   private

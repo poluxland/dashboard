@@ -159,7 +159,7 @@ scope = Ot.all
 
 
 
-  # POST /ots/import
+# POST /ots/import
 def import
   file = params[:file]
   return redirect_to ots_path, alert: "Selecciona un archivo .xlsx o .csv" unless file.present?
