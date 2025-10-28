@@ -58,10 +58,10 @@ wb.add_worksheet(name: "OTs") do |sheet|
       int,  # Frecuencia
       text, # Cód rep.
       int,  # Cant.
-      money,# $ Unitario
-      money,# $ Repuestos
-      money,# $ Servicio
-      money,# $ Total
+      money, # $ Unitario
+      money, # $ Repuestos
+      money, # $ Servicio
+      money, # $ Total
       int,  # Cotización (entero)
       text, # CC
       text, # Responsable
@@ -86,7 +86,7 @@ wb.add_worksheet(name: "OTs") do |sheet|
 
   # Auto ancho de columnas (simple)
   sheet.column_info.each_with_index do |col, i|
-    max = ([15] + sheet.rows.map { |r| (r.cells[i]&.value.to_s || "").length }).max
-    col.width = [[max, 60].min, 10].max
+    max = ([ 15 ] + sheet.rows.map { |r| (r.cells[i]&.value.to_s || "").length }).max
+    col.width = [ [ max, 60 ].min, 10 ].max
   end
 end

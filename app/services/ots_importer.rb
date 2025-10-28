@@ -43,7 +43,7 @@ class OtsImporter
     "servicio"           => :servicio,
 
     # Comentarios
-    "comentarios"        => :comentarios,
+    "comentarios"        => :comentarios
   }.freeze
 
   def self.call(file_path)
