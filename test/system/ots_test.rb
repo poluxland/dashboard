@@ -64,8 +64,8 @@ class OtsTest < ApplicationSystemTestCase
            "No encontré el mensaje de actualización ('OT actualizada correctamente.' o 'Ot was successfully updated')"
   end
 
-  
-  
+
+
 
   private
 
@@ -92,8 +92,8 @@ class OtsTest < ApplicationSystemTestCase
     if page.has_css?('input[name$="[ot_asignada]"]:not([disabled])', wait: 1)
       find('input[name$="[ot_asignada]"]:not([disabled])', match: :first).set(value) and return
     end
-    if page.has_css?('#ot_ot_asignada:not([disabled])', wait: 1)
-      find('#ot_ot_asignada:not([disabled])').set(value) and return
+    if page.has_css?("#ot_ot_asignada:not([disabled])", wait: 1)
+      find("#ot_ot_asignada:not([disabled])").set(value) and return
     end
     if page.has_css?('input[placeholder*="OT asignada"]:not([disabled])', wait: 1)
       find('input[placeholder*="OT asignada"]:not([disabled])', match: :first).set(value) and return
