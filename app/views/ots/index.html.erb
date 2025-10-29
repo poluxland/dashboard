@@ -56,10 +56,10 @@
             <td class="text-end"><%= ot.frecuencia %></td>
             <td><%= ot.cod_rep %></td>
             <td class="text-end"><%= ot.cantidad %></td>
-            <td class="text-end"><%= number_to_currency(ot.unitario, unit: "$", precision: 0, delimiter: ".") %></td>
-            <td class="text-end"><%= number_to_currency(ot.repuestos, unit: "$", precision: 0, delimiter: ".") %></td>
-            <td class="text-end"><%= number_to_currency(ot.servicio, unit: "$", precision: 0, delimiter: ".") %></td>
-            <td class="text-end fw-semibold"><%= number_to_currency(ot.total, unit: "$", precision: 0, delimiter: ".") %></td>
+            <td class="text-end"><%= number_to_currency(ot.unitario, unit: "", precision: 0, delimiter: ".") %></td>
+            <td class="text-end"><%= number_to_currency(ot.repuestos, unit: "", precision: 0, delimiter: ".") %></td>
+            <td class="text-end"><%= number_to_currency(ot.servicio, unit: "", precision: 0, delimiter: ".") %></td>
+            <td class="text-end fw-semibold"><%= number_to_currency(ot.total, unit: "", precision: 0, delimiter: ".") %></td>
             <td><%= ot.cotizacion %></td>
             <td><%= ot.cc %></td>
             <td><%= ot.responsable %></td>
