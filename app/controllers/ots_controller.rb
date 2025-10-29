@@ -32,20 +32,32 @@ class OtsController < ApplicationController
     end
   end
 
+  def compact
+    @q = params[:q].to_s.strip
+    estados = Array(params[:estado]).reject(&:blank?)
+    tipos   = Array(params[:tipo_ot]).reject(&:blank?)
+
+    # NUEVO: semanas sueltas separadas por coma (sin rangos)
+    semanas = parse_semanas_sin_rangos(params[:semanas].to_s)
+
+    scope = Ot.search(@q)
+    scope = scope.where(estado: estados.map(&:to_i)) if estados.any?
+    scope = scope.where("LOWER(tipo_ot) IN (?)", tipos.map { |t| t.to_s.downcase }) if tipos.any?
+    scope = scope.where(semana: semanas) if semanas.any?  # ← filtro de semanas
+    scope = scope.order(created_at: :desc)
+
+    @pagy, @ots = pagy(scope)   # sin :items ni :per
 
 
-
-
-
-
-
-
-
-
-
-def compact
-  @ots = Ot.order(created_at: :desc)
-end
+    respond_to do |format|
+      format.html
+      format.xlsx do
+        @ots_xlsx = scope # exporta con los filtros aplicados (incluye semanas)
+        response.headers["Content-Disposition"] =
+          "attachment; filename=ots_#{Time.zone.now.strftime('%Y%m%d_%H%M')}.xlsx"
+      end
+    end
+  end
 
 def backlog
   @ots = Ot.where(estado: [ 70, 30 ]).order(created_at: :desc)

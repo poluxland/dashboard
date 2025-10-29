@@ -1,52 +1,39 @@
 <%# app/views/ots/index.html.erb %>
 <% content_for :title, "OTs" %>
 
-<%# --- Mensajes --- %>
-<% if notice.present? %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= notice %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-  </div>
-<% end %>
-
-<% if alert.present? %>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <%= alert %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-  </div>
-<% end %>
-
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <h1 class="h3 mb-0">OTs</h1>
-  <%= link_to "Nueva OT", new_ot_path, class: "btn btn-primary" %>
-</div>
 
 
-
-<div class="d-flex justify-content-end mb-2">
-  <span class="text-muted">Total registros: <strong><%= @ots.size %></strong></span>
-</div>
+<%= render "search" %>
 
 
 
 
-<% if @ots.any? %>
+<%# --- Tabla / Lista: TODAS LAS COLUMNAS --- %>
+<% if @ots&.any? %>
   <div class="table-responsive" style="max-height: 70vh;">
     <table class="table table-sm table-striped table-hover align-middle mb-0">
       <thead class="table-light position-sticky top-0" style="z-index: 1;">
         <tr>
           <th class="text-start">OT asignada</th>
           <th class="text-end">Semana</th>
-          
+          <th class="text-end">Item</th>
+          <th class="text-start">Área</th>
           <th class="text-start">Código</th>
           <th class="text-start" style="min-width: 260px;">Actividad</th>
+          <th class="text-start">ESP</th>
+          <th class="text-end">Frecuencia</th>
+          <th class="text-start">Cód rep.</th>
           
-          <th class="text-end">Total</th>
-          <th class="text-start">Responsable</th>
+          <th class="text-end fw-semibold">$ Total</th>
+          <th class="text-start">Cotización</th>
+          <th class="text-start">CC</th>
           
           <th class="text-start">Tipo OT</th>
           <th class="text-end">Estado</th>
           <th class="text-end">Sem. ejec.</th>
+          
+          <th class="text-start">Causa</th>
+          
           <th class="text-center">Acciones</th>
         </tr>
       </thead>
@@ -55,39 +42,45 @@
           <tr>
             <td><%= ot.ot_asignada %></td>
             <td class="text-end"><%= ot.semana %></td>
-           
+            <td class="text-end"><%= ot.item %></td>
+            <td><%= ot.area %></td>
             <td><%= ot.codigo %></td>
-            <td class="text-truncate" title="<%= ot.actividad_semanal %>" style="max-width: 380px;"><%= ot.actividad_semanal %></td>
+            <td class="text-truncate" title="<%= h ot.actividad_semanal %>" style="max-width: 380px;"><%= ot.actividad_semanal %></td>
+            <td><%= ot.esp %></td>
+            <td class="text-end"><%= ot.frecuencia %></td>
+            <td><%= ot.cod_rep %></td>
             
-            <td class="text-end fw-semibold"><%= number_to_currency(ot.total, unit: "$", precision: 0, delimiter: ".") %></td>
-            <td><%= ot.responsable %></td>
-           
+            <td class="text-end fw-semibold"><%= number_to_currency(ot.total, unit: "", precision: 0, delimiter: ".") %></td>
+            <td><%= ot.cotizacion %></td>
+            <td><%= ot.cc %></td>
+            
             <td>
-              <%# Badge según tipo_ot %>
               <% tipo_class =
-                  case ot.tipo_ot.to_s.strip.downcase
-                  when "u" then "bg-secondary"
-                  when "a" then "bg-info"
-                  when "c" then "bg-warning"
-                  when "f" then "bg-danger"
-                  when "i" then "bg-primary"
-                  else "bg-dark"
-                  end %>
+                case ot.tipo_ot.to_s.strip.downcase
+                when "u" then "bg-secondary"
+                when "a" then "bg-info"
+                when "c" then "bg-warning"
+                when "f" then "bg-danger"
+                when "i" then "bg-primary"
+                else "bg-dark"
+                end %>
               <span class="badge <%= tipo_class %>"><%= ot.tipo_ot %></span>
             </td>
             <td class="text-end">
-              <%# Badge según estado %>
               <% estado = ot.estado.to_s.strip.downcase %>
               <% estado_class =
-                  case estado
-                  when "70" then "bg-warning text-dark"
-                  when "80", "85" then "bg-success"
-                  when "90" then "bg-secondary"
-                  else "bg-light text-dark"
-                  end %>
+                case estado
+                when "70" then "bg-warning text-dark"
+                when "80", "85" then "bg-success"
+                when "90" then "bg-secondary"
+                else "bg-light text-dark"
+                end %>
               <span class="badge <%= estado_class %>"><%= ot.estado %></span>
             </td>
             <td class="text-end"><%= ot.sem_ejec %></td>
+            
+            <td><%= ot.causa %></td>
+            
             <td class="text-center">
               <div class="btn-group btn-group-sm" role="group" aria-label="Acciones">
                 <%= link_to "Ver", ot, class: "btn btn-outline-secondary" %>
@@ -100,18 +93,13 @@
           </tr>
         <% end %>
       </tbody>
-      <tfoot class="table-light">
-        <tr>
-          <td colspan="4" class="text-end fw-semibold">Total:</td>
-          
-          <td class="text-end fw-bold"><%= number_to_currency(@ots.sum(:total), unit: "$", precision: 0, delimiter: ".") %></td>
-          
-        </tr>
-      </tfoot>
     </table>
   </div>
 <% else %>
   <div class="alert alert-info mb-0" role="alert">
-    No hay OTs cargadas.
+    No hay OTs cargadas<%= " para “#{h params[:q]}”" if params[:q].present? %>.
   </div>
 <% end %>
+<div class="d-flex justify-content-center mt-3">
+  <%= pagy_bootstrap_nav(@pagy).html_safe %>
+</div>
