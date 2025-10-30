@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fecha: 2025-10-30
+  planta: MyString
+  numero_cotizacion: 1
+  solicita: MyString
+  supervisor: MyString
+  hora_inicio: 2025-10-30 19:52:46
+  hora_termino: 2025-10-30 19:52:46
+  nombre: MyString
+  seguridad: MyText
+  descripcion: MyText
+  personal: MyText
+
+two:
+  fecha: 2025-10-30
+  planta: MyString
+  numero_cotizacion: 1
+  solicita: MyString
+  supervisor: MyString
+  hora_inicio: 2025-10-30 19:52:46
+  hora_termino: 2025-10-30 19:52:46
+  nombre: MyString
+  seguridad: MyText
+  descripcion: MyText
+  personal: MyText

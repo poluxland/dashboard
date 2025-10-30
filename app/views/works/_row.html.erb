@@ -1,0 +1,40 @@
+<tr id="<%= dom_id(work) %>">
+  <td><%= work.fecha&.strftime("%d-%m-%Y") %></td>
+  <td><%= work.planta %></td>
+  <td><%= work.numero_cotizacion %></td>
+  <td><%= work.solicita %></td>
+  <td><%= work.supervisor %></td>
+  <td><%= work.hora_inicio&.strftime("%H:%M") %></td>
+  <td><%= work.hora_termino&.strftime("%H:%M") %></td>
+  <td><%= truncate(work.nombre.to_s, length: 24) %></td>
+
+  <td>
+    <% if work.fotos.attached? %>
+      <div class="d-flex gap-1">
+        <% work.fotos.first(2).each do |foto| %>
+          <%= image_tag(
+                foto.variant(resize_to_limit: [60, 60]).processed,
+                class: "rounded border",
+                alt: "foto"
+              ) %>
+        <% end %>
+        <% if work.fotos.count > 2 %>
+          <span class="badge text-bg-secondary">+<%= work.fotos.count - 2 %></span>
+        <% end %>
+      </div>
+    <% else %>
+      <span class="text-muted">—</span>
+    <% end %>
+  </td>
+
+  <td class="text-end">
+    <div class="btn-group btn-group-sm" role="group">
+      <%= link_to "Ver", work_path(work), class: "btn btn-outline-primary" %>
+      <%= link_to "Editar", edit_work_path(work), class: "btn btn-outline-secondary" %>
+      <%= link_to "Eliminar",
+                  work_path(work),
+                  data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este trabajo?" },
+                  class: "btn btn-outline-danger" %>
+    </div>
+  </td>
+</tr>

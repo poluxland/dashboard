@@ -33,6 +33,36 @@
           </ul>
         </li>
 
+        <!-- Menú Works -->
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle <%= (controller_name == 'works') ? 'active' : '' %>"
+     href="#" id="worksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Trabajos
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
+    <li>
+      <%= link_to "Trabajos", works_path, class: "dropdown-item", data: { turbo: false } %>
+    </li>
+    <li>
+      <%= link_to "Nuevo", new_work_path, class: "dropdown-item", data: { turbo: false } %>
+    </li>
+
+    <%# Opcionales: descomenta solo si creaste estas rutas personalizadas %>
+    <% if main_app.respond_to?(:compact_works_path) %>
+      <li><%= link_to "Compacta", compact_works_path, class: "dropdown-item", data: { turbo: false } %></li>
+    <% end %>
+    <% if main_app.respond_to?(:graficos_works_path) %>
+      <li><%= link_to "Gráficos", graficos_works_path, class: "dropdown-item", data: { turbo: false } %></li>
+    <% end %>
+    <% if main_app.respond_to?(:backlog_works_path) %>
+      <li><%= link_to "Backlog", backlog_works_path, class: "dropdown-item", data: { turbo: false } %></li>
+    <% end %>
+  </ul>
+</li>
+
+
+      
+
         <!-- Indicadores -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle <%= (%w[monthly_records indicator_readings people].include?(controller_name) || current_page?(monthly_records_path)) ? 'active' : '' %>"

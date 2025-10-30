@@ -10,82 +10,128 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_21_002833) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_30_225417) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "indicator_readings", force: :cascade do |t|
-    t.bigint "person_id", null: false
-    t.date "period", null: false
-    t.decimal "cuasi", precision: 5, scale: 2, default: "0.0", null: false
-    t.decimal "lvs", precision: 5, scale: 2, default: "0.0", null: false
-    t.decimal "cc", precision: 5, scale: 2, default: "0.0", null: false
-    t.decimal "hh", precision: 5, scale: 2, default: "0.0", null: false
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "indicator_readings", force: :cascade do |t|
+    t.decimal "cc", precision: 5, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.decimal "cuasi", precision: 5, scale: 2, default: "0.0", null: false
+    t.decimal "hh", precision: 5, scale: 2, default: "0.0", null: false
+    t.decimal "lvs", precision: 5, scale: 2, default: "0.0", null: false
+    t.date "period", null: false
+    t.bigint "person_id", null: false
     t.datetime "updated_at", null: false
     t.index ["person_id", "period"], name: "idx_unique_person_period", unique: true
     t.index ["person_id"], name: "index_indicator_readings_on_person_id"
   end
 
   create_table "monthly_records", force: :cascade do |t|
-    t.date "period"
-    t.integer "nomina"
-    t.integer "hh"
-    t.integer "dp"
+    t.integer "acreditacion"
     t.integer "actp"
     t.integer "astp"
-    t.integer "iap"
-    t.integer "acreditacion"
-    t.integer "salud"
-    t.integer "recepcion"
-    t.integer "tiempo"
-    t.integer "soplado"
-    t.integer "uso_jetin"
-    t.integer "servicios"
-    t.integer "despacho"
     t.datetime "created_at", null: false
+    t.integer "despacho"
+    t.integer "dp"
+    t.integer "hh"
+    t.integer "iap"
+    t.integer "nomina"
+    t.date "period"
+    t.integer "recepcion"
+    t.integer "salud"
+    t.integer "servicios"
+    t.integer "soplado"
+    t.integer "tiempo"
     t.datetime "updated_at", null: false
+    t.integer "uso_jetin"
   end
 
   create_table "ots", force: :cascade do |t|
-    t.integer "semana"
-    t.integer "item"
-    t.string "area"
-    t.string "codigo"
     t.string "actividad_semanal"
-    t.string "esp"
-    t.integer "frecuencia"
-    t.string "cod_rep"
+    t.string "area"
     t.integer "cantidad"
-    t.integer "unitario"
-    t.integer "servicio"
-    t.integer "cotizacion"
-    t.string "cc"
-    t.string "responsable"
-    t.string "contratista"
-    t.string "tipo_ot"
-    t.integer "estado"
-    t.integer "sem_ejec"
-    t.integer "n_personas"
-    t.integer "duracion_hr"
-    t.integer "hh"
     t.string "causa"
+    t.string "cc"
+    t.string "cod_rep"
+    t.string "codigo"
     t.text "comentarios"
+    t.string "contratista"
+    t.integer "cotizacion"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "repuestos"
-    t.integer "total"
+    t.integer "duracion_hr"
+    t.string "esp"
+    t.integer "estado"
+    t.integer "frecuencia"
+    t.integer "hh"
+    t.integer "item"
+    t.integer "n_personas"
     t.integer "ot_asignada"
+    t.integer "repuestos"
+    t.string "responsable"
+    t.integer "sem_ejec"
+    t.integer "semana"
+    t.integer "servicio"
+    t.string "tipo_ot"
+    t.integer "total"
+    t.integer "unitario"
+    t.datetime "updated_at", null: false
     t.index ["ot_asignada"], name: "index_ots_on_ot_asignada", unique: true
   end
 
   create_table "people", force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "name"
     t.string "planta"
+    t.datetime "updated_at", null: false
     t.index ["name"], name: "index_people_on_name", unique: true
   end
 
+  create_table "works", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "descripcion"
+    t.date "fecha"
+    t.time "hora_inicio"
+    t.time "hora_termino"
+    t.string "nombre"
+    t.integer "numero_cotizacion"
+    t.text "personal"
+    t.string "planta"
+    t.text "seguridad"
+    t.string "solicita"
+    t.string "supervisor"
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "indicator_readings", "people"
 end

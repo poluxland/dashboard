@@ -1,0 +1,74 @@
+<%= form_with(model: work, local: true) do |f| %>
+  <% if work.errors.any? %>
+    <div class="alert alert-danger">
+      <p><strong><%= pluralize(work.errors.count, "error") %></strong> impidieron guardar:</p>
+      <ul>
+        <% work.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row g-3">
+    <div class="col-md-3">
+      <%= f.label :fecha %>
+      <%= f.date_field :fecha, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :planta %>
+      <%= f.text_field :planta, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :numero_cotizacion, "Número cotización" %>
+      <%= f.text_field :numero_cotizacion, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :solicita %>
+      <%= f.text_field :solicita, class: "form-control" %>
+    </div>
+
+    <div class="col-md-3">
+      <%= f.label :supervisor %>
+      <%= f.text_field :supervisor, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :hora_inicio, "Hora inicio" %>
+      <%= f.time_field :hora_inicio, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :hora_termino, "Hora término" %>
+      <%= f.time_field :hora_termino, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :nombre %>
+      <%= f.text_field :nombre, class: "form-control" %>
+    </div>
+
+    <div class="col-12">
+      <%= f.label :seguridad, "Seguridad y medio ambiente" %>
+      <%= f.text_area :seguridad, class: "form-control", rows: 3 %>
+    </div>
+    <div class="col-12">
+      <%= f.label :descripcion, "Descripción del trabajo" %>
+      <%= f.text_area :descripcion, class: "form-control", rows: 4 %>
+    </div>
+    <div class="col-12">
+      <%= f.label :personal %>
+      <%= f.text_area :personal, class: "form-control", rows: 2 %>
+    </div>
+
+    <div class="col-12">
+      <div class="mb-3">
+        <%= f.label :fotos, "Registro fotográfico (múltiples)" %>
+        <%= f.file_field :fotos, multiple: true, direct_upload: true, class: "form-control" %>
+        <small class="text-muted">PNG/JPG/WEBP (10MB c/u)</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3 d-flex gap-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancelar", works_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>
