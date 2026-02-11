@@ -50,9 +50,38 @@
       <%= f.text_area :seguridad, class: "form-control", rows: 3 %>
     </div>
     <div class="col-12">
-      <%= f.label :descripcion, "Descripción del trabajo" %>
-      <%= f.text_area :descripcion, class: "form-control", rows: 4 %>
-    </div>
+      <%= f.label :descripcion, "Descripción" %>
+      <div class="col-12">
+  
+
+  <div class="btn-group flex-wrap" role="group" aria-label="Plantillas descripcion">
+  <button type="button" class="btn btn-outline-primary btn-sm"
+  data-fill-target="work_descripcion"
+  data-fill-mode="replace"
+  data-fill-text="INSPECTOR:\n\nTomas de muestras de cemento de ambas lineas de molienda\nLimpieza de separador molino 2 y niveles del separador y tapas de filtro\nLimpieza inferior del separador tapas\nAsistencia de carga de materias primas\nInspeccion rutinaria de \nTrampa de metales\nRevisión de chutes Molino 1 Molino 2\nChutes de carga de materias primas ambos molinos\nRevisión de filtros de las lineas de molienda 1 y 2\nLimpieza de Alimentadores de yeso y puzolana de ambas plantas\nLimpieza de tomas de muestra ambos molinos\nRevision de reguera 90 molino 1\n\nOK / Observación: ">
+Inspector
+</button>
+
+
+    <button type="button" class="btn btn-outline-primary btn-sm"
+            data-fill-target="work_descripcion"
+            data-fill-mode="replace"
+            data-fill-text="NGP:\n\n- Equipo:\n- Síntoma:\n- Diagnóstico:\n- Trabajo realizado:\n- Repuestos:\n- Pruebas y resultados:">
+      NGP
+    </button>
+
+    <button type="button" class="btn btn-outline-secondary btn-sm"
+            data-fill-target="work_descripcion"
+            data-fill-mode="append"
+            data-fill-text="\n\n---\nObservación adicional: ">
+      Observación
+    </button>
+  </div>
+</div>
+
+    <%= f.text_area :descripcion, class: "form-control", rows: 12, id: "work_descripcion" %>
+  </div>
+  
     <div class="col-12">
       <%= f.label :personal %>
       <%= f.text_area :personal, class: "form-control", rows: 2 %>
@@ -72,3 +101,39 @@
     <%= link_to "Cancelar", works_path, class: "btn btn-outline-secondary" %>
   </div>
 <% end %>
+
+<script>
+  (function () {
+    function insertText(textarea, text, mode) {
+      if (!textarea) return;
+
+      if (mode === "replace") {
+        textarea.value = text;
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+        return;
+      }
+
+      const needsBreak = textarea.value && !textarea.value.endsWith("\n");
+      textarea.value = textarea.value + (needsBreak ? "\n" : "") + text;
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    document.addEventListener("click", function (e) {
+      const btn = e.target.closest("[data-fill-target][data-fill-text]");
+      if (!btn) return;
+
+      const targetId = btn.getAttribute("data-fill-target");
+      const mode = btn.getAttribute("data-fill-mode") || "append";
+
+      const raw = btn.getAttribute("data-fill-text") || "";
+      const text = raw.replace(/\\n/g, "\n"); // <- clave
+
+      const textarea = document.getElementById(targetId);
+      insertText(textarea, text, mode);
+    });
+  })();
+</script>
