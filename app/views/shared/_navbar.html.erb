@@ -37,11 +37,11 @@
 <li class="nav-item dropdown">
   <a class="nav-link dropdown-toggle <%= (controller_name == 'works') ? 'active' : '' %>"
      href="#" id="worksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Trabajos
+    Reportes
   </a>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
     <li>
-      <%= link_to "Trabajos", works_path, class: "dropdown-item", data: { turbo: false } %>
+      <%= link_to "Reportes", works_path, class: "dropdown-item", data: { turbo: false } %>
     </li>
     <li>
       <%= link_to "Nuevo", new_work_path, class: "dropdown-item", data: { turbo: false } %>
