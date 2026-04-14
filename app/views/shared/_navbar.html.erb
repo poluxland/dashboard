@@ -2,8 +2,15 @@
   <div class="container">
     <%= link_to "Impromaq", root_path, class: "navbar-brand", data: { turbo: false } %>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-            aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -12,18 +19,24 @@
 
         <!-- Menú OTs -->
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle <%= (controller_name == 'ots') ? 'active' : '' %>" href="#" id="otsDropdown"
-             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a
+            class="nav-link dropdown-toggle <%= 'active' if controller_name == 'ots' %>"
+            href="#"
+            id="otsDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
             OTs
           </a>
+
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="otsDropdown">
-          <li>
+            <li>
               <%= link_to "OTs", ots_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>  
-          <li>
+            </li>
+            <li>
               <%= link_to "Compacta", compact_ots_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
-            
             <li>
               <%= link_to "Gráficos", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
@@ -33,60 +46,101 @@
           </ul>
         </li>
 
-        <!-- Menú Works -->
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle <%= (controller_name == 'works') ? 'active' : '' %>"
-     href="#" id="worksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Reportes
-  </a>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
-    <li>
-      <%= link_to "Reportes", works_path, class: "dropdown-item", data: { turbo: false } %>
-    </li>
-    <li>
-      <%= link_to "Nuevo", new_work_path, class: "dropdown-item", data: { turbo: false } %>
-    </li>
+        <!-- Menú Reportes -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle <%= 'active' if controller_name == 'works' %>"
+            href="#"
+            id="worksDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Reportes
+          </a>
 
-    <%# Opcionales: descomenta solo si creaste estas rutas personalizadas %>
-    <% if main_app.respond_to?(:compact_works_path) %>
-      <li><%= link_to "Compacta", compact_works_path, class: "dropdown-item", data: { turbo: false } %></li>
-    <% end %>
-    <% if main_app.respond_to?(:graficos_works_path) %>
-      <li><%= link_to "Gráficos", graficos_works_path, class: "dropdown-item", data: { turbo: false } %></li>
-    <% end %>
-    <% if main_app.respond_to?(:backlog_works_path) %>
-      <li><%= link_to "Backlog", backlog_works_path, class: "dropdown-item", data: { turbo: false } %></li>
-    <% end %>
-  </ul>
-</li>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
+            <li>
+              <%= link_to "Reportes", works_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Nuevo", new_work_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
 
+            <% if main_app.respond_to?(:compact_works_path) %>
+              <li>
+                <%= link_to "Compacta", compact_works_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
+            <% end %>
 
-      
+            <% if main_app.respond_to?(:graficos_works_path) %>
+              <li>
+                <%= link_to "Gráficos", graficos_works_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
+            <% end %>
+
+            <% if main_app.respond_to?(:backlog_works_path) %>
+              <li>
+                <%= link_to "Backlog", backlog_works_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
 
         <!-- Indicadores -->
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle <%= (%w[monthly_records indicator_readings people].include?(controller_name) || current_page?(monthly_records_path)) ? 'active' : '' %>"
-             href="#" id="indicadoresDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a
+            class="nav-link dropdown-toggle <%= 'active' if %w[monthly_records indicator_readings people].include?(controller_name) || current_page?(monthly_records_path) %>"
+            href="#"
+            id="indicadoresDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
             Indicadores
           </a>
+
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="indicadoresDropdown">
             <li>
-              <%= link_to "Registros Mensuales", monthly_records_path,
-                          class: "dropdown-item #{current_page?(monthly_records_path) ? 'active' : ''}",
+              <%= link_to "Registros Mensuales",
+                          monthly_records_path,
+                          class: "dropdown-item #{'active' if current_page?(monthly_records_path)}",
                           data: { turbo: false } %>
             </li>
             <li>
-              <%= link_to "Indicadores particulares", indicator_readings_path,
-                          class: "dropdown-item #{controller_name == 'indicator_readings' ? 'active' : ''}",
+              <%= link_to "Indicadores particulares",
+                          indicator_readings_path,
+                          class: "dropdown-item #{'active' if controller_name == 'indicator_readings'}",
                           data: { turbo: false } %>
             </li>
             <li>
-              <%= link_to "Personas", people_path,
-                          class: "dropdown-item #{controller_name == 'people' ? 'active' : ''}",
+              <%= link_to "Personas",
+                          people_path,
+                          class: "dropdown-item #{'active' if controller_name == 'people'}",
                           data: { turbo: false } %>
             </li>
           </ul>
         </li>
+
+        <!-- Menú Demo -->
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="demoDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Demo
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoDropdown">
+              <li>
+                <%= link_to "App", root_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
+            </ul>
+          </li>
 
       </ul>
     </div>
