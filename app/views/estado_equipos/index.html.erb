@@ -1,16 +1,361 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Estado equipos" %>
 
-<h1>Estado equipos</h1>
+<%
+  registros = @estado_equipos.order(created_at: :desc)
 
-<div id="estado_equipos">
-  <% @estado_equipos.each do |estado_equipo| %>
-    <%= render estado_equipo %>
-    <p>
-      <%= link_to "Show this estado equipo", estado_equipo %>
-    </p>
+  def score_equipo(estado_equipo)
+    valores = [
+      estado_equipo.estado_cinta,
+      estado_equipo.estado_motor,
+      estado_equipo.estado_polines,
+      estado_equipo.estado_ruedas,
+      estado_equipo.estado_capachos,
+      estado_equipo.estado_sistema_aire,
+      estado_equipo.estado_filtro,
+      estado_equipo.estado_estructura,
+      estado_equipo.estado_lubricacion,
+      estado_equipo.estado_limpieza
+    ].compact.map(&:to_f)
+
+    return nil if valores.empty?
+    (valores.sum / valores.size).round
+  end
+
+  def clase_score(score)
+    return "score-na" if score.nil?
+    return "score-critico" if score <= 25
+    return "score-malo" if score <= 50
+    return "score-suficiente" if score <= 75
+    "score-ok"
+  end
+
+  def texto_score(score)
+    return "Sin datos" if score.nil?
+    return "Crítico" if score <= 25
+    return "Malo" if score <= 50
+    return "Suficiente" if score <= 75
+    "OK"
+  end
+
+  total = registros.count
+  con_score = registros.map { |r| score_equipo(r) }.compact
+  promedio_general = con_score.any? ? (con_score.sum.to_f / con_score.size).round : 0
+  criticos = con_score.count { |s| s <= 25 }
+  malos = con_score.count { |s| s > 25 && s <= 50 }
+  suficientes = con_score.count { |s| s > 50 && s <= 75 }
+  ok = con_score.count { |s| s > 75 }
+%>
+
+<style>
+  :root {
+    --navy: #0C447C;
+    --blue: #185FA5;
+    --blue-lt: #E6F1FB;
+    --green: #3B6D11;
+    --green-lt: #EAF3DE;
+    --amber: #854F0B;
+    --amber-lt: #FAEEDA;
+    --red: #A32D2D;
+    --red-lt: #FCEBEB;
+    --text: #1a1a2e;
+    --text-2: #5F5E5A;
+    --text-3: #8A8882;
+    --bg: #F4F6F9;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --radius: 12px;
+  }
+
+  body { background: var(--bg); }
+
+  .estado-wrap {
+    padding: 20px;
+  }
+
+  .estado-topbar {
+    background: var(--navy);
+    color: white;
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+
+  .estado-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .estado-subtitle {
+    font-size: 13px;
+    opacity: 0.75;
+    margin-top: 4px;
+  }
+
+  .estado-actions a {
+    text-decoration: none;
+  }
+
+  .estado-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .estado-kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  .estado-kpi-label {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-bottom: 6px;
+  }
+
+  .estado-kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .estado-kpi-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  .estado-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin: 18px 0 10px;
+  }
+
+  .estado-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .estado-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .estado-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .estado-stripe {
+    width: 4px;
+    align-self: stretch;
+    border-radius: 4px;
+    background: var(--blue);
+  }
+
+  .estado-main {
+    flex: 1;
+  }
+
+  .estado-equipo {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .estado-meta {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 2px;
+  }
+
+  .estado-score {
+    min-width: 120px;
+    text-align: right;
+  }
+
+  .estado-score-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .score-critico {
+    background: var(--red-lt);
+    color: var(--red);
+  }
+
+  .score-malo {
+    background: var(--amber-lt);
+    color: var(--amber);
+  }
+
+  .score-suficiente {
+    background: var(--blue-lt);
+    color: var(--blue);
+  }
+
+  .score-ok {
+    background: var(--green-lt);
+    color: var(--green);
+  }
+
+  .score-na {
+    background: #efefef;
+    color: #666;
+  }
+
+  .estado-card-body {
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 1.4fr .9fr;
+    gap: 16px;
+  }
+
+  .estado-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 14px;
+  }
+
+  .estado-item {
+    font-size: 13px;
+  }
+
+  .estado-item strong {
+    color: var(--text-2);
+    display: block;
+    font-size: 11px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .estado-comentarios {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text);
+    background: #fafbfc;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .estado-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .estado-fotos {
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .estado-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .estado-thumbs img {
+    width: 92px;
+    height: 92px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .estado-links {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .estado-links a {
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .estado-empty {
+    background: white;
+    border: 1px dashed rgba(0,0,0,0.15);
+    border-radius: 12px;
+    padding: 24px;
+    color: var(--text-2);
+  }
+
+  .stripe-critico { background: var(--red); }
+  .stripe-malo { background: #EF9F27; }
+  .stripe-suficiente { background: var(--blue); }
+  .stripe-ok { background: var(--green); }
+  .stripe-na { background: #999; }
+
+  @media (max-width: 900px) {
+    .estado-kpis { grid-template-columns: repeat(2, 1fr); }
+    .estado-card-body { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .estado-topbar { flex-direction: column; align-items: start; }
+    .estado-kpis { grid-template-columns: 1fr; }
+    .estado-grid { grid-template-columns: 1fr; }
+  }
+  .estado-main-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.estado-main-link:hover .estado-equipo {
+  color: var(--blue);
+  text-decoration: underline;
+}
+</style>
+
+
+
+<div class="estado-wrap">
+  <%= render "topbar" %>
+
+  <%= render "kpis",
+      total: total,
+      promedio_general: promedio_general,
+      criticos: criticos,
+      malos: malos,
+      suficientes: suficientes,
+      ok: ok %>
+
+  <div class="estado-section-title">Hallazgos y estados registrados</div>
+
+  <% if registros.any? %>
+    <div class="estado-list">
+      <% registros.each do |estado_equipo| %>
+        <%= render "estado_card", estado_equipo: estado_equipo %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "empty_state" %>
   <% end %>
 </div>
-
-<%= link_to "New estado equipo", new_estado_equipo_path %>

@@ -11,20 +11,75 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :equipo_principal, style: "display: block" %>
-    <%= form.text_field :equipo_principal %>
-  </div>
+ <div>
+  <%= form.label :equipo_principal, style: "display: block" %>
+  <%= form.select :equipo_principal,
+    ["Molino 22"],
+    { include_blank: false } %>
+</div>
 
-  <div>
-    <%= form.label :equipo, style: "display: block" %>
-    <%= form.text_field :equipo %>
-  </div>
+<div>
+  <%= form.label :equipo, style: "display: block" %>
+  <%= form.select :equipo,
+    [
+      "Dosimat clinker Melón",
+      "Dosimat clinker import.",
+      "Dosimat de puzolana",
+      "Cinta de la puzolana",
+      "Dosimat del yeso",
+      "Transportador 1 M°22",
+      "Inspección ruedas",
+      "Inspección capachos",
+      "Filtro clink imp. C426DC01",
+      "Clapetas",
+      "Presión de aire jet pulse",
+      "Disparos jet-pulse",
+      "Filtro clink. Melón. C426DC02",
+      "Filtro puz C426DC03",
+      "Transportador 2 M°22",
+      "Filtro yeso C426DC04",
+      "Filtro yeso C426DC05",
+      "Transportador 3 M°22",
+      "Filtro C426DC06",
+      "Chute alimentación molino",
+      "Pernos fondo entrada M°22",
+      "Pernos periféricos M°22",
+      "Bombas descanso entrada",
+      "Bombas descanso salida",
+      "Reguera descarga molino",
+      "Elevador molino",
+      "Chute descarga elevador",
+      "Reguera descarga elevador",
+      "Ventilador reguera",
+      "Separador",
+      "Chapaletas separador",
+      "Vent. reguera separ C426AS04FA01",
+      "Filtro C426DC07",
+      "Inspección rosca C426DC07SC01",
+      "Inspección rosca C426DC07SC02",
+      "Inspección esclusa C426RA02",
+      "Inspección esclusa C426RA03",
+      "Filtro C426DC09",
+      "Vent. C426AS06FA01",
+      "Inspección reguera C426AS05",
+      "Inspección reguera C426AS06",
+      "Inspección esclusa C426DC09RA01",
+      "Inspección esclusa C426DC09RA02",
+      "Ventilador C426AS07FA01",
+      "Reguera C426-AS07",
+      "Ventilador C426AS08SA01",
+      "Reguera C426AS06",
+      "Ductos aspiración polden 1-2",
+      "Válvula polden 1 428PS01VV01",
+      "Válvula polden 2 428PS01VV06"
+    ],
+    { include_blank: true } %>
+</div>
 
-  <div>
-    <%= form.label :estado_cinta, style: "display: block" %>
-    <%= form.number_field :estado_cinta %>
-  </div>
+<div>
+  <%= form.label :estado_cinta, style: "display: block" %>
+  <%= form.number_field :estado_cinta %>
+</div>
 
   <div>
     <%= form.label :estado_motor, style: "display: block" %>
@@ -70,13 +125,19 @@
     <%= form.label :estado_limpieza, style: "display: block" %>
     <%= form.number_field :estado_limpieza %>
   </div>
-
+<div>
+  <%= form.label :fotos, style: "display: block" %>
+  <%= form.file_field :fotos, multiple: true, direct_upload: true, accept: "image/png,image/jpg,image/jpeg,image/webp" %>
+</div>
   <div>
     <%= form.label :comentarios, style: "display: block" %>
     <%= form.textarea :comentarios %>
   </div>
+  
 
   <div>
     <%= form.submit %>
   </div>
+
+  
 <% end %>

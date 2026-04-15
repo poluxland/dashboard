@@ -1,0 +1,260 @@
+<!-- app/views/estado_equipos/_estado_card.html.erb -->
+<%
+  valores = [
+    estado_equipo.estado_cinta,
+    estado_equipo.estado_motor,
+    estado_equipo.estado_polines,
+    estado_equipo.estado_ruedas,
+    estado_equipo.estado_capachos,
+    estado_equipo.estado_sistema_aire,
+    estado_equipo.estado_filtro,
+    estado_equipo.estado_estructura,
+    estado_equipo.estado_lubricacion,
+    estado_equipo.estado_limpieza
+  ].compact.map(&:to_f)
+
+  score = valores.any? ? (valores.sum / valores.size).round : nil
+
+  nivel =
+    if score.nil?
+      "na"
+    elsif score <= 25
+      "critico"
+    elsif score <= 50
+      "malo"
+    elsif score <= 75
+      "suficiente"
+    else
+      "ok"
+    end
+
+  texto_estado =
+    if score.nil?
+      "SIN DATOS"
+    elsif score <= 25
+      "CRÍTICO"
+    elsif score <= 50
+      "MALO"
+    elsif score <= 75
+      "SUFICIENTE"
+    else
+      "OK"
+    end
+%>
+
+
+
+
+<style>
+.ac {
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+
+.ac:hover {
+  box-shadow: 0 8px 22px rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+
+.ac-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #efefef;
+  flex-wrap: wrap;
+}
+
+.ac-stripe {
+  width: 6px;
+  min-width: 6px;
+  align-self: stretch;
+  border-radius: 999px;
+}
+
+.ac[data-level="critico"] .ac-stripe { background: #dc2626; }
+.ac[data-level="malo"] .ac-stripe { background: #ea580c; }
+.ac[data-level="suficiente"] .ac-stripe { background: #ca8a04; }
+.ac[data-level="ok"] .ac-stripe { background: #16a34a; }
+.ac[data-level="na"] .ac-stripe { background: #9ca3af; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.b-critico {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.b-malo {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.b-suficiente {
+  background: #fef3c7;
+  color: #a16207;
+}
+
+.b-ok {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.b-na {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.ac-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: #111827;
+}
+
+.ac-param {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.ac-pct {
+  margin-left: auto;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.pct-critico { color: #b91c1c; }
+.pct-malo { color: #c2410c; }
+.pct-suficiente { color: #a16207; }
+.pct-ok { color: #15803d; }
+.pct-na { color: #6b7280; }
+
+.ac-body {
+  padding: 14px;
+}
+
+.ac-comment {
+  color: #1f2937;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.ac-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.ac-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.btn-ot {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #111827;
+  color: #fff;
+}
+
+.btn-ot-light {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.ac-thumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ac-thumb-img {
+  width: 74px;
+  height: 74px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  display: block;
+}
+</style>
+
+<div class="ac" data-level="<%= nivel %>" onclick="window.location='<%= estado_equipo_path(estado_equipo) %>'">
+  <div class="ac-head">
+    <div class="ac-stripe"></div>
+
+    <span class="badge b-<%= nivel %>">
+      <%= texto_estado %>
+      <% if score.present? %>
+        · <%= score %>%
+      <% end %>
+    </span>
+
+    <span class="ac-name">
+      <%= estado_equipo.equipo.presence || "Sin equipo" %>
+    </span>
+
+    <span class="ac-param">
+      <%= estado_equipo.equipo_principal.presence || "Sin equipo principal" %>
+    </span>
+
+    <span class="ac-pct pct-<%= nivel %>">
+      <% if score.present? %>
+        <%= score %>%
+      <% else %>
+        --
+      <% end %>
+    </span>
+  </div>
+
+  <div class="ac-body">
+    <div class="ac-comment">
+      <%= estado_equipo.comentarios.presence || "Sin comentarios." %>
+    </div>
+
+    <div class="ac-meta">
+      <div class="time">
+        <%= l(estado_equipo.created_at, format: :short) %>
+      </div>
+
+      <div class="photos">
+        <%= estado_equipo.fotos.attached? ? "#{estado_equipo.fotos.count} foto(s) adjuntas" : "Sin fotos" %>
+      </div>
+
+      <div class="ac-actions" onclick="event.stopPropagation();">
+        <%= link_to "Ver", estado_equipo, class: "btn-ot" %>
+        <%= link_to "Editar", edit_estado_equipo_path(estado_equipo), class: "btn-ot btn-ot-light" %>
+      </div>
+    </div>
+
+    <% if estado_equipo.fotos.attached? %>
+      <div class="ac-thumbs">
+        <% estado_equipo.fotos.first(4).each do |foto| %>
+          <%= image_tag foto, class: "ac-thumb-img" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

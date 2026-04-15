@@ -1,0 +1,26 @@
+<!-- app/views/estado_equipos/_kpis.html.erb -->
+<div class="estado-kpis">
+  <div class="estado-kpi">
+    <div class="estado-kpi-label">Registros totales</div>
+    <div class="estado-kpi-value"><%= total %></div>
+    <div class="estado-kpi-sub">Inspecciones cargadas</div>
+  </div>
+
+  <div class="estado-kpi">
+    <div class="estado-kpi-label">Promedio general</div>
+    <div class="estado-kpi-value"><%= promedio_general %>%</div>
+    <div class="estado-kpi-sub">Promedio de estados numéricos</div>
+  </div>
+
+  <div class="estado-kpi">
+    <div class="estado-kpi-label">Críticos / malos</div>
+    <div class="estado-kpi-value"><%= criticos %> / <%= malos %></div>
+    <div class="estado-kpi-sub">Registros con mayor atención</div>
+  </div>
+
+  <div class="estado-kpi">
+    <div class="estado-kpi-label">Suficientes / OK</div>
+    <div class="estado-kpi-value"><%= suficientes %> / <%= ok %></div>
+    <div class="estado-kpi-sub">Registros bajo control</div>
+  </div>
+</div>

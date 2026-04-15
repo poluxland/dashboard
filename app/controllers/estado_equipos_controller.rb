@@ -2,9 +2,14 @@ class EstadoEquiposController < ApplicationController
   before_action :set_estado_equipo, only: %i[ show edit update destroy ]
 
   # GET /estado_equipos or /estado_equipos.json
-  def index
-    @estado_equipos = EstadoEquipo.all
-  end
+def index
+  subquery = EstadoEquipo
+    .where.not(equipo: [nil, ""])
+    .select("MAX(id) AS id")
+    .group(:equipo)
+
+  @estado_equipos = EstadoEquipo.where(id: subquery).order(created_at: :desc)
+end
 
   # GET /estado_equipos/1 or /estado_equipos/1.json
   def show
@@ -65,6 +70,21 @@ class EstadoEquiposController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def estado_equipo_params
-      params.expect(estado_equipo: [ :equipo_principal, :equipo, :estado_cinta, :estado_motor, :estado_polines, :estado_ruedas, :estado_capachos, :estado_sistema_aire, :estado_filtro, :estado_estructura, :estado_lubricacion, :estado_limpieza, :comentarios ])
+      params.expect(estado_equipo: [
+        :equipo_principal,
+        :equipo,
+        :estado_cinta,
+        :estado_motor,
+        :estado_polines,
+        :estado_ruedas,
+        :estado_capachos,
+        :estado_sistema_aire,
+        :estado_filtro,
+        :estado_estructura,
+        :estado_lubricacion,
+        :estado_limpieza,
+        :comentarios,
+        fotos: []
+      ])
     end
 end
