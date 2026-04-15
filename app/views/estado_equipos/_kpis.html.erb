@@ -1,4 +1,5 @@
-<!-- app/views/estado_equipos/_kpis.html.erb -->
+<% cobertura = [((total.to_f / 70) * 100).round, 100].min %>
+
 <div class="kpi-row">
   <div class="kc">
     <div class="kc-label">Score general zona</div>
@@ -25,10 +26,10 @@
 
   <div class="kc">
     <div class="kc-label">Cobertura inspector</div>
-    <div class="kc-value green">100%</div>
-    <div class="kc-sub">Área principal completada · demo</div>
+    <div class="kc-value green"><%= cobertura %>%</div>
+    <div class="kc-sub"><%= total %> de 70 equipos inspeccionados</div>
     <div class="kc-bar">
-      <div class="kc-bar-fill" style="width:100%;background:#639922"></div>
+      <div class="kc-bar-fill" style="width:<%= cobertura %>%;background:#639922"></div>
     </div>
   </div>
 </div>
