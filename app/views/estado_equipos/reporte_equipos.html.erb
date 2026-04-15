@@ -346,7 +346,7 @@
     <div>
       <h1 class="demo-title">Plant Intelligence / Molino 22</h1>
       <div class="demo-subtitle">
-        Demo ejecutivo · información simulada para presentación
+        Reporte ejecutivo
       </div>
     </div>
 
@@ -356,16 +356,33 @@
     </div>
   </div>
 
-  <div class="ger-header">
-    <div>
-      <div class="gh-title">Reporte semanal ejecutivo — Molino 22</div>
-      <div class="gh-sub">Planta Cemento · Semana 11 / 2026 · Generado automáticamente</div>
-    </div>
-    <div class="gh-period">
-      <div class="gh-period-main">10 – 16 mar 2026</div>
-      <div class="gh-period-sub">Generado: 18 mar 2026 · 06:00</div>
+<%
+  hoy = Time.zone.today
+  semana_anterior = hoy.prev_week(:monday)
+
+  inicio_periodo = semana_anterior.beginning_of_week(:monday)
+  fin_periodo    = semana_anterior.end_of_week(:monday)
+
+  generado_en = Time.zone.now - 2.hours
+%>
+
+<div class="ger-header">
+  <div>
+    <div class="gh-title">Reporte semanal ejecutivo — Molino 22</div>
+    <div class="gh-sub">
+      Planta Cemento · Semana <%= inicio_periodo.cweek %> / <%= inicio_periodo.year %> · Generado automáticamente
     </div>
   </div>
+
+  <div class="gh-period">
+    <div class="gh-period-main">
+      <%= l(inicio_periodo, format: "%d") %> – <%= l(fin_periodo, format: "%d %b %Y") %>
+    </div>
+    <div class="gh-period-sub">
+      Generado: <%= l(generado_en, format: "%d %b %Y · %H:%M") %>
+    </div>
+  </div>
+</div>
 
   <div class="sec-label">Indicadores clave de la semana</div>
   <div class="kpi5">
@@ -580,6 +597,6 @@
   </div>
 
   <div class="footer-note">
-    Demo basado en la misma línea visual de tu vista de turno y del mockup ejecutivo que compartiste. :contentReference[oaicite:0]{index=0}
+    Impromaq Ltda.
   </div>
 </div>
