@@ -1,0 +1,585 @@
+<% content_for :title, "Vista gerencia demo" %>
+
+<style>
+  :root {
+    --navy: #0C447C;
+    --blue: #185FA5;
+    --blue-lt: #E6F1FB;
+    --green: #3B6D11;
+    --green-lt: #EAF3DE;
+    --amber: #854F0B;
+    --amber-lt: #FAEEDA;
+    --red: #A32D2D;
+    --red-lt: #FCEBEB;
+    --text: #1a1a2e;
+    --text-2: #5F5E5A;
+    --text-3: #8A8882;
+    --bg: #F4F6F9;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --radius: 12px;
+  }
+
+  body {
+    background: var(--bg);
+  }
+
+  .demo-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .demo-topbar {
+    background: var(--navy);
+    color: white;
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+
+  .demo-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .demo-subtitle {
+    font-size: 13px;
+    opacity: 0.78;
+    margin-top: 4px;
+  }
+
+  .demo-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .demo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 10px 16px;
+    min-height: 42px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  }
+
+  .demo-btn-secondary {
+    background: rgba(255,255,255,0.10);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: none;
+  }
+
+  .ger-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .gh-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .gh-sub, .gh-period-sub {
+    color: var(--text-2);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .gh-period {
+    text-align: right;
+  }
+
+  .gh-period-main {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .sec-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin: 18px 0 10px;
+  }
+
+  .kpi5 {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .kc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+
+  .kc-label {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-bottom: 6px;
+  }
+
+  .kc-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .kc-value.blue { color: var(--blue); }
+  .kc-value.red { color: var(--red); }
+  .kc-value.green { color: var(--green); }
+  .kc-value.amber { color: var(--amber); }
+
+  .kc-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  .zone-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .zc {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .zc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .zc-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .zc-score {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .zs-red { background: var(--red-lt); color: var(--red); }
+  .zs-amber { background: var(--amber-lt); color: var(--amber); }
+  .zs-blue { background: var(--blue-lt); color: var(--blue); }
+  .zs-green { background: var(--green-lt); color: var(--green); }
+
+  .zc-body {
+    padding: 14px 16px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .zc-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 52px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .zc-param {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .mini-track {
+    height: 8px;
+    border-radius: 999px;
+    background: #edf1f5;
+    overflow: hidden;
+  }
+
+  .mini-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .zc-val {
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .zc-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #fafbfc;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .trend-up { color: var(--red); font-weight: 700; }
+  .trend-down { color: var(--green); font-weight: 700; }
+
+  .table-wrap {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 18px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: #f8fafc;
+    color: var(--text-2);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .chip-red {
+    background: var(--red-lt);
+    color: var(--red);
+  }
+
+  .chip-amber {
+    background: var(--amber-lt);
+    color: var(--amber);
+  }
+
+  .footer-note {
+    margin-top: 18px;
+    color: var(--text-3);
+    font-size: 12px;
+  }
+
+  @media (max-width: 1100px) {
+    .kpi5 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .zone-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .zc-row {
+      grid-template-columns: 1fr;
+    }
+
+    .ger-header, .demo-topbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .gh-period {
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .kpi5 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="demo-wrap">
+  <div class="demo-topbar">
+    <div>
+      <h1 class="demo-title">Plant Intelligence / Molino 22</h1>
+      <div class="demo-subtitle">
+        Demo ejecutivo · información simulada para presentación
+      </div>
+    </div>
+
+    <div class="demo-actions">
+      <%= link_to "Volver a inspecciones", estado_equipos_path, class: "demo-btn demo-btn-secondary" %>
+      <%= link_to "Nueva inspección", new_estado_equipo_path, class: "demo-btn" %>
+    </div>
+  </div>
+
+  <div class="ger-header">
+    <div>
+      <div class="gh-title">Reporte semanal ejecutivo — Molino 22</div>
+      <div class="gh-sub">Planta Cemento · Semana 11 / 2026 · Generado automáticamente</div>
+    </div>
+    <div class="gh-period">
+      <div class="gh-period-main">10 – 16 mar 2026</div>
+      <div class="gh-period-sub">Generado: 18 mar 2026 · 06:00</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Indicadores clave de la semana</div>
+  <div class="kpi5">
+    <div class="kc">
+      <div class="kc-label">Score promedio planta</div>
+      <div class="kc-value blue">71%</div>
+      <div class="kc-sub">Suficiente bajo seguimiento</div>
+    </div>
+
+    <div class="kc">
+      <div class="kc-label">Hallazgos generados</div>
+      <div class="kc-value red">47</div>
+      <div class="kc-sub">Semana completa · 6 turnos</div>
+    </div>
+
+    <div class="kc">
+      <div class="kc-label">Hallazgos normalizados</div>
+      <div class="kc-value green">31</div>
+      <div class="kc-sub">66% tasa de cierre</div>
+    </div>
+
+    <div class="kc">
+      <div class="kc-label">Tiempo prom. normalización</div>
+      <div class="kc-value amber">18,4 h</div>
+      <div class="kc-sub">Críticos: 6,2 h · Malos: 24,1 h</div>
+    </div>
+
+    <div class="kc">
+      <div class="kc-label">Hallazgos pendientes</div>
+      <div class="kc-value red">16</div>
+      <div class="kc-sub">5 críticos · 11 malos</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Estado por zona — semana 11</div>
+  <div class="zone-grid">
+    <div class="zc">
+      <div class="zc-head">
+        <div class="zc-name">Zona alimentación — Dosimats y cintas</div>
+        <div class="zc-score zs-amber">52% · Suficiente</div>
+      </div>
+      <div class="zc-body">
+        <div class="zc-row">
+          <span class="zc-param">Estado cinta</span>
+          <div class="mini-track"><div class="mini-fill" style="width:45%;background:#EF9F27"></div></div>
+          <span class="zc-val" style="color:#854F0B">45%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Estado polines</span>
+          <div class="mini-track"><div class="mini-fill" style="width:68%;background:#185FA5"></div></div>
+          <span class="zc-val" style="color:#185FA5">68%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Ruedas / capachos</span>
+          <div class="mini-track"><div class="mini-fill" style="width:38%;background:#EF9F27"></div></div>
+          <span class="zc-val" style="color:#854F0B">38%</span>
+        </div>
+      </div>
+      <div class="zc-foot">
+        <span>7 hallazgos · 3 pendientes</span>
+        <span class="trend-up">▼ −5pp vs sem. ant.</span>
+      </div>
+    </div>
+
+    <div class="zc">
+      <div class="zc-head">
+        <div class="zc-name">Zona filtros — Red jet pulse</div>
+        <div class="zc-score zs-blue">61% · Seguimiento</div>
+      </div>
+      <div class="zc-body">
+        <div class="zc-row">
+          <span class="zc-param">Presión de aire</span>
+          <div class="mini-track"><div class="mini-fill" style="width:55%;background:#EF9F27"></div></div>
+          <span class="zc-val" style="color:#854F0B">55%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Disparos jet pulse</span>
+          <div class="mini-track"><div class="mini-fill" style="width:63%;background:#185FA5"></div></div>
+          <span class="zc-val" style="color:#185FA5">63%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Filtro saturado</span>
+          <div class="mini-track"><div class="mini-fill" style="width:45%;background:#EF9F27"></div></div>
+          <span class="zc-val" style="color:#854F0B">45%</span>
+        </div>
+      </div>
+      <div class="zc-foot">
+        <span>12 hallazgos · 6 pendientes</span>
+        <span class="trend-down">▲ +4pp vs sem. ant.</span>
+      </div>
+    </div>
+
+    <div class="zc">
+      <div class="zc-head">
+        <div class="zc-name">Zona molino — Cuerpo y mecanismos</div>
+        <div class="zc-score zs-red">38% · Malo</div>
+      </div>
+      <div class="zc-body">
+        <div class="zc-row">
+          <span class="zc-param">Pernos fondo / periféricos</span>
+          <div class="mini-track"><div class="mini-fill" style="width:20%;background:#A32D2D"></div></div>
+          <span class="zc-val" style="color:#A32D2D">20%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Bombas descanso</span>
+          <div class="mini-track"><div class="mini-fill" style="width:15%;background:#A32D2D"></div></div>
+          <span class="zc-val" style="color:#A32D2D">15%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Chute alimentación</span>
+          <div class="mini-track"><div class="mini-fill" style="width:42%;background:#EF9F27"></div></div>
+          <span class="zc-val" style="color:#854F0B">42%</span>
+        </div>
+      </div>
+      <div class="zc-foot">
+        <span>18 hallazgos · 5 críticos activos</span>
+        <span class="trend-up">▼ −12pp — ALERTA</span>
+      </div>
+    </div>
+
+    <div class="zc">
+      <div class="zc-head">
+        <div class="zc-name">Zona separador y ventilación</div>
+        <div class="zc-score zs-green">79% · Cumple</div>
+      </div>
+      <div class="zc-body">
+        <div class="zc-row">
+          <span class="zc-param">Separador</span>
+          <div class="mini-track"><div class="mini-fill" style="width:81%;background:#3B6D11"></div></div>
+          <span class="zc-val" style="color:#3B6D11">81%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Chapaletas</span>
+          <div class="mini-track"><div class="mini-fill" style="width:70%;background:#185FA5"></div></div>
+          <span class="zc-val" style="color:#185FA5">70%</span>
+        </div>
+        <div class="zc-row">
+          <span class="zc-param">Ventiladores</span>
+          <div class="mini-track"><div class="mini-fill" style="width:82%;background:#3B6D11"></div></div>
+          <span class="zc-val" style="color:#3B6D11">82%</span>
+        </div>
+      </div>
+      <div class="zc-foot">
+        <span>4 hallazgos · 2 pendientes</span>
+        <span class="trend-down">▲ +6pp vs sem. ant.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Componentes recurrentes — top 5 semana 11</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Parámetro</th>
+          <th>Zona</th>
+          <th>Score</th>
+          <th>Hallazgos</th>
+          <th>Tiempo prom.</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Bombas descanso entrada</td>
+          <td>Fugas de aceite</td>
+          <td>Molino</td>
+          <td><span class="chip chip-red">15%</span></td>
+          <td>4</td>
+          <td>4,1 h</td>
+          <td><span class="chip chip-red">Crítico activo</span></td>
+        </tr>
+        <tr>
+          <td>Transportador 2 — Ruedas</td>
+          <td>Ruedas dañadas</td>
+          <td>Alimentación</td>
+          <td><span class="chip chip-red">10%</span></td>
+          <td>3</td>
+          <td>8,7 h</td>
+          <td><span class="chip chip-red">Crítico activo</span></td>
+        </tr>
+        <tr>
+          <td>Filtro C426DC01 — Clapetas</td>
+          <td>Fuga de aire</td>
+          <td>Filtros</td>
+          <td><span class="chip chip-red">20%</span></td>
+          <td>3</td>
+          <td>12,3 h</td>
+          <td><span class="chip chip-red">Crítico activo</span></td>
+        </tr>
+        <tr>
+          <td>Dosimat clinker importación</td>
+          <td>Estado cinta</td>
+          <td>Alimentación</td>
+          <td><span class="chip chip-amber">35%</span></td>
+          <td>3</td>
+          <td>28,4 h</td>
+          <td><span class="chip chip-amber">Malo · pendiente</span></td>
+        </tr>
+        <tr>
+          <td>Ventilador 426AS04FA01</td>
+          <td>Temperatura motor</td>
+          <td>Separador</td>
+          <td><span class="chip chip-amber">42%</span></td>
+          <td>2</td>
+          <td>19,2 h</td>
+          <td><span class="chip chip-amber">Malo · seguimiento</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    Demo basado en la misma línea visual de tu vista de turno y del mockup ejecutivo que compartiste. :contentReference[oaicite:0]{index=0}
+  </div>
+</div>

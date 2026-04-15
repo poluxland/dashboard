@@ -15,6 +15,9 @@ end
   def show
   end
 
+  def reporte_equipos
+  end
+
   # GET /estado_equipos/new
   def new
     @estado_equipo = EstadoEquipo.new

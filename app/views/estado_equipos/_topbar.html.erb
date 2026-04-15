@@ -45,8 +45,9 @@
   </div>
 
   <div class="estado-actions">
-    <%= link_to "Nueva inspección", new_estado_equipo_path, class: "estado-topbar-btn" %>
-  </div>
+  <%= link_to "Reporte", reporte_equipos_estado_equipos_path, class: "estado-topbar-btn estado-topbar-btn-secondary" %>
+  <%= link_to "Nueva inspección", new_estado_equipo_path, class: "estado-topbar-btn" %>
+</div>
 </div>
 
 <style>
@@ -137,6 +138,8 @@
 .estado-actions {
   display: flex;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .estado-topbar-btn {
@@ -154,7 +157,7 @@
   font-weight: 700;
   border: 1px solid rgba(255,255,255,0.22);
   box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease, background .12s ease;
 }
 
 .estado-topbar-btn:hover {
@@ -166,6 +169,21 @@
 
 .estado-topbar-btn:active {
   transform: translateY(0);
+}
+
+.estado-topbar-btn-secondary {
+  background: rgba(255,255,255,0.10);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: none;
+}
+
+.estado-topbar-btn-secondary:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.16);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.10);
 }
 
 @media (max-width: 1100px) {
@@ -187,7 +205,8 @@
     width: 100%;
   }
 
-  .estado-topbar-btn {
+  .estado-topbar-btn,
+  .estado-topbar-btn-secondary {
     width: 100%;
   }
 }
