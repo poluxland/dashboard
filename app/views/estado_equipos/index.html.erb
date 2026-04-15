@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Estado equipos" %>
+
+<h1>Estado equipos</h1>
+
+<div id="estado_equipos">
+  <% @estado_equipos.each do |estado_equipo| %>
+    <%= render estado_equipo %>
+    <p>
+      <%= link_to "Show this estado equipo", estado_equipo %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New estado equipo", new_estado_equipo_path %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_30_225417) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_14_230201) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,24 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_30_225417) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "estado_equipos", force: :cascade do |t|
+    t.text "comentarios"
+    t.datetime "created_at", null: false
+    t.string "equipo"
+    t.string "equipo_principal"
+    t.integer "estado_capachos"
+    t.integer "estado_cinta"
+    t.integer "estado_estructura"
+    t.integer "estado_filtro"
+    t.integer "estado_limpieza"
+    t.integer "estado_lubricacion"
+    t.integer "estado_motor"
+    t.integer "estado_polines"
+    t.integer "estado_ruedas"
+    t.integer "estado_sistema_aire"
+    t.datetime "updated_at", null: false
   end
 
   create_table "indicator_readings", force: :cascade do |t|

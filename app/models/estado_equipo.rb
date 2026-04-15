@@ -1,0 +1,2 @@
+class EstadoEquipo < ApplicationRecord
+end

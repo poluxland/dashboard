@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  equipo_principal: MyString
+  equipo: MyString
+  estado_cinta: 1
+  estado_motor: 1
+  estado_polines: 1
+  estado_ruedas: 1
+  estado_capachos: 1
+  estado_sistema_aire: 1
+  estado_filtro: 1
+  estado_estructura: 1
+  estado_lubricacion: 1
+  estado_limpieza: 1
+  comentarios: MyText
+
+two:
+  equipo_principal: MyString
+  equipo: MyString
+  estado_cinta: 1
+  estado_motor: 1
+  estado_polines: 1
+  estado_ruedas: 1
+  estado_capachos: 1
+  estado_sistema_aire: 1
+  estado_filtro: 1
+  estado_estructura: 1
+  estado_lubricacion: 1
+  estado_limpieza: 1
+  comentarios: MyText

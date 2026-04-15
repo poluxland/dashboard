@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @estado_equipo %>
+
+<div>
+  <%= link_to "Edit this estado equipo", edit_estado_equipo_path(@estado_equipo) %> |
+  <%= link_to "Back to estado equipos", estado_equipos_path %>
+
+  <%= button_to "Destroy this estado equipo", @estado_equipo, method: :delete %>
+</div>

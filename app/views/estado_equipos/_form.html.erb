@@ -1,0 +1,82 @@
+<%= form_with(model: estado_equipo) do |form| %>
+  <% if estado_equipo.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(estado_equipo.errors.count, "error") %> prohibited this estado_equipo from being saved:</h2>
+
+      <ul>
+        <% estado_equipo.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :equipo_principal, style: "display: block" %>
+    <%= form.text_field :equipo_principal %>
+  </div>
+
+  <div>
+    <%= form.label :equipo, style: "display: block" %>
+    <%= form.text_field :equipo %>
+  </div>
+
+  <div>
+    <%= form.label :estado_cinta, style: "display: block" %>
+    <%= form.number_field :estado_cinta %>
+  </div>
+
+  <div>
+    <%= form.label :estado_motor, style: "display: block" %>
+    <%= form.number_field :estado_motor %>
+  </div>
+
+  <div>
+    <%= form.label :estado_polines, style: "display: block" %>
+    <%= form.number_field :estado_polines %>
+  </div>
+
+  <div>
+    <%= form.label :estado_ruedas, style: "display: block" %>
+    <%= form.number_field :estado_ruedas %>
+  </div>
+
+  <div>
+    <%= form.label :estado_capachos, style: "display: block" %>
+    <%= form.number_field :estado_capachos %>
+  </div>
+
+  <div>
+    <%= form.label :estado_sistema_aire, style: "display: block" %>
+    <%= form.number_field :estado_sistema_aire %>
+  </div>
+
+  <div>
+    <%= form.label :estado_filtro, style: "display: block" %>
+    <%= form.number_field :estado_filtro %>
+  </div>
+
+  <div>
+    <%= form.label :estado_estructura, style: "display: block" %>
+    <%= form.number_field :estado_estructura %>
+  </div>
+
+  <div>
+    <%= form.label :estado_lubricacion, style: "display: block" %>
+    <%= form.number_field :estado_lubricacion %>
+  </div>
+
+  <div>
+    <%= form.label :estado_limpieza, style: "display: block" %>
+    <%= form.number_field :estado_limpieza %>
+  </div>
+
+  <div>
+    <%= form.label :comentarios, style: "display: block" %>
+    <%= form.textarea :comentarios %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

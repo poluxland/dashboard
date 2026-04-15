@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :estado_equipos
   resources :works
 # OTs + import
 # config/routes.rb
