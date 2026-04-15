@@ -1,11 +1,72 @@
-<% content_for :title, "New estado equipo" %>
+<% content_for :title, "Nuevo estado de equipo" %>
 
-<h1>New estado equipo</h1>
+<div class="estado-edit-wrap">
+  <div class="estado-edit-header">
+    <h1 class="estado-edit-title">Nuevo estado de equipo</h1>
+    <p class="estado-edit-subtitle">
+      Registra el estado general del equipo, sus condiciones operativas y observaciones relevantes.
+    </p>
+  </div>
 
-<%= render "form", estado_equipo: @estado_equipo %>
+  <div class="estado-edit-card">
+    <%= render "form", estado_equipo: @estado_equipo %>
+  </div>
 
-<br>
-
-<div>
-  <%= link_to "Back to estado equipos", estado_equipos_path %>
+  <div class="estado-edit-actions">
+    <%= link_to "Volver al listado", estado_equipos_path, class: "btn btn-outline-secondary" %>
+  </div>
 </div>
+
+<style>
+.estado-edit-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.estado-edit-header {
+  margin-bottom: 18px;
+}
+
+.estado-edit-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.estado-edit-subtitle {
+  margin: 6px 0 0 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.estado-edit-card {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+}
+
+.estado-edit-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+@media (max-width: 700px) {
+  .estado-edit-wrap {
+    padding: 14px;
+  }
+
+  .estado-edit-title {
+    font-size: 24px;
+  }
+
+  .estado-edit-card {
+    padding: 14px;
+  }
+}
+</style>

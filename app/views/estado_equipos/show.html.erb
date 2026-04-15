@@ -1,10 +1,38 @@
-<p style="color: green"><%= notice %></p>
+<p class="notice-msg"><%= notice %></p>
 
 <%= render @estado_equipo %>
 
-<div>
-  <%= link_to "Edit this estado equipo", edit_estado_equipo_path(@estado_equipo) %> |
-  <%= link_to "Back to estado equipos", estado_equipos_path %>
+<div class="estado-show-actions">
+  <%= link_to "Editar registro", edit_estado_equipo_path(@estado_equipo), class: "btn btn-primary" %>
 
-  <%= button_to "Destroy this estado equipo", @estado_equipo, method: :delete %>
+  <%= link_to "Volver al listado", estado_equipos_path, class: "btn btn-outline-secondary" %>
+
+  <%= button_to "Eliminar registro",
+      @estado_equipo,
+      method: :delete,
+      data: { turbo_confirm: "¿Seguro que deseas eliminar este registro?" },
+      class: "btn btn-danger" %>
 </div>
+
+<style>
+.notice-msg {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.estado-show-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.estado-show-actions form {
+  margin: 0;
+}
+</style>

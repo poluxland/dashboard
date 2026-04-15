@@ -1,7 +1,9 @@
-<%= form_with(model: estado_equipo) do |form| %>
+<%= form_with(model: estado_equipo, html: { class: "estado-form" }) do |form| %>
   <% if estado_equipo.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(estado_equipo.errors.count, "error") %> prohibited this estado_equipo from being saved:</h2>
+    <div class="estado-form-errors">
+      <h2>
+        <%= pluralize(estado_equipo.errors.count, "error") %> impidieron guardar este registro:
+      </h2>
 
       <ul>
         <% estado_equipo.errors.each do |error| %>
@@ -11,133 +13,313 @@
     </div>
   <% end %>
 
- <div>
-  <%= form.label :equipo_principal, style: "display: block" %>
-  <%= form.select :equipo_principal,
-    ["Molino 22"],
-    { include_blank: false } %>
-</div>
+  <style>
+    .estado-form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
 
-<div>
-  <%= form.label :equipo, style: "display: block" %>
-  <%= form.select :equipo,
-    [
-      "Dosimat clinker Melón",
-      "Dosimat clinker import.",
-      "Dosimat de puzolana",
-      "Cinta de la puzolana",
-      "Dosimat del yeso",
-      "Transportador 1 M°22",
-      "Inspección ruedas",
-      "Inspección capachos",
-      "Filtro clink imp. C426DC01",
-      "Clapetas",
-      "Presión de aire jet pulse",
-      "Disparos jet-pulse",
-      "Filtro clink. Melón. C426DC02",
-      "Filtro puz C426DC03",
-      "Transportador 2 M°22",
-      "Filtro yeso C426DC04",
-      "Filtro yeso C426DC05",
-      "Transportador 3 M°22",
-      "Filtro C426DC06",
-      "Chute alimentación molino",
-      "Pernos fondo entrada M°22",
-      "Pernos periféricos M°22",
-      "Bombas descanso entrada",
-      "Bombas descanso salida",
-      "Reguera descarga molino",
-      "Elevador molino",
-      "Chute descarga elevador",
-      "Reguera descarga elevador",
-      "Ventilador reguera",
-      "Separador",
-      "Chapaletas separador",
-      "Vent. reguera separ C426AS04FA01",
-      "Filtro C426DC07",
-      "Inspección rosca C426DC07SC01",
-      "Inspección rosca C426DC07SC02",
-      "Inspección esclusa C426RA02",
-      "Inspección esclusa C426RA03",
-      "Filtro C426DC09",
-      "Vent. C426AS06FA01",
-      "Inspección reguera C426AS05",
-      "Inspección reguera C426AS06",
-      "Inspección esclusa C426DC09RA01",
-      "Inspección esclusa C426DC09RA02",
-      "Ventilador C426AS07FA01",
-      "Reguera C426-AS07",
-      "Ventilador C426AS08SA01",
-      "Reguera C426AS06",
-      "Ductos aspiración polden 1-2",
-      "Válvula polden 1 428PS01VV01",
-      "Válvula polden 2 428PS01VV06"
-    ],
-    { include_blank: true } %>
-</div>
+    .estado-form-section {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 14px;
+      padding: 18px;
+    }
 
-<div>
-  <%= form.label :estado_cinta, style: "display: block" %>
-  <%= form.number_field :estado_cinta %>
-</div>
+    .estado-form-section-title {
+      margin: 0 0 14px 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #111827;
+    }
 
-  <div>
-    <%= form.label :estado_motor, style: "display: block" %>
-    <%= form.number_field :estado_motor %>
+    .estado-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .estado-form-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .estado-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .estado-field-full {
+      grid-column: 1 / -1;
+    }
+
+    .estado-field label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .estado-field input[type="text"],
+    .estado-field input[type="number"],
+    .estado-field input[type="file"],
+    .estado-field select,
+    .estado-field textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #111827;
+      background: #fff;
+      box-sizing: border-box;
+    }
+
+    .estado-field input:focus,
+    .estado-field select:focus,
+    .estado-field textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    .estado-field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .estado-help {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: -2px;
+    }
+
+    .estado-form-errors {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .estado-form-errors h2 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .estado-form-errors ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .estado-form-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .estado-submit {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: #111827;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .estado-submit:hover {
+      opacity: 0.95;
+    }
+
+    .estado-secondary-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: #e5e7eb;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      .estado-form-grid,
+      .estado-form-grid-4 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .estado-form-grid,
+      .estado-form-grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="estado-form-section">
+    <h3 class="estado-form-section-title">Identificación del equipo</h3>
+
+    <div class="estado-form-grid">
+      <div class="estado-field">
+        <%= form.label :equipo_principal, "Equipo principal" %>
+        <%= form.select :equipo_principal,
+          ["Molino 22"],
+          { include_blank: false } %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :equipo, "Equipo o subequipo" %>
+        <%= form.select :equipo,
+          [
+            "Dosimat clinker Melón",
+            "Dosimat clinker import.",
+            "Dosimat de puzolana",
+            "Cinta de la puzolana",
+            "Dosimat del yeso",
+            "Transportador 1 M°22",
+            "Inspección ruedas",
+            "Inspección capachos",
+            "Filtro clink imp. C426DC01",
+            "Clapetas",
+            "Presión de aire jet pulse",
+            "Disparos jet-pulse",
+            "Filtro clink. Melón. C426DC02",
+            "Filtro puz C426DC03",
+            "Transportador 2 M°22",
+            "Filtro yeso C426DC04",
+            "Filtro yeso C426DC05",
+            "Transportador 3 M°22",
+            "Filtro C426DC06",
+            "Chute alimentación molino",
+            "Pernos fondo entrada M°22",
+            "Pernos periféricos M°22",
+            "Bombas descanso entrada",
+            "Bombas descanso salida",
+            "Reguera descarga molino",
+            "Elevador molino",
+            "Chute descarga elevador",
+            "Reguera descarga elevador",
+            "Ventilador reguera",
+            "Separador",
+            "Chapaletas separador",
+            "Vent. reguera separ C426AS04FA01",
+            "Filtro C426DC07",
+            "Inspección rosca C426DC07SC01",
+            "Inspección rosca C426DC07SC02",
+            "Inspección esclusa C426RA02",
+            "Inspección esclusa C426RA03",
+            "Filtro C426DC09",
+            "Vent. C426AS06FA01",
+            "Inspección reguera C426AS05",
+            "Inspección reguera C426AS06",
+            "Inspección esclusa C426DC09RA01",
+            "Inspección esclusa C426DC09RA02",
+            "Ventilador C426AS07FA01",
+            "Reguera C426-AS07",
+            "Ventilador C426AS08SA01",
+            "Reguera C426AS06",
+            "Ductos aspiración polden 1-2",
+            "Válvula polden 1 428PS01VV01",
+            "Válvula polden 2 428PS01VV06"
+          ],
+          { include_blank: "Seleccione un equipo" } %>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :estado_polines, style: "display: block" %>
-    <%= form.number_field :estado_polines %>
+  <div class="estado-form-section">
+    <h3 class="estado-form-section-title">Evaluación de condición</h3>
+
+    <div class="estado-form-grid-4">
+      <div class="estado-field">
+        <%= form.label :estado_cinta, "Estado cinta" %>
+        <%= form.number_field :estado_cinta, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_motor, "Estado motor" %>
+        <%= form.number_field :estado_motor, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_polines, "Estado polines" %>
+        <%= form.number_field :estado_polines, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_ruedas, "Estado ruedas" %>
+        <%= form.number_field :estado_ruedas, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_capachos, "Estado capachos" %>
+        <%= form.number_field :estado_capachos, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_sistema_aire, "Estado sistema aire" %>
+        <%= form.number_field :estado_sistema_aire, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_filtro, "Estado filtro" %>
+        <%= form.number_field :estado_filtro, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_estructura, "Estado estructura" %>
+        <%= form.number_field :estado_estructura, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_lubricacion, "Estado lubricación" %>
+        <%= form.number_field :estado_lubricacion, min: 0, max: 100, step: 1 %>
+      </div>
+
+      <div class="estado-field">
+        <%= form.label :estado_limpieza, "Estado limpieza" %>
+        <%= form.number_field :estado_limpieza, min: 0, max: 100, step: 1 %>
+      </div>
+    </div>
+
+    <div class="estado-help">
+      Usa una escala de 0 a 100 para reflejar la condición de cada componente.
+    </div>
   </div>
 
-  <div>
-    <%= form.label :estado_ruedas, style: "display: block" %>
-    <%= form.number_field :estado_ruedas %>
+  <div class="estado-form-section">
+    <h3 class="estado-form-section-title">Registro complementario</h3>
+
+    <div class="estado-form-grid">
+      <div class="estado-field estado-field-full">
+        <%= form.label :fotos, "Fotografías" %>
+        <%= form.file_field :fotos,
+          multiple: true,
+          direct_upload: true,
+          accept: "image/png,image/jpg,image/jpeg,image/webp" %>
+        <div class="estado-help">
+          Puedes adjuntar varias imágenes en formato PNG, JPG, JPEG o WEBP.
+        </div>
+      </div>
+
+      <div class="estado-field estado-field-full">
+        <%= form.label :comentarios, "Comentarios" %>
+        <%= form.textarea :comentarios, placeholder: "Describe hallazgos, observaciones, fugas, ruidos, desgaste u otra condición relevante..." %>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :estado_capachos, style: "display: block" %>
-    <%= form.number_field :estado_capachos %>
+  <div class="estado-form-actions">
+    <%= form.submit estado_equipo.persisted? ? "Guardar cambios" : "Crear registro", class: "estado-submit" %>
+    <%= link_to "Volver al listado", estado_equipos_path, class: "estado-secondary-link" %>
   </div>
-
-  <div>
-    <%= form.label :estado_sistema_aire, style: "display: block" %>
-    <%= form.number_field :estado_sistema_aire %>
-  </div>
-
-  <div>
-    <%= form.label :estado_filtro, style: "display: block" %>
-    <%= form.number_field :estado_filtro %>
-  </div>
-
-  <div>
-    <%= form.label :estado_estructura, style: "display: block" %>
-    <%= form.number_field :estado_estructura %>
-  </div>
-
-  <div>
-    <%= form.label :estado_lubricacion, style: "display: block" %>
-    <%= form.number_field :estado_lubricacion %>
-  </div>
-
-  <div>
-    <%= form.label :estado_limpieza, style: "display: block" %>
-    <%= form.number_field :estado_limpieza %>
-  </div>
-<div>
-  <%= form.label :fotos, style: "display: block" %>
-  <%= form.file_field :fotos, multiple: true, direct_upload: true, accept: "image/png,image/jpg,image/jpeg,image/webp" %>
-</div>
-  <div>
-    <%= form.label :comentarios, style: "display: block" %>
-    <%= form.textarea :comentarios %>
-  </div>
-  
-
-  <div>
-    <%= form.submit %>
-  </div>
-
-  
 <% end %>

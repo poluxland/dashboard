@@ -1,13 +1,194 @@
 <!-- app/views/estado_equipos/_topbar.html.erb -->
 <div class="estado-topbar">
-  <div>
-    <h1 class="estado-title">Estado equipos</h1>
-    <div class="estado-subtitle">
-      Molino 22 · Registros de inspección y condición general de equipos
+  <div class="estado-topbar-main">
+    <div>
+      <h1 class="estado-title">Estado equipos</h1>
+      <div class="estado-subtitle">
+        Molino 22 · Registros de inspección y condición general de equipos
+      </div>
+    </div>
+
+    <div class="estado-topbar-stats">
+      <div class="ets">
+        <div class="ets-val ets-critico"><%= criticos %></div>
+        <div class="ets-lbl">Críticos</div>
+      </div>
+
+      <div class="ets-div"></div>
+
+      <div class="ets">
+        <div class="ets-val ets-malo"><%= malos %></div>
+        <div class="ets-lbl">Malos</div>
+      </div>
+
+      <div class="ets-div"></div>
+
+      <div class="ets">
+        <div class="ets-val ets-suficiente"><%= suficientes %></div>
+        <div class="ets-lbl">Suficientes</div>
+      </div>
+
+      <div class="ets-div"></div>
+
+      <div class="ets">
+        <div class="ets-val ets-ok"><%= ok %></div>
+        <div class="ets-lbl">OK</div>
+      </div>
+
+      <div class="ets-div"></div>
+
+      <div class="ets">
+        <div class="ets-val"><%= total %></div>
+        <div class="ets-lbl">Total</div>
+      </div>
     </div>
   </div>
 
   <div class="estado-actions">
-    <%= link_to "Nueva inspección", new_estado_equipo_path, class: "btn btn-light" %>
+    <%= link_to "Nueva inspección", new_estado_equipo_path, class: "estado-topbar-btn" %>
   </div>
 </div>
+
+<style>
+.estado-topbar {
+  background: var(--navy);
+  color: white;
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.estado-topbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+}
+
+.estado-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.estado-subtitle {
+  font-size: 13px;
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+.estado-topbar-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  flex-wrap: wrap;
+}
+
+.ets {
+  text-align: center;
+  min-width: 56px;
+}
+
+.ets-val {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.ets-lbl {
+  font-size: 11px;
+  opacity: 0.82;
+  margin-top: 4px;
+}
+
+.ets-div {
+  width: 1px;
+  height: 34px;
+  background: rgba(255,255,255,0.16);
+}
+
+.ets-critico {
+  color: #fca5a5;
+}
+
+.ets-malo {
+  color: #fdba74;
+}
+
+.ets-suficiente {
+  color: #fde68a;
+}
+
+.ets-ok {
+  color: #86efac;
+}
+
+.estado-actions {
+  display: flex;
+  align-items: center;
+}
+
+.estado-topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 10px 16px;
+  min-height: 42px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+
+.estado-topbar-btn:hover {
+  color: var(--navy);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+}
+
+.estado-topbar-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 1100px) {
+  .estado-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .estado-topbar-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .estado-topbar-stats {
+    width: 100%;
+  }
+
+  .estado-actions {
+    width: 100%;
+  }
+
+  .estado-topbar-btn {
+    width: 100%;
+  }
+}
+</style>

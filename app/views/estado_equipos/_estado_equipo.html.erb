@@ -1,67 +1,297 @@
-<div id="<%= dom_id estado_equipo %>">
-  <div>
-    <strong>Equipo principal:</strong>
-    <%= estado_equipo.equipo_principal %>
+<% 
+  valores = [
+    estado_equipo.estado_cinta,
+    estado_equipo.estado_motor,
+    estado_equipo.estado_polines,
+    estado_equipo.estado_ruedas,
+    estado_equipo.estado_capachos,
+    estado_equipo.estado_sistema_aire,
+    estado_equipo.estado_filtro,
+    estado_equipo.estado_estructura,
+    estado_equipo.estado_lubricacion,
+    estado_equipo.estado_limpieza
+  ].compact.map(&:to_f)
+
+  score = valores.any? ? (valores.sum / valores.size).round : nil
+
+  nivel =
+    if score.nil?
+      "na"
+    elsif score <= 25
+      "critico"
+    elsif score <= 50
+      "malo"
+    elsif score <= 75
+      "suficiente"
+    else
+      "ok"
+    end
+
+  texto_estado =
+    if score.nil?
+      "SIN DATOS"
+    elsif score <= 25
+      "CRÍTICO"
+    elsif score <= 50
+      "MALO"
+    elsif score <= 75
+      "SUFICIENTE"
+    else
+      "OK"
+    end
+%>
+
+<style>
+.ac-show {
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ac-show-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #efefef;
+  flex-wrap: wrap;
+}
+
+.ac-show-stripe {
+  width: 6px;
+  min-width: 6px;
+  align-self: stretch;
+  border-radius: 999px;
+}
+
+.ac-show[data-level="critico"] .ac-show-stripe { background: #dc2626; }
+.ac-show[data-level="malo"] .ac-show-stripe { background: #ea580c; }
+.ac-show[data-level="suficiente"] .ac-show-stripe { background: #ca8a04; }
+.ac-show[data-level="ok"] .ac-show-stripe { background: #16a34a; }
+.ac-show[data-level="na"] .ac-show-stripe { background: #9ca3af; }
+
+.ac-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.b-critico { background: #fee2e2; color: #b91c1c; }
+.b-malo { background: #ffedd5; color: #c2410c; }
+.b-suficiente { background: #fef3c7; color: #a16207; }
+.b-ok { background: #dcfce7; color: #15803d; }
+.b-na { background: #f3f4f6; color: #6b7280; }
+
+.ac-show-name {
+  font-weight: 700;
+  font-size: 18px;
+  color: #111827;
+}
+
+.ac-show-param {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.ac-show-pct {
+  margin-left: auto;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.pct-critico { color: #b91c1c; }
+.pct-malo { color: #c2410c; }
+.pct-suficiente { color: #a16207; }
+.pct-ok { color: #15803d; }
+.pct-na { color: #6b7280; }
+
+.ac-show-body {
+  padding: 14px;
+}
+
+.ac-show-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.ac-show-item {
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.ac-show-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+
+.ac-show-value {
+  font-size: 15px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.ac-show-comment {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #ececec;
+  color: #1f2937;
+  line-height: 1.45;
+}
+
+.ac-show-photos {
+  margin-top: 14px;
+}
+
+.ac-show-photos-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 8px;
+}
+
+.ac-show-thumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ac-show-thumb {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  display: block;
+}
+
+@media (max-width: 700px) {
+  .ac-show-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ac-show-pct {
+    margin-left: 0;
+  }
+}
+</style>
+
+<div id="<%= dom_id estado_equipo %>" class="ac-show" data-level="<%= nivel %>">
+  <div class="ac-show-head">
+    <div class="ac-show-stripe"></div>
+
+    <span class="ac-badge b-<%= nivel %>">
+      <%= texto_estado %>
+      <% if score.present? %>
+        · <%= score %>%
+      <% end %>
+    </span>
+
+    <span class="ac-show-name">
+      <%= estado_equipo.equipo.presence || "Sin equipo" %>
+    </span>
+
+    <span class="ac-show-param">
+      <%= estado_equipo.equipo_principal.presence || "Sin equipo principal" %>
+    </span>
+
+    <span class="ac-show-pct pct-<%= nivel %>">
+      <% if score.present? %>
+        <%= score %>%
+      <% else %>
+        --
+      <% end %>
+    </span>
   </div>
 
-  <div>
-    <strong>Equipo:</strong>
-    <%= estado_equipo.equipo %>
-  </div>
+  <div class="ac-show-body">
+    <div class="ac-show-grid">
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado cinta</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_cinta || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado cinta:</strong>
-    <%= estado_equipo.estado_cinta %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado motor</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_motor || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado motor:</strong>
-    <%= estado_equipo.estado_motor %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado polines</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_polines || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado polines:</strong>
-    <%= estado_equipo.estado_polines %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado ruedas</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_ruedas || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado ruedas:</strong>
-    <%= estado_equipo.estado_ruedas %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado capachos</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_capachos || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado capachos:</strong>
-    <%= estado_equipo.estado_capachos %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado sistema aire</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_sistema_aire || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado sistema aire:</strong>
-    <%= estado_equipo.estado_sistema_aire %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado filtro</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_filtro || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado filtro:</strong>
-    <%= estado_equipo.estado_filtro %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado estructura</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_estructura || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado estructura:</strong>
-    <%= estado_equipo.estado_estructura %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado lubricación</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_lubricacion || "-" %></div>
+      </div>
 
-  <div>
-    <strong>Estado lubricacion:</strong>
-    <%= estado_equipo.estado_lubricacion %>
-  </div>
+      <div class="ac-show-item">
+        <span class="ac-show-label">Estado limpieza</span>
+        <div class="ac-show-value"><%= estado_equipo.estado_limpieza || "-" %></div>
+      </div>
+    </div>
 
-  <div>
-    <strong>Estado limpieza:</strong>
-    <%= estado_equipo.estado_limpieza %>
-  </div>
+    <div class="ac-show-comment">
+      <span class="ac-show-label">Comentarios</span>
+      <%= simple_format(estado_equipo.comentarios.presence || "Sin comentarios.") %>
+    </div>
 
-  <div>
-    <strong>Comentarios:</strong>
-    <%= estado_equipo.comentarios %>
-  </div>
+    <% if estado_equipo.fotos.attached? %>
+      <div class="ac-show-photos">
+        <div class="ac-show-photos-title">
+          Registro fotográfico · <%= estado_equipo.fotos.count %> foto(s)
+        </div>
 
+        <% estado_equipo.fotos.each do |foto| %>
+  <%= link_to url_for(foto), target: "_blank", rel: "noopener" do %>
+    <%= image_tag foto, class: "ac-show-thumb" %>
+  <% end %>
+<% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>

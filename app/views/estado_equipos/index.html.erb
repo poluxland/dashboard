@@ -163,15 +163,16 @@
 </style>
 
 <div class="estado-wrap">
-  <%= render "topbar" %>
+  <%= render "topbar",
+    criticos: criticos,
+    malos: malos,
+    suficientes: suficientes,
+    ok: ok,
+    total: total %>
 
   <%= render "kpis",
-      total: total,
-      promedio_general: promedio_general,
-      criticos: criticos,
-      malos: malos,
-      suficientes: suficientes,
-      ok: ok %>
+    total: total,
+    promedio_general: promedio_general %>
 
   <div class="estado-section-title">Hallazgos y estados registrados</div>
 
