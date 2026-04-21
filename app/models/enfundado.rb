@@ -1,4 +1,9 @@
 class Enfundado < ApplicationRecord
-  validates :operador, presence: true
-  validates :turno, presence: true
+  validates :operador, :turno, presence: true
+  validates :fecha, presence: true
+
+  validates :turno, uniqueness: {
+    scope: :fecha,
+    message: "ya existe para esa fecha"
+  }
 end
