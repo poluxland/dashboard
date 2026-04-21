@@ -1,0 +1,9 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @enfundado %>
+
+<div style="margin-top: 16px;">
+  <%= link_to "Editar", edit_enfundado_path(@enfundado) %> |
+  <%= link_to "Volver", enfundados_path %> |
+  <%= link_to "Eliminar", @enfundado, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este registro?" } %>
+</div>

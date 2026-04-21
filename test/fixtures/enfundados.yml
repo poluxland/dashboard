@@ -1,0 +1,59 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  operador: MyString
+  fecha: 2026-04-21
+  turno: MyString
+  numero_pallet_enfundado_manual: 1
+  numero_pallet_enfundado_automatica: 1
+  especial_plastificados_lados_manual: 1
+  especial_plastificados_lados_automatica: 1
+  especial_plastificados_completo_manual: 1
+  especial_plastificados_completo_automatica: 1
+  especial_plastificados_3_vueltas_manual: 1
+  especial_plastificados_3_vueltas_automatica: 1
+  especial_plastificado_zuncho_reforzado_manual: 1
+  especial_plastificado_zuncho_reforzado_automatica: 1
+  especial_plastificado_completo_doble_films_manual: 1
+  especial_plastificado_completo_doble_films_automatica: 1
+  especial_soluble_plastificados_completo_manual: 1
+  especial_soluble_plastificados_completo_automatica: 1
+  extra_plastificados_lados_manual: 1
+  extra_plastificados_lados_automatica: 1
+  extra_plastificados_completo_doble_films_manual: 1
+  extra_plastificados_completo_doble_films_automatica: 1
+  extra_plastificados_completo_doble_films_zuncho_manual: 1
+  extra_plastificados_completo_doble_films_zuncho_automatica: 1
+  extra_soluble_plastificados_completo_manual: 1
+  extra_soluble_plastificados_completo_automatica: 1
+  numero_rollos_films_cambiados_manual: 1
+  numero_rollos_films_cambiados_automatica: 1
+
+two:
+  operador: MyString
+  fecha: 2026-04-21
+  turno: MyString
+  numero_pallet_enfundado_manual: 1
+  numero_pallet_enfundado_automatica: 1
+  especial_plastificados_lados_manual: 1
+  especial_plastificados_lados_automatica: 1
+  especial_plastificados_completo_manual: 1
+  especial_plastificados_completo_automatica: 1
+  especial_plastificados_3_vueltas_manual: 1
+  especial_plastificados_3_vueltas_automatica: 1
+  especial_plastificado_zuncho_reforzado_manual: 1
+  especial_plastificado_zuncho_reforzado_automatica: 1
+  especial_plastificado_completo_doble_films_manual: 1
+  especial_plastificado_completo_doble_films_automatica: 1
+  especial_soluble_plastificados_completo_manual: 1
+  especial_soluble_plastificados_completo_automatica: 1
+  extra_plastificados_lados_manual: 1
+  extra_plastificados_lados_automatica: 1
+  extra_plastificados_completo_doble_films_manual: 1
+  extra_plastificados_completo_doble_films_automatica: 1
+  extra_plastificados_completo_doble_films_zuncho_manual: 1
+  extra_plastificados_completo_doble_films_zuncho_automatica: 1
+  extra_soluble_plastificados_completo_manual: 1
+  extra_soluble_plastificados_completo_automatica: 1
+  numero_rollos_films_cambiados_manual: 1
+  numero_rollos_films_cambiados_automatica: 1

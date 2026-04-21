@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :enfundados
   resources :estado_equipos do
   collection do
     get :reporte_equipos

@@ -1,0 +1,233 @@
+<% content_for :title, "Registros de enfundado" %>
+
+<style>
+  .enf-index {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .enf-index-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .enf-index-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .enf-index-subtitle {
+    margin-top: 4px;
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .enf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .enf-btn:hover {
+    background: #f9fafb;
+  }
+
+  .enf-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    overflow: hidden;
+  }
+
+  .enf-table-wrap {
+    overflow-x: auto;
+  }
+
+  .enf-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1150px;
+  }
+
+  .enf-table thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+  }
+
+  .enf-table tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #edf0f2;
+    font-size: 14px;
+    color: #111827;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .enf-table tbody tr:hover {
+    background: #fafafa;
+  }
+
+  .enf-operador {
+    font-weight: 600;
+  }
+
+  .enf-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .enf-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .enf-link {
+    text-decoration: none;
+    color: #374151;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .enf-link:hover {
+    background: #f9fafb;
+  }
+
+  .enf-link-danger {
+    color: #7f1d1d;
+  }
+
+  .enf-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 15px;
+  }
+</style>
+
+<div class="enf-index">
+  <div class="enf-index-topbar">
+    <div>
+      <h1 class="enf-index-title">Registros de enfundado</h1>
+      <div class="enf-index-subtitle">Resumen general de enfundado manual y automática</div>
+    </div>
+
+    <%= link_to "Nuevo registro", new_enfundado_path, class: "enf-btn" %>
+  </div>
+
+  <div class="enf-card">
+    <div class="enf-table-wrap">
+      <table class="enf-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Operador</th>
+            <th>Turno</th>
+            <th>Pallet Manual</th>
+            <th>Pallet Automática</th>
+            <th>Especiales Manual</th>
+            <th>Especiales Automática</th>
+            <th>Extras Manual</th>
+            <th>Extras Automática</th>
+            <th>Films Manual</th>
+            <th>Films Automática</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @enfundados.present? %>
+            <% @enfundados.order(fecha: :desc, created_at: :desc).each do |enfundado| %>
+              <% especiales_manual =
+                enfundado.especial_plastificados_lados_manual.to_i +
+                enfundado.especial_plastificados_completo_manual.to_i +
+                enfundado.especial_plastificados_3_vueltas_manual.to_i +
+                enfundado.especial_plastificado_zuncho_reforzado_manual.to_i +
+                enfundado.especial_plastificado_completo_doble_films_manual.to_i +
+                enfundado.especial_soluble_plastificados_completo_manual.to_i
+              %>
+
+              <% especiales_automatica =
+                enfundado.especial_plastificados_lados_automatica.to_i +
+                enfundado.especial_plastificados_completo_automatica.to_i +
+                enfundado.especial_plastificados_3_vueltas_automatica.to_i +
+                enfundado.especial_plastificado_zuncho_reforzado_automatica.to_i +
+                enfundado.especial_plastificado_completo_doble_films_automatica.to_i +
+                enfundado.especial_soluble_plastificados_completo_automatica.to_i
+              %>
+
+              <% extras_manual =
+                enfundado.extra_plastificados_lados_manual.to_i +
+                enfundado.extra_plastificados_completo_doble_films_manual.to_i +
+                enfundado.extra_plastificados_completo_doble_films_zuncho_manual.to_i +
+                enfundado.extra_soluble_plastificados_completo_manual.to_i
+              %>
+
+              <% extras_automatica =
+                enfundado.extra_plastificados_lados_automatica.to_i +
+                enfundado.extra_plastificados_completo_doble_films_automatica.to_i +
+                enfundado.extra_plastificados_completo_doble_films_zuncho_automatica.to_i +
+                enfundado.extra_soluble_plastificados_completo_automatica.to_i
+              %>
+
+              <tr>
+                <td><strong><%= enfundado.fecha&.strftime("%d-%m-%Y") %></strong></td>
+                <td class="enf-operador"><%= enfundado.operador %></td>
+                <td><span class="enf-badge"><%= enfundado.turno %></span></td>
+                <td><%= enfundado.numero_pallet_enfundado_manual.to_i %></td>
+                <td><%= enfundado.numero_pallet_enfundado_automatica.to_i %></td>
+                <td><%= especiales_manual %></td>
+                <td><%= especiales_automatica %></td>
+                <td><%= extras_manual %></td>
+                <td><%= extras_automatica %></td>
+                <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
+                <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+                <td>
+                  <div class="enf-actions">
+                    <%= link_to "Ver", enfundado, class: "enf-link" %>
+                    <%= link_to "Editar", edit_enfundado_path(enfundado), class: "enf-link" %>
+                    <%= link_to "Eliminar", enfundado, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este registro?" }, class: "enf-link enf-link-danger" %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="12" class="enf-empty">No hay registros de enfundado todavía.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

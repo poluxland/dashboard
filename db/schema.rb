@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_230201) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_183845) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_230201) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "enfundados", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "especial_plastificado_completo_doble_films_automatica"
+    t.integer "especial_plastificado_completo_doble_films_manual"
+    t.integer "especial_plastificado_zuncho_reforzado_automatica"
+    t.integer "especial_plastificado_zuncho_reforzado_manual"
+    t.integer "especial_plastificados_3_vueltas_automatica"
+    t.integer "especial_plastificados_3_vueltas_manual"
+    t.integer "especial_plastificados_completo_automatica"
+    t.integer "especial_plastificados_completo_manual"
+    t.integer "especial_plastificados_lados_automatica"
+    t.integer "especial_plastificados_lados_manual"
+    t.integer "especial_soluble_plastificados_completo_automatica"
+    t.integer "especial_soluble_plastificados_completo_manual"
+    t.integer "extra_plastificados_completo_doble_films_automatica"
+    t.integer "extra_plastificados_completo_doble_films_manual"
+    t.integer "extra_plastificados_completo_doble_films_zuncho_automatica"
+    t.integer "extra_plastificados_completo_doble_films_zuncho_manual"
+    t.integer "extra_plastificados_lados_automatica"
+    t.integer "extra_plastificados_lados_manual"
+    t.integer "extra_soluble_plastificados_completo_automatica"
+    t.integer "extra_soluble_plastificados_completo_manual"
+    t.date "fecha"
+    t.integer "numero_pallet_enfundado_automatica"
+    t.integer "numero_pallet_enfundado_manual"
+    t.integer "numero_rollos_films_cambiados_automatica"
+    t.integer "numero_rollos_films_cambiados_manual"
+    t.string "operador"
+    t.string "turno"
+    t.datetime "updated_at", null: false
   end
 
   create_table "estado_equipos", force: :cascade do |t|

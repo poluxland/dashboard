@@ -121,7 +121,26 @@
             </li>
           </ul>
         </li>
+           <!-- Menú DEnvasadora -->
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="demoDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Envasadora
+            </a>
 
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoDropdown">
+              <li>
+                <%= link_to "Enfundado", enfundados_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
+              
+            </ul>
+          </li>
         <!-- Menú Demo -->
           <li class="nav-item dropdown">
             <a

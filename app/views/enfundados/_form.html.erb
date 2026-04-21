@@ -1,0 +1,375 @@
+<% operadores = [
+  "Alan Andrade Iturrieta",
+  "Ricardo Astudillo Ibaceta",
+  "Fernando Briones Morales",
+  "Juan Escobar Astudillo",
+  "Marco Fernandez Frez",
+  "Alejandro Fierro Guzman",
+  "Marcelo Frez Miranda",
+  "Luis Meza Flores",
+  "Julio Muñoz Olivares",
+  "Oscar Olivares Cifuentes",
+  "Hector Pizarro Arias",
+  "Alvaro Porta Guerra",
+  "Brayan Rojas Rojas",
+  "Bastian Suarez Hidalgo",
+  "Francisco Suazo Lopez",
+  "Pedro Valencia Martinez"
+] %>
+
+<% turnos = ["Turno Mañana", "Turno Tarde", "Turno Noche"] %>
+
+<style>
+  .enf-form-wrap {
+    max-width: 1050px;
+    margin: 0 auto;
+    background: #eef0b0;
+    border: 1px solid #cfcfcf;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .enf-section-top {
+    background: #cfd7e3;
+    padding: 14px 18px;
+    border-bottom: 1px solid #b8c1ce;
+  }
+
+  .enf-section-body {
+    padding: 14px 18px 20px 18px;
+  }
+
+  .enf-title {
+    font-weight: 700;
+    font-size: 20px;
+    margin: 0 0 12px 0;
+  }
+
+  .enf-subtitle {
+    font-weight: 700;
+    font-size: 18px;
+    margin: 20px 0 10px 0;
+  }
+
+  .enf-errors {
+    background: #fff1f1;
+    border: 1px solid #d33;
+    color: #900;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+  }
+
+  .enf-grid-head {
+    display: grid;
+    grid-template-columns: 40px 1.7fr 150px 150px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .enf-grid-row {
+    display: grid;
+    grid-template-columns: 40px 1.7fr 150px 150px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .enf-grid-row label,
+  .enf-grid-head div {
+    font-size: 15px;
+  }
+
+  .enf-num {
+    font-weight: 700;
+  }
+
+  .enf-col-head {
+    text-align: center;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  .enf-label {
+    font-weight: 600;
+  }
+
+  .enf-label.blue {
+    color: #0839d6;
+  }
+
+  .enf-label.red {
+    color: #d31616;
+  }
+
+  .enf-field,
+  .enf-select,
+  .enf-date {
+    width: 100%;
+    height: 36px;
+    border: 1px solid #444;
+    background: #fff;
+    padding: 6px 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .enf-small-note {
+    font-size: 12px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  .enf-actions {
+    margin-top: 22px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .enf-submit {
+    background: #0d3b7a;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .enf-submit:hover {
+    background: #0a2d5c;
+  }
+
+  @media (max-width: 860px) {
+    .enf-grid-head,
+    .enf-grid-row {
+      grid-template-columns: 34px 1fr 110px 110px;
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .enf-grid-head {
+      display: none;
+    }
+
+    .enf-grid-row {
+      grid-template-columns: 1fr;
+      background: rgba(255,255,255,.35);
+      border: 1px solid rgba(0,0,0,.08);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .enf-num {
+      display: none;
+    }
+  }
+</style>
+
+<%= form_with(model: enfundado) do |form| %>
+  <% if enfundado.errors.any? %>
+    <div class="enf-errors">
+      <p><%= pluralize(enfundado.errors.count, "") %> Revise los siguientes campos:</p>
+      <ul>
+        <% enfundado.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="enf-form-wrap">
+    <div class="enf-section-top">
+      <div class="enf-title">I DATOS INICIO</div>
+
+      <div class="enf-grid-row">
+        <div class="enf-num">1.-</div>
+        <div class="enf-label">Operador</div>
+        <div style="grid-column: span 2;">
+          <%= form.select :operador,
+              options_for_select(operadores, enfundado.operador),
+              { include_blank: "Seleccione operador" },
+              class: "enf-select" %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div class="enf-num">2.-</div>
+        <div class="enf-label">Fecha</div>
+        <div style="grid-column: span 2;">
+          <%= form.date_field :fecha, value: (enfundado.fecha || Date.current), class: "enf-date" %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div class="enf-num">3.-</div>
+        <div class="enf-label">Turno</div>
+        <div style="grid-column: span 2;">
+          <%= form.select :turno,
+              options_for_select(turnos, enfundado.turno),
+              { include_blank: "Seleccione turno" },
+              class: "enf-select" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="enf-section-body">
+      <div class="enf-subtitle">II ENFUNDADO</div>
+
+      <div class="enf-grid-head">
+        <div></div>
+        <div></div>
+        <div class="enf-col-head">Manual</div>
+        <div class="enf-col-head">Automática</div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div class="enf-num">4.-</div>
+        <div class="enf-label">N° Pallet Enfundado</div>
+        <div>
+          <%= form.number_field :numero_pallet_enfundado_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :numero_pallet_enfundado_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label blue">Especial plastificados por los lados</div>
+        <div>
+          <%= form.number_field :especial_plastificados_lados_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :especial_plastificados_lados_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label blue">Especial plastificados completo</div>
+        <div>
+          <%= form.number_field :especial_plastificados_completo_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :especial_plastificados_completo_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label blue">Especial plastificados 3 vueltas</div>
+        <div>
+          <%= form.number_field :especial_plastificados_3_vueltas_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :especial_plastificados_3_vueltas_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label blue">Especial plastificado Zuncho reforzado</div>
+        <div>
+          <%= form.number_field :especial_plastificado_zuncho_reforzado_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :especial_plastificado_zuncho_reforzado_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label blue">Especial plastificado completo DOBLE FILMS</div>
+        <div>
+          <%= form.number_field :especial_plastificado_completo_doble_films_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :especial_plastificado_completo_doble_films_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label blue">Especial Soluble plastificados completo</div>
+        <div>
+          <%= form.number_field :especial_soluble_plastificados_completo_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :especial_soluble_plastificados_completo_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row" style="margin-top: 14px;">
+        <div></div>
+        <div class="enf-label red">Extra plastificados por los lados</div>
+        <div>
+          <%= form.number_field :extra_plastificados_lados_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :extra_plastificados_lados_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label red">Extra plastificados completo DOBLE Films</div>
+        <div>
+          <%= form.number_field :extra_plastificados_completo_doble_films_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :extra_plastificados_completo_doble_films_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label red">Extra plastificados completo DOBLE Films Y Zuncho</div>
+        <div>
+          <%= form.number_field :extra_plastificados_completo_doble_films_zuncho_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :extra_plastificados_completo_doble_films_zuncho_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div></div>
+        <div class="enf-label red">Extra Soluble plastificados Completo</div>
+        <div>
+          <%= form.number_field :extra_soluble_plastificados_completo_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :extra_soluble_plastificados_completo_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-subtitle" style="margin-top: 28px;">III FILMS</div>
+
+      <div class="enf-grid-head">
+        <div></div>
+        <div></div>
+        <div class="enf-col-head">Manual</div>
+        <div class="enf-col-head">Automática</div>
+      </div>
+
+      <div class="enf-grid-row">
+        <div class="enf-num">6.-</div>
+        <div class="enf-label">N° Rollo Films cambiados</div>
+        <div>
+          <%= form.number_field :numero_rollos_films_cambiados_manual, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :numero_rollos_films_cambiados_automatica, class: "enf-field", min: 0 %>
+        </div>
+      </div>
+
+      <div class="enf-actions">
+        <%= form.submit "Guardar registro", class: "enf-submit" %>
+      </div>
+    </div>
+  </div>
+<% end %>

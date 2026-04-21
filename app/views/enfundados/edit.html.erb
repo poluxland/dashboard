@@ -1,0 +1,12 @@
+<% content_for :title, "Editing enfundado" %>
+
+<h1>Editing enfundado</h1>
+
+<%= render "form", enfundado: @enfundado %>
+
+<br>
+
+<div>
+  <%= link_to "Ver registro", @enfundado %> |
+  <%= link_to "Volver", enfundados_path %>
+</div>
