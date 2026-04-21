@@ -2,7 +2,7 @@
 
 <style>
   .enf-index {
-    max-width: 1400px;
+    max-width: 1800px;
     margin: 0 auto;
     padding: 20px;
   }
@@ -62,7 +62,7 @@
   .enf-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1150px;
+    min-width: 2600px;
   }
 
   .enf-table thead th {
@@ -77,7 +77,7 @@
   }
 
   .enf-table tbody td {
-    padding: 14px 12px;
+    padding: 12px;
     border-bottom: 1px solid #edf0f2;
     font-size: 14px;
     color: #111827;
@@ -140,7 +140,7 @@
   <div class="enf-index-topbar">
     <div>
       <h1 class="enf-index-title">Registros de enfundado</h1>
-      <div class="enf-index-subtitle">Resumen general de enfundado manual y automática</div>
+      <div class="enf-index-subtitle">Detalle completo manual y automática</div>
     </div>
 
     <%= link_to "Nuevo registro", new_enfundado_path, class: "enf-btn" %>
@@ -154,76 +154,105 @@
             <th>Fecha</th>
             <th>Operador</th>
             <th>Turno</th>
-            <th>Pallet Manual</th>
-            <th>Pallet Automática</th>
-            <th>Especiales Manual</th>
-            <th>Especiales Automática</th>
-            <th>Extras Manual</th>
-            <th>Extras Automática</th>
-            <th>Films Manual</th>
-            <th>Films Automática</th>
+
+           
+
+            <th>Esp. lados Manual</th>
+            <th>Esp. lados Automática</th>
+
+            <th>Esp. completo Manual</th>
+            <th>Esp. completo Automática</th>
+
+            <th>Esp. 3 vueltas Manual</th>
+            <th>Esp. 3 vueltas Automática</th>
+
+            <th>Esp. zuncho ref. Manual</th>
+            <th>Esp. zuncho ref. Automática</th>
+
+            <th>Esp. doble films Manual</th>
+            <th>Esp. doble films Automática</th>
+
+            <th>Esp. soluble completo Manual</th>
+            <th>Esp. soluble completo Automática</th>
+
+            <th>Extra lados Manual</th>
+            <th>Extra lados Automática</th>
+
+            <th>Extra doble films Manual</th>
+            <th>Extra doble films Automática</th>
+
+            <th>Extra doble films + zuncho Manual</th>
+            <th>Extra doble films + zuncho Automática</th>
+
+            <th>Extra soluble completo Manual</th>
+            <th>Extra soluble completo Automática</th>
+
+            <th>Films cambiados Manual</th>
+            <th>Films cambiados Automática</th>
+
             <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           <% if @enfundados.present? %>
             <% @enfundados.order(fecha: :desc, created_at: :desc).each do |enfundado| %>
-              <% especiales_manual =
-                enfundado.especial_plastificados_lados_manual.to_i +
-                enfundado.especial_plastificados_completo_manual.to_i +
-                enfundado.especial_plastificados_3_vueltas_manual.to_i +
-                enfundado.especial_plastificado_zuncho_reforzado_manual.to_i +
-                enfundado.especial_plastificado_completo_doble_films_manual.to_i +
-                enfundado.especial_soluble_plastificados_completo_manual.to_i
-              %>
-
-              <% especiales_automatica =
-                enfundado.especial_plastificados_lados_automatica.to_i +
-                enfundado.especial_plastificados_completo_automatica.to_i +
-                enfundado.especial_plastificados_3_vueltas_automatica.to_i +
-                enfundado.especial_plastificado_zuncho_reforzado_automatica.to_i +
-                enfundado.especial_plastificado_completo_doble_films_automatica.to_i +
-                enfundado.especial_soluble_plastificados_completo_automatica.to_i
-              %>
-
-              <% extras_manual =
-                enfundado.extra_plastificados_lados_manual.to_i +
-                enfundado.extra_plastificados_completo_doble_films_manual.to_i +
-                enfundado.extra_plastificados_completo_doble_films_zuncho_manual.to_i +
-                enfundado.extra_soluble_plastificados_completo_manual.to_i
-              %>
-
-              <% extras_automatica =
-                enfundado.extra_plastificados_lados_automatica.to_i +
-                enfundado.extra_plastificados_completo_doble_films_automatica.to_i +
-                enfundado.extra_plastificados_completo_doble_films_zuncho_automatica.to_i +
-                enfundado.extra_soluble_plastificados_completo_automatica.to_i
-              %>
-
               <tr>
                 <td><strong><%= enfundado.fecha&.strftime("%d-%m-%Y") %></strong></td>
                 <td class="enf-operador"><%= enfundado.operador %></td>
                 <td><span class="enf-badge"><%= enfundado.turno %></span></td>
+
                 <td><%= enfundado.numero_pallet_enfundado_manual.to_i %></td>
                 <td><%= enfundado.numero_pallet_enfundado_automatica.to_i %></td>
-                <td><%= especiales_manual %></td>
-                <td><%= especiales_automatica %></td>
-                <td><%= extras_manual %></td>
-                <td><%= extras_automatica %></td>
+
+                <td><%= enfundado.especial_plastificados_lados_manual.to_i %></td>
+                <td><%= enfundado.especial_plastificados_lados_automatica.to_i %></td>
+
+                <td><%= enfundado.especial_plastificados_completo_manual.to_i %></td>
+                <td><%= enfundado.especial_plastificados_completo_automatica.to_i %></td>
+
+                <td><%= enfundado.especial_plastificados_3_vueltas_manual.to_i %></td>
+                <td><%= enfundado.especial_plastificados_3_vueltas_automatica.to_i %></td>
+
+                <td><%= enfundado.especial_plastificado_zuncho_reforzado_manual.to_i %></td>
+                <td><%= enfundado.especial_plastificado_zuncho_reforzado_automatica.to_i %></td>
+
+                <td><%= enfundado.especial_plastificado_completo_doble_films_manual.to_i %></td>
+                <td><%= enfundado.especial_plastificado_completo_doble_films_automatica.to_i %></td>
+
+                <td><%= enfundado.especial_soluble_plastificados_completo_manual.to_i %></td>
+                <td><%= enfundado.especial_soluble_plastificados_completo_automatica.to_i %></td>
+
+                <td><%= enfundado.extra_plastificados_lados_manual.to_i %></td>
+                <td><%= enfundado.extra_plastificados_lados_automatica.to_i %></td>
+
+                <td><%= enfundado.extra_plastificados_completo_doble_films_manual.to_i %></td>
+                <td><%= enfundado.extra_plastificados_completo_doble_films_automatica.to_i %></td>
+
+                <td><%= enfundado.extra_plastificados_completo_doble_films_zuncho_manual.to_i %></td>
+                <td><%= enfundado.extra_plastificados_completo_doble_films_zuncho_automatica.to_i %></td>
+
+                <td><%= enfundado.extra_soluble_plastificados_completo_manual.to_i %></td>
+                <td><%= enfundado.extra_soluble_plastificados_completo_automatica.to_i %></td>
+
                 <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
                 <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+
                 <td>
                   <div class="enf-actions">
                     <%= link_to "Ver", enfundado, class: "enf-link" %>
                     <%= link_to "Editar", edit_enfundado_path(enfundado), class: "enf-link" %>
-                    <%= link_to "Eliminar", enfundado, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este registro?" }, class: "enf-link enf-link-danger" %>
+                    <%= link_to "Eliminar",
+                        enfundado,
+                        data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este registro?" },
+                        class: "enf-link enf-link-danger" %>
                   </div>
                 </td>
               </tr>
             <% end %>
           <% else %>
             <tr>
-              <td colspan="12" class="enf-empty">No hay registros de enfundado todavía.</td>
+              <td colspan="28" class="enf-empty">No hay registros de enfundado todavía.</td>
             </tr>
           <% end %>
         </tbody>
