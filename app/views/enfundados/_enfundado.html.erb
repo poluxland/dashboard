@@ -1,5 +1,217 @@
 <div id="<%= dom_id enfundado %>">
-  <div><strong>Operador:</strong> <%= enfundado.operador %></div>
-  <div><strong>Fecha:</strong> <%= enfundado.fecha %></div>
-  <div><strong>Turno:</strong> <%= enfundado.turno %></div>
+  <style>
+    .enf-show {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+      overflow: hidden;
+    }
+
+    .enf-show-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+
+    .enf-show-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .enf-show-subtitle {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .enf-show-body {
+      padding: 24px;
+    }
+
+    .enf-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .enf-meta-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .enf-meta-label {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .enf-meta-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .enf-section-title {
+      margin: 24px 0 12px 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .enf-table-wrap {
+      overflow-x: auto;
+    }
+
+    .enf-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .enf-table th,
+    .enf-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .enf-table thead th {
+      background: #f8fafc;
+      font-size: 13px;
+      color: #374151;
+      font-weight: 700;
+    }
+
+    .enf-table tbody td:first-child {
+      font-weight: 600;
+      color: #111827;
+      white-space: normal;
+    }
+
+    .enf-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    @media (max-width: 800px) {
+      .enf-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="enf-show">
+    <div class="enf-show-header">
+      <h2 class="enf-show-title">Registro de enfundado</h2>
+      <div class="enf-show-subtitle">Detalle completo del turno registrado</div>
+    </div>
+
+    <div class="enf-show-body">
+      <div class="enf-meta">
+        <div class="enf-meta-card">
+          <div class="enf-meta-label">Operador</div>
+          <div class="enf-meta-value"><%= enfundado.operador %></div>
+        </div>
+
+        <div class="enf-meta-card">
+          <div class="enf-meta-label">Fecha</div>
+          <div class="enf-meta-value"><%= enfundado.fecha&.strftime("%d-%m-%Y") %></div>
+        </div>
+
+        <div class="enf-meta-card">
+          <div class="enf-meta-label">Turno</div>
+          <div class="enf-meta-value"><%= enfundado.turno %></div>
+        </div>
+      </div>
+
+      <h3 class="enf-section-title">Enfundado</h3>
+
+      <div class="enf-table-wrap">
+        <table class="enf-table">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Manual</th>
+              <th>Automática</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>N° Pallet Enfundado</td>
+              <td><%= enfundado.numero_pallet_enfundado_manual.to_i %></td>
+              <td><%= enfundado.numero_pallet_enfundado_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Especial plastificados por los lados</td>
+              <td><%= enfundado.especial_plastificados_lados_manual.to_i %></td>
+              <td><%= enfundado.especial_plastificados_lados_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Especial plastificados completo</td>
+              <td><%= enfundado.especial_plastificados_completo_manual.to_i %></td>
+              <td><%= enfundado.especial_plastificados_completo_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Especial plastificados 3 vueltas</td>
+              <td><%= enfundado.especial_plastificados_3_vueltas_manual.to_i %></td>
+              <td><%= enfundado.especial_plastificados_3_vueltas_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Especial plastificado Zuncho reforzado</td>
+              <td><%= enfundado.especial_plastificado_zuncho_reforzado_manual.to_i %></td>
+              <td><%= enfundado.especial_plastificado_zuncho_reforzado_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Especial plastificado completo DOBLE FILMS</td>
+              <td><%= enfundado.especial_plastificado_completo_doble_films_manual.to_i %></td>
+              <td><%= enfundado.especial_plastificado_completo_doble_films_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Especial Soluble plastificados completo</td>
+              <td><%= enfundado.especial_soluble_plastificados_completo_manual.to_i %></td>
+              <td><%= enfundado.especial_soluble_plastificados_completo_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Extra plastificados por los lados</td>
+              <td><%= enfundado.extra_plastificados_lados_manual.to_i %></td>
+              <td><%= enfundado.extra_plastificados_lados_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Extra plastificados completo DOBLE Films</td>
+              <td><%= enfundado.extra_plastificados_completo_doble_films_manual.to_i %></td>
+              <td><%= enfundado.extra_plastificados_completo_doble_films_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Extra plastificados completo DOBLE Films Y Zuncho</td>
+              <td><%= enfundado.extra_plastificados_completo_doble_films_zuncho_manual.to_i %></td>
+              <td><%= enfundado.extra_plastificados_completo_doble_films_zuncho_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>Extra Soluble plastificados Completo</td>
+              <td><%= enfundado.extra_soluble_plastificados_completo_manual.to_i %></td>
+              <td><%= enfundado.extra_soluble_plastificados_completo_automatica.to_i %></td>
+            </tr>
+            <tr>
+              <td>N° Rollo Films cambiados</td>
+              <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
+              <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>

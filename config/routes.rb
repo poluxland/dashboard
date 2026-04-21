@@ -1,6 +1,10 @@
 # config/routes.rb
 Rails.application.routes.draw do
-  resources :enfundados
+  resources :enfundados do
+  collection do
+    get :reporte
+  end
+end
   resources :estado_equipos do
   collection do
     get :reporte_equipos
@@ -21,7 +25,7 @@ end
 
   # MonthlyRecords + home
   resources :monthly_records
-  root "monthly_records#index"
+  root "home#index"
 
   # IndicatorReadings con acciones de colección
   resources :indicator_readings, only: [ :index, :new, :create, :edit, :update ] do

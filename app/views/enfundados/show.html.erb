@@ -1,9 +1,49 @@
 <p style="color: green"><%= notice %></p>
 
+<style>
+  .enf-show-actions {
+    margin-top: 22px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .enf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+
+  .enf-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  .enf-btn-primary {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+  }
+
+  .enf-btn-primary:hover {
+    background: #1f2937;
+    border-color: #1f2937;
+  }
+</style>
+
 <%= render @enfundado %>
 
-<div style="margin-top: 16px;">
-  <%= link_to "Editar", edit_enfundado_path(@enfundado) %> |
-  <%= link_to "Volver", enfundados_path %> |
-  <%= link_to "Eliminar", @enfundado, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este registro?" } %>
+<div class="enf-show-actions">
+  <%= link_to "Editar", edit_enfundado_path(@enfundado), class: "enf-btn enf-btn-primary" %>
+  <%= link_to "Volver", enfundados_path, class: "enf-btn" %>
 </div>

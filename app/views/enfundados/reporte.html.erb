@@ -1,0 +1,297 @@
+<% content_for :title, "Reporte de enfundado" %>
+
+<style>
+  .rep-wrap {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .rep-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .rep-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .rep-subtitle {
+    margin-top: 4px;
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .rep-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  .rep-card-body {
+    padding: 18px;
+  }
+
+  .rep-filter {
+    display: flex;
+    gap: 12px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+
+  .rep-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+
+  .rep-field input {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: #fff;
+  }
+
+  .rep-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .rep-btn:hover {
+    background: #f9fafb;
+  }
+
+  .rep-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .rep-kpi {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 16px;
+    background: #fff;
+  }
+
+  .rep-kpi-label {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .rep-kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .rep-table-wrap {
+    overflow-x: auto;
+  }
+
+  .rep-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+  }
+
+  .rep-table th {
+    background: #f8fafc;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+  }
+
+  .rep-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #edf0f2;
+    font-size: 14px;
+    color: #111827;
+    white-space: nowrap;
+  }
+
+  .rep-table tbody tr:hover {
+    background: #fafafa;
+  }
+
+  .rep-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .rep-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .rep-kpis {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .rep-kpis {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="rep-wrap">
+  <div class="rep-topbar">
+    <div>
+      <h1 class="rep-title">Reporte de enfundado</h1>
+      <div class="rep-subtitle">Totales y detalle por período</div>
+    </div>
+
+    <div class="rep-actions">
+      <%= link_to "Volver", enfundados_path, class: "rep-btn" %>
+      <%= link_to "Nuevo registro", new_enfundado_path, class: "rep-btn" %>
+    </div>
+  </div>
+
+  <div class="rep-card">
+    <div class="rep-card-body">
+      <%= form_with url: reporte_enfundados_path, method: :get, local: true do %>
+        <div class="rep-filter">
+          <div class="rep-field">
+            <label>Desde</label>
+            <%= date_field_tag :desde, @desde %>
+          </div>
+
+          <div class="rep-field">
+            <label>Hasta</label>
+            <%= date_field_tag :hasta, @hasta %>
+          </div>
+
+          <div>
+            <%= submit_tag "Filtrar", class: "rep-btn" %>
+          </div>
+
+          <div>
+            <%= link_to "Limpiar", reporte_enfundados_path, class: "rep-btn" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="rep-kpis">
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Total Manual</div>
+    <div class="rep-kpi-value"><%= @total_manual %></div>
+  </div>
+
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Total Automática</div>
+    <div class="rep-kpi-value"><%= @total_automatica %></div>
+  </div>
+
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Gramos Manual</div>
+    <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_manual, delimiter: ".") %> g</div>
+  </div>
+
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Gramos Automática</div>
+    <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_automatica, delimiter: ".") %> g</div>
+  </div>
+
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Gramos Totales</div>
+    <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_general, delimiter: ".") %> g</div>
+  </div>
+
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Films Manual</div>
+    <div class="rep-kpi-value"><%= @total_films_manual %></div>
+  </div>
+
+  <div class="rep-kpi">
+    <div class="rep-kpi-label">Films Automática</div>
+    <div class="rep-kpi-value"><%= @total_films_automatica %></div>
+  </div>
+</div>
+
+  <div class="rep-card" style="margin-top:18px;">
+    <div class="rep-table-wrap">
+      <table class="rep-table">
+        <thead>
+  <tr>
+    <th>Fecha</th>
+    <th>Operador</th>
+    <th>Turno</th>
+    <th>Total Manual</th>
+    <th>Total Automática</th>
+    <th>Gramos Manual</th>
+    <th>Gramos Automática</th>
+    <th>Gramos Totales</th>
+    <th>Films Manual</th>
+    <th>Films Automática</th>
+    <th>Ver</th>
+  </tr>
+</thead>
+       <tbody>
+  <% if @enfundados.any? %>
+    <% @enfundados.each do |enfundado| %>
+      <tr>
+        <td><strong><%= enfundado.fecha&.strftime("%d-%m-%Y") %></strong></td>
+        <td><%= enfundado.operador %></td>
+        <td><span class="rep-badge"><%= enfundado.turno %></span></td>
+        <td><%= enfundado.total_manual_reporte %></td>
+        <td><%= enfundado.total_automatica_reporte %></td>
+        <td><%= number_with_delimiter(enfundado.gramos_consumidos_manual, delimiter: ".") %> g</td>
+        <td><%= number_with_delimiter(enfundado.gramos_consumidos_automatica, delimiter: ".") %> g</td>
+        <td><%= number_with_delimiter(enfundado.gramos_consumidos_total, delimiter: ".") %> g</td>
+        <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
+        <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+        <td><%= link_to "Ver", enfundado, class: "rep-btn" %></td>
+      </tr>
+    <% end %>
+  <% else %>
+    <tr>
+      <td colspan="11" style="padding:24px; text-align:center; color:#6b7280;">
+        No hay registros para el período seleccionado.
+      </td>
+    </tr>
+  <% end %>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>

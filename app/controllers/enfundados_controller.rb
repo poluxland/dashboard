@@ -10,6 +10,25 @@ class EnfundadosController < ApplicationController
   def show
   end
 
+  def reporte
+  @desde = params[:desde].presence
+  @hasta = params[:hasta].presence
+
+  @enfundados = Enfundado.all
+  @enfundados = @enfundados.where("fecha >= ?", @desde) if @desde.present?
+  @enfundados = @enfundados.where("fecha <= ?", @hasta) if @hasta.present?
+  @enfundados = @enfundados.order(fecha: :desc, created_at: :desc)
+
+  @total_manual = @enfundados.sum { |e| e.total_manual_reporte }
+  @total_automatica = @enfundados.sum { |e| e.total_automatica_reporte }
+  @total_films_manual = @enfundados.sum { |e| e.numero_rollos_films_cambiados_manual.to_i }
+  @total_films_automatica = @enfundados.sum { |e| e.numero_rollos_films_cambiados_automatica.to_i }
+
+  @total_gramos_manual = @enfundados.sum { |e| e.gramos_consumidos_manual }
+  @total_gramos_automatica = @enfundados.sum { |e| e.gramos_consumidos_automatica }
+  @total_gramos_general = @enfundados.sum { |e| e.gramos_consumidos_total }
+end
+
   # GET /enfundados/new
   def new
     @enfundado = Enfundado.new
