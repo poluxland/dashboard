@@ -45,5 +45,5 @@
 
 <div class="enf-show-actions">
   <%= link_to "Editar", edit_enfundado_path(@enfundado), class: "enf-btn enf-btn-primary" %>
-  <%= link_to "Volver", enfundados_path, class: "enf-btn" %>
+  <%= link_to "Volver", (request.referer.presence || enfundados_path), class: "enf-btn" %>
 </div>
