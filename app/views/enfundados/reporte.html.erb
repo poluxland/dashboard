@@ -237,15 +237,29 @@
     <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_general, delimiter: ".") %> g</div>
   </div>
 
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Films Manual</div>
-    <div class="rep-kpi-value"><%= @total_films_manual %></div>
+<div class="rep-kpi">
+  <div class="rep-kpi-label">Films Manual</div>
+  <div class="rep-kpi-value">
+    <%= @total_films_manual %>
+    (<%= number_with_precision(@total_gramos_manual.to_f / 15000, precision: 1) %> est.)
   </div>
+</div>
 
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Films Automática</div>
-    <div class="rep-kpi-value"><%= @total_films_automatica %></div>
+<div class="rep-kpi">
+  <div class="rep-kpi-label">Films Automática</div>
+  <div class="rep-kpi-value">
+    <%= @total_films_automatica %>
+    (<%= number_with_precision(@total_gramos_automatica.to_f / 15000, precision: 1) %> est.)
   </div>
+</div>
+
+<div class="rep-kpi">
+  <div class="rep-kpi-label">Films Totales</div>
+  <div class="rep-kpi-value">
+    <%= @total_films_manual.to_i + @total_films_automatica.to_i %>
+    (<%= number_with_precision(@total_gramos_general.to_f / 15000, precision: 1) %> est.)
+  </div>
+</div>
 </div>
 
   <div class="rep-card" style="margin-top:18px;">
