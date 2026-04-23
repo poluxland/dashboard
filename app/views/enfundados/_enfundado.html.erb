@@ -1,4 +1,14 @@
 <div id="<%= dom_id enfundado %>">
+  <% mostrar_con_gramos = ->(cantidad, gramos_unitarios = nil) do
+       cantidad = cantidad.to_i
+       if gramos_unitarios.present? && gramos_unitarios.to_i > 0
+         "#{cantidad} (#{cantidad * gramos_unitarios.to_i} g)"
+       else
+         cantidad.to_s
+       end
+     end
+  %>
+
   <style>
     .enf-show {
       max-width: 1100px;
@@ -151,63 +161,63 @@
           <tbody>
             <tr>
               <td>N° Pallet Enfundado</td>
-              <td><%= enfundado.numero_pallet_enfundado_manual.to_i %></td>
-              <td><%= enfundado.numero_pallet_enfundado_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.numero_pallet_enfundado_manual) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.numero_pallet_enfundado_automatica) %></td>
             </tr>
             <tr>
               <td>Especial plastificados por los lados</td>
-              <td><%= enfundado.especial_plastificados_lados_manual.to_i %></td>
-              <td><%= enfundado.especial_plastificados_lados_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificados_lados_manual, 207) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificados_lados_automatica, 360) %></td>
             </tr>
             <tr>
               <td>Especial plastificados completo</td>
-              <td><%= enfundado.especial_plastificados_completo_manual.to_i %></td>
-              <td><%= enfundado.especial_plastificados_completo_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificados_completo_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificados_completo_automatica, 510) %></td>
             </tr>
             <tr>
               <td>Especial plastificados 3 vueltas</td>
-              <td><%= enfundado.especial_plastificados_3_vueltas_manual.to_i %></td>
-              <td><%= enfundado.especial_plastificados_3_vueltas_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificados_3_vueltas_manual, 245) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificados_3_vueltas_automatica) %></td>
             </tr>
             <tr>
               <td>Especial plastificado Zuncho reforzado</td>
-              <td><%= enfundado.especial_plastificado_zuncho_reforzado_manual.to_i %></td>
-              <td><%= enfundado.especial_plastificado_zuncho_reforzado_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificado_zuncho_reforzado_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificado_zuncho_reforzado_automatica, 510) %></td>
             </tr>
             <tr>
               <td>Especial plastificado completo DOBLE FILMS</td>
-              <td><%= enfundado.especial_plastificado_completo_doble_films_manual.to_i %></td>
-              <td><%= enfundado.especial_plastificado_completo_doble_films_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificado_completo_doble_films_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_plastificado_completo_doble_films_automatica, 510) %></td>
             </tr>
             <tr>
               <td>Especial Soluble plastificados completo</td>
-              <td><%= enfundado.especial_soluble_plastificados_completo_manual.to_i %></td>
-              <td><%= enfundado.especial_soluble_plastificados_completo_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_soluble_plastificados_completo_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.especial_soluble_plastificados_completo_automatica, 510) %></td>
             </tr>
             <tr>
               <td>Extra plastificados por los lados</td>
-              <td><%= enfundado.extra_plastificados_lados_manual.to_i %></td>
-              <td><%= enfundado.extra_plastificados_lados_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_plastificados_lados_manual, 207) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_plastificados_lados_automatica, 360) %></td>
             </tr>
             <tr>
               <td>Extra plastificados completo DOBLE Films</td>
-              <td><%= enfundado.extra_plastificados_completo_doble_films_manual.to_i %></td>
-              <td><%= enfundado.extra_plastificados_completo_doble_films_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_plastificados_completo_doble_films_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_plastificados_completo_doble_films_automatica, 510) %></td>
             </tr>
             <tr>
               <td>Extra plastificados completo DOBLE Films Y Zuncho</td>
-              <td><%= enfundado.extra_plastificados_completo_doble_films_zuncho_manual.to_i %></td>
-              <td><%= enfundado.extra_plastificados_completo_doble_films_zuncho_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_plastificados_completo_doble_films_zuncho_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_plastificados_completo_doble_films_zuncho_automatica, 510) %></td>
             </tr>
             <tr>
               <td>Extra Soluble plastificados Completo</td>
-              <td><%= enfundado.extra_soluble_plastificados_completo_manual.to_i %></td>
-              <td><%= enfundado.extra_soluble_plastificados_completo_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_soluble_plastificados_completo_manual, 366) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.extra_soluble_plastificados_completo_automatica, 510) %></td>
             </tr>
             <tr>
               <td>N° Rollo Films cambiados</td>
-              <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
-              <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.numero_rollos_films_cambiados_manual) %></td>
+              <td><%= mostrar_con_gramos.call(enfundado.numero_rollos_films_cambiados_automatica) %></td>
             </tr>
           </tbody>
         </table>
