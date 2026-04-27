@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @entrega_film %>
+
+<div>
+  <%= link_to "Edit this entrega film", edit_entrega_film_path(@entrega_film) %> |
+  <%= link_to "Back to entrega films", entrega_films_path %>
+
+  <%= button_to "Destroy this entrega film", @entrega_film, method: :delete %>
+</div>

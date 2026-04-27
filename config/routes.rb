@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :entrega_films
   resources :enfundados do
   collection do
     get :reporte

@@ -1,0 +1,223 @@
+<%= form_with(model: entrega_film) do |form| %>
+  <style>
+    .film-form-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+      overflow: hidden;
+    }
+
+    .film-form-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+
+    .film-form-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .film-form-subtitle {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .film-form-body {
+      padding: 24px;
+    }
+
+    .film-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .film-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .film-form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .film-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .film-input,
+    .film-textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #111827;
+      background: #fff;
+      box-sizing: border-box;
+    }
+
+    .film-input:focus,
+    .film-textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .film-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .film-help {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .film-errors {
+      margin-bottom: 18px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .film-errors h2 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+    }
+
+    .film-errors ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .film-actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .film-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      background: #111827;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .film-submit:hover {
+      background: #1f2937;
+    }
+
+    .film-cancel {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #111827;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .film-cancel:hover {
+      background: #f3f4f6;
+    }
+
+    @media (max-width: 800px) {
+      .film-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="film-form-wrap">
+    <div class="film-form-header">
+      <h2 class="film-form-title">
+        <%= entrega_film.persisted? ? "Editar entrega de films" : "Nueva entrega de films" %>
+      </h2>
+
+      <div class="film-form-subtitle">
+        Registro de rollos entregados por bodega
+      </div>
+    </div>
+
+    <div class="film-form-body">
+      <% if entrega_film.errors.any? %>
+        <div class="film-errors">
+          <h2>No se pudo guardar el registro:</h2>
+
+          <ul>
+            <% entrega_film.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="film-form-grid">
+        <div class="film-form-group">
+          <%= form.label :fecha, "Fecha", class: "film-label" %>
+          <%= form.date_field :fecha,
+                value: (entrega_film.fecha || Date.current).strftime("%Y-%m-%d"),
+                class: "film-input" %>
+        </div>
+
+        <div class="film-form-group">
+          <%= form.label :rollos_entregados, "Rollos entregados", class: "film-label" %>
+          <%= form.number_field :rollos_entregados,
+                min: 0,
+                step: 1,
+                class: "film-input" %>
+          <div class="film-help">Cantidad total de rollos entregados por bodega.</div>
+        </div>
+
+        <div class="film-form-group full">
+          <%= form.label :operador_bodega, "Operador bodega / responsable", class: "film-label" %>
+          <%= form.text_field :operador_bodega,
+                class: "film-input",
+                placeholder: "Opcional" %>
+        </div>
+
+        <div class="film-form-group full">
+          <%= form.label :observaciones, "Observaciones", class: "film-label" %>
+          <%= form.text_area :observaciones,
+                class: "film-textarea",
+                placeholder: "Observaciones opcionales..." %>
+        </div>
+      </div>
+
+      <div class="film-actions">
+        <%= form.submit entrega_film.persisted? ? "Actualizar entrega" : "Crear entrega",
+              class: "film-submit" %>
+
+        <%= link_to "Volver", entrega_films_path, class: "film-cancel" %>
+      </div>
+    </div>
+  </div>
+<% end %>

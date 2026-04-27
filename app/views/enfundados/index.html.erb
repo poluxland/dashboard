@@ -8,32 +8,43 @@
   }
 
   .enf-index-topbar {
+    background: #111827;
+    color: white;
+    border-radius: 16px;
+    padding: 20px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
     margin-bottom: 18px;
     flex-wrap: wrap;
   }
 
   .enf-index-title {
     margin: 0;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
-    color: #1f2937;
+    color: white;
   }
 
   .enf-index-subtitle {
-    margin-top: 4px;
-    color: #6b7280;
+    margin-top: 5px;
+    color: white;
+    opacity: .75;
     font-size: 14px;
+  }
+
+  .enf-topbar-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
   .enf-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 14px;
+    padding: 10px 16px;
     border-radius: 10px;
     border: 1px solid #d1d5db;
     background: #ffffff;
@@ -41,10 +52,12 @@
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
   }
 
   .enf-btn:hover {
-    background: #f9fafb;
+    background: #f3f4f6;
   }
 
   .enf-card {
@@ -134,6 +147,13 @@
     color: #6b7280;
     font-size: 15px;
   }
+
+  @media (max-width: 800px) {
+    .enf-index-topbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
 </style>
 
 <div class="enf-index">
@@ -143,10 +163,11 @@
       <div class="enf-index-subtitle">Resumen manual y automática</div>
     </div>
 
-    <%= link_to "Nuevo registro", new_enfundado_path, class: "enf-btn" %>
-    <%= link_to "Reporte", reporte_enfundados_path, class: "enf-btn" %>
+    <div class="enf-topbar-actions">
+      <%= link_to "Nuevo registro", new_enfundado_path, class: "enf-btn" %>
+      <%= link_to "Reporte", reporte_enfundados_path, class: "enf-btn" %>
+    </div>
   </div>
-  
 
   <div class="enf-card">
     <div class="enf-table-wrap">

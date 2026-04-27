@@ -8,27 +8,31 @@
   }
 
   .rep-topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
+  background: #111827;
+  color: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
 
-  .rep-title {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
-  }
+.rep-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
 
-  .rep-subtitle {
-    margin-top: 4px;
-    color: #6b7280;
-    font-size: 14px;
-  }
-
+.rep-subtitle {
+  margin-top: 5px;
+  color: white;
+  opacity: .75;
+  font-size: 14px;
+}
   .rep-card {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -170,6 +174,77 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .rep-section-title {
+  margin: 22px 0 12px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.rep-equation-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.05);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.rep-equation-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.rep-equation-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.rep-equation-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #f9fafb;
+  width: 210px;
+  min-height: 78px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rep-equation-box small {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.rep-equation-symbol {
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.rep-equation-result {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+.rep-equation-sub {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #6b7280;
+}
 </style>
 
 <div class="rep-wrap">
@@ -211,56 +286,92 @@
     </div>
   </div>
 
-  <div class="rep-kpis">
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Total Manual</div>
-    <div class="rep-kpi-value"><%= @total_manual %></div>
+
+        <h2 class="rep-section-title">Rollos Film</h2>
+
+<div class="rep-equation-card">
+  <div class="rep-equation-label">
+    Rollos entregados bodega - Rollos estimados segun gramos = Diferencia Rollos
   </div>
 
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Total Automática</div>
-    <div class="rep-kpi-value"><%= @total_automatica %></div>
+  <div class="rep-equation-line">
+    <div class="rep-equation-box">
+      <small>Rollos entregados bodega</small>
+      <%= @total_films_entregados %>
+    </div>
+
+    <div class="rep-equation-symbol">-</div>
+
+    <div class="rep-equation-box">
+      <small>Rollos estimados</small>
+      <%= number_with_precision(@rollos_usados_segun_gramos, precision: 1) %>
+    </div>
+
+    <div class="rep-equation-symbol">=</div>
+
+    <div class="rep-equation-box rep-equation-result">
+      <small>Diferencia rollos</small>
+      <%= number_with_precision(@diferencia_rollos_segun_gramos, precision: 1) %>
+    </div>
   </div>
 
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Gramos Manual</div>
-    <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_manual, delimiter: ".") %> g</div>
+  <div class="rep-equation-sub">
+    Máquina manual + Máquina automática = Gramos totales
   </div>
 
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Gramos Automática</div>
-    <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_automatica, delimiter: ".") %> g</div>
-  </div>
+  <div class="rep-equation-line" style="margin-top:10px;">
+    <div class="rep-equation-box">
+      <small>Máquina manual</small>
+      <%= number_with_delimiter(@total_gramos_manual, delimiter: ".") %> g
+    </div>
 
-  <div class="rep-kpi">
-    <div class="rep-kpi-label">Gramos Totales</div>
-    <div class="rep-kpi-value"><%= number_with_delimiter(@total_gramos_general, delimiter: ".") %> g</div>
-  </div>
+    <div class="rep-equation-symbol">+</div>
 
-<div class="rep-kpi">
-  <div class="rep-kpi-label">Films Manual</div>
-  <div class="rep-kpi-value">
-    <%= @total_films_manual %>
-    (<%= number_with_precision(@total_gramos_manual.to_f / 15000, precision: 1) %> est.)
+    <div class="rep-equation-box">
+      <small>Máquina automática</small>
+      <%= number_with_delimiter(@total_gramos_automatica, delimiter: ".") %> g
+    </div>
+
+    <div class="rep-equation-symbol">=</div>
+
+    <div class="rep-equation-box rep-equation-result">
+      <small>Gramos totales</small>
+      <%= number_with_delimiter(@total_gramos_general, delimiter: ".") %> g
+    </div>
   </div>
 </div>
 
-<div class="rep-kpi">
-  <div class="rep-kpi-label">Films Automática</div>
-  <div class="rep-kpi-value">
-    <%= @total_films_automatica %>
-    (<%= number_with_precision(@total_gramos_automatica.to_f / 15000, precision: 1) %> est.)
+<h2 class="rep-section-title">Pallet enfundados</h2>
+
+<div class="rep-equation-card">
+  <div class="rep-equation-label">
+    Pallet máquina manual + Pallet máquina automática = Total pallet
+  </div>
+
+  <div class="rep-equation-line">
+    <div class="rep-equation-box">
+      <small>Pallet máquina manual</small>
+      <%= @total_pallet_manual %>
+    </div>
+
+    <div class="rep-equation-symbol">+</div>
+
+    <div class="rep-equation-box">
+      <small>Pallet máquina automática</small>
+      <%= @total_pallet_automatica %>
+    </div>
+
+    <div class="rep-equation-symbol">=</div>
+
+    <div class="rep-equation-box rep-equation-result">
+      <small>Total pallet</small>
+      <%= @total_pallet_enfundados %>
+    </div>
   </div>
 </div>
 
-<div class="rep-kpi">
-  <div class="rep-kpi-label">Films Totales</div>
-  <div class="rep-kpi-value">
-    <%= @total_films_manual.to_i + @total_films_automatica.to_i %>
-    (<%= number_with_precision(@total_gramos_general.to_f / 15000, precision: 1) %> est.)
-  </div>
-</div>
-</div>
+
+ 
 
   <div class="rep-card" style="margin-top:18px;">
     <div class="rep-table-wrap">

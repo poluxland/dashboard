@@ -1,0 +1,139 @@
+<div id="<%= dom_id entrega_film %>">
+  <style>
+    .film-show {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+      overflow: hidden;
+    }
+
+    .film-show-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+
+    .film-show-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .film-show-subtitle {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .film-show-body {
+      padding: 24px;
+    }
+
+    .film-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .film-meta-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .film-meta-label {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .film-meta-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .film-section-title {
+      margin: 24px 0 12px 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .film-observaciones {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #f9fafb;
+      color: #374151;
+      line-height: 1.5;
+      min-height: 60px;
+    }
+
+    .film-empty {
+      color: #9ca3af;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    @media (max-width: 800px) {
+      .film-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="film-show">
+    <div class="film-show-header">
+      <h2 class="film-show-title">Entrega de films</h2>
+      <div class="film-show-subtitle">Registro de rollos entregados por bodega</div>
+    </div>
+
+    <div class="film-show-body">
+      <div class="film-meta">
+        <div class="film-meta-card">
+          <div class="film-meta-label">Fecha</div>
+          <div class="film-meta-value">
+            <%= entrega_film.fecha&.strftime("%d-%m-%Y") || content_tag(:span, "Sin fecha", class: "film-empty") %>
+          </div>
+        </div>
+
+        <div class="film-meta-card">
+          <div class="film-meta-label">Rollos entregados</div>
+          <div class="film-meta-value">
+            <%= entrega_film.rollos_entregados.to_i %>
+          </div>
+        </div>
+
+        <div class="film-meta-card">
+          <div class="film-meta-label">Operador bodega</div>
+          <div class="film-meta-value">
+            <% if entrega_film.operador_bodega.present? %>
+              <%= entrega_film.operador_bodega %>
+            <% else %>
+              <span class="film-empty">No informado</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="film-section-title">Observaciones</h3>
+
+      <div class="film-observaciones">
+        <% if entrega_film.observaciones.present? %>
+          <%= simple_format(entrega_film.observaciones) %>
+        <% else %>
+          <span class="film-empty">Sin observaciones registradas.</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

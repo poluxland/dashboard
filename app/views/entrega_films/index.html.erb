@@ -1,0 +1,236 @@
+<% content_for :title, "Entregas de films" %>
+
+<style>
+  .film-index {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .film-topbar {
+    background: #111827;
+    color: white;
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .film-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .film-subtitle {
+    margin-top: 5px;
+    font-size: 14px;
+    opacity: .75;
+  }
+
+  .film-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .film-btn:hover {
+    background: #f3f4f6;
+  }
+
+  .film-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    overflow: hidden;
+  }
+
+  .film-table-wrap {
+    overflow-x: auto;
+  }
+
+  .film-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+  }
+
+  .film-table thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+  }
+
+  .film-table tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #edf0f2;
+    font-size: 14px;
+    color: #111827;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .film-table tbody tr:hover {
+    background: #fafafa;
+  }
+
+  .film-fecha {
+    font-weight: 700;
+  }
+
+  .film-total {
+    font-weight: 700;
+  }
+
+  .film-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .film-muted {
+    color: #9ca3af;
+    font-style: italic;
+  }
+
+  .film-observacion {
+    max-width: 340px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #374151;
+  }
+
+  .film-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .film-link {
+    text-decoration: none;
+    color: #374151;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .film-link:hover {
+    background: #f9fafb;
+  }
+
+  .film-empty-row {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 15px;
+  }
+
+  @media (max-width: 800px) {
+    .film-topbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+
+<div class="film-index">
+  <div class="film-topbar">
+    <div>
+      <h1 class="film-title">Entregas de films</h1>
+      <div class="film-subtitle">
+        Registro de rollos entregados por bodega
+      </div>
+    </div>
+
+    <%= link_to "Nueva entrega de films", new_entrega_film_path, class: "film-btn" %>
+  </div>
+
+  <div class="film-card">
+    <div class="film-table-wrap">
+      <table class="film-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Rollos entregados</th>
+            <th>Operador bodega</th>
+            <th>Observaciones</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if @entrega_films.present? %>
+            <% @entrega_films.order(fecha: :desc, created_at: :desc).each do |entrega_film| %>
+              <tr id="<%= dom_id entrega_film %>">
+                <td class="film-fecha">
+                  <%= entrega_film.fecha&.strftime("%d-%m-%Y") || "Sin fecha" %>
+                </td>
+
+                <td class="film-total">
+                  <span class="film-badge">
+                    <%= entrega_film.rollos_entregados.to_i %>
+                  </span>
+                </td>
+
+                <td>
+                  <% if entrega_film.operador_bodega.present? %>
+                    <%= entrega_film.operador_bodega %>
+                  <% else %>
+                    <span class="film-muted">No informado</span>
+                  <% end %>
+                </td>
+
+                <td class="film-observacion">
+                  <% if entrega_film.observaciones.present? %>
+                    <%= truncate(entrega_film.observaciones, length: 100) %>
+                  <% else %>
+                    <span class="film-muted">Sin observaciones</span>
+                  <% end %>
+                </td>
+
+                <td>
+                  <div class="film-actions">
+                    <%= link_to "Ver", entrega_film_path(entrega_film), class: "film-link" %>
+                    <%= link_to "Editar", edit_entrega_film_path(entrega_film), class: "film-link" %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="5" class="film-empty-row">
+                No hay entregas de films registradas.
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

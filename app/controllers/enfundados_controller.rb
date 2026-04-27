@@ -21,12 +21,28 @@ class EnfundadosController < ApplicationController
 
   @total_manual = @enfundados.sum { |e| e.total_manual_reporte }
   @total_automatica = @enfundados.sum { |e| e.total_automatica_reporte }
+
   @total_films_manual = @enfundados.sum { |e| e.numero_rollos_films_cambiados_manual.to_i }
   @total_films_automatica = @enfundados.sum { |e| e.numero_rollos_films_cambiados_automatica.to_i }
+  @total_films_usados = @total_films_manual + @total_films_automatica
 
   @total_gramos_manual = @enfundados.sum { |e| e.gramos_consumidos_manual }
   @total_gramos_automatica = @enfundados.sum { |e| e.gramos_consumidos_automatica }
   @total_gramos_general = @enfundados.sum { |e| e.gramos_consumidos_total }
+
+  @entregas_films = EntregaFilm.all
+  @entregas_films = @entregas_films.where("fecha >= ?", @desde) if @desde.present?
+  @entregas_films = @entregas_films.where("fecha <= ?", @hasta) if @hasta.present?
+
+  @total_films_entregados = @entregas_films.sum(:rollos_entregados).to_i
+  @diferencia_films = @total_films_entregados - @total_films_usados
+
+  @rollos_usados_segun_gramos = @total_gramos_general.to_f / 15000
+@diferencia_rollos_segun_gramos = @total_films_entregados.to_f - @rollos_usados_segun_gramos
+
+@total_pallet_manual = @enfundados.sum { |e| e.numero_pallet_enfundado_manual.to_i }
+@total_pallet_automatica = @enfundados.sum { |e| e.numero_pallet_enfundado_automatica.to_i }
+@total_pallet_enfundados = @total_pallet_manual + @total_pallet_automatica
 end
 
   # GET /enfundados/new
