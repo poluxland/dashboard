@@ -370,7 +370,34 @@
   </div>
 </div>
 
+<h2 class="rep-section-title">EP Pallet enfundado</h2>
 
+<div class="rep-equation-card">
+  <div class="rep-equation-line">
+    <div class="rep-equation-box">
+      <small>Pallet Enf. Normal</small>
+      <%= @total_pallet_enf_normal %>
+      <small>Σ 1 + 7</small>
+    </div>
+
+    <div class="rep-equation-box">
+      <small>Pallet Enf. Completo</small>
+      <%= @total_pallet_enf_completo %>
+      <small>Σ 2 + 3 + 5 + 6 + 8 + 10</small>
+    </div>
+
+    <div class="rep-equation-box">
+      <small>Pallet Enf. Zuncho</small>
+      <%= @total_pallet_enf_zuncho %>
+      <small>Σ 4 + 9</small>
+    </div>
+
+    <div class="rep-equation-box rep-equation-result">
+      <small>Total calculado</small>
+      <%= @total_pallet_enf_calculado %>
+    </div>
+  </div>
+</div>
  
 
   <div class="rep-card" style="margin-top:18px;">

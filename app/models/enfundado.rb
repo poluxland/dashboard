@@ -79,4 +79,37 @@ class Enfundado < ApplicationRecord
   def gramos_consumidos_total
     gramos_consumidos_manual + gramos_consumidos_automatica
   end
+
+  def pallet_enf_normal
+  especial_plastificados_lados_manual.to_i +
+    especial_plastificados_lados_automatica.to_i +
+    extra_plastificados_lados_manual.to_i +
+    extra_plastificados_lados_automatica.to_i
+end
+
+def pallet_enf_completo
+  especial_plastificados_completo_manual.to_i +
+    especial_plastificados_completo_automatica.to_i +
+    especial_plastificados_3_vueltas_manual.to_i +
+    especial_plastificados_3_vueltas_automatica.to_i +
+    especial_plastificado_completo_doble_films_manual.to_i +
+    especial_plastificado_completo_doble_films_automatica.to_i +
+    especial_soluble_plastificados_completo_manual.to_i +
+    especial_soluble_plastificados_completo_automatica.to_i +
+    extra_plastificados_completo_doble_films_manual.to_i +
+    extra_plastificados_completo_doble_films_automatica.to_i +
+    extra_soluble_plastificados_completo_manual.to_i +
+    extra_soluble_plastificados_completo_automatica.to_i
+end
+
+def pallet_enf_zuncho
+  especial_plastificado_zuncho_reforzado_manual.to_i +
+    especial_plastificado_zuncho_reforzado_automatica.to_i +
+    extra_plastificados_completo_doble_films_zuncho_manual.to_i +
+    extra_plastificados_completo_doble_films_zuncho_automatica.to_i
+end
+
+def pallet_enf_total_calculado
+  pallet_enf_normal + pallet_enf_completo + pallet_enf_zuncho
+end
 end

@@ -43,6 +43,11 @@ class EnfundadosController < ApplicationController
 @total_pallet_manual = @enfundados.sum { |e| e.numero_pallet_enfundado_manual.to_i }
 @total_pallet_automatica = @enfundados.sum { |e| e.numero_pallet_enfundado_automatica.to_i }
 @total_pallet_enfundados = @total_pallet_manual + @total_pallet_automatica
+
+@total_pallet_enf_normal = @enfundados.sum { |e| e.pallet_enf_normal }
+@total_pallet_enf_completo = @enfundados.sum { |e| e.pallet_enf_completo }
+@total_pallet_enf_zuncho = @enfundados.sum { |e| e.pallet_enf_zuncho }
+@total_pallet_enf_calculado = @total_pallet_enf_normal + @total_pallet_enf_completo + @total_pallet_enf_zuncho
 end
 
   # GET /enfundados/new
