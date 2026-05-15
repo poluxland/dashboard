@@ -19,12 +19,14 @@
     <%= f.month_field :period, value: (@reading.period&.strftime("%Y-%m") || Date.current.strftime("%Y-%m")), class: "form-control" %>
   </div>
 
-  <% [:cuasi, :lvs, :cc, :hh].each do |attr| %>
-    <div class="mb-3">
-      <%= f.label attr, "#{attr.to_s.upcase} (%)", class: "form-label" %>
-      <%= f.number_field attr, step: 0.01, min: 0, class: "form-control" %>
-    </div>
-  <% end %>
+<% [:cuasi, :lvs, :cc, :hh].each do |attr| %>
+  <div class="mb-3">
+    <% label_text = attr == :lvs ? "CS" : attr.to_s.upcase %>
+
+    <%= f.label attr, "#{label_text} (%)", class: "form-label" %>
+    <%= f.number_field attr, step: 0.01, min: 0, class: "form-control" %>
+  </div>
+<% end %>
 
   <%= f.submit "Guardar", class: "btn btn-primary" %>
 <% end %>
