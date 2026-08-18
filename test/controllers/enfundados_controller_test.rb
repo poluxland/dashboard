@@ -16,23 +16,25 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get reporte" do
-    EntregaFilm.create!(fecha: Date.current, rollos_entregados: 8)
-    Enfundado.create!(
-      operador: "Operador prueba",
-      fecha: Date.current,
-      turno: Enfundado::TURNOS.first,
-      numero_rollos_films_cambiados_manual: 2,
-      numero_rollos_films_cambiados_automatica: 1
-    )
+    travel_to EnfundadosController::FECHA_STOCK_FISICO_FILMS do
+      EntregaFilm.create!(fecha: Date.current, rollos_entregados: 8)
+      Enfundado.create!(
+        operador: "Operador prueba",
+        fecha: Date.current,
+        turno: Enfundado::TURNOS.first,
+        numero_rollos_films_cambiados_manual: 2,
+        numero_rollos_films_cambiados_automatica: 1
+      )
 
-    get reporte_enfundados_url
+      get reporte_enfundados_url
 
-    assert_response :success
-    assert_select ".rep-inventory-table tbody tr", count: 3
-    assert_select "[data-inventario-entregados]", text: /8/
-    assert_select "[data-inventario-usados]", text: /3/
-    assert_select "[data-inventario-inicial]", text: /-2/
-    assert_select "[data-inventario-fecha='#{Date.current.iso8601}']", text: /3/
+      assert_response :success
+      assert_select ".rep-inventory-table tbody tr", count: 3
+      assert_select ".rep-inventory-table thead th", count: 17
+      assert_select "[data-inventario-entregados]", text: /8/
+      assert_select "[data-inventario-usados]", text: /3/
+      assert_select "[data-inventario-fecha='#{Date.current.iso8601}']", text: /9/
+    end
   end
 
   test "should create enfundado" do

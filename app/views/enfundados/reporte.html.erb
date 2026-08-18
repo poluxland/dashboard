@@ -1,5 +1,4 @@
 <% content_for :title, "Reporte de enfundado" %>
-<% nombres_meses = %w[Enero Febrero Marzo Abril Mayo Junio Julio Agosto Septiembre Octubre Noviembre Diciembre] %>
 
 <style>
   .rep-wrap {
@@ -380,7 +379,9 @@
 
   <div class="rep-inventory-card">
     <div class="rep-inventory-period">
-      Inventario diario · <%= nombres_meses[@inventario_mes.month - 1] %> <%= @inventario_mes.year %>
+      Inventario diario · Últimos 15 días ·
+      <%= @inventario_desde.strftime("%d-%m-%Y") %> al
+      <%= @inventario_hasta.strftime("%d-%m-%Y") %>
     </div>
 
     <div class="rep-inventory-scroll">
@@ -390,7 +391,7 @@
             <th class="rep-inventory-label">Movimiento</th>
             <th class="rep-inventory-initial">Inicial</th>
             <% @inventario_dias.each do |fecha| %>
-              <th title="<%= fecha.strftime('%d-%m-%Y') %>"><%= fecha.strftime("%d") %></th>
+              <th title="<%= fecha.strftime('%d-%m-%Y') %>"><%= fecha.strftime("%d/%m") %></th>
             <% end %>
           </tr>
         </thead>
@@ -423,7 +424,9 @@
     </div>
 
     <div class="rep-inventory-caption">
-      El inventario inicial corresponde al saldo acumulado antes del primer día del mes.
+      Inventario conciliado con el conteo físico de
+      <strong><%= EnfundadosController::STOCK_FISICO_FILMS %> films</strong>
+      realizado el <%= EnfundadosController::FECHA_STOCK_FISICO_FILMS.strftime("%d-%m-%Y") %>.
     </div>
   </div>
 

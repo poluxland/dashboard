@@ -1,4 +1,7 @@
 class EnfundadosController < ApplicationController
+  STOCK_FISICO_FILMS = 9
+  FECHA_STOCK_FISICO_FILMS = Date.new(2026, 8, 18)
+
   before_action :set_enfundado, only: %i[ show edit update destroy ]
 
   # GET /enfundados or /enfundados.json
@@ -62,27 +65,34 @@ class EnfundadosController < ApplicationController
     @total_pallet_enf_completo +
     @total_pallet_enf_zuncho
 
-  fechas_inventario = [ Enfundado.maximum(:fecha), EntregaFilm.maximum(:fecha) ].compact
-  fecha_referencia_inventario = @hasta.present? ? Date.parse(@hasta) : fechas_inventario.max
-  @inventario_mes = (fecha_referencia_inventario || Date.current).beginning_of_month
-  @inventario_fin_mes = @inventario_mes.end_of_month
-  @inventario_dias = (@inventario_mes..@inventario_fin_mes).to_a
+  @inventario_hasta = Date.current
+  @inventario_desde = @inventario_hasta - 14.days
+  @inventario_dias = (@inventario_desde..@inventario_hasta).to_a
 
-  entregas_anteriores = EntregaFilm.where("fecha < ?", @inventario_mes).sum(:rollos_entregados).to_i
-  enfundados_anteriores = Enfundado.where("fecha < ?", @inventario_mes)
-  usados_anteriores = enfundados_anteriores.sum do |enfundado|
-    enfundado.numero_rollos_films_cambiados_manual.to_i +
-      enfundado.numero_rollos_films_cambiados_automatica.to_i
-  end
-  @inventario_inicial = entregas_anteriores - usados_anteriores
+  entregas_hasta_conteo = EntregaFilm
+    .where(fecha: ..FECHA_STOCK_FISICO_FILMS)
+    .sum(:rollos_entregados)
+    .to_i
+  usados_hasta_conteo = total_rollos_films_usados(
+    Enfundado.where(fecha: ..FECHA_STOCK_FISICO_FILMS)
+  )
+  ajuste_inventario =
+    STOCK_FISICO_FILMS -
+    (entregas_hasta_conteo - usados_hasta_conteo)
+
+  entregas_anteriores = EntregaFilm.where("fecha < ?", @inventario_desde).sum(:rollos_entregados).to_i
+  usados_anteriores = total_rollos_films_usados(
+    Enfundado.where("fecha < ?", @inventario_desde)
+  )
+  @inventario_inicial = entregas_anteriores - usados_anteriores + ajuste_inventario
 
   @inventario_entregas_por_dia = EntregaFilm
-    .where(fecha: @inventario_mes..@inventario_fin_mes)
+    .where(fecha: @inventario_desde..@inventario_hasta)
     .group(:fecha)
     .sum(:rollos_entregados)
 
   @inventario_usados_por_dia = Enfundado
-    .where(fecha: @inventario_mes..@inventario_fin_mes)
+    .where(fecha: @inventario_desde..@inventario_hasta)
     .group_by(&:fecha)
     .transform_values do |registros|
       registros.sum do |enfundado|
@@ -155,6 +165,13 @@ end
     # Only allow a list of trusted parameters through.
     def enfundado_params
       params.expect(enfundado: [ :operador, :fecha, :turno, :numero_pallet_enfundado_manual, :numero_pallet_enfundado_automatica, :especial_plastificados_lados_manual, :especial_plastificados_lados_automatica, :especial_plastificados_completo_manual, :especial_plastificados_completo_automatica, :especial_plastificados_3_vueltas_manual, :especial_plastificados_3_vueltas_automatica, :especial_plastificado_zuncho_reforzado_manual, :especial_plastificado_zuncho_reforzado_automatica, :especial_plastificado_completo_doble_films_manual, :especial_plastificado_completo_doble_films_automatica, :especial_soluble_plastificados_completo_manual, :especial_soluble_plastificados_completo_automatica, :extra_plastificados_lados_manual, :extra_plastificados_lados_automatica, :extra_plastificados_completo_doble_films_manual, :extra_plastificados_completo_doble_films_automatica, :extra_plastificados_completo_doble_films_zuncho_manual, :extra_plastificados_completo_doble_films_zuncho_automatica, :extra_soluble_plastificados_completo_manual, :extra_soluble_plastificados_completo_automatica, :numero_rollos_films_cambiados_manual, :numero_rollos_films_cambiados_automatica ])
+    end
+
+    def total_rollos_films_usados(registros)
+      registros.sum do |enfundado|
+        enfundado.numero_rollos_films_cambiados_manual.to_i +
+          enfundado.numero_rollos_films_cambiados_automatica.to_i
+      end
     end
 
 end
