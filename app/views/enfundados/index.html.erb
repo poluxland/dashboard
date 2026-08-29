@@ -181,6 +181,7 @@
             <th>T.Automática</th>
             <th>F. Manual</th>
             <th>F. Automático</th>
+            <th>F. Tapa</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -224,6 +225,7 @@
                 <td class="enf-total"><%= total_automatica %></td>
                 <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
                 <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+                <td><%= enfundado.numero_rollos_films_tapa.to_i %></td>
                 <td>
                   <div class="enf-actions">
                     <%= link_to "Ver", enfundado, class: "enf-link" %>
@@ -234,7 +236,7 @@
             <% end %>
           <% else %>
             <tr>
-              <td colspan="8" class="enf-empty">No hay registros de enfundado todavía.</td>
+              <td colspan="9" class="enf-empty">No hay registros de enfundado todavía.</td>
             </tr>
           <% end %>
         </tbody>

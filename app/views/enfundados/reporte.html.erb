@@ -489,27 +489,34 @@
 
 <div class="rep-equation-card">
   <div class="rep-equation-label">
-    Film manual + Film automático = Total films usados
+    Film manual + Film automático + Film Tapa = Total films usados
   </div>
 
   <div class="rep-equation-line">
     <div class="rep-equation-box">
       <small>Films manual</small>
-      <%= @total_films_manual %>
+      <%= number_with_precision(@total_films_manual, precision: 1, strip_insignificant_zeros: true) %>
     </div>
 
     <div class="rep-equation-symbol">+</div>
 
     <div class="rep-equation-box">
       <small>Films automática</small>
-      <%= @total_films_automatica %>
+      <%= number_with_precision(@total_films_automatica, precision: 1, strip_insignificant_zeros: true) %>
+    </div>
+
+    <div class="rep-equation-symbol">+</div>
+
+    <div class="rep-equation-box">
+      <small>Film Tapa</small>
+      <%= @total_films_tapa %>
     </div>
 
     <div class="rep-equation-symbol">=</div>
 
     <div class="rep-equation-box rep-equation-result">
       <small>Total films usados</small>
-      <%= @total_films_usados %>
+      <%= number_with_precision(@total_films_usados, precision: 1, strip_insignificant_zeros: true) %>
     </div>
   </div>
 </div>
@@ -559,6 +566,7 @@
     <th>Gramos Totales</th>
     <th>Films Manual</th>
     <th>Films Automática</th>
+    <th>Film Tapa</th>
     <th>Ver</th>
   </tr>
 </thead>
@@ -576,12 +584,13 @@
         <td><%= number_with_delimiter(enfundado.gramos_consumidos_total, delimiter: ".") %> g</td>
         <td><%= enfundado.numero_rollos_films_cambiados_manual.to_i %></td>
         <td><%= enfundado.numero_rollos_films_cambiados_automatica.to_i %></td>
+        <td><%= enfundado.numero_rollos_films_tapa.to_i %></td>
         <td><%= link_to "Ver", enfundado, class: "rep-btn" %></td>
       </tr>
     <% end %>
   <% else %>
     <tr>
-      <td colspan="11" style="padding:24px; text-align:center; color:#6b7280;">
+      <td colspan="12" style="padding:24px; text-align:center; color:#6b7280;">
         No hay registros para el período seleccionado.
       </td>
     </tr>

@@ -28,6 +28,7 @@ one:
   extra_soluble_plastificados_completo_automatica: 1
   numero_rollos_films_cambiados_manual: 1
   numero_rollos_films_cambiados_automatica: 1
+  numero_rollos_films_tapa: 0
 
 two:
   operador: MyString
@@ -57,3 +58,4 @@ two:
   extra_soluble_plastificados_completo_automatica: 1
   numero_rollos_films_cambiados_manual: 1
   numero_rollos_films_cambiados_automatica: 1
+  numero_rollos_films_tapa: 0

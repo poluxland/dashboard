@@ -23,7 +23,8 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
         fecha: Date.current,
         turno: Enfundado::TURNOS.first,
         numero_rollos_films_cambiados_manual: 2,
-        numero_rollos_films_cambiados_automatica: 1
+        numero_rollos_films_cambiados_automatica: 1,
+        numero_rollos_films_tapa: 4
       )
 
       get reporte_enfundados_url
@@ -32,8 +33,8 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
       assert_select ".rep-inventory-table tbody tr", count: 3
       assert_select ".rep-inventory-table thead th", count: 17
       assert_select "[data-inventario-entregados]", text: /8/
-      assert_select "[data-inventario-usados]", text: /3/
-      assert_select "[data-inventario-fecha='#{Date.current.iso8601}']", text: /9/
+      assert_select "[data-inventario-usados]", text: /7/
+      assert_select "[data-inventario-fecha='#{Date.current.iso8601}']", text: /2/
     end
   end
 

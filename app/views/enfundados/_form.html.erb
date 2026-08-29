@@ -79,6 +79,10 @@
     margin-bottom: 6px;
   }
 
+  .enf-grid-films {
+    grid-template-columns: 40px 1.7fr 130px 130px 130px;
+  }
+
   .enf-grid-row label,
   .enf-grid-head div {
     font-size: 15px;
@@ -150,6 +154,10 @@
     .enf-grid-row {
       grid-template-columns: 34px 1fr 110px 110px;
       gap: 8px;
+    }
+
+    .enf-grid-films {
+      grid-template-columns: 34px 1fr 95px 95px 95px;
     }
   }
 
@@ -347,14 +355,15 @@
 
       <div class="enf-subtitle" style="margin-top: 28px;">III FILMS</div>
 
-      <div class="enf-grid-head">
+      <div class="enf-grid-head enf-grid-films">
         <div></div>
         <div></div>
         <div class="enf-col-head">Manual</div>
         <div class="enf-col-head">Automática</div>
+        <div class="enf-col-head">Tapa</div>
       </div>
 
-      <div class="enf-grid-row">
+      <div class="enf-grid-row enf-grid-films">
         <div class="enf-num">6.-</div>
         <div class="enf-label">N° Rollo Films cambiados</div>
         <div>
@@ -362,6 +371,9 @@
         </div>
         <div>
           <%= form.number_field :numero_rollos_films_cambiados_automatica, class: "enf-field", min: 0 %>
+        </div>
+        <div>
+          <%= form.number_field :numero_rollos_films_tapa, class: "enf-field", min: 0 %>
         </div>
       </div>
 

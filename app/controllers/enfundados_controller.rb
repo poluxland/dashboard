@@ -1,6 +1,6 @@
 class EnfundadosController < ApplicationController
-  STOCK_FISICO_FILMS = 9
-  FECHA_STOCK_FISICO_FILMS = Date.new(2026, 8, 18)
+  STOCK_FISICO_FILMS = 2
+  FECHA_STOCK_FISICO_FILMS = Date.new(2026, 8, 23)
 
   before_action :set_enfundado, only: %i[ show edit update destroy ]
 
@@ -27,9 +27,10 @@ class EnfundadosController < ApplicationController
   @total_automatica = @enfundados.sum { |e| e.total_automatica_reporte.to_i }
 
   # Films cambiados según registros de enfundado
-  @total_films_manual = @enfundados.sum { |e| e.numero_rollos_films_cambiados_manual.to_i }
-  @total_films_automatica = @enfundados.sum { |e| e.numero_rollos_films_cambiados_automatica.to_i }
-  @total_films_usados = @total_films_manual + @total_films_automatica
+  @total_films_manual = @enfundados.sum(&:films_usados_manual)
+  @total_films_automatica = @enfundados.sum(&:films_usados_automatica)
+  @total_films_tapa = @enfundados.sum(&:films_usados_tapa)
+  @total_films_usados = @total_films_manual + @total_films_automatica + @total_films_tapa
 
   # Gramos consumidos
   @total_gramos_manual = @enfundados.sum { |e| e.gramos_consumidos_manual.to_i }
@@ -96,8 +97,7 @@ class EnfundadosController < ApplicationController
     .group_by(&:fecha)
     .transform_values do |registros|
       registros.sum do |enfundado|
-        enfundado.numero_rollos_films_cambiados_manual.to_i +
-          enfundado.numero_rollos_films_cambiados_automatica.to_i
+        enfundado.films_usados_total
       end
     end
 
@@ -164,13 +164,12 @@ end
 
     # Only allow a list of trusted parameters through.
     def enfundado_params
-      params.expect(enfundado: [ :operador, :fecha, :turno, :numero_pallet_enfundado_manual, :numero_pallet_enfundado_automatica, :especial_plastificados_lados_manual, :especial_plastificados_lados_automatica, :especial_plastificados_completo_manual, :especial_plastificados_completo_automatica, :especial_plastificados_3_vueltas_manual, :especial_plastificados_3_vueltas_automatica, :especial_plastificado_zuncho_reforzado_manual, :especial_plastificado_zuncho_reforzado_automatica, :especial_plastificado_completo_doble_films_manual, :especial_plastificado_completo_doble_films_automatica, :especial_soluble_plastificados_completo_manual, :especial_soluble_plastificados_completo_automatica, :extra_plastificados_lados_manual, :extra_plastificados_lados_automatica, :extra_plastificados_completo_doble_films_manual, :extra_plastificados_completo_doble_films_automatica, :extra_plastificados_completo_doble_films_zuncho_manual, :extra_plastificados_completo_doble_films_zuncho_automatica, :extra_soluble_plastificados_completo_manual, :extra_soluble_plastificados_completo_automatica, :numero_rollos_films_cambiados_manual, :numero_rollos_films_cambiados_automatica ])
+      params.expect(enfundado: [ :operador, :fecha, :turno, :numero_pallet_enfundado_manual, :numero_pallet_enfundado_automatica, :especial_plastificados_lados_manual, :especial_plastificados_lados_automatica, :especial_plastificados_completo_manual, :especial_plastificados_completo_automatica, :especial_plastificados_3_vueltas_manual, :especial_plastificados_3_vueltas_automatica, :especial_plastificado_zuncho_reforzado_manual, :especial_plastificado_zuncho_reforzado_automatica, :especial_plastificado_completo_doble_films_manual, :especial_plastificado_completo_doble_films_automatica, :especial_soluble_plastificados_completo_manual, :especial_soluble_plastificados_completo_automatica, :extra_plastificados_lados_manual, :extra_plastificados_lados_automatica, :extra_plastificados_completo_doble_films_manual, :extra_plastificados_completo_doble_films_automatica, :extra_plastificados_completo_doble_films_zuncho_manual, :extra_plastificados_completo_doble_films_zuncho_automatica, :extra_soluble_plastificados_completo_manual, :extra_soluble_plastificados_completo_automatica, :numero_rollos_films_cambiados_manual, :numero_rollos_films_cambiados_automatica, :numero_rollos_films_tapa ])
     end
 
     def total_rollos_films_usados(registros)
       registros.sum do |enfundado|
-        enfundado.numero_rollos_films_cambiados_manual.to_i +
-          enfundado.numero_rollos_films_cambiados_automatica.to_i
+        enfundado.films_usados_total
       end
     end
 

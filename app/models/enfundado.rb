@@ -7,6 +7,8 @@ class Enfundado < ApplicationRecord
     scope: :fecha,
     message: "ya fue registrado para esta fecha"
   }
+  validates :numero_rollos_films_tapa,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   PESOS_MANUAL = {
     especial_plastificados_lados: 207,
@@ -78,6 +80,24 @@ class Enfundado < ApplicationRecord
 
   def gramos_consumidos_total
     gramos_consumidos_manual + gramos_consumidos_automatica
+  end
+
+  def films_usados_manual
+    numero_rollos_films_cambiados_manual.to_i
+  end
+
+  def films_usados_automatica
+    numero_rollos_films_cambiados_automatica.to_i
+  end
+
+  def films_usados_tapa
+    numero_rollos_films_tapa.to_i
+  end
+
+  def films_usados_total
+    numero_rollos_films_cambiados_manual.to_i +
+      numero_rollos_films_cambiados_automatica.to_i +
+      films_usados_tapa
   end
 
   def pallet_enf_normal
