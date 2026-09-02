@@ -129,7 +129,7 @@
             <a
               class="nav-link dropdown-toggle"
               href="#"
-              id="demoDropdown"
+              id="envasadoraDropdown"
               role="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
@@ -137,12 +137,15 @@
               Envasadora
             </a>
 
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoDropdown">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="envasadoraDropdown">
               <li>
                 <%= link_to "Enfundado", enfundados_path, class: "dropdown-item", data: { turbo: false } %>
               </li>
               <li>
                 <%= link_to "Film entregado", entrega_films_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
+              <li>
+                <%= link_to "Inventario de rollos Film", inventario_films_enfundados_path, class: "dropdown-item", data: { turbo: false } %>
               </li>
               
             </ul>

@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :enfundados do
   collection do
     get :reporte
+    get :inventario_films
   end
 end
   resources :estado_equipos do

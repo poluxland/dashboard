@@ -1,0 +1,212 @@
+<% content_for :title, "Inventario de rollos Film" %>
+
+<style>
+  .inventory-wrap {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .inventory-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    background: #111827;
+    color: #fff;
+  }
+
+  .inventory-title {
+    margin: 0;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .inventory-subtitle {
+    margin-top: 5px;
+    color: rgba(255, 255, 255, .75);
+    font-size: 14px;
+  }
+
+  .inventory-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .inventory-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .inventory-btn:hover {
+    background: #f9fafb;
+  }
+
+  .rep-inventory-card {
+    overflow: hidden;
+    margin-bottom: 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .05);
+  }
+
+  .rep-inventory-period {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rep-inventory-scroll {
+    overflow-x: auto;
+  }
+
+  .rep-inventory-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+  }
+
+  .rep-inventory-table th,
+  .rep-inventory-table td {
+    min-width: 54px;
+    padding: 13px 10px;
+    border-bottom: 1px solid #edf0f2;
+    color: #111827;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .rep-inventory-table th {
+    background: #fff;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .rep-inventory-table .rep-inventory-label {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 170px;
+    padding-left: 18px;
+    background: #fff;
+    text-align: left;
+  }
+
+  .rep-inventory-table thead .rep-inventory-label {
+    z-index: 2;
+  }
+
+  .rep-inventory-table .rep-inventory-result td,
+  .rep-inventory-table .rep-inventory-result .rep-inventory-label {
+    border-bottom: 0;
+    background: #111827;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .rep-inventory-initial {
+    background: #f3f4f6;
+    font-weight: 700;
+  }
+
+  .rep-inventory-zero {
+    color: #9ca3af;
+  }
+
+  .rep-inventory-caption {
+    padding: 11px 18px;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 12px;
+  }
+</style>
+
+<div class="inventory-wrap">
+  <div class="inventory-topbar">
+    <div>
+      <h1 class="inventory-title">Inventario de rollos Film</h1>
+      <div class="inventory-subtitle">Movimientos y saldo diario de los últimos 15 días</div>
+    </div>
+
+    <div class="inventory-actions">
+      <%= link_to "Volver a Enfundado", enfundados_path, class: "inventory-btn" %>
+      <%= link_to "Ver reporte", reporte_enfundados_path, class: "inventory-btn" %>
+    </div>
+  </div>
+
+  <div class="rep-inventory-card">
+    <div class="rep-inventory-period">
+      Inventario diario · Últimos 15 días ·
+      <%= @inventario_desde.strftime("%d-%m-%Y") %> al
+      <%= @inventario_hasta.strftime("%d-%m-%Y") %>
+    </div>
+
+    <div class="rep-inventory-scroll">
+      <table class="rep-inventory-table">
+        <thead>
+          <tr>
+            <th class="rep-inventory-label">Movimiento</th>
+            <th class="rep-inventory-initial">Inicial</th>
+            <% @inventario_dias.each do |fecha| %>
+              <th title="<%= fecha.strftime('%d-%m-%Y') %>"><%= fecha.strftime("%d/%m") %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-inventario-entregados>
+            <td class="rep-inventory-label"><strong>Rollos entregados</strong></td>
+            <td class="rep-inventory-initial">—</td>
+            <% @inventario_dias.each do |fecha| %>
+              <% cantidad = @inventario_entregas_por_dia.fetch(fecha, 0).to_i %>
+              <td class="<%= 'rep-inventory-zero' if cantidad.zero? %>"><%= cantidad.zero? ? "—" : "+#{cantidad}" %></td>
+            <% end %>
+          </tr>
+          <tr data-inventario-usados>
+            <td class="rep-inventory-label"><strong>Films usados</strong></td>
+            <td class="rep-inventory-initial">—</td>
+            <% @inventario_dias.each do |fecha| %>
+              <% cantidad = @inventario_usados_por_dia.fetch(fecha, 0).to_i %>
+              <td class="<%= 'rep-inventory-zero' if cantidad.zero? %>"><%= cantidad.zero? ? "—" : "−#{cantidad}" %></td>
+            <% end %>
+          </tr>
+          <tr class="rep-inventory-result" data-inventario-diario>
+            <td class="rep-inventory-label">Inventario diario</td>
+            <td class="rep-inventory-initial" data-inventario-inicial><%= @inventario_inicial %></td>
+            <% @inventario_dias.each do |fecha| %>
+              <td data-inventario-fecha="<%= fecha.iso8601 %>"><%= @inventario_por_dia.fetch(fecha) %></td>
+            <% end %>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rep-inventory-caption">
+      Inventario conciliado con el conteo físico de
+      <strong><%= EnfundadosController::STOCK_FISICO_FILMS %> films</strong>
+      realizado el <%= EnfundadosController::FECHA_STOCK_FISICO_FILMS.strftime("%d-%m-%Y") %>.
+    </div>
+  </div>
+</div>

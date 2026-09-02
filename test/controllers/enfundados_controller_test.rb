@@ -8,6 +8,7 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get enfundados_url
     assert_response :success
+    assert_select "a[href='#{inventario_films_enfundados_path}']", text: "Inventario de rollos Film"
   end
 
   test "should get new" do
@@ -15,7 +16,7 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get reporte" do
+  test "should get inventario films" do
     travel_to EnfundadosController::FECHA_STOCK_FISICO_FILMS do
       EntregaFilm.create!(fecha: Date.current, rollos_entregados: 8)
       Enfundado.create!(
@@ -27,7 +28,7 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
         numero_rollos_films_tapa: 4
       )
 
-      get reporte_enfundados_url
+      get inventario_films_enfundados_url
 
       assert_response :success
       assert_select ".rep-inventory-table tbody tr", count: 3
@@ -36,6 +37,13 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
       assert_select "[data-inventario-usados]", text: /7/
       assert_select "[data-inventario-fecha='#{Date.current.iso8601}']", text: /2/
     end
+  end
+
+  test "reporte does not show films inventory" do
+    get reporte_enfundados_url
+
+    assert_response :success
+    assert_select ".rep-inventory-table", count: 0
   end
 
   test "should create enfundado" do
