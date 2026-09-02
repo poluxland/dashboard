@@ -2,6 +2,7 @@ require "test_helper"
 
 class WorksControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_with_google
     @work = works(:one)
   end
 

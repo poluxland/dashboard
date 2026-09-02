@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Dashboard</title>
+    <title><%= content_for?(:title) ? yield(:title) : "Dashboard" %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -10,7 +10,7 @@
   </head>
 
   <body>
-  <%= render "shared/navbar" %>
+  <%= render "shared/navbar" if signed_in? %>
 
   <div class="container-fluid">
     <% if notice %>

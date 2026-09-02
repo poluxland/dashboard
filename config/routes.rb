@@ -1,5 +1,10 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get "/login", to: "sessions#new", as: :login
+  get "/auth/google_oauth2/callback", to: "sessions#create"
+  get "/auth/failure", to: "sessions#failure"
+  delete "/logout", to: "sessions#destroy", as: :logout
+
   resources :entrega_films
   resources :enfundados do
   collection do

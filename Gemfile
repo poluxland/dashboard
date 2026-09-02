@@ -30,6 +30,10 @@ gem "pagy"
 gem "caxlsx"        # fork mantenido de axlsx
 gem "caxlsx_rails"
 
+# Google Workspace authentication
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

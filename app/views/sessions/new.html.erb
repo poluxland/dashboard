@@ -1,0 +1,88 @@
+<% content_for :title, "Ingresar" %>
+
+<style>
+  .login-page {
+    min-height: calc(100vh - 2rem);
+    display: grid;
+    place-items: center;
+    padding: 32px 16px;
+    background: #f3f4f6;
+  }
+
+  .login-card {
+    width: min(100%, 430px);
+    padding: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 18px 45px rgba(17, 24, 39, .12);
+    text-align: center;
+  }
+
+  .login-brand {
+    margin-bottom: 10px;
+    color: #111827;
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .login-copy {
+    margin: 0 0 26px;
+    color: #6b7280;
+    line-height: 1.55;
+  }
+
+  .google-login-button {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .google-login-button:hover {
+    background: #f9fafb;
+  }
+
+  .login-domain {
+    margin-top: 18px;
+    color: #6b7280;
+    font-size: 13px;
+  }
+
+  .login-pending {
+    padding: 12px;
+    border-radius: 10px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 14px;
+  }
+</style>
+
+<div class="login-page">
+  <main class="login-card">
+    <div class="login-brand">Impromaq</div>
+    <p class="login-copy">Ingresa al dashboard con tu cuenta corporativa de Google Workspace.</p>
+
+    <% if @google_oauth_configured %>
+      <%= button_to "/auth/google_oauth2",
+            method: :post,
+            class: "google-login-button",
+            data: { turbo: false } do %>
+        <span aria-hidden="true">G</span>
+        Continuar con Google
+      <% end %>
+    <% else %>
+      <div class="login-pending">La autenticación de Google aún no está configurada.</div>
+    <% end %>
+
+    <div class="login-domain">Acceso exclusivo para cuentas @msindustrial.cl</div>
+  </main>
+</div>

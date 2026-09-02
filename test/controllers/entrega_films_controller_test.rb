@@ -2,6 +2,7 @@ require "test_helper"
 
 class EntregaFilmsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_with_google
     @entrega_film = entrega_films(:one)
   end
 

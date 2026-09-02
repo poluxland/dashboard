@@ -3,6 +3,22 @@ require "application_system_test_case"
 
 class OtsTest < ApplicationSystemTestCase
   setup do
+    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
+      provider: "google_oauth2",
+      uid: "system-test-user",
+      info: {
+        email: "usuario@msindustrial.cl",
+        name: "Usuario Industrial",
+        email_verified: true
+      },
+      extra: {
+        id_info: {
+          "hd" => "msindustrial.cl",
+          "email_verified" => true
+        }
+      }
+    )
+
     @ot = (defined?(ots) && ots(:one) rescue nil)
     @ot ||= Ot.create!(
       ot_asignada: unique_ot_number,
@@ -12,6 +28,9 @@ class OtsTest < ApplicationSystemTestCase
       responsable: "MyString", contratista: "MyString", tipo_ot: "C", estado: 85,
       sem_ejec: 1, n_personas: 1, duracion_hr: 1, hh: 1, causa: "MyString", comentarios: "MyText"
     )
+
+    visit login_path
+    click_button "Continuar con Google"
   end
 
   test "visiting the index" do

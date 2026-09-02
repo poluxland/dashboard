@@ -2,6 +2,7 @@ require "test_helper"
 
 class OtsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_with_google
     @ot = ots(:one)
   end
 

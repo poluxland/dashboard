@@ -2,6 +2,7 @@ require "test_helper"
 
 class EstadoEquiposControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_with_google
     @estado_equipo = estado_equipos(:one)
   end
 

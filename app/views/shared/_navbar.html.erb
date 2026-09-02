@@ -173,6 +173,16 @@
             </ul>
           </li>
 
+          <li class="nav-item d-flex align-items-center gap-2 ms-lg-3">
+            <span class="navbar-text text-white-50 small"><%= current_user[:email] %></span>
+            <%= button_to "Salir",
+                  logout_path,
+                  method: :delete,
+                  class: "btn btn-sm btn-outline-light",
+                  form_class: "d-inline-flex",
+                  data: { turbo: false } %>
+          </li>
+
       </ul>
     </div>
   </div>

@@ -2,6 +2,7 @@ require "test_helper"
 
 class EnfundadosControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_with_google
     @enfundado = enfundados(:one)
   end
 
