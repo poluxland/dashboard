@@ -12,14 +12,25 @@
   <body>
   <%= render "shared/navbar" if signed_in? %>
 
-  <div class="container-fluid">
-    <% if notice %>
-      <div class="alert alert-success"><%= notice %></div>
-    <% end %>
-    <% if alert %>
-      <div class="alert alert-danger"><%= alert %></div>
-    <% end %>
+  <% if notice.present? || alert.present? %>
+    <div class="app-flash-stack" aria-live="polite" aria-atomic="true">
+      <% if notice.present? %>
+        <div class="app-flash alert alert-success alert-dismissible fade show" role="status">
+          <%= notice %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      <% end %>
 
+      <% if alert.present? %>
+        <div class="app-flash alert alert-danger alert-dismissible fade show" role="alert">
+          <%= alert %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="container-fluid">
     <%= yield %>
   </div>
 </body>

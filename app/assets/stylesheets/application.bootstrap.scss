@@ -1,2 +1,19 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+
+.app-flash-stack {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 1090;
+  width: min(460px, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.app-flash {
+  margin: 0;
+  border: 0;
+  box-shadow: 0 12px 32px rgba(17, 24, 39, .22);
+  pointer-events: auto;
+}

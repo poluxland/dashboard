@@ -1,21 +1,6 @@
 <%# app/views/ots/index.html.erb %>
 <% content_for :title, "OTs" %>
 
-<%# --- Mensajes --- %>
-<% if notice.present? %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= notice %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-  </div>
-<% end %>
-
-<% if alert.present? %>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <%= alert %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-  </div>
-<% end %>
-
 <div class="d-flex align-items-center justify-content-between mb-3">
   <h1 class="h3 mb-0">OTs</h1>
   <%= link_to "Nueva OT", new_ot_path, class: "btn btn-primary" %>

@@ -12,6 +12,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "form[action='/auth/google_oauth2'][method='post']"
+    assert_select ".google-login-button svg.google-login-logo path", count: 4
     assert_select ".login-domain", text: /@msindustrial\.cl/
   end
 
@@ -35,7 +36,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to login_url
     follow_redirect!
-    assert_select ".alert-danger", text: /@msindustrial\.cl/
+    assert_select ".app-flash-stack .alert-danger", text: /@msindustrial\.cl/
+    assert_select ".app-flash .btn-close[aria-label='Cerrar']"
   end
 
   test "rejects an unverified account" do
