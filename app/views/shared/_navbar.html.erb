@@ -49,7 +49,7 @@
           </ul>
         </li>
 
-        <!-- Menú Reportes -->
+        <!-- Menú Informe -->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle <%= 'active' if controller_name == 'works' %>"
@@ -59,12 +59,18 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Reportes
+            Informe
           </a>
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
             <li>
               <%= link_to "Reportes", works_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li>
+              <span class="dropdown-item-text text-muted" aria-disabled="true">M. Eléctrica</span>
+            </li>
+            <li>
+              <span class="dropdown-item-text text-muted" aria-disabled="true">M. Mecánica</span>
             </li>
             <li>
               <%= link_to "Nuevo", new_work_path, class: "dropdown-item", data: { turbo: false } %>
