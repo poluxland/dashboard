@@ -8,7 +8,7 @@ class EnfundadosControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get enfundados_url
     assert_response :success
-    assert_select "a[href='#{inventario_films_enfundados_path}']", text: "Inventario de rollos Film"
+    assert_select "a[href='#{inventario_films_enfundados_path}']", text: "Inventario"
   end
 
   test "should get new" do
