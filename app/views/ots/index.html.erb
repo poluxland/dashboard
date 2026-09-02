@@ -15,6 +15,7 @@
       <thead class="table-light position-sticky top-0" style="z-index: 1;">
         <tr>
           <th class="text-start">OT asignada</th>
+          <th class="text-end">Año</th>
           <th class="text-end">Semana</th>
           <th class="text-end">Item</th>
           <th class="text-start">Área</th>
@@ -47,6 +48,7 @@
         <% @ots.each do |ot| %>
           <tr>
             <td><%= ot.ot_asignada %></td>
+            <td class="text-end"><%= ot.created_at&.year %></td>
             <td class="text-end"><%= ot.semana %></td>
             <td class="text-end"><%= ot.item %></td>
             <td><%= ot.area %></td>

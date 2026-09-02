@@ -8,6 +8,8 @@ class OtsControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get ots_url
     assert_response :success
+    assert_select "thead th:nth-child(2)", text: "Año"
+    assert_select "tbody tr td:nth-child(2)", text: @ot.created_at.year.to_s
   end
 
   test "should get new" do
