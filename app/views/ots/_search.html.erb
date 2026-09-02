@@ -15,7 +15,8 @@
                  q: params[:q],
                  estado: params[:estado],
                  tipo_ot: params[:tipo_ot],
-                 semanas: params[:semanas]),
+                 semanas: params[:semanas],
+                 current_year: params[:current_year]),
         class: "btn btn-outline-success btn-sm" %>
       <%= link_to "Nueva OT", new_ot_path, class: "btn btn-primary btn-sm" %>
     </div>
@@ -42,6 +43,7 @@
 
     <%# ---- Filtros (todo junto, bien alineado y responsivo) ---- %>
     <%= form_with url: ots_path, method: :get, local: true, class: "row gy-3 gx-3 align-items-end" do %>
+      <%= hidden_field_tag :current_year, 1 if params[:current_year] == "1" %>
       <%# q %>
       <div class="col-12 col-lg-4">
   <label for="q" class="form-label mb-1">Buscar</label>
@@ -106,11 +108,10 @@
   <button class="btn btn-primary btn-sm" type="submit">
     <i class="bi bi-search"></i> Buscar
   </button>
-  <%= link_to "Limpiar", ots_path, class: "btn btn-outline-secondary btn-sm" %>
+  <%= link_to "Limpiar", ots_path(current_year: params[:current_year]), class: "btn btn-outline-secondary btn-sm" %>
 </div>
 
     <% end %>
   </div>
 </div>
-
 

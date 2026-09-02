@@ -10,6 +10,19 @@ class OtsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "thead th:nth-child(2)", text: "Año"
     assert_select "tbody tr td:nth-child(2)", text: @ot.created_at.year.to_s
+    assert_select "a[href='#{ots_path(current_year: 1)}']", text: "OTs año"
+  end
+
+  test "current year index only shows ots created this year" do
+    previous_year_ot = @ot
+    previous_year_ot.update_column(:created_at, 1.year.ago)
+    current_year_ot = ots(:two)
+
+    get ots_url(current_year: 1)
+
+    assert_response :success
+    assert_select "tbody", text: /#{current_year_ot.ot_asignada}/
+    assert_select "tbody", { text: /#{previous_year_ot.ot_asignada}/, count: 0 }
   end
 
   test "should get new" do

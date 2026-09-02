@@ -14,6 +14,7 @@ class OtsController < ApplicationController
     semanas = parse_semanas_sin_rangos(params[:semanas].to_s)
 
     scope = Ot.search(@q)
+    scope = scope.where(created_at: Time.current.all_year) if params[:current_year] == "1"
     scope = scope.where(estado: estados.map(&:to_i)) if estados.any?
     scope = scope.where("LOWER(tipo_ot) IN (?)", tipos.map { |t| t.to_s.downcase }) if tipos.any?
     scope = scope.where(semana: semanas) if semanas.any?  # ← filtro de semanas
