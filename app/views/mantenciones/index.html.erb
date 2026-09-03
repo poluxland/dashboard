@@ -1,0 +1,98 @@
+<% content_for :title, @page_title %>
+
+<div class="mx-auto" style="max-width: 1800px;">
+  <div class="bg-dark text-white rounded-4 p-4 mb-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+      <h1 class="h4 fw-bold mb-1"><%= @page_title %></h1>
+      <p class="mb-0 text-white-50"><%= @page_description %></p>
+    </div>
+
+    <%= link_to "Nueva mantención",
+                new_mantencion_path(especialidad: @especialidad_filter),
+                class: "btn btn-light fw-semibold" %>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" style="min-width: 1750px;">
+        <thead class="table-light">
+          <tr>
+            <th>Semana</th>
+            <th>Fecha</th>
+            <th>Especialidad</th>
+            <th>Área</th>
+            <th>Código</th>
+            <th>Tipo de mantención</th>
+            <th>Actividad</th>
+            <th>Planificación</th>
+            <th>Estado</th>
+            <th>N° OT</th>
+            <th>Duración</th>
+            <th>Comentarios</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if @mantenciones.any? %>
+            <% @mantenciones.each do |mantencion| %>
+              <tr id="<%= dom_id mantencion %>">
+                <td class="fw-semibold"><%= mantencion.semana || "—" %></td>
+                <td class="text-nowrap"><%= mantencion.fecha&.strftime("%d-%m-%Y") || "—" %></td>
+                <td><%= mantencion.especialidad.presence || "—" %></td>
+                <td><%= mantencion.area.presence || "—" %></td>
+                <td><%= mantencion.codigo.presence || "—" %></td>
+                <td><%= mantencion.tipo_mantencion.presence || "—" %></td>
+                <td style="max-width: 330px;">
+                  <span title="<%= mantencion.actividad %>"><%= truncate(mantencion.actividad, length: 75) %></span>
+                </td>
+                <td><%= mantencion.planificacion.presence || "—" %></td>
+                <td>
+                  <% if mantencion.estado.present? %>
+                    <% badge_class = mantencion.estado >= 100 ? "text-bg-success" : (mantencion.estado.zero? ? "text-bg-secondary" : "text-bg-warning") %>
+                    <span class="badge <%= badge_class %>">
+                      <%= number_with_precision(mantencion.estado, precision: 2, strip_insignificant_zeros: true) %>%
+                    </span>
+                  <% else %>
+                    —
+                  <% end %>
+                </td>
+                <td><%= mantencion.numero_ot.presence || "—" %></td>
+                <td>
+                  <% if mantencion.duracion.present? %>
+                    <%= number_with_precision(mantencion.duracion, precision: 2, strip_insignificant_zeros: true) %> h
+                  <% else %>
+                    —
+                  <% end %>
+                </td>
+                <td style="max-width: 330px;">
+                  <% if mantencion.comentarios.present? %>
+                    <span title="<%= mantencion.comentarios %>"><%= truncate(mantencion.comentarios, length: 75) %></span>
+                  <% else %>
+                    <span class="text-body-secondary">Sin comentarios</span>
+                  <% end %>
+                </td>
+                <td class="text-end text-nowrap">
+                  <%= link_to "Ver", mantencion_path(mantencion), class: "btn btn-sm btn-outline-secondary" %>
+                  <%= link_to "Editar", edit_mantencion_path(mantencion), class: "btn btn-sm btn-outline-primary" %>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="13" class="text-center text-body-secondary py-5">
+                No hay mantenciones registradas para esta vista.
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <% if @pagy.pages > 1 %>
+    <div class="d-flex justify-content-center mt-4">
+      <%= pagy_bootstrap_nav(@pagy).html_safe %>
+    </div>
+  <% end %>
+</div>

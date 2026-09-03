@@ -1,0 +1,27 @@
+one:
+  semana: 36
+  fecha: 2026-09-02
+  especialidad: Eléctrico
+  area: P416
+  codigo: WT01
+  tipo_mantencion: Preventivo
+  actividad: Inspección de equipos eléctricos
+  planificacion: Plan
+  estado: 100
+  numero_ot: "55387466"
+  duracion: 2
+  comentarios: Trabajo realizado sin observaciones.
+
+two:
+  semana: 36
+  fecha: 2026-09-03
+  especialidad: Mecánico
+  area: P426
+  codigo: FA01
+  tipo_mantencion: Correctivo Programado
+  actividad: Cambio de motor
+  planificacion: Adicional
+  estado: 50
+  numero_ot: "55387467"
+  duracion: 3.5
+  comentarios: Trabajo en ejecución.

@@ -1,0 +1,111 @@
+<%= form_with(model: mantencion, url: mantencion.persisted? ? mantencion_path(mantencion) : mantenciones_path(especialidad: @especialidad_filter)) do |form| %>
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden mx-auto" style="max-width: 1100px;">
+    <div class="card-header bg-dark text-white p-4">
+      <h1 class="h4 fw-bold mb-1"><%= mantencion.persisted? ? "Editar mantención" : "Nueva mantención" %></h1>
+      <p class="mb-0 text-white-50">Completa los datos del informe de ejecución</p>
+    </div>
+
+    <div class="card-body p-4">
+      <% if mantencion.errors.any? %>
+        <div class="alert alert-danger" role="alert">
+          <p class="fw-bold mb-2">No se pudo guardar la mantención:</p>
+          <ul class="mb-0">
+            <% mantencion.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row g-3">
+        <div class="col-md-3">
+          <%= form.label :semana, "Semana", class: "form-label fw-semibold" %>
+          <%= form.number_field :semana, min: 1, max: 53, step: 1, class: "form-control", placeholder: "1–53" %>
+        </div>
+
+        <div class="col-md-3">
+          <%= form.label :fecha, "Fecha", class: "form-label fw-semibold" %>
+          <%= form.date_field :fecha, class: "form-control", required: true %>
+        </div>
+
+        <div class="col-md-3">
+          <%= form.label :especialidad, "Especialidad", class: "form-label fw-semibold" %>
+          <%= form.text_field :especialidad, class: "form-control", list: "especialidades-mantencion", required: true %>
+          <datalist id="especialidades-mantencion">
+            <option value="Eléctrico"></option>
+            <option value="Mecánico"></option>
+            <option value="Instrumentación"></option>
+          </datalist>
+        </div>
+
+        <div class="col-md-3">
+          <%= form.label :planificacion, "Planificación", class: "form-label fw-semibold" %>
+          <%= form.text_field :planificacion, class: "form-control", list: "planificaciones-mantencion", placeholder: "Plan o Adicional" %>
+          <datalist id="planificaciones-mantencion">
+            <option value="Plan"></option>
+            <option value="Adicional"></option>
+            <option value="Programado"></option>
+          </datalist>
+        </div>
+
+        <div class="col-md-4">
+          <%= form.label :area, "Área", class: "form-label fw-semibold" %>
+          <%= form.text_field :area, class: "form-control", placeholder: "Ej.: P416" %>
+        </div>
+
+        <div class="col-md-4">
+          <%= form.label :codigo, "Código", class: "form-label fw-semibold" %>
+          <%= form.text_field :codigo, class: "form-control", placeholder: "Ej.: WT01" %>
+        </div>
+
+        <div class="col-md-4">
+          <%= form.label :tipo_mantencion, "Tipo de mantención", class: "form-label fw-semibold" %>
+          <%= form.text_field :tipo_mantencion, class: "form-control", list: "tipos-mantencion", placeholder: "Preventivo o correctivo" %>
+          <datalist id="tipos-mantencion">
+            <option value="Preventivo"></option>
+            <option value="Correctivo Programado"></option>
+            <option value="Correctivo No Programado"></option>
+            <option value="Reprogramar"></option>
+            <option value="Puesta en marcha"></option>
+          </datalist>
+        </div>
+
+        <div class="col-12">
+          <%= form.label :actividad, "Actividad", class: "form-label fw-semibold" %>
+          <%= form.text_area :actividad, class: "form-control", rows: 3, required: true, placeholder: "Describe la actividad realizada o planificada" %>
+        </div>
+
+        <div class="col-md-4">
+          <%= form.label :estado, "Estado (%)", class: "form-label fw-semibold" %>
+          <div class="input-group">
+            <%= form.number_field :estado, min: 0, max: 100, step: 0.01, class: "form-control", placeholder: "0–100" %>
+            <span class="input-group-text">%</span>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <%= form.label :numero_ot, "N° OT", class: "form-label fw-semibold" %>
+          <%= form.text_field :numero_ot, class: "form-control", inputmode: "numeric", placeholder: "Ej.: 55387466" %>
+        </div>
+
+        <div class="col-md-4">
+          <%= form.label :duracion, "Duración", class: "form-label fw-semibold" %>
+          <div class="input-group">
+            <%= form.number_field :duracion, min: 0, step: 0.25, class: "form-control", placeholder: "Horas" %>
+            <span class="input-group-text">horas</span>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <%= form.label :comentarios, "Comentarios", class: "form-label fw-semibold" %>
+          <%= form.text_area :comentarios, class: "form-control", rows: 4, placeholder: "Observaciones, resultados o motivos de reprogramación" %>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <%= form.submit mantencion.persisted? ? "Actualizar mantención" : "Crear mantención", class: "btn btn-primary fw-semibold" %>
+        <%= link_to "Cancelar", mantenciones_path(especialidad: @especialidad_filter), class: "btn btn-outline-secondary" %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -52,7 +52,7 @@
         <!-- Menú Informe -->
         <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle <%= 'active' if controller_name == 'works' %>"
+            class="nav-link dropdown-toggle <%= 'active' if %w[works mantenciones].include?(controller_name) %>"
             href="#"
             id="worksDropdown"
             role="button"
@@ -64,10 +64,22 @@
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
             <li>
-              <span class="dropdown-item-text text-muted" aria-disabled="true">M. Eléctrica</span>
+              <%= link_to "Mantenciones",
+                          mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && params[:especialidad].blank?}",
+                          data: { turbo: false } %>
             </li>
             <li>
-              <span class="dropdown-item-text text-muted" aria-disabled="true">M. Mecánica</span>
+              <%= link_to "M. Eléctrica",
+                          mantenciones_path(especialidad: "electrica"),
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && params[:especialidad] == 'electrica'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "M. Mecánica",
+                          mantenciones_path(especialidad: "mecanica"),
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && params[:especialidad] == 'mecanica'}",
+                          data: { turbo: false } %>
             </li>
 
             <% if main_app.respond_to?(:compact_works_path) %>

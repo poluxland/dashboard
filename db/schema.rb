@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_000000) do
     t.datetime "updated_at", null: false
     t.index ["person_id", "period"], name: "idx_unique_person_period", unique: true
     t.index ["person_id"], name: "index_indicator_readings_on_person_id"
+  end
+
+  create_table "mantenciones", force: :cascade do |t|
+    t.text "actividad"
+    t.string "area"
+    t.string "codigo"
+    t.text "comentarios"
+    t.datetime "created_at", null: false
+    t.decimal "duracion", precision: 8, scale: 2
+    t.string "especialidad", default: "Eléctrico", null: false
+    t.decimal "estado", precision: 5, scale: 2
+    t.date "fecha"
+    t.string "numero_ot"
+    t.string "planificacion"
+    t.integer "semana"
+    t.string "tipo_mantencion"
+    t.datetime "updated_at", null: false
+    t.index ["especialidad"], name: "index_mantenciones_on_especialidad"
+    t.index ["fecha"], name: "index_mantenciones_on_fecha"
+    t.index ["numero_ot"], name: "index_mantenciones_on_numero_ot"
   end
 
   create_table "monthly_records", force: :cascade do |t|
