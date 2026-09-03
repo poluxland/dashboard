@@ -19,12 +19,17 @@ class MantencionesController < ApplicationController
   def index
     scope = Mantencion.order(fecha: :desc, created_at: :desc)
     filter = specialty_filter
+    @pending_filter = params[:pendientes] == "1"
+    scope = scope.where("estado IS NULL OR estado != ?", 100) if @pending_filter
 
     if filter
       scope = scope.where("LOWER(especialidad) IN (?)", filter[:values])
       @especialidad_filter = params[:especialidad]
       @page_title = filter[:title]
       @page_description = filter[:description]
+    elsif @pending_filter
+      @page_title = "Mantenciones pendientes"
+      @page_description = "Mantenciones cuyo estado de cumplimiento todavía no alcanza el 100%"
     else
       @page_title = "Mantenciones"
       @page_description = "Registro de mantenciones eléctricas y mecánicas"

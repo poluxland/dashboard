@@ -16,7 +16,25 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", mantenciones_path(especialidad: "electrica"), text: "M. Eléctrica"
     assert_select "a[href=?]", mantenciones_path(especialidad: "mecanica"), text: "M. Mecánica"
     assert_select "a[href=?]", graficos_mantenciones_path, text: "Gráficos de mantenciones"
+    assert_select "a[href=?]", pendientes_mantenciones_path, text: "Pendientes"
     assert_select "a[href=?]", graficos_mantenciones_path, text: "Ver gráficos"
+  end
+
+  test "muestra solamente las mantenciones pendientes" do
+    without_state = Mantencion.create!(
+      fecha: Date.new(2026, 9, 4),
+      especialidad: "Eléctrico",
+      actividad: "Tarea sin estado"
+    )
+
+    get pendientes_mantenciones_url
+
+    assert_response :success
+    assert_select "h1", text: "Mantenciones pendientes"
+    assert_select "#mantencion_#{mantenciones(:one).id}", count: 0
+    assert_select "#mantencion_#{mantenciones(:two).id}", count: 1
+    assert_select "#mantencion_#{without_state.id}", count: 1
+    assert_select "a[href=?].active", pendientes_mantenciones_path, text: "Pendientes"
   end
 
   test "muestra los gráficos y agrupa categorías normalizadas" do

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :entrega_films
   get "mantenciones/importar", to: "mantencion_imports#new", as: :new_mantencion_import
   post "mantenciones/importar", to: "mantencion_imports#create", as: :mantencion_import
+  get "mantenciones/pendientes", to: "mantenciones#index", defaults: { pendientes: "1" }, as: :pendientes_mantenciones
   resources :mantenciones do
     collection do
       get :graficos
