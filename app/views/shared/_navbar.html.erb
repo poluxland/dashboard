@@ -66,19 +66,25 @@
             <li>
               <%= link_to "Mantenciones",
                           mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && params[:especialidad].blank?}",
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad].blank?}",
                           data: { turbo: false } %>
             </li>
             <li>
               <%= link_to "M. Eléctrica",
                           mantenciones_path(especialidad: "electrica"),
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && params[:especialidad] == 'electrica'}",
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad] == 'electrica'}",
                           data: { turbo: false } %>
             </li>
             <li>
               <%= link_to "M. Mecánica",
                           mantenciones_path(especialidad: "mecanica"),
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && params[:especialidad] == 'mecanica'}",
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad] == 'mecanica'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Gráficos de mantenciones",
+                          graficos_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'graficos'}",
                           data: { turbo: false } %>
             </li>
 

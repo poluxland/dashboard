@@ -27,4 +27,31 @@ class MantencionTest < ActiveSupport::TestCase
     assert_not mantencion.valid?
     assert mantencion.errors[:duracion].any?
   end
+
+  test "normaliza categorías e identificadores antes de guardar" do
+    mantencion = Mantencion.new(
+      fecha: Date.new(2026, 9, 2),
+      especialidad: " MECÁNICA ",
+      area: " p426 ",
+      codigo: " fa01 ",
+      tipo_mantencion: " CORRECTIVO   PROGRAMADO ",
+      actividad: "Cambio de motor",
+      planificacion: " plan ",
+      numero_ot: " 55387467 "
+    )
+
+    assert mantencion.valid?
+    assert_equal "Mecánico", mantencion.especialidad
+    assert_equal "P426", mantencion.area
+    assert_equal "FA01", mantencion.codigo
+    assert_equal "Correctivo programado", mantencion.tipo_mantencion
+    assert_equal "Plan", mantencion.planificacion
+    assert_equal "55387467", mantencion.numero_ot
+  end
+
+  test "normaliza variantes conocidas de planificación" do
+    assert_equal "Adicional", Mantencion.canonical_planning("adicional")
+    assert_equal "Adicional", Mantencion.canonical_planning("Adicionsl")
+    assert_equal "Reprogramar", Mantencion.canonical_planning("REPROGRAMADO")
+  end
 end

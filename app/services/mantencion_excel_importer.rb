@@ -46,7 +46,13 @@ class MantencionExcelImporter
         next
       end
 
-      prepare_row(row, result, pending_rows, known_fingerprints)
+      prepare_row(
+        row,
+        result,
+        pending_rows,
+        known_fingerprints,
+        formatted_state: sheet.formatted_value(row_number, 9)
+      )
     rescue ArgumentError, ActiveRecord::RecordInvalid => error
       result.errors << "Fila #{row_number}: #{error.message}"
     end
@@ -86,7 +92,7 @@ class MantencionExcelImporter
     meaningful_indexes.all? { |index| row[index].blank? }
   end
 
-  def prepare_row(row, result, pending_rows, known_fingerprints)
+  def prepare_row(row, result, pending_rows, known_fingerprints, formatted_state:)
     fecha = date_value(row[1])
     attributes = {
       semana: week_value(row[0], fecha, result),
@@ -97,21 +103,24 @@ class MantencionExcelImporter
       tipo_mantencion: text_value(row[5]),
       actividad: text_value(row[6]),
       planificacion: text_value(row[7]),
-      estado: percentage_value(row[8]),
+      estado: percentage_value(row[8], formatted_value: formatted_state),
       numero_ot: text_value(row[9]),
       duracion: decimal_value(row[10]),
       comentarios: text_value(row[11])
     }
 
-    fingerprint = fingerprint_for(attributes)
+    record = Mantencion.new(attributes)
+    raise ActiveRecord::RecordInvalid, record unless record.valid?
+
+    normalized_attributes = FINGERPRINT_FIELDS.index_with { |field| record.public_send(field) }
+    fingerprint = fingerprint_for(normalized_attributes)
 
     if known_fingerprints.include?(fingerprint)
       result.duplicates += 1
       return
     end
 
-    record = Mantencion.new(attributes.merge(source_fingerprint: fingerprint))
-    raise ActiveRecord::RecordInvalid, record unless record.valid?
+    record.source_fingerprint = fingerprint
 
     timestamp = Time.current
     pending_rows << record.attributes.symbolize_keys.slice(
@@ -124,7 +133,7 @@ class MantencionExcelImporter
   def existing_fingerprints
     Mantencion.find_each.each_with_object(Set.new) do |mantencion, fingerprints|
       attributes = FINGERPRINT_FIELDS.index_with { |field| mantencion.public_send(field) }
-      fingerprints << (mantencion.source_fingerprint.presence || fingerprint_for(attributes))
+      fingerprints << fingerprint_for(attributes)
     end
   end
 
@@ -176,11 +185,15 @@ class MantencionExcelImporter
     BigDecimal(value.to_s.tr(",", "."))
   end
 
-  def percentage_value(value)
+  def percentage_value(value, formatted_value: nil)
     return if value.blank?
 
     if value.is_a?(Numeric)
-      BigDecimal(value.to_s) * 100
+      formatted_text = formatted_value.to_s.strip
+      return BigDecimal(formatted_text.delete("%").strip.tr(",", ".")) if formatted_text.include?("%")
+
+      number = BigDecimal(value.to_s)
+      number <= 1 ? number * 100 : number
     else
       text = value.to_s.strip
       has_percentage_sign = text.include?("%")

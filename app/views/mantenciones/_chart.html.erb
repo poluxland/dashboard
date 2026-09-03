@@ -1,0 +1,140 @@
+<%
+  chart_type = local_assigns.fetch(:type, "bar")
+  chart_format = local_assigns.fetch(:format, "count")
+  horizontal = local_assigns.fetch(:horizontal, false)
+  suggested_max = local_assigns[:suggested_max]
+  chart_config = {
+    type: chart_type,
+    labels: labels,
+    values: values,
+    datasetLabel: local_assigns.fetch(:dataset_label, title),
+    format: chart_format,
+    horizontal: horizontal,
+    suggestedMax: suggested_max
+  }
+%>
+
+<div class="card border-0 shadow-sm rounded-4 h-100" id="<%= canvas_id %>Card">
+  <div class="card-body p-4">
+    <h2 class="h6 fw-bold mb-1"><%= title %></h2>
+    <% if local_assigns[:subtitle].present? %>
+      <p class="small text-body-secondary mb-3"><%= subtitle %></p>
+    <% end %>
+
+    <% if labels.any? && values.any? %>
+      <div style="height: <%= local_assigns.fetch(:height, 320) %>px;">
+        <canvas id="<%= canvas_id %>" aria-label="<%= title %>" role="img"></canvas>
+      </div>
+
+      <ul class="visually-hidden chart-data">
+        <% labels.zip(values).each do |label, value| %>
+          <li><%= label %>: <%= value %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="d-flex align-items-center justify-content-center text-body-secondary" style="height: 320px;">
+        Sin datos para mostrar
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if labels.any? && values.any? %>
+  <%= javascript_tag nonce: true do %>
+    (() => {
+      const config = <%= raw(json_escape(chart_config.to_json)) %>;
+      const palette = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#db2777", "#65a30d", "#ea580c", "#4f46e5", "#0f766e", "#64748b", "#9333ea"];
+
+      function loadChartJs() {
+        if (window.Chart) return Promise.resolve();
+        if (window.__mantencionesChartJsPromise) return window.__mantencionesChartJsPromise;
+
+        window.__mantencionesChartJsPromise = new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
+          script.crossOrigin = "anonymous";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+        return window.__mantencionesChartJsPromise;
+      }
+
+      function formatValue(value) {
+        const number = Number(value || 0).toLocaleString("es-CL", { maximumFractionDigits: 1 });
+        if (config.format === "percent") return `${number}%`;
+        if (config.format === "hours") return `${number} h`;
+        return `${number} mantenciones`;
+      }
+
+      function renderChart() {
+        const canvas = document.getElementById("<%= canvas_id %>");
+        if (!canvas || !window.Chart) return;
+
+        window.__charts = window.__charts || {};
+        if (window.__charts[canvas.id]) window.__charts[canvas.id].destroy();
+
+        const isCircular = config.type === "doughnut" || config.type === "pie";
+        const isLine = config.type === "line";
+        const dataset = {
+          label: config.datasetLabel,
+          data: config.values,
+          borderWidth: isLine ? 3 : 1,
+          borderColor: isLine ? "#2563eb" : "#ffffff",
+          backgroundColor: isLine ? "rgba(37, 99, 235, .16)" : config.labels.map((_, index) => palette[index % palette.length]),
+          tension: isLine ? 0.3 : undefined,
+          fill: isLine,
+          pointRadius: isLine ? 4 : undefined
+        };
+        const options = {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: config.horizontal ? "y" : "x",
+          plugins: {
+            legend: { display: isCircular, position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const parsed = typeof context.parsed === "object"
+                    ? (config.horizontal ? context.parsed.x : context.parsed.y)
+                    : context.parsed;
+                  return `${context.label || context.dataset.label}: ${formatValue(parsed)}`;
+                }
+              }
+            }
+          }
+        };
+
+        if (isCircular) {
+          options.cutout = config.type === "doughnut" ? "58%" : undefined;
+        } else {
+          const valueAxis = config.horizontal ? "x" : "y";
+          const categoryAxis = config.horizontal ? "y" : "x";
+          options.scales = {};
+          options.scales[valueAxis] = {
+            beginAtZero: true,
+            suggestedMax: config.suggestedMax,
+            ticks: {
+              precision: config.format === "count" ? 0 : undefined,
+              callback: (value) => config.format === "percent" ? `${value}%` : value
+            }
+          };
+          options.scales[categoryAxis] = { ticks: { autoSkip: false, maxRotation: 0 } };
+        }
+
+        window.__charts[canvas.id] = new Chart(canvas, {
+          type: config.type,
+          data: { labels: config.labels, datasets: [dataset] },
+          options: options
+        });
+      }
+
+      const start = () => loadChartJs().then(renderChart).catch(() => {});
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start, { once: true });
+      } else {
+        start();
+      }
+    })();
+  <% end %>
+<% end %>

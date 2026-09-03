@@ -1,0 +1,166 @@
+<% content_for :title, "Mantenciones · Gráficos" %>
+
+<div class="mx-auto pb-4" style="max-width: 1600px;">
+  <div class="bg-dark text-white rounded-4 p-4 mb-3 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+    <div>
+      <p class="small text-uppercase text-white-50 fw-semibold mb-1">Informe de mantenciones</p>
+      <h1 class="h3 fw-bold mb-1">Gráficos de mantenciones</h1>
+      <p class="mb-0 text-white-50">Resumen normalizado de ejecución, planificación, especialidades, áreas y carga semanal.</p>
+    </div>
+
+    <%= link_to "Volver a mantenciones", mantenciones_path, class: "btn btn-outline-light fw-semibold", data: { turbo: false } %>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-body p-4">
+      <%= form_with url: graficos_mantenciones_path, method: :get, class: "row g-3 align-items-end", data: { turbo: false } do |form| %>
+        <div class="col-sm-6 col-lg-4">
+          <%= form.label :especialidad, "Especialidad", class: "form-label fw-semibold" %>
+          <%= form.select :especialidad,
+                          options_for_select([
+                            ["Todas las especialidades", ""],
+                            ["M. Eléctrica", "electrica"],
+                            ["M. Mecánica", "mecanica"]
+                          ], @selected_specialty),
+                          {},
+                          class: "form-select" %>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+          <%= form.label :year, "Año", class: "form-label fw-semibold" %>
+          <%= form.select :year,
+                          options_for_select([["Todos los años", ""]] + @available_years.map { |year| [year, year] }, @selected_year),
+                          {},
+                          class: "form-select" %>
+        </div>
+
+        <div class="col-lg-5 d-flex flex-wrap gap-2">
+          <%= form.submit "Aplicar filtros", class: "btn btn-primary fw-semibold" %>
+          <%= link_to "Limpiar", graficos_mantenciones_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4">
+          <div class="small text-body-secondary mb-1">Mantenciones</div>
+          <div class="h2 fw-bold mb-0"><%= number_with_delimiter(@total_mantenciones) %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4">
+          <div class="small text-body-secondary mb-1">Completadas</div>
+          <div class="h2 fw-bold mb-0"><%= number_with_delimiter(@completed_mantenciones) %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4">
+          <div class="small text-body-secondary mb-1">Estado promedio</div>
+          <div class="h2 fw-bold mb-0"><%= @average_state ? "#{number_with_precision(@average_state, precision: 1)}%" : "—" %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4">
+          <div class="small text-body-secondary mb-1">Duración total</div>
+          <div class="h2 fw-bold mb-0"><%= number_with_precision(@total_duration, precision: 1) %> h</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if @total_mantenciones.zero? %>
+    <div class="alert alert-info rounded-4 border-0 shadow-sm">No hay mantenciones para los filtros seleccionados.</div>
+  <% else %>
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <%= render "chart",
+                   title: "Estado de ejecución",
+                   subtitle: "Completadas, en progreso, no iniciadas y sin estado",
+                   canvas_id: "mantencionesEstadoChart",
+                   type: "doughnut",
+                   labels: @state_labels,
+                   values: @state_values %>
+      </div>
+      <div class="col-lg-4">
+        <%= render "chart",
+                   title: "Planificación",
+                   subtitle: "Plan, adicional, reprogramar y otras categorías",
+                   canvas_id: "mantencionesPlanificacionChart",
+                   type: "doughnut",
+                   labels: @planning_labels,
+                   values: @planning_values %>
+      </div>
+      <div class="col-lg-4">
+        <%= render "chart",
+                   title: "Especialidad",
+                   canvas_id: "mantencionesEspecialidadChart",
+                   type: "doughnut",
+                   labels: @specialty_labels,
+                   values: @specialty_values %>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-xl-6">
+        <%= render "chart",
+                   title: "Tipos de mantención",
+                   canvas_id: "mantencionesTipoChart",
+                   labels: @maintenance_type_labels,
+                   values: @maintenance_type_values,
+                   horizontal: true,
+                   height: 380 %>
+      </div>
+      <div class="col-xl-6">
+        <%= render "chart",
+                   title: "Áreas con más mantenciones",
+                   subtitle: "Se muestran las 12 áreas principales",
+                   canvas_id: "mantencionesAreaChart",
+                   labels: @area_labels,
+                   values: @area_values,
+                   horizontal: true,
+                   height: 380 %>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-12">
+        <%= render "chart",
+                   title: "Mantenciones por semana",
+                   canvas_id: "mantencionesSemanaChart",
+                   labels: @week_labels,
+                   values: @week_values,
+                   height: 360 %>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-xl-7">
+        <%= render "chart",
+                   title: "Estado promedio por semana",
+                   canvas_id: "mantencionesEstadoSemanalChart",
+                   type: "line",
+                   format: "percent",
+                   labels: @week_labels,
+                   values: @weekly_average_state_values,
+                   suggested_max: 100 %>
+      </div>
+      <div class="col-xl-5">
+        <%= render "chart",
+                   title: "Horas por especialidad",
+                   canvas_id: "mantencionesDuracionChart",
+                   format: "hours",
+                   labels: @duration_labels,
+                   values: @duration_values %>
+      </div>
+    </div>
+  <% end %>
+</div>

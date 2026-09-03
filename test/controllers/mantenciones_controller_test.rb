@@ -15,6 +15,42 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", mantenciones_path, text: "Mantenciones"
     assert_select "a[href=?]", mantenciones_path(especialidad: "electrica"), text: "M. Eléctrica"
     assert_select "a[href=?]", mantenciones_path(especialidad: "mecanica"), text: "M. Mecánica"
+    assert_select "a[href=?]", graficos_mantenciones_path, text: "Gráficos de mantenciones"
+    assert_select "a[href=?]", graficos_mantenciones_path, text: "Ver gráficos"
+  end
+
+  test "muestra los gráficos y agrupa categorías normalizadas" do
+    @mantencion.update_column(:planificacion, " plan ")
+    Mantencion.create!(
+      semana: 37,
+      fecha: Date.new(2026, 9, 9),
+      especialidad: "ELÉCTRICA",
+      area: "p416",
+      codigo: "wt02",
+      tipo_mantencion: "preventivo",
+      actividad: "Prueba semanal",
+      planificacion: "PLAN",
+      estado: 100,
+      duracion: 2
+    )
+
+    get graficos_mantenciones_url
+
+    assert_response :success
+    assert_select "h1", text: "Gráficos de mantenciones"
+    assert_select "canvas", count: 8
+    assert_select "#mantencionesPlanificacionChartCard .chart-data li", text: "Plan: 2"
+    assert_select "#mantencionesEspecialidadChartCard .chart-data li", text: "Eléctrico: 2"
+    assert_select "#mantencionesAreaChartCard .chart-data li", text: "P416: 2"
+  end
+
+  test "filtra los gráficos por especialidad y año" do
+    get graficos_mantenciones_url(especialidad: "mecanica", year: 2026)
+
+    assert_response :success
+    assert_select "select[name='especialidad'] option[selected][value='mecanica']"
+    assert_select "select[name='year'] option[selected][value='2026']"
+    assert_select "#mantencionesEspecialidadChartCard .chart-data li", text: "Mecánico: 1"
   end
 
   test "filtra las mantenciones eléctricas" do

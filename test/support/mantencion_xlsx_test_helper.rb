@@ -19,7 +19,7 @@ module MantencionXlsxTestHelper
       rows.each do |row|
         styles = Array.new(MANTENCION_HEADERS.length)
         styles[1] = date_style
-        styles[8] = percentage_style
+        styles[8] = percentage_style if row[8].is_a?(Numeric) && row[8].between?(0, 1)
         sheet.add_row row, style: styles
       end
     end
