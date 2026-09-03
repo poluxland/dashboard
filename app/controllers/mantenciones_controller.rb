@@ -38,6 +38,7 @@ class MantencionesController < ApplicationController
     @available_years = Mantencion.where.not(fecha: nil).pluck(:fecha).map(&:year).uniq.sort.reverse
     @selected_year = params[:year].to_s if params[:year].to_s.match?(/\A\d{4}\z/)
     @selected_specialty = params[:especialidad].to_s if specialty_filter
+    @selected_week = params[:semana].to_s if params[:semana].to_s.match?(/\A(?:[1-9]|[1-4]\d|5[0-3])\z/)
 
     if @selected_year.present?
       year = @selected_year.to_i
@@ -47,6 +48,9 @@ class MantencionesController < ApplicationController
     if (filter = specialty_filter)
       scope = scope.where("LOWER(especialidad) IN (?)", filter[:values])
     end
+
+    @available_weeks = scope.where.not(semana: nil).distinct.reorder(:semana).pluck(:semana)
+    scope = scope.where(semana: @selected_week.to_i) if @selected_week.present?
 
     build_chart_data(scope.to_a)
   end

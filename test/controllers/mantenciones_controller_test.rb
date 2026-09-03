@@ -44,12 +44,13 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#mantencionesAreaChartCard .chart-data li", text: "P416: 2"
   end
 
-  test "filtra los gráficos por especialidad y año" do
-    get graficos_mantenciones_url(especialidad: "mecanica", year: 2026)
+  test "filtra los gráficos por especialidad, año y semana" do
+    get graficos_mantenciones_url(especialidad: "mecanica", year: 2026, semana: 36)
 
     assert_response :success
     assert_select "select[name='especialidad'] option[selected][value='mecanica']"
     assert_select "select[name='year'] option[selected][value='2026']"
+    assert_select "select[name='semana'] option[selected][value='36']", text: "Semana 36"
     assert_select "#mantencionesEspecialidadChartCard .chart-data li", text: "Mecánico: 1"
   end
 
