@@ -64,16 +64,10 @@
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
             <li>
-              <%= link_to "Reportes", works_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
-            <li>
               <span class="dropdown-item-text text-muted" aria-disabled="true">M. Eléctrica</span>
             </li>
             <li>
               <span class="dropdown-item-text text-muted" aria-disabled="true">M. Mecánica</span>
-            </li>
-            <li>
-              <%= link_to "Nuevo", new_work_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
 
             <% if main_app.respond_to?(:compact_works_path) %>
@@ -93,6 +87,10 @@
                 <%= link_to "Backlog", backlog_works_path, class: "dropdown-item", data: { turbo: false } %>
               </li>
             <% end %>
+
+            <li>
+              <%= link_to "Reportes", works_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
           </ul>
         </li>
 
