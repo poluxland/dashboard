@@ -57,6 +57,42 @@
             </table>
           </div>
         <% end %>
+
+        <div style="border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:18px;">
+          <h2 style="font-size:17px;margin:0 0 4px;">Tareas de la semana</h2>
+          <p style="font-size:13px;color:#64748b;margin:0 0 14px;">Detalle de las <%= @report.total %> mantenciones y su porcentaje de cumplimiento.</p>
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+            <% @report.records.each_with_index do |record, index| %>
+              <%
+                completion_label = record.estado.nil? ? "Sin estado" : "#{number_with_precision(record.estado, precision: 1, strip_insignificant_zeros: true)}%"
+                completion_color = if record.estado.nil?
+                  "#64748b"
+                elsif record.estado >= 100
+                  "#166534"
+                elsif record.estado.positive?
+                  "#92400e"
+                else
+                  "#991b1b"
+                end
+              %>
+              <tr>
+                <td style="padding:12px 8px 12px 0;border-top:<%= index.zero? ? 0 : 1 %>px solid #e5e7eb;vertical-align:top;width:72px;font-size:12px;color:#64748b;white-space:nowrap;">
+                  <%= l(record.fecha, format: :short) %>
+                </td>
+                <td style="padding:12px 8px;border-top:<%= index.zero? ? 0 : 1 %>px solid #e5e7eb;vertical-align:top;">
+                  <div style="font-size:14px;font-weight:700;line-height:1.35;"><%= record.actividad %></div>
+                  <div style="font-size:12px;color:#64748b;margin-top:4px;line-height:1.4;">
+                    <%= [record.especialidad, record.area.presence && "Área #{record.area}", record.numero_ot.presence && "OT #{record.numero_ot}"].compact.join(" · ") %>
+                  </div>
+                </td>
+                <td style="padding:12px 0 12px 8px;border-top:<%= index.zero? ? 0 : 1 %>px solid #e5e7eb;vertical-align:top;width:74px;text-align:right;white-space:nowrap;">
+                  <span style="display:inline-block;background:<%= completion_color %>;color:#ffffff;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:700;"><%= completion_label %></span>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
       <% end %>
 
       <div style="text-align:center;padding-top:6px;">

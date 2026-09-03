@@ -13,4 +13,10 @@ Duración total: <%= @report.total_duration %> h
 <% end %>
 
 <% end %>
+
+TAREAS DE LA SEMANA
+<% @report.records.each do |record| %>
+- <%= l(record.fecha, format: :short) %> | <%= record.especialidad %> | <%= record.actividad %> | <%= record.numero_ot.present? ? "OT #{record.numero_ot}" : "Sin OT" %> | Cumplimiento: <%= record.estado.nil? ? "Sin estado" : "#{number_with_precision(record.estado, precision: 1, strip_insignificant_zeros: true)}%" %>
+<% end %>
+
 Ver gráficos: <%= graficos_mantenciones_url(year: @report.end_date.year, semana: @report.week_number) %>
