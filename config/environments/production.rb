@@ -26,7 +26,8 @@ Rails.application.configure do
   # (deja comentado cualquier solid_queue)
 
   config.action_mailer.default_url_options = {
-    host: "TU-APP.herokuapp.com", protocol: "https"
+    host: ENV.fetch("APP_HOST", "impromaq-dashboard-e00010b0db83.herokuapp.com"),
+    protocol: "https"
   }
 
   config.i18n.fallbacks = true
