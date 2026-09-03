@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_02_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -128,11 +128,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_010000) do
     t.string "numero_ot"
     t.string "planificacion"
     t.integer "semana"
+    t.string "source_fingerprint"
     t.string "tipo_mantencion"
     t.datetime "updated_at", null: false
     t.index ["especialidad"], name: "index_mantenciones_on_especialidad"
     t.index ["fecha"], name: "index_mantenciones_on_fecha"
     t.index ["numero_ot"], name: "index_mantenciones_on_numero_ot"
+    t.index ["source_fingerprint"], name: "index_mantenciones_on_source_fingerprint", unique: true
   end
 
   create_table "monthly_records", force: :cascade do |t|

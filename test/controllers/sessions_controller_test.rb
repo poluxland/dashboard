@@ -64,4 +64,20 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_redirected_to login_url
   end
+
+  test "muestra Demo solamente al usuario autorizado" do
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+    get root_url
+
+    assert_select "#demoDropdown", count: 1
+    assert_select "a[href=?]", new_mantencion_import_path, text: "Importar mantenciones"
+  end
+
+  test "oculta Demo a otros usuarios corporativos" do
+    sign_in_with_google(email: "usuario@msindustrial.cl", uid: "usuario-sin-demo")
+    get root_url
+
+    assert_select "#demoDropdown", count: 0
+    assert_select "a[href=?]", new_mantencion_import_path, count: 0
+  end
 end

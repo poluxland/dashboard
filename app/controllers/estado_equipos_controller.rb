@@ -1,4 +1,5 @@
 class EstadoEquiposController < ApplicationController
+  before_action :require_demo_user!
   before_action :set_estado_equipo, only: %i[ show edit update destroy ]
 
   # GET /estado_equipos or /estado_equipos.json

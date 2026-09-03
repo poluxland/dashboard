@@ -166,10 +166,11 @@
               
             </ul>
           </li>
-        <!-- Menú Demo -->
+        <% if demo_user? %>
+          <!-- Menú Demo -->
           <li class="nav-item dropdown">
             <a
-              class="nav-link dropdown-toggle"
+              class="nav-link dropdown-toggle <%= 'active' if %w[estado_equipos mantencion_imports].include?(controller_name) %>"
               href="#"
               id="demoDropdown"
               role="button"
@@ -186,8 +187,12 @@
               <li>
                 <%= link_to "Reporte", reporte_equipos_estado_equipos_path, class: "dropdown-item", data: { turbo: false } %>
               </li>
+              <li>
+                <%= link_to "Importar mantenciones", new_mantencion_import_path, class: "dropdown-item", data: { turbo: false } %>
+              </li>
             </ul>
           </li>
+        <% end %>
 
           <li class="nav-item d-flex align-items-center gap-2 ms-lg-3">
             <span class="navbar-text text-white-50 small"><%= current_user[:email] %></span>

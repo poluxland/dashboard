@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   delete "/logout", to: "sessions#destroy", as: :logout
 
   resources :entrega_films
+  get "mantenciones/importar", to: "mantencion_imports#new", as: :new_mantencion_import
+  post "mantenciones/importar", to: "mantencion_imports#create", as: :mantencion_import
   resources :mantenciones
   resources :enfundados do
   collection do

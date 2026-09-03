@@ -2,8 +2,17 @@ require "test_helper"
 
 class EstadoEquiposControllerTest < ActionDispatch::IntegrationTest
   setup do
-    sign_in_with_google
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     @estado_equipo = estado_equipos(:one)
+  end
+
+  test "rechaza usuarios sin acceso a Demo" do
+    delete logout_url
+    sign_in_with_google(email: "usuario@msindustrial.cl", uid: "sin-demo")
+
+    get estado_equipos_url
+
+    assert_redirected_to root_url
   end
 
   test "should get index" do
