@@ -22,8 +22,12 @@ class MantencionWeeklyReport
     records.size
   end
 
-  def completed
-    records.count { |record| record.estado.to_f >= 100 }
+  def planned_percentage
+    percentage(planned_count)
+  end
+
+  def unplanned_percentage
+    percentage(total - planned_count)
   end
 
   def average_state
@@ -31,18 +35,12 @@ class MantencionWeeklyReport
     (values.sum / values.size).round(1) if values.any?
   end
 
-  def total_duration
-    records.sum { |record| record.duracion.to_f }.round(1)
-  end
-
   def chart_groups
     [
       chart("Estado de ejecución", state_counts),
       chart("Planificación", category_counts("Sin planificación") { |record| Mantencion.canonical_planning(record.planificacion) }),
       chart("Especialidad", category_counts("Sin especialidad") { |record| Mantencion.canonical_specialty(record.especialidad) }),
-      chart("Tipo de mantención", category_counts("Sin tipo") { |record| Mantencion.canonical_maintenance_type(record.tipo_mantencion) }),
-      chart("Áreas con más mantenciones", area_counts),
-      chart("Horas por especialidad", duration_counts, suffix: " h")
+      chart("Áreas con más mantenciones", area_counts)
     ]
   end
 
@@ -83,13 +81,14 @@ class MantencionWeeklyReport
     top_areas.to_h
   end
 
-  def duration_counts
-    counts = records.each_with_object(Hash.new(0.0)) do |record, result|
-      label = Mantencion.canonical_specialty(record.especialidad) || "Sin especialidad"
-      result[label] += record.duracion.to_f
+  def planned_count
+    @planned_count ||= records.count do |record|
+      Mantencion.canonical_planning(record.planificacion) == "Plan"
     end
+  end
 
-    counts.sort_by { |label, _value| label }.to_h.transform_values { |value| value.round(1) }
+  def percentage(count)
+    ((count.to_f / total) * 100).round(1) if total.positive?
   end
 
   def ordered_counts(counts)

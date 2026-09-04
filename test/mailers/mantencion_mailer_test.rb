@@ -12,13 +12,19 @@ class MantencionMailerTest < ActionMailer::TestCase
     assert_equal [ "control@msindustrial.cl" ], email.from
     assert_equal "Informe semanal de mantenciones · Semana 36", email.subject
     assert_match "Mantenciones · Semana 36", email.html_part.body.to_s
+    assert_match "Planificado", email.html_part.body.to_s
+    assert_match "No programado", email.html_part.body.to_s
     assert_match "Estado de ejecución", email.html_part.body.to_s
+    assert_no_match "Tipo de mantención", email.html_part.body.to_s
+    assert_no_match "Horas por especialidad", email.html_part.body.to_s
     assert_match "Tareas de la semana", email.html_part.body.to_s
     assert_match "Inspección de equipos eléctricos", email.html_part.body.to_s
     assert_match "100%", email.html_part.body.to_s
     assert_match "Cambio de motor", email.html_part.body.to_s
     assert_match "50%", email.html_part.body.to_s
+    assert_match "Trabajo realizado sin observaciones.", email.html_part.body.to_s
     assert_match "SEMANA 36", email.text_part.body.to_s
     assert_match "Cumplimiento: 100%", email.text_part.body.to_s
+    assert_match "Comentarios: Trabajo realizado sin observaciones.", email.text_part.body.to_s
   end
 end
