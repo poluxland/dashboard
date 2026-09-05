@@ -110,6 +110,7 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Preventiva"
     assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Correctivo Programado"
     assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Correctivo No programado"
+    assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Reprogramar"
     assert_select "input[name='mantencion[tipo_mantencion]']", count: 0
     assert_select "label[for='mantencion_duracion']", text: "Duración del trabajo"
   end

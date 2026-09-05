@@ -4,7 +4,7 @@ one:
   especialidad: Eléctrico
   area: P416
   codigo: WT01
-  tipo_mantencion: Preventivo
+  tipo_mantencion: Preventiva
   actividad: Inspección de equipos eléctricos
   planificacion: Plan
   estado: 100

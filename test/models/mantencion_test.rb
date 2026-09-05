@@ -57,7 +57,15 @@ class MantencionTest < ActiveSupport::TestCase
 
   test "define las opciones cerradas del formulario" do
     assert_equal [ "Plan", "Adicional", "Reprogramado" ], Mantencion::PLANNING_OPTIONS
-    assert_equal [ "Preventiva", "Correctivo Programado", "Correctivo No programado" ],
+    assert_equal [ "Preventiva", "Correctivo Programado", "Correctivo No programado", "Reprogramar" ],
                  Mantencion::MAINTENANCE_TYPE_OPTIONS
+  end
+
+  test "clasifica tipos ambiguos usando la planificación" do
+    assert_equal "Preventiva", Mantencion.canonical_maintenance_type("prventiva", planning: "Plan")
+    assert_equal "Correctivo Programado", Mantencion.canonical_maintenance_type("Mejora", planning: "Plan")
+    assert_equal "Correctivo No programado", Mantencion.canonical_maintenance_type("Adicional", planning: "Adicional")
+    assert_equal "Correctivo No programado", Mantencion.canonical_maintenance_type(nil, planning: nil)
+    assert_equal "Reprogramar", Mantencion.canonical_maintenance_type("Correctivo Programado", planning: "Reprogramado")
   end
 end

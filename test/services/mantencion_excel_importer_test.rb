@@ -58,6 +58,8 @@ class MantencionExcelImporterTest < ActiveSupport::TestCase
       assert_equal 50, mechanical.estado
       assert_equal "426", mechanical.area
       assert_equal BigDecimal("3.5"), mechanical.duracion
+      assert_equal "Preventiva", electrical.tipo_mantencion
+      assert_equal "Correctivo Programado", mechanical.tipo_mantencion
       whole_percentage = Mantencion.find_by!(numero_ot: "55990005")
       assert_equal 100, whole_percentage.estado
       assert_equal "Mecánico", whole_percentage.especialidad
