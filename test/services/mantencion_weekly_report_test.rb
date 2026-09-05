@@ -25,7 +25,7 @@ class MantencionWeeklyReportTest < ActiveSupport::TestCase
     assert_not charts.key?("Horas por especialidad")
   end
 
-  test "considera programada solamente la planificacion Plan" do
+  test "normaliza Programado como Plan antes de contar" do
     Mantencion.create!(
       fecha: Date.new(2026, 9, 4),
       especialidad: "Eléctrico",
@@ -35,7 +35,7 @@ class MantencionWeeklyReportTest < ActiveSupport::TestCase
 
     report = MantencionWeeklyReport.new(reference_date: Date.new(2026, 9, 7))
 
-    assert_equal 1, report.planned_count
-    assert_equal 2, report.unplanned_count
+    assert_equal 2, report.planned_count
+    assert_equal 1, report.unplanned_count
   end
 end

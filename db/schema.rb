@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_04_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -126,7 +126,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
     t.decimal "estado", precision: 5, scale: 2
     t.date "fecha"
     t.string "numero_ot"
-    t.string "planificacion"
+    t.string "planificacion", null: false
     t.integer "semana"
     t.string "source_fingerprint"
     t.string "tipo_mantencion", null: false
@@ -135,6 +135,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
     t.index ["fecha"], name: "index_mantenciones_on_fecha"
     t.index ["numero_ot"], name: "index_mantenciones_on_numero_ot"
     t.index ["source_fingerprint"], name: "index_mantenciones_on_source_fingerprint", unique: true
+    t.check_constraint "planificacion::text = ANY (ARRAY['Plan'::character varying, 'Adicional'::character varying, 'Reprogramado'::character varying]::text[])", name: "mantenciones_planificacion_allowed"
     t.check_constraint "tipo_mantencion::text = ANY (ARRAY['Preventiva'::character varying, 'Correctivo Programado'::character varying, 'Correctivo No programado'::character varying, 'Reprogramar'::character varying]::text[])", name: "mantenciones_tipo_mantencion_allowed"
   end
 

@@ -39,7 +39,7 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "muestra los gráficos y agrupa categorías normalizadas" do
-    @mantencion.update_column(:planificacion, " plan ")
+    @mantencion.update!(planificacion: " plan ")
     Mantencion.create!(
       semana: 37,
       fecha: Date.new(2026, 9, 9),

@@ -17,19 +17,25 @@ class Mantencion < ApplicationRecord
 
   PLANNING_LABELS = {
     "plan" => "Plan",
+    "paln" => "Plan",
     "planificada" => "Plan",
     "planificado" => "Plan",
     "adicion" => "Adicional",
     "adicional" => "Adicional",
+    "adicional." => "Adicional",
     "adiciona" => "Adicional",
+    "adcional" => "Adicional",
+    "adiconal" => "Adicional",
+    "adiciopnal" => "Adicional",
     "adicionsl" => "Adicional",
-    "programada" => "Programado",
-    "programado" => "Programado",
     "reprogramacion" => "Reprogramado",
     "reprogramada" => "Reprogramado",
     "reprogramado" => "Reprogramado",
-    "reprogramar" => "Reprogramado"
+    "reprogramar" => "Reprogramado",
+    "reprogremar" => "Reprogramado"
   }.freeze
+
+  PROGRAMMED_PLANNING_KEYS = %w[programada programado preventiva preventivo].freeze
 
   MAINTENANCE_TYPE_LABELS = {
     "preventiva" => "Preventiva",
@@ -58,6 +64,7 @@ class Mantencion < ApplicationRecord
   validates :duracion,
             numericality: { greater_than_or_equal_to: 0 },
             allow_nil: true
+  validates :planificacion, inclusion: { in: PLANNING_OPTIONS }
   validates :tipo_mantencion, inclusion: { in: MAINTENANCE_TYPE_OPTIONS }
 
   class << self
@@ -69,8 +76,18 @@ class Mantencion < ApplicationRecord
       canonical_value(value, SPECIALTY_LABELS)
     end
 
-    def canonical_planning(value)
-      canonical_value(value, PLANNING_LABELS)
+    def canonical_planning(value, maintenance_type: nil)
+      planning_key = normalization_key(value)
+      mapped = PLANNING_LABELS[planning_key]
+      return mapped if PLANNING_OPTIONS.include?(mapped)
+
+      type_key = normalization_key(maintenance_type)
+      return "Reprogramado" if type_key == "reprogramar"
+      return "Adicional" if type_key == "correctivo no programado"
+      return "Plan" if [ "preventiva", "correctivo programado" ].include?(type_key)
+      return "Plan" if PROGRAMMED_PLANNING_KEYS.include?(planning_key)
+
+      "Adicional"
     end
 
     def canonical_maintenance_type(value, planning: nil)
@@ -107,8 +124,9 @@ class Mantencion < ApplicationRecord
 
   def normalize_categorical_fields
     self.especialidad = self.class.canonical_specialty(especialidad)
-    self.planificacion = self.class.canonical_planning(planificacion)
-    self.tipo_mantencion = self.class.canonical_maintenance_type(tipo_mantencion, planning: planificacion)
+    normalized_type = self.class.canonical_maintenance_type(tipo_mantencion, planning: planificacion)
+    self.planificacion = self.class.canonical_planning(planificacion, maintenance_type: normalized_type)
+    self.tipo_mantencion = normalized_type
     self.area = self.class.canonical_identifier(area)
     self.codigo = self.class.canonical_identifier(codigo)
     self.numero_ot = numero_ot.to_s.squish.presence

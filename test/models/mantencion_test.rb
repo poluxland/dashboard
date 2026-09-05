@@ -52,7 +52,12 @@ class MantencionTest < ActiveSupport::TestCase
   test "normaliza variantes conocidas de planificación" do
     assert_equal "Adicional", Mantencion.canonical_planning("adicional")
     assert_equal "Adicional", Mantencion.canonical_planning("Adicionsl")
+    assert_equal "Adicional", Mantencion.canonical_planning("Adcional")
+    assert_equal "Plan", Mantencion.canonical_planning("PALN")
     assert_equal "Reprogramado", Mantencion.canonical_planning("REPROGRAMADO")
+    assert_equal "Reprogramado", Mantencion.canonical_planning("Programado", maintenance_type: "Reprogramar")
+    assert_equal "Adicional", Mantencion.canonical_planning(nil, maintenance_type: "Correctivo No programado")
+    assert_equal "Plan", Mantencion.canonical_planning("Programado", maintenance_type: "Preventiva")
   end
 
   test "define las opciones cerradas del formulario" do
