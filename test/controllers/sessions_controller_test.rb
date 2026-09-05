@@ -7,6 +7,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_url
   end
 
+  test "permite ver los gráficos de mantenciones sin iniciar sesión" do
+    get graficos_mantenciones_url
+
+    assert_response :success
+    assert_select "h1", text: "Gráficos de mantenciones"
+    assert_select "nav", count: 0
+
+    get mantenciones_url
+    assert_redirected_to login_url
+  end
+
   test "shows Google login" do
     get login_url
 

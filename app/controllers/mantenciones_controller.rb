@@ -15,6 +15,7 @@ class MantencionesController < ApplicationController
   }.freeze
 
   before_action :set_mantencion, only: %i[show edit update destroy]
+  skip_before_action :authenticate_user!, only: :graficos
 
   def index
     scope = Mantencion.order(fecha: :desc, created_at: :desc)
