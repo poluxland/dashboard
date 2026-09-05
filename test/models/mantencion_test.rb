@@ -73,4 +73,29 @@ class MantencionTest < ActiveSupport::TestCase
     assert_equal "Correctivo No programado", Mantencion.canonical_maintenance_type(nil, planning: nil)
     assert_equal "Reprogramar", Mantencion.canonical_maintenance_type("Correctivo Programado", planning: "Reprogramado")
   end
+
+  test "completa el estado vacío cuando hay comentarios u horas" do
+    with_comments = Mantencion.new(comentarios: "Trabajo terminado")
+    with_duration = Mantencion.new(duracion: 2.5)
+    without_evidence = Mantencion.new(comentarios: " ", duracion: 0)
+
+    with_comments.validate
+    with_duration.validate
+    without_evidence.validate
+
+    assert_equal 100, with_comments.estado
+    assert_equal 100, with_duration.estado
+    assert_nil without_evidence.estado
+  end
+
+  test "conserva cualquier estado que ya tenga un número" do
+    not_started = Mantencion.new(estado: 0, comentarios: "Pendiente")
+    in_progress = Mantencion.new(estado: 50, duracion: 2)
+
+    not_started.validate
+    in_progress.validate
+
+    assert_equal 0, not_started.estado
+    assert_equal 50, in_progress.estado
+  end
 end

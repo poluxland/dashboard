@@ -53,6 +53,7 @@ class Mantencion < ApplicationRecord
 
   before_validation :normalize_categorical_fields
   before_validation :complete_week_from_date
+  before_validation :complete_state_from_work_evidence
 
   validates :fecha, :especialidad, :actividad, presence: true
   validates :semana,
@@ -134,5 +135,11 @@ class Mantencion < ApplicationRecord
 
   def complete_week_from_date
     self.semana = fecha.cweek if semana.blank? && fecha.present?
+  end
+
+  def complete_state_from_work_evidence
+    return if estado.present?
+
+    self.estado = 100 if comentarios.to_s.strip.present? || duracion.to_f.positive?
   end
 end
