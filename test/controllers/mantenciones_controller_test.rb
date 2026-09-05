@@ -57,10 +57,17 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: "Gráficos de mantenciones"
-    assert_select "canvas", count: 8
+    assert_select "canvas", count: 6
     assert_select "#mantencionesPlanificacionChartCard .chart-data li", text: "Plan: 2"
     assert_select "#mantencionesEspecialidadChartCard .chart-data li", text: "Eléctrico: 2"
     assert_select "#mantencionesAreaChartCard .chart-data li", text: "P416: 2"
+    assert_select "#mantencionesWithOtCard .h2", text: "2"
+    assert_select "#mantencionesWithOtCard", text: /66[,.]7% del total/
+    assert_select "#mantencionesProgrammedCard .h2", text: /66[,.]7%/
+    assert_select "#mantencionesUnprogrammedCard .h2", text: /33[,.]3%/
+    assert_select "#mantencionesSemanaChart", count: 0
+    assert_select "#mantencionesDuracionChart", count: 0
+    assert_select "div", text: "Duración total", count: 0
   end
 
   test "filtra los gráficos por especialidad, año y semana" do

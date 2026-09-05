@@ -136,7 +136,11 @@ class MantencionesController < ApplicationController
     @total_mantenciones = records.size
     @completed_mantenciones = states.count { |state| state >= 100 }
     @average_state = states.any? ? (states.sum / states.size).round(1) : nil
-    @total_duration = records.sum { |record| record.duracion.to_f }.round(1)
+    @with_ot_count = records.count { |record| record.numero_ot.present? }
+    programmed_count = records.count { |record| record.planificacion == "Plan" }
+    @with_ot_percentage = percentage(@with_ot_count, @total_mantenciones)
+    @programmed_percentage = percentage(programmed_count, @total_mantenciones)
+    @unprogrammed_percentage = percentage(@total_mantenciones - programmed_count, @total_mantenciones)
 
     set_state_chart(records)
     set_category_chart(records, :planning, "Sin planificación") do |record|
@@ -149,8 +153,7 @@ class MantencionesController < ApplicationController
       Mantencion.canonical_maintenance_type(record.tipo_mantencion)
     end
     set_area_chart(records)
-    set_week_charts(records)
-    set_duration_chart(records)
+    set_weekly_state_chart(records)
   end
 
   def set_state_chart(records)
@@ -193,24 +196,19 @@ class MantencionesController < ApplicationController
     @area_labels, @area_values = chart_arrays(top_areas.to_h)
   end
 
-  def set_week_charts(records)
+  def set_weekly_state_chart(records)
     by_week = records.select { |record| record.semana.present? }.group_by(&:semana).sort.to_h
     @week_labels = by_week.keys.map { |week| "S#{week}" }
-    @week_values = by_week.values.map(&:size)
     @weekly_average_state_values = by_week.values.map do |week_records|
       states = week_records.filter_map(&:estado).map(&:to_f)
       (states.sum / states.size).round(1) if states.any?
     end
   end
 
-  def set_duration_chart(records)
-    duration_by_specialty = records.each_with_object(Hash.new(0.0)) do |record, totals|
-      label = Mantencion.canonical_specialty(record.especialidad) || "Sin especialidad"
-      totals[label] += record.duracion.to_f
-    end
-    duration_by_specialty = duration_by_specialty.sort_by { |label, _duration| label }.to_h
-    @duration_labels = duration_by_specialty.keys
-    @duration_values = duration_by_specialty.values.map { |duration| duration.round(1) }
+  def percentage(count, total)
+    return if total.zero?
+
+    ((count.to_f / total) * 100).round(1)
   end
 
   def grouped_counts(records, fallback:)

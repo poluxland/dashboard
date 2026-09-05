@@ -5,7 +5,7 @@
     <div>
       <p class="small text-uppercase text-white-50 fw-semibold mb-1">Informe de mantenciones</p>
       <h1 class="h3 fw-bold mb-1">Gráficos de mantenciones</h1>
-      <p class="mb-0 text-white-50">Resumen normalizado de ejecución, planificación, especialidades, áreas y carga semanal.</p>
+      <p class="mb-0 text-white-50">Resumen normalizado de ejecución, planificación, especialidades, áreas y avance semanal.</p>
     </div>
 
     <%= link_to "Volver a mantenciones", mantenciones_path, class: "btn btn-outline-light fw-semibold", data: { turbo: false } %>
@@ -51,35 +51,52 @@
   </div>
 
   <div class="row g-3 mb-3">
-    <div class="col-6 col-xl-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
+    <div class="col-6 col-lg-4 col-xl-2">
+      <div id="mantencionesTotalCard" class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body p-4">
           <div class="small text-body-secondary mb-1">Mantenciones</div>
           <div class="h2 fw-bold mb-0"><%= number_with_delimiter(@total_mantenciones) %></div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-xl-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
+    <div class="col-6 col-lg-4 col-xl-2">
+      <div id="mantencionesCompletedCard" class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body p-4">
           <div class="small text-body-secondary mb-1">Completadas</div>
           <div class="h2 fw-bold mb-0"><%= number_with_delimiter(@completed_mantenciones) %></div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-xl-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
+    <div class="col-6 col-lg-4 col-xl-2">
+      <div id="mantencionesAverageStateCard" class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body p-4">
           <div class="small text-body-secondary mb-1">Estado promedio</div>
           <div class="h2 fw-bold mb-0"><%= @average_state ? "#{number_with_precision(@average_state, precision: 1)}%" : "—" %></div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-xl-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
+    <div class="col-6 col-lg-4 col-xl-2">
+      <div id="mantencionesWithOtCard" class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body p-4">
-          <div class="small text-body-secondary mb-1">Duración total</div>
-          <div class="h2 fw-bold mb-0"><%= number_with_precision(@total_duration, precision: 1) %> h</div>
+          <div class="small text-body-secondary mb-1">Con OT</div>
+          <div class="h2 fw-bold mb-0"><%= number_with_delimiter(@with_ot_count) %></div>
+          <div class="small text-body-secondary mt-1"><%= @with_ot_percentage ? "#{number_with_precision(@with_ot_percentage, precision: 1)}% del total" : "—" %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-4 col-xl-2">
+      <div id="mantencionesProgrammedCard" class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4">
+          <div class="small text-body-secondary mb-1">Programado</div>
+          <div class="h2 fw-bold mb-0"><%= @programmed_percentage ? "#{number_with_precision(@programmed_percentage, precision: 1)}%" : "—" %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-4 col-xl-2">
+      <div id="mantencionesUnprogrammedCard" class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4">
+          <div class="small text-body-secondary mb-1">No programado</div>
+          <div class="h2 fw-bold mb-0"><%= @unprogrammed_percentage ? "#{number_with_precision(@unprogrammed_percentage, precision: 1)}%" : "—" %></div>
         </div>
       </div>
     </div>
@@ -101,7 +118,7 @@
       <div class="col-lg-4">
         <%= render "chart",
                    title: "Planificación",
-                   subtitle: "Plan, adicional, reprogramar y otras categorías",
+                   subtitle: "Plan, Adicional y Reprogramado",
                    canvas_id: "mantencionesPlanificacionChart",
                    type: "doughnut",
                    labels: @planning_labels,
@@ -139,19 +156,8 @@
       </div>
     </div>
 
-    <div class="row g-3 mb-3">
-      <div class="col-12">
-        <%= render "chart",
-                   title: "Mantenciones por semana",
-                   canvas_id: "mantencionesSemanaChart",
-                   labels: @week_labels,
-                   values: @week_values,
-                   height: 360 %>
-      </div>
-    </div>
-
     <div class="row g-3">
-      <div class="col-xl-7">
+      <div class="col-12">
         <%= render "chart",
                    title: "Estado promedio por semana",
                    canvas_id: "mantencionesEstadoSemanalChart",
@@ -160,14 +166,6 @@
                    labels: @week_labels,
                    values: @weekly_average_state_values,
                    suggested_max: 100 %>
-      </div>
-      <div class="col-xl-5">
-        <%= render "chart",
-                   title: "Horas por especialidad",
-                   canvas_id: "mantencionesDuracionChart",
-                   format: "hours",
-                   labels: @duration_labels,
-                   values: @duration_values %>
       </div>
     </div>
   <% end %>
