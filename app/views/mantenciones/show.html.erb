@@ -26,7 +26,7 @@
           ["Planificación", @mantencion.planificacion],
           ["Estado", @mantencion.estado.present? ? "#{number_with_precision(@mantencion.estado, precision: 2, strip_insignificant_zeros: true)}%" : nil],
           ["N° OT", @mantencion.numero_ot],
-          ["Duración", @mantencion.duracion.present? ? "#{number_with_precision(@mantencion.duracion, precision: 2, strip_insignificant_zeros: true)} horas" : nil]
+          ["Duración del trabajo", @mantencion.duracion.present? ? "#{number_with_precision(@mantencion.duracion, precision: 2, strip_insignificant_zeros: true)} horas" : nil]
         ] %>
 
         <% fields.each do |label, value| %>

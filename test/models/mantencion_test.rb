@@ -44,7 +44,7 @@ class MantencionTest < ActiveSupport::TestCase
     assert_equal "Mecánico", mantencion.especialidad
     assert_equal "P426", mantencion.area
     assert_equal "FA01", mantencion.codigo
-    assert_equal "Correctivo programado", mantencion.tipo_mantencion
+    assert_equal "Correctivo Programado", mantencion.tipo_mantencion
     assert_equal "Plan", mantencion.planificacion
     assert_equal "55387467", mantencion.numero_ot
   end
@@ -52,6 +52,12 @@ class MantencionTest < ActiveSupport::TestCase
   test "normaliza variantes conocidas de planificación" do
     assert_equal "Adicional", Mantencion.canonical_planning("adicional")
     assert_equal "Adicional", Mantencion.canonical_planning("Adicionsl")
-    assert_equal "Reprogramar", Mantencion.canonical_planning("REPROGRAMADO")
+    assert_equal "Reprogramado", Mantencion.canonical_planning("REPROGRAMADO")
+  end
+
+  test "define las opciones cerradas del formulario" do
+    assert_equal [ "Plan", "Adicional", "Reprogramado" ], Mantencion::PLANNING_OPTIONS
+    assert_equal [ "Preventiva", "Correctivo Programado", "Correctivo No programado" ],
+                 Mantencion::MAINTENANCE_TYPE_OPTIONS
   end
 end

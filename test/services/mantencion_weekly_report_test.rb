@@ -8,8 +8,9 @@ class MantencionWeeklyReportTest < ActiveSupport::TestCase
     assert_equal Date.new(2026, 9, 6), report.end_date
     assert_equal 36, report.week_number
     assert_equal 2, report.total
-    assert_equal 50.0, report.planned_percentage
-    assert_equal 50.0, report.unplanned_percentage
+    assert_equal 1, report.planned_count
+    assert_equal 1, report.unplanned_count
+    assert_equal 2, report.with_ot_count
     assert_equal 75.0, report.average_state
   end
 
@@ -34,7 +35,7 @@ class MantencionWeeklyReportTest < ActiveSupport::TestCase
 
     report = MantencionWeeklyReport.new(reference_date: Date.new(2026, 9, 7))
 
-    assert_equal 33.3, report.planned_percentage
-    assert_equal 66.7, report.unplanned_percentage
+    assert_equal 1, report.planned_count
+    assert_equal 2, report.unplanned_count
   end
 end

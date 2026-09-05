@@ -11,20 +11,24 @@
     <div style="padding:24px 28px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="border-collapse:separate;margin:0 -8px 24px;">
         <tr>
-          <td width="25%" style="background:#eff6ff;border-radius:10px;padding:14px;vertical-align:top;">
+          <td width="20%" style="background:#eff6ff;border-radius:10px;padding:14px;vertical-align:top;">
             <div style="font-size:12px;color:#64748b;">Mantenciones</div>
             <div style="font-size:24px;font-weight:700;color:#1e3a8a;"><%= number_with_delimiter(@report.total) %></div>
           </td>
-          <td width="25%" style="background:#f0fdf4;border-radius:10px;padding:14px;vertical-align:top;">
-            <div style="font-size:12px;color:#64748b;">Planificado</div>
-            <div style="font-size:24px;font-weight:700;color:#166534;"><%= @report.planned_percentage ? "#{number_with_precision(@report.planned_percentage, precision: 1)}%" : "—" %></div>
+          <td width="20%" style="background:#f0fdf4;border-radius:10px;padding:14px;vertical-align:top;">
+            <div style="font-size:12px;color:#64748b;">Programadas</div>
+            <div style="font-size:24px;font-weight:700;color:#166534;"><%= number_with_delimiter(@report.planned_count) %></div>
           </td>
-          <td width="25%" style="background:#fffbeb;border-radius:10px;padding:14px;vertical-align:top;">
-            <div style="font-size:12px;color:#64748b;">No programado</div>
-            <div style="font-size:24px;font-weight:700;color:#92400e;"><%= @report.unplanned_percentage ? "#{number_with_precision(@report.unplanned_percentage, precision: 1)}%" : "—" %></div>
+          <td width="20%" style="background:#fffbeb;border-radius:10px;padding:14px;vertical-align:top;">
+            <div style="font-size:12px;color:#64748b;">No programadas</div>
+            <div style="font-size:24px;font-weight:700;color:#92400e;"><%= number_with_delimiter(@report.unplanned_count) %></div>
           </td>
-          <td width="25%" style="background:#faf5ff;border-radius:10px;padding:14px;vertical-align:top;">
-            <div style="font-size:12px;color:#64748b;">Estado promedio</div>
+          <td width="20%" style="background:#ecfeff;border-radius:10px;padding:14px;vertical-align:top;">
+            <div style="font-size:12px;color:#64748b;">Con OT</div>
+            <div style="font-size:24px;font-weight:700;color:#155e75;"><%= number_with_delimiter(@report.with_ot_count) %></div>
+          </td>
+          <td width="20%" style="background:#faf5ff;border-radius:10px;padding:14px;vertical-align:top;">
+            <div style="font-size:12px;color:#64748b;">Ejecutado</div>
             <div style="font-size:24px;font-weight:700;color:#6b21a8;"><%= @report.average_state ? "#{number_with_precision(@report.average_state, precision: 1)}%" : "—" %></div>
           </td>
         </tr>
@@ -85,9 +89,11 @@
                   <div style="font-size:12px;color:#64748b;margin-top:4px;line-height:1.4;">
                     <%= [record.especialidad, record.area.presence && "Área #{record.area}", record.numero_ot.presence && "OT #{record.numero_ot}"].compact.join(" · ") %>
                   </div>
-                  <div style="font-size:12px;color:#475569;margin-top:4px;line-height:1.4;">
-                    <strong>Comentarios:</strong> <%= record.comentarios.presence || "Sin comentarios" %>
-                  </div>
+                  <% if record.comentarios.present? %>
+                    <div style="font-size:12px;color:#475569;margin-top:4px;line-height:1.4;">
+                      <%= record.comentarios.to_s.strip.sub(/\p{L}/) { |letter| letter.upcase } %>
+                    </div>
+                  <% end %>
                 </td>
                 <td style="padding:12px 0 12px 8px;border-top:<%= index.zero? ? 0 : 1 %>px solid #e5e7eb;vertical-align:top;width:74px;text-align:right;white-space:nowrap;">
                   <span style="display:inline-block;background:<%= completion_color %>;color:#ffffff;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:700;"><%= completion_label %></span>

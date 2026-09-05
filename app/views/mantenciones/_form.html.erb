@@ -40,12 +40,11 @@
 
         <div class="col-md-3">
           <%= form.label :planificacion, "Planificación", class: "form-label fw-semibold" %>
-          <%= form.text_field :planificacion, class: "form-control", list: "planificaciones-mantencion", placeholder: "Plan o Adicional" %>
-          <datalist id="planificaciones-mantencion">
-            <option value="Plan"></option>
-            <option value="Adicional"></option>
-            <option value="Programado"></option>
-          </datalist>
+          <% planning_options = Mantencion::PLANNING_OPTIONS | Array(mantencion.planificacion.presence) %>
+          <%= form.select :planificacion,
+                          planning_options,
+                          { include_blank: "Selecciona una opción" },
+                          class: "form-select" %>
         </div>
 
         <div class="col-md-4">
@@ -60,14 +59,11 @@
 
         <div class="col-md-4">
           <%= form.label :tipo_mantencion, "Tipo de mantención", class: "form-label fw-semibold" %>
-          <%= form.text_field :tipo_mantencion, class: "form-control", list: "tipos-mantencion", placeholder: "Preventivo o correctivo" %>
-          <datalist id="tipos-mantencion">
-            <option value="Preventivo"></option>
-            <option value="Correctivo Programado"></option>
-            <option value="Correctivo No Programado"></option>
-            <option value="Reprogramar"></option>
-            <option value="Puesta en marcha"></option>
-          </datalist>
+          <% maintenance_type_options = Mantencion::MAINTENANCE_TYPE_OPTIONS | Array(mantencion.tipo_mantencion.presence) %>
+          <%= form.select :tipo_mantencion,
+                          maintenance_type_options,
+                          { include_blank: "Selecciona una opción" },
+                          class: "form-select" %>
         </div>
 
         <div class="col-12">
@@ -89,7 +85,7 @@
         </div>
 
         <div class="col-md-4">
-          <%= form.label :duracion, "Duración", class: "form-label fw-semibold" %>
+          <%= form.label :duracion, "Duración del trabajo", class: "form-label fw-semibold" %>
           <div class="input-group">
             <%= form.number_field :duracion, min: 0, step: 0.25, class: "form-control", placeholder: "Horas" %>
             <span class="input-group-text">horas</span>

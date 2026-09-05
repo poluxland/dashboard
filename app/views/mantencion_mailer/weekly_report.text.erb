@@ -2,9 +2,10 @@ INFORME SEMANAL DE MANTENCIONES · SEMANA <%= @report.week_number %>
 <%= l(@report.start_date, format: :long) %> al <%= l(@report.end_date, format: :long) %>
 
 Mantenciones: <%= @report.total %>
-Planificado: <%= @report.planned_percentage ? "#{@report.planned_percentage}%" : "Sin datos" %>
-No programado: <%= @report.unplanned_percentage ? "#{@report.unplanned_percentage}%" : "Sin datos" %>
-Estado promedio: <%= @report.average_state ? "#{@report.average_state}%" : "Sin datos" %>
+Programadas: <%= @report.planned_count %>
+No programadas: <%= @report.unplanned_count %>
+Con OT: <%= @report.with_ot_count %>
+Ejecutado: <%= @report.average_state ? "#{@report.average_state}%" : "Sin datos" %>
 
 <% @report.chart_groups.each do |chart| %>
 <%= chart[:title].upcase %>
@@ -17,7 +18,9 @@ Estado promedio: <%= @report.average_state ? "#{@report.average_state}%" : "Sin 
 TAREAS DE LA SEMANA
 <% @report.records.each do |record| %>
 - <%= l(record.fecha, format: :short) %> | <%= record.especialidad %> | <%= record.actividad %> | <%= record.numero_ot.present? ? "OT #{record.numero_ot}" : "Sin OT" %> | Cumplimiento: <%= record.estado.nil? ? "Sin estado" : "#{number_with_precision(record.estado, precision: 1, strip_insignificant_zeros: true)}%" %>
-  Comentarios: <%= record.comentarios.presence || "Sin comentarios" %>
+<% if record.comentarios.present? %>
+  <%= record.comentarios.to_s.strip.sub(/\p{L}/) { |letter| letter.upcase } %>
+<% end %>
 <% end %>
 
 Ver gráficos: <%= graficos_mantenciones_url(year: @report.end_date.year, semana: @report.week_number) %>

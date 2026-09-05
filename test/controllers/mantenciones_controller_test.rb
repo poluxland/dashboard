@@ -18,6 +18,7 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", graficos_mantenciones_path, text: "Gráficos de mantenciones"
     assert_select "a[href=?]", pendientes_mantenciones_path, text: "Pendientes"
     assert_select "a[href=?]", graficos_mantenciones_path, text: "Ver gráficos"
+    assert_select "th", text: "Duración del trabajo"
   end
 
   test "muestra solamente las mantenciones pendientes" do
@@ -101,6 +102,16 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     ].each do |field|
       assert_select "[name='mantencion[#{field}]']", count: 1
     end
+
+    assert_select "select[name='mantencion[planificacion]'] option", text: "Plan"
+    assert_select "select[name='mantencion[planificacion]'] option", text: "Adicional"
+    assert_select "select[name='mantencion[planificacion]'] option", text: "Reprogramado"
+    assert_select "input[name='mantencion[planificacion]']", count: 0
+    assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Preventiva"
+    assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Correctivo Programado"
+    assert_select "select[name='mantencion[tipo_mantencion]'] option", text: "Correctivo No programado"
+    assert_select "input[name='mantencion[tipo_mantencion]']", count: 0
+    assert_select "label[for='mantencion_duracion']", text: "Duración del trabajo"
   end
 
   test "preselecciona especialidad mecánica desde su filtro" do
@@ -152,6 +163,7 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: "Detalle de mantención"
+    assert_select "div.text-body-secondary.small", text: "Duración del trabajo"
   end
 
   test "muestra el formulario de edición" do

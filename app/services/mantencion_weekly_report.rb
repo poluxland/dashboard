@@ -22,12 +22,18 @@ class MantencionWeeklyReport
     records.size
   end
 
-  def planned_percentage
-    percentage(planned_count)
+  def planned_count
+    @planned_count ||= records.count do |record|
+      Mantencion.canonical_planning(record.planificacion) == "Plan"
+    end
   end
 
-  def unplanned_percentage
-    percentage(total - planned_count)
+  def unplanned_count
+    total - planned_count
+  end
+
+  def with_ot_count
+    records.count { |record| record.numero_ot.present? }
   end
 
   def average_state
@@ -79,16 +85,6 @@ class MantencionWeeklyReport
     other_total = counts.drop(10).sum { |_label, value| value }
     top_areas << [ "Otras áreas", other_total ] if other_total.positive?
     top_areas.to_h
-  end
-
-  def planned_count
-    @planned_count ||= records.count do |record|
-      Mantencion.canonical_planning(record.planificacion) == "Plan"
-    end
-  end
-
-  def percentage(count)
-    ((count.to_f / total) * 100).round(1) if total.positive?
   end
 
   def ordered_counts(counts)

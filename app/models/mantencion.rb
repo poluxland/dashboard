@@ -1,4 +1,7 @@
 class Mantencion < ApplicationRecord
+  PLANNING_OPTIONS = [ "Plan", "Adicional", "Reprogramado" ].freeze
+  MAINTENANCE_TYPE_OPTIONS = [ "Preventiva", "Correctivo Programado", "Correctivo No programado" ].freeze
+
   SPECIALTY_LABELS = {
     "electrica" => "Eléctrico",
     "electrico" => "Eléctrico",
@@ -17,19 +20,19 @@ class Mantencion < ApplicationRecord
     "adicionsl" => "Adicional",
     "programada" => "Programado",
     "programado" => "Programado",
-    "reprogramacion" => "Reprogramar",
-    "reprogramada" => "Reprogramar",
-    "reprogramado" => "Reprogramar",
-    "reprogramar" => "Reprogramar"
+    "reprogramacion" => "Reprogramado",
+    "reprogramada" => "Reprogramado",
+    "reprogramado" => "Reprogramado",
+    "reprogramar" => "Reprogramado"
   }.freeze
 
   MAINTENANCE_TYPE_LABELS = {
-    "preventiva" => "Preventivo",
-    "preventivo" => "Preventivo",
-    "correctiva programada" => "Correctivo programado",
-    "correctivo programado" => "Correctivo programado",
-    "correctiva no programada" => "Correctivo no programado",
-    "correctivo no programado" => "Correctivo no programado",
+    "preventiva" => "Preventiva",
+    "preventivo" => "Preventiva",
+    "correctiva programada" => "Correctivo Programado",
+    "correctivo programado" => "Correctivo Programado",
+    "correctiva no programada" => "Correctivo No programado",
+    "correctivo no programado" => "Correctivo No programado",
     "puesta en marcha" => "Puesta en marcha",
     "reprogramada" => "Reprogramar",
     "reprogramado" => "Reprogramar",
