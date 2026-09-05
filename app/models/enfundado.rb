@@ -1,5 +1,5 @@
 class Enfundado < ApplicationRecord
-  TURNOS = ["Turno Mañana", "Turno Tarde", "Turno Noche"].freeze
+  TURNOS = [ "Turno Mañana", "Turno Tarde", "Turno Noche" ].freeze
 
   validates :operador, :fecha, :turno, presence: true
   validates :turno, inclusion: { in: TURNOS }

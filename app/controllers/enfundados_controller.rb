@@ -65,7 +65,6 @@ class EnfundadosController < ApplicationController
     @total_pallet_enf_normal +
     @total_pallet_enf_completo +
     @total_pallet_enf_zuncho
-
 end
 
   def inventario_films
@@ -177,5 +176,4 @@ end
         enfundado.films_usados_total
       end
     end
-
 end

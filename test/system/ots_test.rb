@@ -29,8 +29,7 @@ class OtsTest < ApplicationSystemTestCase
       sem_ejec: 1, n_personas: 1, duracion_hr: 1, hh: 1, causa: "MyString", comentarios: "MyText"
     )
 
-    visit login_path
-    click_button "Continuar con Google"
+    visit "/auth/google_oauth2/callback"
   end
 
   test "visiting the index" do
@@ -139,6 +138,12 @@ class OtsTest < ApplicationSystemTestCase
   end
 
   def click_primary_submit
+    ot_submit = 'form[action^="/ots"] input[type="submit"], form[action^="/ots"] button[type="submit"]'
+    if page.has_css?(ot_submit, wait: 1)
+      find(ot_submit, match: :first).click
+      return
+    end
+
     %w[Crear\ OT Guardar Create\ Ot Create Actualizar\ OT Update\ Ot Update].each do |label|
       if page.has_button?(label, wait: 1)
         click_on label

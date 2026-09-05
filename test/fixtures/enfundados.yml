@@ -3,7 +3,7 @@
 one:
   operador: MyString
   fecha: 2026-04-21
-  turno: MyString
+  turno: Turno Mañana
   numero_pallet_enfundado_manual: 1
   numero_pallet_enfundado_automatica: 1
   especial_plastificados_lados_manual: 1
@@ -33,7 +33,7 @@ one:
 two:
   operador: MyString
   fecha: 2026-04-21
-  turno: MyString
+  turno: Turno Tarde
   numero_pallet_enfundado_manual: 1
   numero_pallet_enfundado_automatica: 1
   especial_plastificados_lados_manual: 1

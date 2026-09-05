@@ -2,10 +2,10 @@ class EstadoEquiposController < ApplicationController
   before_action :require_demo_user!
   before_action :set_estado_equipo, only: %i[ show edit update destroy ]
 
-  # GET /estado_equipos or /estado_equipos.json
+# GET /estado_equipos or /estado_equipos.json
 def index
   subquery = EstadoEquipo
-    .where.not(equipo: [nil, ""])
+    .where.not(equipo: [ nil, "" ])
     .select("MAX(id) AS id")
     .group(:equipo)
 
