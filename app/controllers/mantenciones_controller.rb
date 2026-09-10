@@ -20,8 +20,10 @@ class MantencionesController < ApplicationController
   def index
     scope = Mantencion.order(fecha: :desc, created_at: :desc)
     filter = specialty_filter
+    @search_query = params[:q].to_s.squish
     @pending_filter = params[:pendientes] == "1"
     scope = scope.where("estado IS NULL OR estado != ?", 100) if @pending_filter
+    scope = scope.search(@search_query) if @search_query.present?
 
     if filter
       scope = scope.where("LOWER(especialidad) IN (?)", filter[:values])

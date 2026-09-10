@@ -98,6 +98,24 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#mantencion_#{mantenciones(:two).id}", count: 1
   end
 
+  test "busca mantenciones por texto y conserva el filtro de especialidad" do
+    get mantenciones_url(especialidad: "mecanica", q: "motor")
+
+    assert_response :success
+    assert_select "input[name='q'][value='motor']"
+    assert_select "#mantencion_#{mantenciones(:one).id}", count: 0
+    assert_select "#mantencion_#{mantenciones(:two).id}", count: 1
+    assert_select "input[name='especialidad'][value='mecanica'][type='hidden']"
+  end
+
+  test "busca mantenciones por número de OT" do
+    get mantenciones_url(q: mantenciones(:one).numero_ot)
+
+    assert_response :success
+    assert_select "#mantencion_#{mantenciones(:one).id}", count: 1
+    assert_select "#mantencion_#{mantenciones(:two).id}", count: 0
+  end
+
   test "muestra el formulario con todas las columnas del informe" do
     get new_mantencion_url
 

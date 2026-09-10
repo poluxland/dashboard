@@ -1,4 +1,9 @@
 class Mantencion < ApplicationRecord
+  SEARCHABLE_TEXT_COLUMNS = %w[
+    especialidad area codigo tipo_mantencion actividad planificacion numero_ot comentarios
+  ].freeze
+  SEARCHABLE_NUMERIC_COLUMNS = %w[semana estado duracion].freeze
+
   PLANNING_OPTIONS = [ "Plan", "Adicional", "Reprogramado" ].freeze
   MAINTENANCE_TYPE_OPTIONS = [
     "Preventiva",
@@ -67,6 +72,31 @@ class Mantencion < ApplicationRecord
             allow_nil: true
   validates :planificacion, inclusion: { in: PLANNING_OPTIONS }
   validates :tipo_mantencion, inclusion: { in: MAINTENANCE_TYPE_OPTIONS }
+
+  scope :search, ->(query) do
+    next all if query.blank?
+
+    term = query.to_s.squish
+    pattern = "%#{ActiveRecord::Base.sanitize_sql_like(term)}%"
+    table = arel_table
+
+    condition = SEARCHABLE_TEXT_COLUMNS
+      .map { |column| table[column].matches(pattern) }
+      .reduce(:or)
+
+    if (number = BigDecimal(term) rescue nil)
+      numeric_condition = SEARCHABLE_NUMERIC_COLUMNS
+        .map { |column| table[column].eq(number) }
+        .reduce(:or)
+      condition = condition.or(numeric_condition)
+    end
+
+    if (date = Date.iso8601(term) rescue nil)
+      condition = condition.or(table[:fecha].eq(date))
+    end
+
+    where(condition)
+  end
 
   class << self
     def normalization_key(value)
