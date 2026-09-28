@@ -51,8 +51,8 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
       area: "Molienda", tag: "MOL-02", fecha: "2026-09-28",
       repuestos: "2 rodamientos", epp: "Guantes y lentes",
       hallazgos: "Rodamiento desgastado", observaciones: "Verificar vibración",
-      fotos_antes: [image_blob("antes.png").signed_id],
-      fotos_despues: [image_blob("despues.png").signed_id]
+      fotos_antes: [ image_blob("antes.png").signed_id ],
+      fotos_despues: [ image_blob("despues.png").signed_id ]
     }
     assert_difference("Work.count") do
       post works_url, params: { work: fields }
@@ -62,8 +62,8 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     fields.except(:fecha, :fotos_antes, :fotos_despues).each do |field, value|
       assert_equal value, report.public_send(field)
     end
-    assert_equal ["antes.png"], report.fotos_antes.map { |photo| photo.filename.to_s }
-    assert_equal ["despues.png"], report.fotos_despues.map { |photo| photo.filename.to_s }
+    assert_equal [ "antes.png" ], report.fotos_antes.map { |photo| photo.filename.to_s }
+    assert_equal [ "despues.png" ], report.fotos_despues.map { |photo| photo.filename.to_s }
     get work_url(report)
     assert_response :success
     assert_select "h1", "Informe técnico de mantenimiento · Impromaq"
@@ -80,20 +80,20 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
       @work.public_send(field).attach(image_blob("#{field}-original.png"))
     end
     patch work_url(@work), params: { work: {
-      observaciones: "Prueba satisfactoria", fotos: [""], fotos_despues: [""],
-      fotos_antes: ["", image_blob("otra.png").signed_id]
+      observaciones: "Prueba satisfactoria", fotos: [ "" ], fotos_despues: [ "" ],
+      fotos_antes: [ "", image_blob("otra.png").signed_id ]
     } }
     assert_redirected_to work_url(@work)
     @work.reload
     assert_equal "Prueba satisfactoria", @work.observaciones
     assert_equal 1, @work.fotos.count
     assert_equal 1, @work.fotos_despues.count
-    assert_equal ["fotos_antes-original.png", "otra.png"], @work.fotos_antes.map { |photo| photo.filename.to_s }
+    assert_equal [ "fotos_antes-original.png", "otra.png" ], @work.fotos_antes.map { |photo| photo.filename.to_s }
   end
 
   test "rejects non image evidence without changing saved report" do
     blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("plain text"), filename: "invalid.txt", content_type: "text/plain")
-    patch work_url(@work), params: { work: { fotos_despues: [blob.signed_id] } }
+    patch work_url(@work), params: { work: { fotos_despues: [ blob.signed_id ] } }
     assert_response :unprocessable_entity
     assert_not @work.reload.fotos_despues.attached?
   end
@@ -108,11 +108,11 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
       post send_email_work_url(@work), params: { recipient: " destino@example.com " }
     end
     assert_redirected_to work_url(@work)
-    assert_equal ["destino@example.com"], ActionMailer::Base.deliveries.last.to
+    assert_equal [ "destino@example.com" ], ActionMailer::Base.deliveries.last.to
   end
 
   test "does not send to invalid or multiple recipients" do
-    ["", "invalid", "one@example.com,two@example.com", "one@example.com\r\nBcc: other@example.com"].each do |recipient|
+    [ "", "invalid", "one@example.com,two@example.com", "one@example.com\r\nBcc: other@example.com" ].each do |recipient|
       assert_no_difference("ActionMailer::Base.deliveries.size") do
         post send_email_work_url(@work), params: { recipient: recipient }
       end
@@ -156,5 +156,4 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     png = Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=")
     ActiveStorage::Blob.create_and_upload!(io: StringIO.new(png), filename: filename, content_type: "image/png")
   end
-
 end

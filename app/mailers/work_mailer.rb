@@ -20,7 +20,7 @@ class WorkMailer < ApplicationMailer
         attachments.inline[filename] = { mime_type: photo.content_type, content: photo.download }
         filename
       end
-      [label, names]
+      [ label, names ]
     end
     @details = {
       "Fecha" => work.fecha&.strftime("%d-%m-%Y"), "Planta" => work.planta,

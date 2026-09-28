@@ -10,7 +10,7 @@ class WorkMailerTest < ActionMailer::TestCase
     end
 
     email = WorkMailer.technical_report(work, recipient: "destino@example.com")
-    assert_equal ["destino@example.com"], email.to
+    assert_equal [ "destino@example.com" ], email.to
     assert_includes email.subject, "##{work.id}"
     assert_equal 4, email.attachments.size
     assert_equal 4, email.attachments.map(&:filename).uniq.size

@@ -218,10 +218,10 @@ class MantencionesController < ApplicationController
 
   def set_weekly_planning_chart(records)
     by_week = records.select { |record| record.fecha.present? && record.semana.present? }
-      .group_by { |record| [record.fecha.year, record.semana] }
+      .group_by { |record| [ record.fecha.year, record.semana ] }
     weeks = by_week.keys.group_by(&:first).sort.flat_map do |year, keys|
       first_week, last_week = keys.map(&:last).minmax
-      (first_week..last_week).map { |week| [year, week] }
+      (first_week..last_week).map { |week| [ year, week ] }
     end
     weeks = weeks.last(38)
     @weekly_planning_labels = weeks.map { |year, week| "#{year} · S#{week}" }

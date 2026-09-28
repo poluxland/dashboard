@@ -266,5 +266,4 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "canvas", count: 0
   end
-
 end
