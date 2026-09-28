@@ -46,4 +46,63 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to works_url
   end
+  test "creates and displays a technical report with separate before and after evidence" do
+    fields = {
+      area: "Molienda", tag: "MOL-02", fecha: "2026-09-28",
+      repuestos: "2 rodamientos", epp: "Guantes y lentes",
+      hallazgos: "Rodamiento desgastado", observaciones: "Verificar vibración",
+      fotos_antes: [image_blob("antes.png").signed_id],
+      fotos_despues: [image_blob("despues.png").signed_id]
+    }
+    assert_difference("Work.count") do
+      post works_url, params: { work: fields }
+    end
+    report = Work.order(:id).last
+    assert_redirected_to work_url(report)
+    fields.except(:fecha, :fotos_antes, :fotos_despues).each do |field, value|
+      assert_equal value, report.public_send(field)
+    end
+    assert_equal ["antes.png"], report.fotos_antes.map { |photo| photo.filename.to_s }
+    assert_equal ["despues.png"], report.fotos_despues.map { |photo| photo.filename.to_s }
+    get work_url(report)
+    assert_response :success
+    assert_select "h1", "Informe técnico de mantenimiento · Impromaq"
+    assert_select "img[alt='Imágenes antes: antes.png']"
+    assert_select "img[alt='Imágenes después: despues.png']"
+    assert_match "Rodamiento desgastado", response.body
+    get works_url
+    assert_response :success
+    assert_select "td", "MOL-02"
+  end
+
+  test "editing preserves evidence and adds new photos without replacing old photos" do
+    %i[fotos fotos_antes fotos_despues].each do |field|
+      @work.public_send(field).attach(image_blob("#{field}-original.png"))
+    end
+    patch work_url(@work), params: { work: {
+      observaciones: "Prueba satisfactoria", fotos: [""], fotos_despues: [""],
+      fotos_antes: ["", image_blob("otra.png").signed_id]
+    } }
+    assert_redirected_to work_url(@work)
+    @work.reload
+    assert_equal "Prueba satisfactoria", @work.observaciones
+    assert_equal 1, @work.fotos.count
+    assert_equal 1, @work.fotos_despues.count
+    assert_equal ["fotos_antes-original.png", "otra.png"], @work.fotos_antes.map { |photo| photo.filename.to_s }
+  end
+
+  test "rejects non image evidence without changing saved report" do
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("plain text"), filename: "invalid.txt", content_type: "text/plain")
+    patch work_url(@work), params: { work: { fotos_despues: [blob.signed_id] } }
+    assert_response :unprocessable_entity
+    assert_not @work.reload.fotos_despues.attached?
+  end
+
+  private
+
+  def image_blob(filename)
+    png = Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=")
+    ActiveStorage::Blob.create_and_upload!(io: StringIO.new(png), filename: filename, content_type: "image/png")
+  end
+
 end

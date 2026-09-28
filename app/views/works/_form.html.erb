@@ -10,7 +10,14 @@
     </div>
   <% end %>
 
+  <p class="text-muted">Informe técnico de mantenimiento · Impromaq. Registra la intervención y su evidencia antes y después.</p>
   <div class="row g-3">
+    <% { area: "Área", tag: "Tag del equipo" }.each do |campo, etiqueta| %>
+      <div class="col-md-6">
+        <%= f.label campo, etiqueta %>
+        <%= f.text_field campo, class: "form-control" %>
+      </div>
+    <% end %>
     <div class="col-md-3">
       <%= f.label :fecha %>
       <%= f.date_field :fecha, class: "form-control" %>
@@ -41,7 +48,7 @@
       <%= f.time_field :hora_termino, class: "form-control" %>
     </div>
     <div class="col-md-3">
-      <%= f.label :nombre %>
+      <%= f.label :nombre, "Título de la intervención" %>
       <%= f.text_field :nombre, class: "form-control" %>
     </div>
 
@@ -50,7 +57,7 @@
       <%= f.text_area :seguridad, class: "form-control", rows: 3 %>
     </div>
     <div class="col-12">
-      <%= f.label :descripcion, "Descripción" %>
+      <%= f.label :descripcion, "Trabajo realizado" %>
       <div class="col-12">
   
 
@@ -87,17 +94,31 @@ Inspector
       <%= f.text_area :personal, class: "form-control", rows: 2 %>
     </div>
 
-    <div class="col-12">
-      <div class="mb-3">
-        <%= f.label :fotos, "Registro fotográfico (múltiples)" %>
-        <%= f.file_field :fotos, multiple: true, direct_upload: true, class: "form-control" %>
-        <small class="text-muted">PNG/JPG/WEBP (10MB c/u)</small>
+    <% { repuestos: "Repuestos utilizados (detalle y cantidad)", epp: "EPP utilizados", hallazgos: "Hallazgos", observaciones: "Observaciones y recomendaciones" }.each do |campo, etiqueta| %>
+      <div class="col-md-6">
+        <%= f.label campo, etiqueta %>
+        <%= f.text_area campo, class: "form-control", rows: 4 %>
       </div>
-    </div>
+    <% end %>
+
+    <% { fotos_antes: "Imágenes antes de la intervención", fotos_despues: "Imágenes después de la intervención", fotos: "Registro fotográfico adicional / histórico" }.each do |campo, etiqueta| %>
+      <div class="col-md-6">
+        <%= f.label campo, etiqueta %>
+        <%= f.file_field campo, multiple: true, direct_upload: true, accept: "image/png,image/jpeg,image/webp", class: "form-control" %>
+        <small class="text-muted">PNG/JPG/WEBP (10 MB por imagen). Las nuevas fotos se agregan a las existentes.</small>
+        <% if work.public_send(campo).attached? %>
+          <ul class="small mt-2">
+            <% work.public_send(campo).each do |foto| %>
+              <li><%= foto.filename %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <div class="mt-3 d-flex gap-2">
-    <%= f.submit class: "btn btn-primary" %>
+    <%= f.submit "Guardar informe técnico", class: "btn btn-primary" %>
     <%= link_to "Cancelar", works_path, class: "btn btn-outline-secondary" %>
   </div>
 <% end %>

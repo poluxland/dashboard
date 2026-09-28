@@ -1,6 +1,8 @@
 <tr id="<%= dom_id(work) %>">
   <td><%= work.fecha&.strftime("%d-%m-%Y") %></td>
   <td><%= work.planta %></td>
+  <td><%= work.area %></td>
+  <td><%= work.tag %></td>
   <td><%= work.numero_cotizacion %></td>
   <td><%= work.solicita %></td>
   <td><%= work.supervisor %></td>
@@ -9,21 +11,8 @@
   <td><%= truncate(work.nombre.to_s, length: 24) %></td>
 
   <td>
-    <% if work.fotos.attached? %>
-      <div class="d-flex gap-1">
-        <% work.fotos.first(2).each do |foto| %>
-          <%= image_tag(
-                foto.variant(resize_to_limit: [60, 60]).processed,
-                class: "rounded border",
-                alt: "foto"
-              ) %>
-        <% end %>
-        <% if work.fotos.count > 2 %>
-          <span class="badge text-bg-secondary">+<%= work.fotos.count - 2 %></span>
-        <% end %>
-      </div>
-    <% else %>
-      <span class="text-muted">—</span>
+    <% { fotos_antes: "Antes", fotos_despues: "Después", fotos: "Adicionales" }.each do |campo, etiqueta| %>
+      <span class="badge text-bg-light"><%= etiqueta %>: <%= work.public_send(campo).size %></span>
     <% end %>
   </td>
 
@@ -33,7 +22,7 @@
       <%= link_to "Editar", edit_work_path(work), class: "btn btn-outline-secondary" %>
       <%= link_to "Eliminar",
                   work_path(work),
-                  data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este trabajo?" },
+                  data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este informe técnico?" },
                   class: "btn btn-outline-danger" %>
     </div>
   </td>

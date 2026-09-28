@@ -3,7 +3,7 @@ class WorksController < ApplicationController
 
   # GET /works or /works.json
   def index
-    @works = Work.all
+    @works = Work.with_attached_fotos.with_attached_fotos_antes.with_attached_fotos_despues.order(fecha: :desc, id: :desc)
   end
 
   # GET /works/1 or /works/1.json
@@ -25,7 +25,7 @@ class WorksController < ApplicationController
 
     respond_to do |format|
       if @work.save
-        format.html { redirect_to @work, notice: "Work was successfully created." }
+        format.html { redirect_to @work, notice: "Informe técnico creado correctamente." }
         format.json { render :show, status: :created, location: @work }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +38,7 @@ class WorksController < ApplicationController
   def update
     respond_to do |format|
       if @work.update(work_params)
-        format.html { redirect_to @work, notice: "Work was successfully updated.", status: :see_other }
+        format.html { redirect_to @work, notice: "Informe técnico actualizado correctamente.", status: :see_other }
         format.json { render :show, status: :ok, location: @work }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,7 +52,7 @@ class WorksController < ApplicationController
     @work.destroy!
 
     respond_to do |format|
-      format.html { redirect_to works_path, notice: "Work was successfully destroyed.", status: :see_other }
+      format.html { redirect_to works_path, notice: "Informe técnico eliminado correctamente.", status: :see_other }
       format.json { head :no_content }
     end
   end
@@ -65,16 +65,25 @@ class WorksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def work_params
-      params.expect(
+      attributes = params.expect(
         work: [
           :fecha, :planta, :numero_cotizacion, :solicita, :supervisor,
           :hora_inicio, :hora_termino,
-          :nombre,          # <- nuevo
-          :seguridad,       # <- antes era desc_seguridad
-          :descripcion,     # <- antes era desc_trabajo
+          :nombre, :area, :tag, :repuestos, :epp, :hallazgos, :observaciones,
+          :seguridad,
+          :descripcion,
           :personal,
-          { fotos: [] }     # múltiples archivos
+          { fotos: [], fotos_antes: [], fotos_despues: [] }
         ]
       )
+
+      # New uploads supplement existing evidence, including historical photos.
+      %i[fotos fotos_antes fotos_despues].each do |campo|
+        uploads = Array(attributes.delete(campo)).reject(&:blank?)
+        next if uploads.empty?
+
+        attributes[campo] = (@work ? @work.public_send(campo).blobs.to_a : []) + uploads
+      end
+      attributes
     end
 end
