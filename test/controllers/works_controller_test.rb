@@ -98,6 +98,58 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_not @work.reload.fotos_despues.attached?
   end
 
+  test "email form opens without sending and accepts one recipient" do
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      get email_work_url(@work)
+    end
+    assert_response :success
+    assert_select "input[type=email][name=recipient]"
+    assert_difference("ActionMailer::Base.deliveries.size", 1) do
+      post send_email_work_url(@work), params: { recipient: " destino@example.com " }
+    end
+    assert_redirected_to work_url(@work)
+    assert_equal ["destino@example.com"], ActionMailer::Base.deliveries.last.to
+  end
+
+  test "does not send to invalid or multiple recipients" do
+    ["", "invalid", "one@example.com,two@example.com", "one@example.com\r\nBcc: other@example.com"].each do |recipient|
+      assert_no_difference("ActionMailer::Base.deliveries.size") do
+        post send_email_work_url(@work), params: { recipient: recipient }
+      end
+      assert_response :unprocessable_entity
+    end
+  end
+
+  test "email requires authentication" do
+    delete logout_url
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_work_url(@work), params: { recipient: "destino@example.com" }
+    end
+    assert_redirected_to login_path
+  end
+
+  test "reports oversized evidence without sending a partial report" do
+    blob = image_blob("large.png")
+    @work.fotos.attach(blob)
+    blob.update!(byte_size: 16.megabytes)
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_work_url(@work), params: { recipient: "destino@example.com" }
+    end
+    assert_response :unprocessable_entity
+    assert_match "superan los 15 MB", response.body
+  end
+
+  test "missing photos produce an error instead of a success confirmation" do
+    blob = image_blob("missing.png")
+    @work.fotos.attach(blob)
+    blob.service.delete(blob.key)
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_work_url(@work), params: { recipient: "destino@example.com" }
+    end
+    assert_response :service_unavailable
+    assert_match "No se pudo confirmar", response.body
+  end
+
   private
 
   def image_blob(filename)

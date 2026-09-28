@@ -33,6 +33,9 @@
     <div class="btn-group btn-group-sm" role="group">
       <%= link_to "Ver", work_path(work), class: "btn btn-outline-primary" %>
       <%= link_to "Editar", edit_work_path(work), class: "btn btn-outline-secondary" %>
+      <%= link_to email_work_path(work), class: "btn btn-outline-primary", title: "Enviar informe por correo" do %>
+        <i class="bi bi-envelope" aria-hidden="true"></i> Correo
+      <% end %>
       <%= link_to "Eliminar",
                   work_path(work),
                   data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este informe técnico?" },

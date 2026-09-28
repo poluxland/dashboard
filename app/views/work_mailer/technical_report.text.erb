@@ -1,0 +1,11 @@
+IMPROMAQ · INFORME TÉCNICO DE MANTENIMIENTO N° <%= @work.id %>
+<%= @work.nombre.presence || "Sin título" %>
+
+<% @details.each do |label, value| %>
+<%= label %>: <%= value.to_s.presence || "Sin registrar" %>
+
+<% end %>
+FOTOGRAFÍAS INCLUIDAS EN EL CORREO
+<% @photo_groups.each do |label, filenames| %>
+<%= label %>: <%= filenames.size %> imagen(es)
+<% end %>

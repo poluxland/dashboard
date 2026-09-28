@@ -1,5 +1,5 @@
 class WorksController < ApplicationController
-  before_action :set_work, only: %i[ show edit update destroy ]
+  before_action :set_work, only: %i[ show edit update destroy email send_email ]
 
   # GET /works or /works.json
   def index
@@ -8,6 +8,27 @@ class WorksController < ApplicationController
 
   # GET /works/1 or /works/1.json
   def show
+  end
+
+  def email
+  end
+
+  def send_email
+    @recipient = params[:recipient].to_s.strip
+    unless @recipient.match?(URI::MailTo::EMAIL_REGEXP) && !@recipient.match?(/[\r\n]/)
+      flash.now[:alert] = "Ingresa un correo válido para el destinatario."
+      return render :email, status: :unprocessable_entity
+    end
+
+    WorkMailer.technical_report(@work, recipient: @recipient).deliver_now
+    redirect_to @work, notice: "Informe enviado a #{@recipient}.", status: :see_other
+  rescue WorkMailer::PhotosTooLarge
+    flash.now[:alert] = "Las fotos superan los 15 MB permitidos por envío. Reduce su tamaño antes de enviar el informe."
+    render :email, status: :unprocessable_entity
+  rescue StandardError => error
+    Rails.logger.error("Work report email failed for work #{@work.id}: #{error.class}")
+    flash.now[:alert] = "No se pudo confirmar el envío. Revisa el destinatario y vuelve a intentarlo más tarde."
+    render :email, status: :service_unavailable
   end
 
   # GET /works/new

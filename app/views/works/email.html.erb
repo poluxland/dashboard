@@ -1,0 +1,19 @@
+<% content_for :title, "Enviar informe por correo" %>
+<div class="card shadow-sm mx-auto my-4" style="max-width: 640px;">
+  <div class="card-body p-4">
+    <h1 class="h4">Enviar informe por correo</h1>
+    <p class="text-muted">Informe N° <%= @work.id %> · <%= @work.nombre.presence || "Sin título" %></p>
+    <p>Se enviará el informe completo con sus fotos de antes, después y adicionales incluidas en el correo.</p>
+    <%= form_with url: send_email_work_path(@work), method: :post do |form| %>
+      <div class="mb-3">
+        <%= form.label :recipient, "Correo del destinatario", class: "form-label" %>
+        <%= form.email_field :recipient, value: @recipient, required: true, class: "form-control", placeholder: "nombre@empresa.cl" %>
+      </div>
+      <p class="small text-muted">Máximo 15 MB de fotografías en total por envío.</p>
+      <div class="d-flex gap-2">
+        <%= form.submit "Enviar informe", class: "btn btn-primary", data: { turbo_submits_with: "Enviando…" } %>
+        <%= link_to "Cancelar", work_path(@work), class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

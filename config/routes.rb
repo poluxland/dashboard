@@ -25,7 +25,12 @@ end
     get :reporte_equipos
   end
 end
-  resources :works
+  resources :works do
+    member do
+      get :email
+      post :send_email
+    end
+  end
 # OTs + import
 # config/routes.rb
 resources :ots do

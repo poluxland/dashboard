@@ -1,0 +1,23 @@
+<div style="font-family:Arial,sans-serif;max-width:760px;margin:auto;color:#1e293b;">
+  <p style="color:#64748b;">IMPROMAQ · INFORME N° <%= @work.id %></p>
+  <h1 style="font-size:24px;">Informe técnico de mantenimiento</h1>
+  <h2 style="font-size:20px;"><%= @work.nombre.presence || "Sin título" %></h2>
+  <table role="presentation" style="width:100%;border-collapse:collapse;">
+    <% @details.each do |label, value| %>
+      <tr>
+        <th style="text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid #e2e8f0;width:30%;"><%= label %></th>
+        <td style="padding:10px;border-bottom:1px solid #e2e8f0;"><%= simple_format(value.to_s.presence || "Sin registrar") %></td>
+      </tr>
+    <% end %>
+  </table>
+  <% @photo_groups.each do |label, filenames| %>
+    <h2 style="font-size:18px;margin-top:24px;">Imágenes · <%= label %></h2>
+    <% if filenames.empty? %>
+      <p>Sin imágenes registradas.</p>
+    <% else %>
+      <% filenames.each do |filename| %>
+        <p><%= image_tag attachments[filename].url, alt: "#{label}: #{filename}", style: "width:100%;max-width:700px;height:auto;" %></p>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
