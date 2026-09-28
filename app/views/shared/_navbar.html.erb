@@ -1,6 +1,9 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
-    <%= link_to "Impromaq", root_path, class: "navbar-brand", data: { turbo: false } %>
+    <%= link_to root_path, class: "navbar-brand d-flex align-items-center gap-2", data: { turbo: false } do %>
+      <%= image_tag "impromaq-logo.png", alt: "Logo Impromaq", width: 36, height: 36, class: "rounded" %>
+      <span>Impromaq</span>
+    <% end %>
 
     <button
       class="navbar-toggler"

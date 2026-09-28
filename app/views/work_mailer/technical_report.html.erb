@@ -1,4 +1,5 @@
 <div style="font-family:Arial,sans-serif;max-width:760px;margin:auto;color:#1e293b;">
+  <%= image_tag attachments["impromaq-logo.png"].url, alt: "Logo Impromaq", width: 56, height: 56, style: "display:block;border:0;" %>
   <p style="color:#64748b;">IMPROMAQ · INFORME N° <%= @work.id %></p>
   <h1 style="font-size:24px;">Informe técnico de mantenimiento</h1>
   <h2 style="font-size:20px;"><%= @work.nombre.presence || "Sin título" %></h2>

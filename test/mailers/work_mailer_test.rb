@@ -12,11 +12,12 @@ class WorkMailerTest < ActionMailer::TestCase
     email = WorkMailer.technical_report(work, recipient: "destino@example.com")
     assert_equal ["destino@example.com"], email.to
     assert_includes email.subject, "##{work.id}"
-    assert_equal 3, email.attachments.size
-    assert_equal 3, email.attachments.map(&:filename).uniq.size
+    assert_equal 4, email.attachments.size
+    assert_equal 4, email.attachments.map(&:filename).uniq.size
+    assert_equal File.binread(Rails.root.join("app/assets/images/impromaq-logo.png")), email.attachments["impromaq-logo.png"].body.decoded.b
     email.attachments.each do |attachment|
       assert attachment.inline?
-      assert_equal png.b, attachment.body.decoded.b
+      assert_equal png.b, attachment.body.decoded.b unless attachment.filename == "impromaq-logo.png"
       assert_includes email.html_part.body.decoded, attachment.url
     end
     %w[Molienda MOL-02 Guantes Desgaste].each do |value|

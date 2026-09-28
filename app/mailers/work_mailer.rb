@@ -9,6 +9,11 @@ class WorkMailer < ApplicationMailer
     photos = PHOTO_GROUPS.keys.flat_map { |field| work.public_send(field).to_a }
     raise PhotosTooLarge if photos.sum(&:byte_size) > MAX_PHOTO_BYTES
 
+    attachments.inline["impromaq-logo.png"] = {
+      mime_type: "image/png",
+      content: File.binread(Rails.root.join("app/assets/images/impromaq-logo.png"))
+    }
+
     @photo_groups = PHOTO_GROUPS.map do |field, label|
       names = work.public_send(field).map do |photo|
         filename = "#{field}-#{photo.id}-#{photo.filename}"
