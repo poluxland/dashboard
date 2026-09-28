@@ -11,9 +11,22 @@
   <td><%= truncate(work.nombre.to_s, length: 24) %></td>
 
   <td>
-    <% { fotos_antes: "Antes", fotos_despues: "Después", fotos: "Adicionales" }.each do |campo, etiqueta| %>
-      <span class="badge text-bg-light"><%= etiqueta %>: <%= work.public_send(campo).size %></span>
-    <% end %>
+    <div class="d-flex gap-2">
+      <% { fotos_antes: "Antes", fotos_despues: "Después", fotos: "Adicionales" }.each do |campo, etiqueta| %>
+        <% fotos = work.public_send(campo) %>
+        <div class="d-flex flex-column align-items-center gap-1">
+          <span class="badge text-bg-light"><%= etiqueta %>: <%= fotos.size %></span>
+          <% if fotos.attached? %>
+            <%= link_to work_path(work), title: "Ver imágenes: #{etiqueta}" do %>
+              <%= image_tag fotos.first.variant(resize_to_fill: [60, 60]),
+                            width: 60, height: 60, loading: "lazy",
+                            class: "rounded border",
+                            alt: "#{etiqueta}: #{fotos.first.filename}" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
   </td>
 
   <td class="text-end">
