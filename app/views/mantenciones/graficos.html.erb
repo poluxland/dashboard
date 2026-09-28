@@ -108,21 +108,21 @@
     <div class="row g-3 mb-3">
       <div class="col-lg-4">
         <%= render "chart",
-                   title: "Estado de ejecución",
-                   subtitle: "Completadas, en progreso, no iniciadas y sin estado",
-                   canvas_id: "mantencionesEstadoChart",
-                   type: "doughnut",
-                   labels: @state_labels,
-                   values: @state_values %>
-      </div>
-      <div class="col-lg-4">
-        <%= render "chart",
                    title: "Planificación",
                    subtitle: "Plan, Adicional y Reprogramado",
                    canvas_id: "mantencionesPlanificacionChart",
                    type: "doughnut",
                    labels: @planning_labels,
                    values: @planning_values %>
+      </div>
+      <div class="col-lg-4">
+        <%= render "chart",
+                   title: "Estado de ejecución",
+                   subtitle: "Completadas, en progreso, no iniciadas y sin estado",
+                   canvas_id: "mantencionesEstadoChart",
+                   type: "doughnut",
+                   labels: @state_labels,
+                   values: @state_values %>
       </div>
       <div class="col-lg-4">
         <%= render "chart",
@@ -135,6 +135,18 @@
     </div>
 
     <div class="row g-3 mb-3">
+      <div class="col-xl-4">
+        <%= render "chart",
+                   title: "Planificación",
+                   subtitle: "Porcentaje del total de actividades según los filtros seleccionados",
+                   canvas_id: "mantencionesPlanificacionBarrasChart",
+                   labels: @planning_labels,
+                   values: @planning_values.map { |count| (count * 100.0 / @total_mantenciones).round(1) },
+                   format: "percent",
+                   suggested_max: 100,
+                   horizontal: true,
+                   height: 380 %>
+      </div>
       <div class="col-xl-4">
         <%= render "chart",
                    title: "Tipos de mantención",
@@ -151,16 +163,6 @@
                    canvas_id: "mantencionesAreaChart",
                    labels: @area_labels,
                    values: @area_values,
-                   horizontal: true,
-                   height: 380 %>
-      </div>
-      <div class="col-xl-4">
-        <%= render "chart",
-                   title: "Planificación",
-                   subtitle: "Cantidad de actividades por planificación",
-                   canvas_id: "mantencionesPlanificacionBarrasChart",
-                   labels: @planning_labels,
-                   values: @planning_values,
                    horizontal: true,
                    height: 380 %>
       </div>
