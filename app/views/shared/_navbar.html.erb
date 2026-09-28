@@ -132,6 +132,26 @@
           </ul>
         </li>
 
+        <!-- Inspecciones -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle"
+             href="#"
+             id="inspeccionesDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            Inspecciones
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="inspeccionesDropdown">
+            <li>
+              <%= link_to "Lanzas",
+                          "https://docs.google.com/forms/d/e/1FAIpQLScX-XYIzXGcVZ29GIpBoBQZwpA3F-RJfDbiX5sENyzRVFP3hA/viewform",
+                          class: "dropdown-item",
+                          data: { turbo: false } %>
+            </li>
+          </ul>
+        </li>
+
         <!-- Indicadores -->
         <li class="nav-item dropdown">
           <a

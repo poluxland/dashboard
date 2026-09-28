@@ -135,7 +135,7 @@
     </div>
 
     <div class="row g-3 mb-3">
-      <div class="col-xl-6">
+      <div class="col-xl-4">
         <%= render "chart",
                    title: "Tipos de mantención",
                    canvas_id: "mantencionesTipoChart",
@@ -144,13 +144,23 @@
                    horizontal: true,
                    height: 380 %>
       </div>
-      <div class="col-xl-6">
+      <div class="col-xl-4">
         <%= render "chart",
                    title: "Áreas con más mantenciones",
                    subtitle: "Se muestran las 12 áreas principales",
                    canvas_id: "mantencionesAreaChart",
                    labels: @area_labels,
                    values: @area_values,
+                   horizontal: true,
+                   height: 380 %>
+      </div>
+      <div class="col-xl-4">
+        <%= render "chart",
+                   title: "Planificación",
+                   subtitle: "Cantidad de actividades por planificación",
+                   canvas_id: "mantencionesPlanificacionBarrasChart",
+                   labels: @planning_labels,
+                   values: @planning_values,
                    horizontal: true,
                    height: 380 %>
       </div>
