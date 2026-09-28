@@ -232,6 +232,18 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#worksDropdown + ul li a", text: "Adicional"
   end
 
+  test "weekly planning chart only displays the latest 38 weeks" do
+    Mantencion.create!(fecha: Date.new(2026, 1, 1), semana: 1, especialidad: "Eléctrico", actividad: "Inicio de año", planificacion: "Plan")
+    Mantencion.create!(fecha: Date.new(2026, 10, 28), semana: 44, especialidad: "Eléctrico", actividad: "Semana reciente", planificacion: "Reprogramado")
+    get graficos_mantenciones_url(year: 2026)
+    assert_response :success
+    selector = "#mantencionesPlanificacionSemanalChartCard .chart-data li"
+    assert_select selector, count: 38 * 3
+    assert_select selector, text: "2026 · S6 · Plan: 0", count: 0
+    assert_select selector, text: "2026 · S7 · Plan: 0"
+    assert_select selector, text: "2026 · S44 · Reprogramado: 1"
+  end
+
   test "weekly planning counts include zeros and distinguish years" do
     Mantencion.create!(fecha: Date.new(2025, 9, 3), semana: 36, especialidad: "Eléctrico", actividad: "Anterior", planificacion: "Reprogramado")
     Mantencion.create!(fecha: Date.new(2026, 9, 16), semana: 38, especialidad: "Eléctrico", actividad: "Nueva", planificacion: "Reprogramado")

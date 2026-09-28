@@ -223,6 +223,7 @@ class MantencionesController < ApplicationController
       first_week, last_week = keys.map(&:last).minmax
       (first_week..last_week).map { |week| [year, week] }
     end
+    weeks = weeks.last(38)
     @weekly_planning_labels = weeks.map { |year, week| "#{year} · S#{week}" }
     @weekly_planning_datasets = Mantencion::PLANNING_OPTIONS.map do |planning|
       { label: planning, data: weeks.map { |key| by_week.fetch(key, []).count { |record| record.planificacion == planning } } }
