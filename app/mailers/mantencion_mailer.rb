@@ -10,8 +10,6 @@ class MantencionMailer < ApplicationMailer
     johnny.rute@meloncementos.cl
     camila.birke@msindustrial.cl
     juan.belmar@meloncementos.cl
-    manuel.sepulveda@meloncementos.cl
-    alex.rioseco@meloncementos.cl
     gabriel.arancibia@meloncementos.cl
     alex.dorante@msindustrial.cl
     mario.santibanez@meloncementos.cl
@@ -20,9 +18,7 @@ class MantencionMailer < ApplicationMailer
     hector.ampuero@msindustrial.cl
     luis.navas@msindustrial.cl
     isabel.tapia@meloncementos.cl
-    jose.opazo-externo@melonservicios.cl
     gari.aguilera@meloncementos.cl
-    pia.villegas@meloncementos.cl
     carolina.vera@meloncementos.cl
     moira.cisternas@meloncementos.cl
     exequiel.moya@msindustrial.cl
