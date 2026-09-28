@@ -11,6 +11,7 @@
     labels: labels,
     values: values,
     datasets: datasets,
+    shortWeekLabels: local_assigns.fetch(:short_week_labels, false),
     datasetLabel: local_assigns.fetch(:dataset_label, title),
     format: chart_format,
     horizontal: horizontal,
@@ -138,6 +139,11 @@
             }
           };
           options.scales[categoryAxis] = { ticks: { autoSkip: false, maxRotation: 0 } };
+          if (config.shortWeekLabels) {
+            options.scales[categoryAxis].ticks.callback = function(value) {
+              return this.getLabelForValue(value).replace(/^\d{4} · /, "");
+            };
+          }
         }
 
         window.__charts[canvas.id] = new Chart(canvas, {
