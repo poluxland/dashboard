@@ -168,5 +168,14 @@
                    suggested_max: 100 %>
       </div>
     </div>
+    <div class="mt-3">
+      <%= render "chart",
+                 title: "Actividades por semana y planificación",
+                 subtitle: "Cantidad de actividades Plan, Adicional y Reprogramado. Respeta los filtros seleccionados; cada año se muestra por separado.",
+                 canvas_id: "mantencionesPlanificacionSemanalChart",
+                 type: "line",
+                 labels: @weekly_planning_labels,
+                 datasets: @weekly_planning_datasets %>
+    </div>
   <% end %>
 </div>

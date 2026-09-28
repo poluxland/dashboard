@@ -69,7 +69,7 @@
             <li>
               <%= link_to "Mantenciones",
                           mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad].blank? && params[:pendientes].blank?}",
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad].blank? && params[:pendientes].blank? && params[:planificacion].blank?}",
                           data: { turbo: false } %>
             </li>
             <li>
@@ -94,6 +94,17 @@
               <%= link_to "Pendientes",
                           pendientes_mantenciones_path,
                           class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:pendientes] == '1'}",
+                          data: { turbo: false } %>
+            </li>
+
+            <li>
+              <%= link_to "Reprogramado", reprogramado_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Reprogramado'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Adicional", adicional_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Adicional'}",
                           data: { turbo: false } %>
             </li>
 

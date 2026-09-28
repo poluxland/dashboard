@@ -57,7 +57,7 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: "Gráficos de mantenciones"
-    assert_select "canvas", count: 6
+    assert_select "canvas", count: 7
     assert_select "#mantencionesPlanificacionChartCard .chart-data li", text: "Plan: 2"
     assert_select "#mantencionesEspecialidadChartCard .chart-data li", text: "Eléctrico: 2"
     assert_select "#mantencionesAreaChartCard .chart-data li", text: "P416: 2"
@@ -215,4 +215,42 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to mantenciones_url
   end
+  test "planning shortcuts filter independently of completion and preserve search" do
+    record = Mantencion.create!(fecha: Date.new(2026, 9, 9), especialidad: "Eléctrico", actividad: "Revisión especial", planificacion: "Reprogramado", estado: 100)
+    get reprogramado_mantenciones_url(q: "especial")
+    assert_response :success
+    assert_select "#mantencion_#{record.id}", count: 1
+    assert_select "#mantencion_#{@mantencion.id}", count: 0
+    assert_select "input[name='planificacion'][value='Reprogramado']"
+    assert_select "a.active[href=?]", reprogramado_mantenciones_path
+    assert_select "a.active[href=?]", mantenciones_path, count: 0
+    get adicional_mantenciones_url
+    assert_response :success
+    assert_select "#mantencion_#{mantenciones(:two).id}", count: 1
+    assert_select "#mantencion_#{record.id}", count: 0
+    assert_select "#worksDropdown + ul li a", text: "Reprogramado"
+    assert_select "#worksDropdown + ul li a", text: "Adicional"
+  end
+
+  test "weekly planning counts include zeros and distinguish years" do
+    Mantencion.create!(fecha: Date.new(2025, 9, 3), semana: 36, especialidad: "Eléctrico", actividad: "Anterior", planificacion: "Reprogramado")
+    Mantencion.create!(fecha: Date.new(2026, 9, 16), semana: 38, especialidad: "Eléctrico", actividad: "Nueva", planificacion: "Reprogramado")
+    get graficos_mantenciones_url
+    assert_response :success
+    selector = "#mantencionesPlanificacionSemanalChartCard .chart-data li"
+    assert_select selector, text: "2025 · S36 · Reprogramado: 1"
+    assert_select selector, text: "2026 · S36 · Plan: 1"
+    assert_select selector, text: "2026 · S36 · Adicional: 1"
+    assert_select selector, text: "2026 · S36 · Reprogramado: 0"
+    assert_select selector, text: "2026 · S37 · Plan: 0"
+    assert_select selector, text: "2026 · S38 · Reprogramado: 1"
+    get graficos_mantenciones_url(year: 2026, especialidad: "mecanica", semana: 36)
+    assert_select selector, count: 3
+    assert_select selector, text: "2026 · S36 · Plan: 0"
+    assert_select selector, text: "2026 · S36 · Adicional: 1"
+    get graficos_mantenciones_url(year: 2000)
+    assert_response :success
+    assert_select "canvas", count: 0
+  end
+
 end

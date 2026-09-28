@@ -1,4 +1,7 @@
 <%
+  values = local_assigns.fetch(:values, [])
+  datasets = local_assigns[:datasets]
+  has_data = labels.any? && (values.any? || datasets.present?)
   chart_type = local_assigns.fetch(:type, "bar")
   chart_format = local_assigns.fetch(:format, "count")
   horizontal = local_assigns.fetch(:horizontal, false)
@@ -7,6 +10,7 @@
     type: chart_type,
     labels: labels,
     values: values,
+    datasets: datasets,
     datasetLabel: local_assigns.fetch(:dataset_label, title),
     format: chart_format,
     horizontal: horizontal,
@@ -21,14 +25,22 @@
       <p class="small text-body-secondary mb-3"><%= subtitle %></p>
     <% end %>
 
-    <% if labels.any? && values.any? %>
+    <% if has_data %>
       <div style="height: <%= local_assigns.fetch(:height, 320) %>px;">
         <canvas id="<%= canvas_id %>" aria-label="<%= title %>" role="img"></canvas>
       </div>
 
       <ul class="visually-hidden chart-data">
-        <% labels.zip(values).each do |label, value| %>
-          <li><%= label %>: <%= value %></li>
+        <% if datasets.present? %>
+          <% datasets.each do |series| %>
+            <% labels.zip(series[:data]).each do |label, value| %>
+              <li><%= label %> · <%= series[:label] %>: <%= value %></li>
+            <% end %>
+          <% end %>
+        <% else %>
+          <% labels.zip(values).each do |label, value| %>
+            <li><%= label %>: <%= value %></li>
+          <% end %>
         <% end %>
       </ul>
     <% else %>
@@ -39,7 +51,7 @@
   </div>
 </div>
 
-<% if labels.any? && values.any? %>
+<% if has_data %>
   <%= javascript_tag nonce: true do %>
     (() => {
       const config = <%= raw(json_escape(chart_config.to_json)) %>;
@@ -86,19 +98,25 @@
           fill: isLine,
           pointRadius: isLine ? 4 : undefined
         };
+        const datasets = config.datasets ? config.datasets.map((series, index) => ({
+          label: series.label, data: series.data,
+          borderColor: palette[index % palette.length],
+          backgroundColor: palette[index % palette.length],
+          borderWidth: 3, pointRadius: 4, tension: 0, fill: false
+        })) : [dataset];
         const options = {
           responsive: true,
           maintainAspectRatio: false,
           indexAxis: config.horizontal ? "y" : "x",
           plugins: {
-            legend: { display: isCircular, position: "bottom" },
+            legend: { display: isCircular || !!config.datasets, position: "bottom" },
             tooltip: {
               callbacks: {
                 label: (context) => {
                   const parsed = typeof context.parsed === "object"
                     ? (config.horizontal ? context.parsed.x : context.parsed.y)
                     : context.parsed;
-                  return `${context.label || context.dataset.label}: ${formatValue(parsed)}`;
+                  return `${(config.datasets ? context.dataset.label : context.label) || context.dataset.label}: ${formatValue(parsed)}`;
                 }
               }
             }
@@ -124,7 +142,7 @@
 
         window.__charts[canvas.id] = new Chart(canvas, {
           type: config.type,
-          data: { labels: config.labels, datasets: [dataset] },
+          data: { labels: config.labels, datasets: datasets },
           options: options
         });
       }

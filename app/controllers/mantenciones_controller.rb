@@ -21,6 +21,8 @@ class MantencionesController < ApplicationController
     scope = Mantencion.order(fecha: :desc, created_at: :desc)
     filter = specialty_filter
     @search_query = params[:q].to_s.squish
+    @planning_filter = params[:planificacion].presence_in(Mantencion::PLANNING_OPTIONS)
+    scope = scope.where(planificacion: @planning_filter) if @planning_filter
     @pending_filter = params[:pendientes] == "1"
     scope = scope.where("estado IS NULL OR estado != ?", 100) if @pending_filter
     scope = scope.search(@search_query) if @search_query.present?
@@ -36,6 +38,11 @@ class MantencionesController < ApplicationController
     else
       @page_title = "Mantenciones"
       @page_description = "Registro de mantenciones eléctricas y mecánicas"
+    end
+
+    if @planning_filter
+      @page_title = "Mantenciones · #{@planning_filter}"
+      @page_description = "Actividades con planificación #{@planning_filter.downcase}"
     end
 
     @pagy, @mantenciones = pagy(scope)
@@ -157,6 +164,7 @@ class MantencionesController < ApplicationController
     end
     set_area_chart(records)
     set_weekly_state_chart(records)
+    set_weekly_planning_chart(records)
   end
 
   def set_state_chart(records)
@@ -205,6 +213,19 @@ class MantencionesController < ApplicationController
     @weekly_average_state_values = by_week.values.map do |week_records|
       states = week_records.filter_map(&:estado).map(&:to_f)
       (states.sum / states.size).round(1) if states.any?
+    end
+  end
+
+  def set_weekly_planning_chart(records)
+    by_week = records.select { |record| record.fecha.present? && record.semana.present? }
+      .group_by { |record| [record.fecha.year, record.semana] }
+    weeks = by_week.keys.group_by(&:first).sort.flat_map do |year, keys|
+      first_week, last_week = keys.map(&:last).minmax
+      (first_week..last_week).map { |week| [year, week] }
+    end
+    @weekly_planning_labels = weeks.map { |year, week| "#{year} · S#{week}" }
+    @weekly_planning_datasets = Mantencion::PLANNING_OPTIONS.map do |planning|
+      { label: planning, data: weeks.map { |key| by_week.fetch(key, []).count { |record| record.planificacion == planning } } }
     end
   end
 

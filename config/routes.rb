@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   get "mantenciones/importar", to: "mantencion_imports#new", as: :new_mantencion_import
   post "mantenciones/importar", to: "mantencion_imports#create", as: :mantencion_import
   get "mantenciones/pendientes", to: "mantenciones#index", defaults: { pendientes: "1" }, as: :pendientes_mantenciones
+  get "mantenciones/reprogramado", to: "mantenciones#index", defaults: { planificacion: "Reprogramado" }, as: :reprogramado_mantenciones
+  get "mantenciones/adicional", to: "mantenciones#index", defaults: { planificacion: "Adicional" }, as: :adicional_mantenciones
   resources :mantenciones do
     collection do
       get :graficos

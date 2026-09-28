@@ -22,6 +22,7 @@
     <% if @especialidad_filter.present? %>
       <%= hidden_field_tag :especialidad, @especialidad_filter %>
     <% end %>
+    <%= hidden_field_tag :planificacion, @planning_filter if @planning_filter.present? %>
     <% if @pending_filter %>
       <%= hidden_field_tag :pendientes, "1" %>
     <% end %>
@@ -36,7 +37,7 @@
         <button type="submit" class="btn btn-dark">Buscar</button>
         <% if @search_query.present? %>
           <%= link_to "Limpiar",
-                      mantenciones_path(especialidad: @especialidad_filter, pendientes: (@pending_filter ? "1" : nil)),
+                      mantenciones_path(especialidad: @especialidad_filter, planificacion: @planning_filter, pendientes: (@pending_filter ? "1" : nil)),
                       class: "btn btn-outline-secondary" %>
         <% end %>
       </div>
