@@ -11,44 +11,7 @@
     <%= link_to "Volver a mantenciones", mantenciones_path, class: "btn btn-outline-light fw-semibold", data: { turbo: false } %>
   </div>
 
-  <div class="card border-0 shadow-sm rounded-4 mb-3">
-    <div class="card-body p-4">
-      <%= form_with url: graficos_mantenciones_path, method: :get, class: "row g-3 align-items-end", data: { turbo: false } do |form| %>
-        <div class="col-sm-6 col-lg-3">
-          <%= form.label :especialidad, "Especialidad", class: "form-label fw-semibold" %>
-          <%= form.select :especialidad,
-                          options_for_select([
-                            ["Todas las especialidades", ""],
-                            ["M. Eléctrica", "electrica"],
-                            ["M. Mecánica", "mecanica"]
-                          ], @selected_specialty),
-                          {},
-                          class: "form-select" %>
-        </div>
-
-        <div class="col-sm-6 col-lg-2">
-          <%= form.label :year, "Año", class: "form-label fw-semibold" %>
-          <%= form.select :year,
-                          options_for_select([["Todos los años", ""]] + @available_years.map { |year| [year, year] }, @selected_year),
-                          {},
-                          class: "form-select" %>
-        </div>
-
-        <div class="col-sm-6 col-lg-2">
-          <%= form.label :semana, "Semana", class: "form-label fw-semibold" %>
-          <%= form.select :semana,
-                          options_for_select([["Todas las semanas", ""]] + @available_weeks.map { |week| ["Semana #{week}", week] }, @selected_week),
-                          {},
-                          class: "form-select" %>
-        </div>
-
-        <div class="col-lg-5 d-flex flex-wrap gap-2">
-          <%= form.submit "Aplicar filtros", class: "btn btn-primary fw-semibold" %>
-          <%= link_to "Limpiar", graficos_mantenciones_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
-        </div>
-      <% end %>
-    </div>
-  </div>
+  <%= render "report_filters", report_path: graficos_mantenciones_path %>
 
   <div class="row g-3 mb-3">
     <div class="col-6 col-lg-4 col-xl-2">

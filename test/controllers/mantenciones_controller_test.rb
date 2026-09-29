@@ -21,6 +21,90 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "th", text: "Duración del trabajo"
   end
 
+  test "desglose cuenta los tipos solo dentro del Plan y conserva otras planificaciones" do
+    Mantencion.create!(fecha: Date.new(2026, 9, 9), especialidad: "Eléctrico",
+                       actividad: "Reprogramada", planificacion: "Reprogramado")
+    Mantencion.create!(fecha: Date.new(2026, 9, 9), especialidad: "Eléctrico",
+                       actividad: "Correctivo del plan", planificacion: "Plan",
+                       tipo_mantencion: "Correctivo No programado")
+    get desglose_mantenciones_url
+    assert_response :success
+    assert_select "a.active[href=?]", desglose_mantenciones_path, text: "Desglose"
+    assert_select "#breakdown-total .breakdown-count", text: "4"
+    assert_select "[data-planning='Plan']", text: /50% del total/
+    assert_select "[data-planning='Adicional'] .breakdown-count", text: "1"
+    assert_select "[data-planning='Reprogramado'] .breakdown-count", text: "1"
+    assert_select "[data-maintenance-type='Preventiva']", text: /50% del Plan.*25% del total/m
+    assert_select "[data-maintenance-type='Correctivo Programado'] .breakdown-count", text: "0"
+    assert_select "[data-maintenance-type='Correctivo No programado'] .breakdown-count", text: "1"
+  end
+
+  test "desglose filtra y maneja un Plan vacío o un total vacío" do
+    get desglose_mantenciones_url(especialidad: "mecanica", year: 2026, semana: 36)
+    assert_response :success
+    assert_select "#breakdown-total .breakdown-count", text: "1"
+    assert_select "[data-planning='Plan'] .breakdown-count", text: "0"
+    assert_select "[data-maintenance-type] span", text: "0% del Plan", count: 3
+    assert_select "select[name='especialidad'] option[selected][value='mecanica']"
+    assert_select "form[action=?]", desglose_mantenciones_path
+
+    get desglose_mantenciones_url(year: 2000)
+    assert_response :success
+    assert_select "#breakdown-total .breakdown-count", text: "0"
+    assert_select ".alert-info", text: "No hay tareas para los filtros seleccionados."
+  end
+
+  test "desglose incluye los extremos del tramo entre años y recalcula porcentajes" do
+    [
+      [ 2025, 1, "Plan", "Preventiva", "Eléctrico" ],
+      [ 2025, 2, "Plan", "Preventiva", "Eléctrico" ],
+      [ 2025, 30, "Plan", "Correctivo Programado", "Eléctrico" ],
+      [ 2026, 10, "Adicional", "Correctivo No programado", "Mecánico" ],
+      [ 2026, 11, "Plan", "Preventiva", "Eléctrico" ]
+    ].each do |year, week, planning, type, specialty|
+      Mantencion.create!(fecha: Date.commercial(year, week, 3), semana: week,
+                         actividad: "Tarea del tramo", especialidad: specialty,
+                         planificacion: planning, tipo_mantencion: type)
+    end
+    filters = { desde_year: 2025, desde_semana: 2, hasta_year: 2026, hasta_semana: 10 }
+    get desglose_mantenciones_url(**filters)
+    assert_response :success
+    assert_select "#breakdown-total .breakdown-count", text: "3"
+    assert_select "[data-planning='Plan'] .breakdown-count", text: "2"
+    assert_select "[data-planning='Plan']", text: /66[,.]7% del total/
+    assert_select "[data-planning='Adicional'] .breakdown-count", text: "1"
+    assert_select "[data-maintenance-type='Preventiva']", text: /50% del Plan.*33[,.]3% del total/m
+    filters.each do |key, value|
+      assert_select "select[name='#{key}'] option[selected][value='#{value}']"
+    end
+
+    get desglose_mantenciones_url(**filters, especialidad: "electrica")
+    assert_select "#breakdown-total .breakdown-count", text: "2"
+    assert_select "[data-planning='Plan']", text: /100% del total/
+
+    get desglose_mantenciones_url(desde_year: 2026, desde_semana: 10, hasta_year: 2026, hasta_semana: 10)
+    assert_select "#breakdown-total .breakdown-count", text: "1"
+    assert_select "[data-planning='Plan'] .breakdown-count", text: "0"
+  end
+
+  test "desglose valida rangos incompletos invertidos e inválidos" do
+    [
+      { desde_year: 2025 },
+      { desde_year: 2026, desde_semana: 11, hasta_year: 2026, hasta_semana: 10 },
+      { desde_year: 2026, desde_semana: 54, hasta_year: 2026, hasta_semana: 55 },
+      { desde_year: "error", desde_semana: 1, hasta_year: 2026, hasta_semana: 10 }
+    ].each do |filters|
+      get desglose_mantenciones_url(**filters)
+      assert_response :success
+      assert_select ".alert-warning", count: 1
+      assert_select "#breakdown-total", count: 0
+    end
+
+    get desglose_mantenciones_url(desde_year: "", desde_semana: "", hasta_year: "", hasta_semana: "")
+    assert_select ".alert-warning", count: 0
+    assert_select "#breakdown-total .breakdown-count", text: "2"
+  end
+
   test "muestra solamente las mantenciones pendientes" do
     without_state = Mantencion.create!(
       fecha: Date.new(2026, 9, 4),

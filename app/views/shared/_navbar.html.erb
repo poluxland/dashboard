@@ -91,6 +91,11 @@
                           data: { turbo: false } %>
             </li>
             <li>
+              <%= link_to "Desglose", desglose_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'desglose'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
               <%= link_to "Pendientes",
                           pendientes_mantenciones_path,
                           class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:pendientes] == '1'}",

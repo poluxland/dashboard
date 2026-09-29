@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :mantenciones do
     collection do
       get :graficos
+      get :desglose
     end
   end
   resources :enfundados do

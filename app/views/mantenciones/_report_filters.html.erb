@@ -1,0 +1,67 @@
+  <div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-body p-4">
+      <%= form_with url: report_path, method: :get, class: "row g-3 align-items-end", data: { turbo: false } do |form| %>
+        <div class="col-sm-6 col-lg-3">
+          <%= form.label :especialidad, "Especialidad", class: "form-label fw-semibold" %>
+          <%= form.select :especialidad,
+                          options_for_select([
+                            ["Todas las especialidades", ""],
+                            ["M. Eléctrica", "electrica"],
+                            ["M. Mecánica", "mecanica"]
+                          ], @selected_specialty),
+                          {},
+                          class: "form-select" %>
+        </div>
+
+        <% if local_assigns[:week_range] %>
+          <% range_values = @range_values || {} %>
+          <% range_years = ((@available_years + [Date.current.year]).min..(@available_years + [Date.current.year]).max).to_a.reverse %>
+          <% %w[desde hasta].each do |endpoint| %>
+            <div class="col-sm-6 col-lg-4">
+              <fieldset>
+                <legend class="form-label fs-6 fw-semibold"><%= endpoint == "desde" ? "Desde" : "Hasta" %></legend>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <%= form.label "#{endpoint}_year", "Año", class: "form-label small" %>
+                    <%= form.select "#{endpoint}_year",
+                                    options_for_select([["Seleccionar año", ""]] + (range_years + [range_values["#{endpoint}_year"].to_i]).select { |year| year >= 1000 }.uniq.sort.reverse.map { |year| [year, year] }, range_values["#{endpoint}_year"]),
+                                    {}, class: "form-select" %>
+                  </div>
+                  <div class="col-6">
+                    <%= form.label "#{endpoint}_semana", "Semana", class: "form-label small" %>
+                    <%= form.select "#{endpoint}_semana",
+                                    options_for_select([["Seleccionar semana", ""]] + (1..53).map { |week| ["Semana #{week}", week] }, range_values["#{endpoint}_semana"]),
+                                    {}, class: "form-select" %>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+          <p class="small text-body-secondary mb-0">El tramo incluye ambas semanas y usa el año de la fecha y el campo Semana de cada tarea. Deja los cuatro campos vacíos para ver todo el período.</p>
+        <% else %>
+        <div class="col-sm-6 col-lg-2">
+          <%= form.label :year, "Año", class: "form-label fw-semibold" %>
+          <%= form.select :year,
+                          options_for_select([["Todos los años", ""]] + @available_years.map { |year| [year, year] }, @selected_year),
+                          {},
+                          class: "form-select" %>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+          <%= form.label :semana, "Semana", class: "form-label fw-semibold" %>
+          <%= form.select :semana,
+                          options_for_select([["Todas las semanas", ""]] + @available_weeks.map { |week| ["Semana #{week}", week] }, @selected_week),
+                          {},
+                          class: "form-select" %>
+        </div>
+
+        <% end %>
+
+        <div class="col-lg-5 d-flex flex-wrap gap-2">
+          <%= form.submit "Aplicar filtros", class: "btn btn-primary fw-semibold" %>
+          <%= link_to "Limpiar", report_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+

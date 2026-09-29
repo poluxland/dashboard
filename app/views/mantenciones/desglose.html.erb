@@ -1,0 +1,62 @@
+<% content_for :title, "Mantenciones · Desglose" %>
+
+<div class="mx-auto pb-4" style="max-width: 1600px;">
+  <div class="bg-dark text-white rounded-4 p-4 mb-3 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+    <div>
+      <p class="small text-uppercase text-white-50 fw-semibold mb-1">Informe de mantenciones</p>
+      <h1 class="h3 fw-bold mb-1">Desglose de tareas</h1>
+      <p class="mb-0 text-white-50">Total de tareas por planificación y detalle del Plan según tipo de mantención.</p>
+    </div>
+    <%= link_to "Volver a mantenciones", mantenciones_path, class: "btn btn-outline-light fw-semibold" %>
+  </div>
+
+  <%= render "report_filters", report_path: desglose_mantenciones_path, week_range: true %>
+
+  <% if @range_error %>
+    <div class="alert alert-warning" role="alert"><%= @range_error %></div>
+  <% elsif @breakdown_total.zero? %>
+    <div class="alert alert-info">No hay tareas para los filtros seleccionados.</div>
+  <% end %>
+
+  <% unless @range_error %>
+  <section class="breakdown card border-0 shadow-sm rounded-4 p-3 p-lg-4" aria-label="Desglose de tareas por planificación y tipo de mantención">
+    <div class="breakdown-node breakdown-total" id="breakdown-total">
+      <h2>Total de tareas</h2>
+      <strong class="breakdown-count"><%= number_with_delimiter(@breakdown_total) %></strong>
+      <span><%= breakdown_percentage(@breakdown_total, @breakdown_total) %> del total</span>
+    </div>
+
+    <ul class="breakdown-branches">
+      <% @planning_counts.each do |planning, count| %>
+        <li class="breakdown-branch <%= 'breakdown-plan-branch' if planning == 'Plan' %>">
+          <div class="breakdown-node breakdown-<%= breakdown_tone(planning) %>" data-planning="<%= planning %>">
+            <h2><%= planning %></h2>
+            <strong class="breakdown-count"><%= number_with_delimiter(count) %></strong>
+            <span><%= breakdown_percentage(count, @breakdown_total) %> del total</span>
+          </div>
+          <% if planning == "Plan" %>
+            <p class="breakdown-description">Tareas con planificación Plan.</p>
+            <ul class="breakdown-types">
+              <% @plan_type_counts.each do |type, type_count| %>
+                <li>
+                  <div class="breakdown-node breakdown-<%= breakdown_tone(type) %>" data-maintenance-type="<%= type %>">
+                    <h3><%= type %></h3>
+                    <strong class="breakdown-count"><%= number_with_delimiter(type_count) %></strong>
+                    <span><%= breakdown_percentage(type_count, count) %> del Plan</span>
+                    <span><%= breakdown_percentage(type_count, @breakdown_total) %> del total</span>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          <% elsif planning == "Adicional" %>
+            <p class="breakdown-description">Tareas con planificación Adicional.</p>
+          <% else %>
+            <p class="breakdown-description">Incluidas en el total, fuera del desglose del Plan.</p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <p class="small text-body-secondary text-center mt-4 mb-0">Los porcentajes del total consideran todas las tareas filtradas. Los porcentajes del Plan consideran únicamente las tareas con planificación Plan.</p>
+  </section>
+  <% end %>
+</div>

@@ -49,25 +49,23 @@ class MantencionesController < ApplicationController
   end
 
   def graficos
-    scope = Mantencion.order(:fecha)
-    @available_years = Mantencion.where.not(fecha: nil).pluck(:fecha).map(&:year).uniq.sort.reverse
-    @selected_year = params[:year].to_s if params[:year].to_s.match?(/\A\d{4}\z/)
-    @selected_specialty = params[:especialidad].to_s if specialty_filter
-    @selected_week = params[:semana].to_s if params[:semana].to_s.match?(/\A(?:[1-9]|[1-4]\d|5[0-3])\z/)
+    build_chart_data(report_scope.to_a)
+  end
 
-    if @selected_year.present?
-      year = @selected_year.to_i
-      scope = scope.where(fecha: Date.new(year, 1, 1)..Date.new(year, 12, 31))
+  def desglose
+    counts = report_scope.group(:planificacion, :tipo_mantencion).count
+    @breakdown_total = counts.values.sum
+    @planning_counts = { "Adicional" => 0, "Plan" => 0 }
+    @plan_type_counts = Mantencion::MAINTENANCE_TYPE_OPTIONS.first(3).index_with { 0 }
+
+    counts.each do |(planning, type), count|
+      planning = planning.presence || "Sin planificación"
+      @planning_counts[planning] = @planning_counts.fetch(planning, 0) + count
+      next unless planning == "Plan"
+
+      type = type.presence || "Sin tipo de mantención"
+      @plan_type_counts[type] = @plan_type_counts.fetch(type, 0) + count
     end
-
-    if (filter = specialty_filter)
-      scope = scope.where("LOWER(especialidad) IN (?)", filter[:values])
-    end
-
-    @available_weeks = scope.where.not(semana: nil).distinct.reorder(:semana).pluck(:semana)
-    scope = scope.where(semana: @selected_week.to_i) if @selected_week.present?
-
-    build_chart_data(scope.to_a)
   end
 
   def show
@@ -112,6 +110,52 @@ class MantencionesController < ApplicationController
   end
 
   private
+
+  def report_scope
+    scope = Mantencion.order(:fecha)
+    @available_years = Mantencion.where.not(fecha: nil).pluck(:fecha).map(&:year).uniq.sort.reverse
+    @selected_year = params[:year].to_s if params[:year].to_s.match?(/\A\d{4}\z/)
+    @selected_specialty = params[:especialidad].to_s if specialty_filter
+    @selected_week = params[:semana].to_s if params[:semana].to_s.match?(/\A(?:[1-9]|[1-4]\d|5[0-3])\z/)
+
+    range_requested = action_name == "desglose" && %i[desde_year desde_semana hasta_year hasta_semana].any? { |key| params[key].present? }
+
+    if @selected_year.present? && !range_requested
+      year = @selected_year.to_i
+      scope = scope.where(fecha: Date.new(year, 1, 1)..Date.new(year, 12, 31))
+    end
+
+    if (filter = specialty_filter)
+      scope = scope.where("LOWER(especialidad) IN (?)", filter[:values])
+    end
+
+    @available_weeks = scope.where.not(semana: nil).distinct.reorder(:semana).pluck(:semana)
+    scope = scope.where(semana: @selected_week.to_i) if @selected_week.present? && !range_requested
+    scope = apply_breakdown_range(scope) if range_requested
+
+    scope.reorder(nil)
+  end
+
+  def apply_breakdown_range(scope)
+    @range_values = params.permit(:desde_year, :desde_semana, :hasta_year, :hasta_semana).to_h
+    valid = %w[desde hasta].all? do |endpoint|
+      @range_values["#{endpoint}_year"].to_s.match?(/\A[1-9]\d{3}\z/) &&
+        @range_values["#{endpoint}_semana"].to_s.match?(/\A(?:[1-9]|[1-4]\d|5[0-3])\z/)
+    end
+    unless valid
+      @range_error = "Selecciona el año y la semana de inicio y de término del tramo."
+      return scope.none
+    end
+
+    first = @range_values["desde_year"].to_i * 100 + @range_values["desde_semana"].to_i
+    last = @range_values["hasta_year"].to_i * 100 + @range_values["hasta_semana"].to_i
+    if first > last
+      @range_error = "El inicio del tramo debe ser anterior o igual a su término."
+      return scope.none
+    end
+
+    scope.where("EXTRACT(YEAR FROM fecha) * 100 + semana BETWEEN ? AND ?", first, last)
+  end
 
   def set_mantencion
     @mantencion = Mantencion.find(params.expect(:id))
