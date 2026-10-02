@@ -7,3 +7,5 @@
 </div>
 
 <p><strong>Área:</strong> <%= @person.area.presence || "Sin área" %></p>
+
+<p><strong>Participa en indicadores:</strong> <%= @person.indicator_enabled? ? "Sí" : "No" %></p>

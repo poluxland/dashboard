@@ -44,6 +44,6 @@ class PeopleController < ApplicationController
 
   def person_params
     # incluye :planta
-    params.require(:person).permit(:name, :planta, :area)
+    params.require(:person).permit(:name, :planta, :area, :indicator_enabled)
   end
 end

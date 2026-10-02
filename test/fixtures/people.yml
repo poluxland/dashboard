@@ -1,7 +1,9 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  indicator_enabled: true
   name: Jose
 
 two:
+  indicator_enabled: true
   name: Ignacio

@@ -11,6 +11,7 @@
       <th>Nombre</th>
       <th>Planta</th>
       <th>Área</th>
+      <th>Participa en indicadores</th>
       <th class="text-end">Acciones</th>
     </tr>
   </thead>
@@ -20,6 +21,7 @@
         <td><%= p.name %></td>
         <td><%= p.planta.presence || "-" %></td>
         <td><%= p.area.presence || "Sin área" %></td>
+        <td><%= p.indicator_enabled? ? "Sí" : "No" %></td>
         <td class="text-end">
           <%= link_to "Editar", edit_person_path(p), class: "btn btn-sm btn-outline-secondary" %>
           <%= link_to "Eliminar", p, class: "btn btn-sm btn-outline-danger ms-1",

@@ -7,7 +7,7 @@ def index
   @month = params[:month].presence && Date.strptime("#{params[:month]}-01", "%Y-%m-%d") rescue nil
 
   # ---- Listado con filtros (OK con includes porque no restringimos select) ----
-  scope = IndicatorReading.includes(:person).order(period: :desc)
+  scope = IndicatorReading.for_enabled_people.includes(:person).order(period: :desc)
   scope = scope.where(period: @month.beginning_of_month..@month.end_of_month) if @month
   scope = scope.where(person_id: params[:person_id]) if params[:person_id].present?
   @readings = scope
@@ -16,7 +16,7 @@ def index
   # Tendencia mensual (promedio por indicador)  -> series: Cuasi, LVS, CC, HH
   # Usamos pluck para evitar instanciar registros con columnas parciales.
   # --------------------------------------------------------------------------
-  trend_scope = IndicatorReading
+  trend_scope = IndicatorReading.for_enabled_people
   trend_scope = trend_scope.where(person_id: params[:person_id]) if params[:person_id].present?
 
   trend_rows = trend_scope
@@ -47,7 +47,7 @@ def index
   # Evolución del PROMEDIO por persona (una serie por persona a través de los meses)
   # promedio = (cuasi + lvs + cc + hh) / 4. Usamos pluck y agrupamos en Ruby.
   # ---------------------------------------------------------------------------------
-  avg_base = IndicatorReading.order(:period)
+  avg_base = IndicatorReading.for_enabled_people.order(:period)
   avg_base = avg_base.where(person_id: params[:person_id]) if params[:person_id].present?
 
   periods = avg_base.distinct.order(:period).pluck(:period)
@@ -78,7 +78,7 @@ def index
   # Aquí sí usamos includes(:person) porque NO restringimos select.
   # --------------------------------------------------------------------------
   if @month
-    month_scope = IndicatorReading.for_month(@month).includes(:person).order("people.name")
+    month_scope = IndicatorReading.for_enabled_people.for_month(@month).includes(:person).order("people.name")
     @bar_labels = month_scope.map { |r| r.person.name }
     @bar_datasets = [
       { label: "Cuasi", data: month_scope.map { |r| r.cuasi.to_f } },
@@ -90,7 +90,7 @@ def index
 
   people = Person.arel_table
 
-scope = IndicatorReading.joins(:person)
+scope = IndicatorReading.for_enabled_people.joins(:person)
 scope = scope.where(period: @month.all_month) if @month.present?
 
 rows = scope
@@ -160,7 +160,7 @@ def matrix
 
   range = @month.beginning_of_month..@month.end_of_month
 
-  existing = IndicatorReading.where(period: range)
+  existing = IndicatorReading.for_enabled_people.where(period: range)
                              .pluck(:person_id, :cuasi, :lvs, :cc, :hh)
 
   @by_person = existing.each_with_object(Hash.new { |h, k| h[k] = {} }) do |(pid, cu, lv, cc, hh), h|
@@ -174,6 +174,11 @@ end
     return redirect_to matrix_indicator_readings_path, alert: "Mes inválido" unless month
 
     rows = params[:rows] || {} # { person_id => {cuasi:"", lvs:"", cc:"", hh:""} }
+    eligible_ids = Person.for_indicators.pluck(:id).map(&:to_s)
+    unless rows.keys.all? { |id| eligible_ids.include?(id.to_s) }
+      return redirect_to matrix_indicator_readings_path(month: month.strftime("%Y-%m")), alert: "La nómina cambió: hay personas que no participan en indicadores. Recarga la planilla."
+    end
+
     now  = Time.current
     upserts = rows.map do |pid, vals|
       {
@@ -194,11 +199,11 @@ end
   private
 
   def set_reading
-    @reading = IndicatorReading.find(params[:id])
+    @reading = IndicatorReading.for_enabled_people.find(params[:id])
   end
 
   def load_people
-    @people = Person.order(:name)
+    @people = Person.for_indicators.order(:name)
   end
 
   # Acepta month "YYYY-MM" y campos *_string (opcional)

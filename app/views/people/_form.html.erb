@@ -29,6 +29,12 @@
     <datalist id="person-areas"><% Person.distinct.order(:area).pluck(:area).compact_blank.each do |area| %><option value="<%= area %>"></option><% end %></datalist>
   </div>
 
+  <div class="form-check mb-3">
+    <%= f.check_box :indicator_enabled, class: "form-check-input" %>
+    <%= f.label :indicator_enabled, "Participa en indicadores", class: "form-check-label" %>
+    <div class="form-text">Activa esta opción solo para quienes se evalúan en indicadores. Todas las personas están disponibles para cierre de turno.</div>
+  </div>
+
   <div class="d-flex gap-2">
     <%= f.submit class: "btn btn-primary" %>
     <%= link_to "Volver", people_path, class: "btn btn-outline-secondary" %>

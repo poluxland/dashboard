@@ -1,6 +1,9 @@
 # app/models/indicator_reading.rb
 class IndicatorReading < ApplicationRecord
   belongs_to :person
+  validate :person_participates_in_indicators
+
+  scope :for_enabled_people, -> { where(person_id: Person.for_indicators.select(:id)) }
 
   before_validation :normalize_period_to_month_start
 
@@ -27,6 +30,10 @@ class IndicatorReading < ApplicationRecord
   end
 
   private
+
+  def person_participates_in_indicators
+    errors.add(:person, "no participa en indicadores") if person && !person.indicator_enabled?
+  end
 
   def normalize_period_to_month_start
     self.period = period.beginning_of_month if period.present?
