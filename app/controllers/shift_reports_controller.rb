@@ -42,7 +42,7 @@ class ShiftReportsController < ApplicationController
         @report.update!(sent_at: Time.current)
       end
     end
-    redirect_to @report, notice: "Informe enviado a los tres destinatarios."
+    redirect_to @report, notice: "Informe enviado a los #{ShiftReport::RECIPIENTS.size} destinatarios."
   rescue StandardError => error
     Rails.logger.error("Shift report delivery failed: #{error.class}")
     redirect_to @report, alert: "No se pudo confirmar el envío. El informe sigue guardado; verifica la recepción antes de reintentar."
