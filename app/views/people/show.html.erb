@@ -5,3 +5,5 @@
   <%= link_to "Editar", edit_person_path(@person), class: "btn btn-primary" %>
   <%= link_to "Volver", people_path, class: "btn btn-outline-secondary" %>
 </div>
+
+<p><strong>Área:</strong> <%= @person.area.presence || "Sin área" %></p>

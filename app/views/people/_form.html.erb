@@ -23,6 +23,12 @@
           class: "form-select" %>
   </div>
 
+  <div class="mb-3">
+    <%= f.label :area, "Área", class: "form-label" %>
+    <%= f.text_field :area, required: true, list: "person-areas", class: "form-control" %>
+    <datalist id="person-areas"><% Person.distinct.order(:area).pluck(:area).compact_blank.each do |area| %><option value="<%= area %>"></option><% end %></datalist>
+  </div>
+
   <div class="d-flex gap-2">
     <%= f.submit class: "btn btn-primary" %>
     <%= link_to "Volver", people_path, class: "btn btn-outline-secondary" %>

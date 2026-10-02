@@ -1,0 +1,20 @@
+INFORME DE CIERRE DE TURNO SIN NOVEDADES
+Informe N.º <%= @report.id %>
+Fecha: <%= @report.date.strftime("%d-%m-%Y") %>
+Turno: <%= @report.shift %>
+
+Estimados señores:
+
+<%= @report.statement %>
+
+Nómina del personal (<%= @report.participants.size %>):
+<% @report.participants.each do |person| %>
+- <%= person["name"] %> | Área: <%= person["area"].presence || "Sin área" %> | Planta: <%= person["planta"].presence || "—" %>
+<% end %>
+
+Se emite el presente informe para conocimiento y registro del cierre de la jornada.
+
+Atentamente,
+<%= @report.signer_name %>
+<%= @report.signer_email %>
+MS Industrial

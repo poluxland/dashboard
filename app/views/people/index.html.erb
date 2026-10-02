@@ -4,11 +4,13 @@
   <%= link_to "Nueva Persona", new_person_path, class: "btn btn-primary" %>
 </div>
 
+<p><%= link_to "Ir a cierre de turno", shift_reports_path %></p>
 <table class="table table-sm align-middle">
   <thead>
     <tr>
       <th>Nombre</th>
       <th>Planta</th>
+      <th>Área</th>
       <th class="text-end">Acciones</th>
     </tr>
   </thead>
@@ -17,6 +19,7 @@
       <tr>
         <td><%= p.name %></td>
         <td><%= p.planta.presence || "-" %></td>
+        <td><%= p.area.presence || "Sin área" %></td>
         <td class="text-end">
           <%= link_to "Editar", edit_person_path(p), class: "btn btn-sm btn-outline-secondary" %>
           <%= link_to "Eliminar", p, class: "btn btn-sm btn-outline-danger ms-1",

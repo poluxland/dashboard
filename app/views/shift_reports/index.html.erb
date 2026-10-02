@@ -1,0 +1,6 @@
+<div class="d-flex flex-wrap justify-content-between gap-2 mb-3"><h1 class="h3">Cierre de turno</h1><div><%= link_to "Personas y áreas", people_path, class: "btn btn-outline-secondary" %> <%= link_to "Nuevo informe", new_shift_report_path, class: "btn btn-primary" %></div></div>
+<p>Últimos 100 informes de cierre de turno sin novedades.</p>
+<div class="table-responsive"><table class="table"><thead><tr><th>Fecha</th><th>Turno</th><th>Personas</th><th>Firmado por</th><th>Estado</th><th></th></tr></thead><tbody>
+<% @reports.each do |report| %><tr><td><%= report.date.strftime("%d-%m-%Y") %></td><td><%= report.shift %></td><td><%= report.participants.size %></td><td><%= report.signer_name %></td><td><%= report.sent_at? ? "Enviado" : "Pendiente de envío" %></td><td><%= link_to "Ver informe", report %></td></tr><% end %>
+</tbody></table></div>
+<% if @reports.empty? %><p>Aún no hay informes de cierre de turno.</p><% end %>

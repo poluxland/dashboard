@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -192,11 +192,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
   end
 
   create_table "people", force: :cascade do |t|
+    t.string "area"
     t.datetime "created_at", null: false
     t.string "name"
     t.string "planta"
     t.datetime "updated_at", null: false
+    t.index ["area"], name: "index_people_on_area"
     t.index ["name"], name: "index_people_on_name", unique: true
+  end
+
+  create_table "shift_reports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.jsonb "participants", default: [], null: false
+    t.datetime "sent_at"
+    t.string "shift", null: false
+    t.string "signer_email", null: false
+    t.string "signer_name", null: false
+    t.text "statement", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "works", force: :cascade do |t|

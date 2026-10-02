@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   get "/auth/failure", to: "sessions#failure"
   delete "/logout", to: "sessions#destroy", as: :logout
 
+  resources :shift_reports, only: [ :index, :new, :create, :show ] do
+    post :send_email, on: :member
+  end
+
   resources :entrega_films
   get "mantenciones/importar", to: "mantencion_imports#new", as: :new_mantencion_import
   post "mantenciones/importar", to: "mantencion_imports#create", as: :mantencion_import

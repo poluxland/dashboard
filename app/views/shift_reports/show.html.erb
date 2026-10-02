@@ -1,0 +1,11 @@
+<div class="mb-3 d-print-none">
+  <%= link_to "Volver a informes", shift_reports_path, class: "btn btn-outline-secondary" %>
+  <%= link_to "Nuevo informe", new_shift_report_path, class: "btn btn-outline-primary" %>
+</div>
+<div class="card card-body mb-3"><%= render "report", report: @report %></div>
+<p><strong>Destinatarios:</strong> <%= ShiftReport::RECIPIENTS.join(", ") %></p>
+<% if @report.sent_at? %>
+  <p class="alert alert-success">Enviado el <%= @report.sent_at.in_time_zone("America/Santiago").strftime("%d-%m-%Y a las %H:%M") %>.</p>
+<% elsif @report.signer_email == current_user[:email] %>
+  <%= button_to "Enviar informe por correo", send_email_shift_report_path(@report), class: "btn btn-primary", data: { turbo_submits_with: "Enviando…" } %>
+<% end %>

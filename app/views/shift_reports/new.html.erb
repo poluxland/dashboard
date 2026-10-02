@@ -1,0 +1,32 @@
+<h1 class="h3">Nuevo informe de cierre de turno</h1>
+<p class="text-muted">Carga una o más áreas y ajusta la nómina antes de generar el informe.</p>
+<p><%= link_to "Administrar personas y áreas", people_path %> · <%= link_to "Ver informes", shift_reports_path %></p>
+<%= form_with model: @report, data: { controller: "shift-roster" } do |f| %>
+  <% if @report.errors.any? %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% @report.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div>
+  <% end %>
+  <div class="row mb-3">
+    <div class="col-md-4"><%= f.label :date, "Fecha del turno", class: "form-label" %><%= f.date_field :date, required: true, class: "form-control" %></div>
+    <div class="col-md-4"><%= f.label :shift, "Turno / horario", class: "form-label" %><%= f.text_field :shift, required: true, placeholder: "Ej.: Día, 08:00 a 20:00", class: "form-control" %></div>
+  </div>
+  <div class="card card-body mb-3">
+    <label for="roster-area" class="form-label">Agregar personas por área</label>
+    <div class="d-flex gap-2 mb-3">
+      <select id="roster-area" class="form-select" data-shift-roster-target="area"><option value="">Selecciona un área</option><%= options_for_select(@areas) %></select>
+      <button type="button" class="btn btn-outline-primary" data-action="shift-roster#addArea">Agregar área</button>
+    </div>
+    <p>Marca personas para agregarlas; desmárcalas para retirarlas del informe.</p>
+    <p data-shift-roster-target="count" aria-live="polite"></p>
+    <%= hidden_field_tag "shift_report[person_ids][]", "" %>
+    <% if @people.empty? %><p>No hay personas registradas. Agrega personas desde «Administrar personas y áreas».</p><% end %>
+    <% @people.each do |person| %>
+      <div class="form-check mb-2">
+        <%= check_box_tag "shift_report[person_ids][]", person.id, Array(@report.person_ids).include?(person.id.to_s), id: "person_#{person.id}", class: "form-check-input", data: { shift_roster_target: "person", area: person.area, action: "shift-roster#updateCount" } %>
+        <%= label_tag "person_#{person.id}", "#{person.name} · #{person.area.presence || 'Sin área'} · #{person.planta.presence || 'Sin planta'}", class: "form-check-label" %>
+      </div>
+    <% end %>
+  </div>
+  <div class="card card-body mb-3"><h2 class="h5">Declaración de cierre</h2><p><%= ShiftReport::STATEMENT %></p><p class="mb-0">Firma: <strong><%= current_user[:name].presence || current_user[:email] %></strong> · <%= current_user[:email] %></p></div>
+  <div class="form-check mb-3"><%= f.check_box :confirmed, required: true, class: "form-check-input" %><%= f.label :confirmed, "Confirmo que la nómina es correcta y que las personas seleccionadas finalizaron el turno sin novedades reportadas.", class: "form-check-label" %></div>
+  <%= f.submit "Generar informe para revisión", class: "btn btn-primary" %>
+<% end %>
