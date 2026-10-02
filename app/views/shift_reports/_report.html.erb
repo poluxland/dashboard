@@ -1,3 +1,7 @@
+<div style="margin-bottom:24px;">
+  <%= image_tag local_assigns.fetch(:logo_url, "impromaq-logo.png"), alt: "Logo Impromaq", width: 72, height: 72, style: "display:block;border:0;object-fit:contain;" %>
+  <p style="margin:8px 0;color:#243447;font-weight:bold;">Impromaq Ltda.</p>
+</div>
 <h1>Informe de cierre de turno sin novedades</h1>
 <p><strong>Informe N.º:</strong> <%= report.id %><br><strong>Fecha:</strong> <%= report.date.strftime("%d-%m-%Y") %><br><strong>Turno:</strong> <%= report.shift %></p>
 <p>Estimados señores:</p>
@@ -8,4 +12,4 @@
   <tbody><% report.participants.each do |person| %><tr><td><%= person["name"] %></td><td><%= person["area"].presence || "Sin área" %></td><td><%= person["planta"].presence || "—" %></td></tr><% end %></tbody>
 </table>
 <p>Se emite el presente informe para conocimiento y registro del cierre de la jornada.</p>
-<p>Atentamente,<br><strong><%= report.signer_name %></strong><br><%= report.signer_email %><br>MS Industrial</p>
+<p>Atentamente,<br><strong><%= report.signer_name %></strong><br><%= report.signer_email %><br>Impromaq Ltda.</p>

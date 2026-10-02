@@ -34,6 +34,9 @@ class ShiftReportsControllerTest < ActionDispatch::IntegrationTest
     get shift_report_path(report)
     assert_response :success
     assert_match "sin novedades reportadas", response.body
+    assert_select "img[alt='Logo Impromaq']"
+    assert_includes response.body, "Impromaq Ltda."
+    assert_not_includes response.body, "MS Industrial"
     get shift_reports_path
     assert_response :success
   end
@@ -57,6 +60,14 @@ class ShiftReportsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "usuario@msindustrial.cl" ], mail.reply_to
     assert_includes mail.text_part.body.decoded, @person.name
     assert_includes mail.html_part.body.decoded, "Usuario Industrial"
+    assert_includes mail.html_part.body.decoded, "Impromaq Ltda."
+    assert_includes mail.text_part.body.decoded, "Impromaq Ltda."
+    assert_not_includes mail.html_part.body.decoded, "MS Industrial"
+    assert_not_includes mail.text_part.body.decoded, "MS Industrial"
+    logo = mail.attachments["impromaq-logo.png"]
+    assert logo.inline?
+    assert_equal File.binread(Rails.root.join("app/assets/images/impromaq-logo.png")), logo.body.decoded
+    assert_includes mail.html_part.body.decoded, "cid:#{logo.cid}"
     assert_no_difference("ActionMailer::Base.deliveries.size") { post send_email_shift_report_path(report) }
   end
 
