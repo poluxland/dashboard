@@ -21,7 +21,7 @@
     <p>Marca personas para agregarlas; desmárcalas para retirarlas del informe.</p>
     <p data-shift-roster-target="count" aria-live="polite"></p>
     <%= hidden_field_tag "shift_report[person_ids][]", "" %>
-    <% if @people.empty? %><p>No hay personas registradas. Agrega personas desde «Administrar personas y áreas».</p><% end %>
+    <% if @people.empty? %><p>No hay personas habilitadas para cierre de turno. Revisa la opción «Disponible para cierre de turno» en «Administrar personas y áreas».</p><% end %>
     <% @people.each do |person| %>
       <div class="form-check mb-2">
         <%= check_box_tag "shift_report[person_ids][]", person.id, Array(@report.person_ids).include?(person.id.to_s), id: "person_#{person.id}", class: "form-check-input", data: { shift_roster_target: "person", area: person.area, action: "shift-roster#updateCount" } %>

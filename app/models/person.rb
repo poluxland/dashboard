@@ -1,4 +1,5 @@
 class Person < ApplicationRecord
+  scope :for_shift_reports, -> { where(shift_report_enabled: true) }
   scope :for_indicators, -> { where(indicator_enabled: true) }
 
   normalizes :area, with: ->(area) { area.strip.presence }

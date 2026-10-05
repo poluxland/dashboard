@@ -32,7 +32,13 @@
   <div class="form-check mb-3">
     <%= f.check_box :indicator_enabled, class: "form-check-input" %>
     <%= f.label :indicator_enabled, "Participa en indicadores", class: "form-check-label" %>
-    <div class="form-text">Activa esta opción solo para quienes se evalúan en indicadores. Todas las personas están disponibles para cierre de turno.</div>
+    <div class="form-text">Activa esta opción solo para quienes se evalúan en indicadores.</div>
+  </div>
+
+  <div class="form-check mb-3">
+    <%= f.check_box :shift_report_enabled, class: "form-check-input" %>
+    <%= f.label :shift_report_enabled, "Disponible para cierre de turno", class: "form-check-label" %>
+    <div class="form-text">Permite seleccionar a esta persona individualmente o al agregar su área. Desactivar esta opción no modifica los informes ya generados.</div>
   </div>
 
   <div class="d-flex gap-2">

@@ -13,7 +13,7 @@ class ShiftReportsController < ApplicationController
   def create
     @report = ShiftReport.new(params.require(:shift_report).permit(:date, :shift, :confirmed, person_ids: []))
     ids = Array(@report.person_ids).reject(&:blank?).uniq
-    people = Person.where(id: ids).order(:name).to_a
+    people = Person.for_shift_reports.where(id: ids).order(:name).to_a
     @report.assign_attributes(
       signer_name: current_user[:name].presence || current_user[:email],
       signer_email: current_user[:email], statement: ShiftReport::STATEMENT,
@@ -55,7 +55,7 @@ class ShiftReportsController < ApplicationController
   end
 
   def load_people
-    @people = Person.order(:name)
+    @people = Person.for_shift_reports.order(:name)
     @areas = @people.map(&:area).compact_blank.uniq.sort
   end
 end

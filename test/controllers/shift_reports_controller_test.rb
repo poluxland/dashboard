@@ -100,6 +100,25 @@ class ShiftReportsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
   end
 
+  test "availability is managed independently and applies to area and individual selection" do
+    create_report
+    original = ShiftReport.last
+    patch person_path(@person), params: { person: { shift_report_enabled: "0" } }
+    assert_not @person.reload.shift_report_enabled?
+    assert @person.indicator_enabled?
+    get new_shift_report_path
+    assert_response :success
+    assert_select "input[value='#{@person.id}']", count: 0
+    assert_select "option", text: "Molienda", count: 0
+    assert_no_difference("ShiftReport.count") { create_report }
+    assert_response :unprocessable_entity
+    assert_equal @person.name, original.reload.participants.first["name"]
+    patch person_path(@person), params: { person: { shift_report_enabled: "1" } }
+    get new_shift_report_path
+    assert_select "input[value='#{@person.id}']", count: 1
+    assert_difference("ShiftReport.count") { create_report }
+  end
+
   private
 
   def create_report(**changes)

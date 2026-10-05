@@ -9,3 +9,5 @@
 <p><strong>Área:</strong> <%= @person.area.presence || "Sin área" %></p>
 
 <p><strong>Participa en indicadores:</strong> <%= @person.indicator_enabled? ? "Sí" : "No" %></p>
+
+<p><strong>Disponible para cierre de turno:</strong> <%= @person.shift_report_enabled? ? "Sí" : "No" %></p>
