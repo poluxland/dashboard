@@ -1,6 +1,9 @@
 <h1 class="h3">Nuevo informe de cierre de turno</h1>
 <p class="text-muted">Carga una o más áreas y ajusta la nómina antes de generar el informe.</p>
-<p><%= link_to "Administrar personas y áreas", people_path %> · <%= link_to "Ver informes", shift_reports_path %></p>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <%= link_to "Administrar personas y áreas", people_path, class: "btn btn-outline-primary" %>
+  <%= link_to "Ver informes", shift_reports_path, class: "btn btn-outline-secondary" %>
+</div>
 <%= form_with model: @report, data: { controller: "shift-roster" } do |f| %>
   <% if @report.errors.any? %>
     <div class="alert alert-danger" role="alert"><ul class="mb-0"><% @report.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div>
