@@ -11,5 +11,9 @@
   <thead><tr><th>Nombre</th><th>Área</th><th>Planta</th></tr></thead>
   <tbody><% report.participants.each do |person| %><tr><td><%= person["name"] %></td><td><%= person["area"].presence || "Sin área" %></td><td><%= person["planta"].presence || "—" %></td></tr><% end %></tbody>
 </table>
+<% if report.observations.present? %>
+  <h2>Observaciones</h2>
+  <%= simple_format(h(report.observations)) %>
+<% end %>
 <p>Se emite el presente informe para conocimiento y registro del cierre de la jornada.</p>
 <p>Atentamente,<br><strong><%= report.signer_name %></strong><br><%= report.signer_email %><br>Impromaq Ltda.</p>

@@ -119,6 +119,41 @@ class ShiftReportsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("ShiftReport.count") { create_report }
   end
 
+  test "optional observations are saved and safely included in page and both email formats" do
+    notes = "Entrega coordinada.\n<b>Comentario literal</b>"
+    create_report(observations: notes)
+    report = ShiftReport.last
+    assert_equal notes, report.observations
+    get shift_report_path(report)
+    assert_select "h2", "Observaciones"
+    assert_includes response.body, "&lt;b&gt;Comentario literal&lt;/b&gt;"
+    mail = ShiftReportMailer.closing_report(report)
+    assert_includes mail.html_part.body.decoded, "Entrega coordinada."
+    assert_includes mail.html_part.body.decoded, "&lt;b&gt;Comentario literal&lt;/b&gt;"
+    assert_includes mail.text_part.body.decoded, notes
+  end
+
+  test "blank observations are optional and omitted from report and email" do
+    get new_shift_report_path
+    assert_select "textarea[name='shift_report[observations]']"
+    assert_select "textarea[name='shift_report[observations]'][required]", count: 0
+    [ nil, "", "  " ].each do |notes|
+      assert_difference("ShiftReport.count") { create_report(observations: notes) }
+      report = ShiftReport.last
+      get shift_report_path(report)
+      assert_select "h2", text: "Observaciones", count: 0
+      mail = ShiftReportMailer.closing_report(report)
+      assert_not_includes mail.html_part.body.decoded, "Observaciones"
+      assert_not_includes mail.text_part.body.decoded, "Observaciones"
+    end
+  end
+
+  test "observations survive form validation errors" do
+    create_report(observations: "Conservar comentario", confirmed: "0")
+    assert_response :unprocessable_entity
+    assert_select "textarea[name='shift_report[observations]']", "Conservar comentario"
+  end
+
   private
 
   def create_report(**changes)

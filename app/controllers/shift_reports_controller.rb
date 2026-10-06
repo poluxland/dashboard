@@ -11,7 +11,7 @@ class ShiftReportsController < ApplicationController
   end
 
   def create
-    @report = ShiftReport.new(params.require(:shift_report).permit(:date, :shift, :confirmed, person_ids: []))
+    @report = ShiftReport.new(params.require(:shift_report).permit(:date, :shift, :confirmed, :observations, person_ids: []))
     ids = Array(@report.person_ids).reject(&:blank?).uniq
     people = Person.for_shift_reports.where(id: ids).order(:name).to_a
     @report.assign_attributes(

@@ -30,6 +30,11 @@
     <% end %>
   </div>
   <div class="card card-body mb-3"><h2 class="h5">Declaración de cierre</h2><p><%= ShiftReport::STATEMENT %></p><p class="mb-0">Firma: <strong><%= current_user[:name].presence || current_user[:email] %></strong> · <%= current_user[:email] %></p></div>
+  <div class="mb-3">
+    <%= f.label :observations, "Observaciones (opcional)", class: "form-label" %>
+    <%= f.text_area :observations, rows: 4, class: "form-control", placeholder: "Agrega un comentario si corresponde.", aria: { describedby: "observations-help" } %>
+    <div id="observations-help" class="form-text">Puedes dejar este campo vacío. Si agregas observaciones, se incluirán en el informe y en el correo.</div>
+  </div>
   <div class="form-check mb-3"><%= f.check_box :confirmed, required: true, class: "form-check-input" %><%= f.label :confirmed, "Confirmo que la nómina es correcta y que las personas seleccionadas finalizaron el turno sin novedades reportadas.", class: "form-check-label" %></div>
   <%= f.submit "Generar informe para revisión", class: "btn btn-primary" %>
 <% end %>

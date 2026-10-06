@@ -12,6 +12,11 @@ Nómina del personal (<%= @report.participants.size %>):
 - <%= person["name"] %> | Área: <%= person["area"].presence || "Sin área" %> | Planta: <%= person["planta"].presence || "—" %>
 <% end %>
 
+<% if @report.observations.present? %>
+Observaciones:
+<%= @report.observations %>
+
+<% end %>
 Se emite el presente informe para conocimiento y registro del cierre de la jornada.
 
 Atentamente,
