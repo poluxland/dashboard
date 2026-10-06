@@ -1,0 +1,22 @@
+es:
+  activerecord:
+    models:
+      person:
+        one: Persona
+        other: Personas
+    attributes:
+      person:
+        name: Nombre
+        planta: Planta
+        area: Área
+        indicator_enabled: Participa en indicadores
+        shift_report_enabled: Disponible para cierre de turno
+      indicator_reading:
+        person: Persona
+        person_id: Persona
+  helpers:
+    submit:
+      person:
+        create: Crear persona
+        update: Actualizar persona
+        submit: Guardar persona
