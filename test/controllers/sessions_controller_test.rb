@@ -76,7 +76,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_url
   end
 
-  test "muestra Demo solamente al usuario autorizado" do
+  test "muestra Demo a Jose" do
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     get root_url
 
@@ -90,5 +90,19 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "#demoDropdown", count: 0
     assert_select "a[href=?]", new_mantencion_import_path, count: 0
+  end
+
+  test "muestra Demo a Fernando sin distinguir mayusculas" do
+    sign_in_with_google(email: "Fernando.Gonzalez@msindustrial.cl", uid: "fernando")
+    get root_url
+
+    assert_select "#demoDropdown", count: 1
+    assert_select "a[href=?]", new_mantencion_import_path, text: "Importar mantenciones"
+
+    get estado_equipos_url
+    assert_response :success
+
+    get new_mantencion_import_url
+    assert_response :success
   end
 end

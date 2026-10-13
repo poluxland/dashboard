@@ -1,6 +1,9 @@
 class ApplicationController < ActionController::Base
   SESSION_DURATION = 12.hours
-  DEMO_USER_EMAIL = "jose.jerez@msindustrial.cl"
+  DEMO_USER_EMAILS = %w[
+    jose.jerez@msindustrial.cl
+    fernando.gonzalez@msindustrial.cl
+  ].freeze
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -25,7 +28,7 @@ class ApplicationController < ActionController::Base
   end
 
   def demo_user?
-    signed_in? && current_user[:email].to_s.casecmp?(DEMO_USER_EMAIL)
+    signed_in? && DEMO_USER_EMAILS.any? { |email| current_user[:email].to_s.casecmp?(email) }
   end
 
   def authenticate_user!
