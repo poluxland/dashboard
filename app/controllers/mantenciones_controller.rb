@@ -52,6 +52,34 @@ class MantencionesController < ApplicationController
     build_chart_data(report_scope.to_a)
   end
 
+  def area
+    area_variants = Mantencion.distinct.pluck(:area).group_by { |value| Mantencion.canonical_identifier(value) }
+    @available_areas = area_variants.keys.compact.sort
+    @selected_area = Mantencion.canonical_identifier(params[:area])
+    @invalid_area = @selected_area.present? && !@available_areas.include?(@selected_area)
+    scope = @selected_area.present? && !@invalid_area ? Mantencion.where(area: area_variants[@selected_area]) : Mantencion.none
+    scope = report_scope(scope)
+    records = scope.to_a
+    build_chart_data(records)
+    @pending_count = records.count { |record| record.estado.present? && record.estado < 100 }
+    @unknown_state_count = records.count { |record| record.estado.nil? }
+    @recorded_durations = records.filter_map(&:duracion)
+    @total_duration = @recorded_durations.sum
+    @equipment_count = records.filter_map { |record| Mantencion.canonical_identifier(record.codigo) }.uniq.size
+    @first_date, @last_date = records.filter_map(&:fecha).minmax
+    equipment = grouped_counts(records, fallback: "Sin código") { |record| Mantencion.canonical_identifier(record.codigo) }
+    @equipment_labels, @equipment_values = chart_arrays(equipment.first(12).to_h)
+    # Keep each year's weeks separate when displaying the complete area history.
+    weeks = records.select { |record| record.fecha.present? && record.semana.present? }
+      .group_by { |record| [ record.fecha.year, record.semana ] }.sort.to_h
+    @week_labels = weeks.keys.map { |year, week| "#{year} · S#{week}" }
+    @weekly_average_state_values = weeks.values.map do |week_records|
+      states = week_records.filter_map(&:estado).map(&:to_f)
+      (states.sum / states.size).round(1) if states.any?
+    end
+    @pagy, @mantenciones = pagy(scope.order(fecha: :desc, id: :desc))
+  end
+
   def desglose
     counts = report_scope.group(:planificacion, :tipo_mantencion).count
     @breakdown_total = counts.values.sum
@@ -111,9 +139,8 @@ class MantencionesController < ApplicationController
 
   private
 
-  def report_scope
-    scope = Mantencion.order(:fecha)
-    @available_years = Mantencion.where.not(fecha: nil).pluck(:fecha).map(&:year).uniq.sort.reverse
+  def report_scope(scope = Mantencion.all)
+    @available_years = scope.where.not(fecha: nil).pluck(:fecha).map(&:year).uniq.sort.reverse
     @selected_year = params[:year].to_s if params[:year].to_s.match?(/\A\d{4}\z/)
     @selected_specialty = params[:especialidad].to_s if specialty_filter
     @selected_week = params[:semana].to_s if params[:semana].to_s.match?(/\A(?:[1-9]|[1-4]\d|5[0-3])\z/)

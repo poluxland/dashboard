@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     collection do
       get :graficos
       get :desglose
+      get :area
     end
   end
   resources :enfundados do

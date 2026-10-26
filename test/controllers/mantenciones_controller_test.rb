@@ -6,6 +6,76 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     @mantencion = mantenciones(:one)
   end
 
+  test "detalle por área requiere elegir un área y maneja selecciones vacías" do
+    get area_mantenciones_url
+    assert_response :success
+    assert_select "select[name='area'] option[value='P416']"
+    assert_select "canvas", count: 0
+    assert_select "a.active[href=?]", area_mantenciones_path
+
+    get area_mantenciones_url(area: "NO-EXISTE")
+    assert_response :success
+    assert_select ".alert-warning", text: /El área solicitada no existe/
+    assert_select "tbody tr", count: 0
+
+    get area_mantenciones_url(area: "P416", year: 2000)
+    assert_response :success
+    assert_select ".alert-info", text: /No hay mantenciones de esta área/
+  end
+
+  test "detalle por área aísla registros y separa semanas entre años" do
+    previous = Mantencion.create!(fecha: Date.new(2025, 9, 3), semana: 36,
+      especialidad: "Mecánico", area: "p416", codigo: "WT02",
+      actividad: "Actividad anterior", planificacion: "Adicional", estado: 0)
+    get area_mantenciones_url(area: " p416 ")
+    assert_response :success
+    assert_select "select[name='area'] option[selected][value='P416']"
+    assert_select "#areaTotal .h2", text: "2"
+    assert_select "#areaPending .h2", text: "1"
+    assert_select "#areaCompleted .h2", text: "1"
+    assert_select "#areaEquipment .h2", text: "2"
+    assert_select "#mantencion_#{previous.id}"
+    assert_select "#mantencion_#{mantenciones(:two).id}", count: 0
+    assert_select "#areaAvanceChartCard .chart-data li", text: "2025 · S36: 0.0"
+    assert_select "#areaAvanceChartCard .chart-data li", text: "2026 · S36: 100.0"
+    assert_select "canvas", count: 7
+
+    get area_mantenciones_url(area: "P416", year: 2026, semana: 36, especialidad: "electrica")
+    assert_select "#areaTotal .h2", text: "1"
+    assert_select "#mantencion_#{previous.id}", count: 0
+    assert_select "#mantencion_#{@mantencion.id}"
+    assert_select "a[href=?]", area_mantenciones_path(area: "P416"), text: "Limpiar"
+  end
+
+  test "detalle por área distingue estados y duraciones desconocidos" do
+    Mantencion.create!(fecha: Date.new(2026, 9, 3), especialidad: "Eléctrico",
+      area: "P513", actividad: "Inspección pendiente")
+    get area_mantenciones_url(area: "P513")
+    assert_response :success
+    assert_select "#areaUnknown .h2", text: "1"
+    assert_select "#areaPending .h2", text: "0"
+    assert_select "#areaHours .h2", text: "—"
+    assert_select "#areaAverage .h2", text: "—"
+  end
+
+  test "detalle por área pagina el historial conservando el resumen y filtros" do
+    30.times do |index|
+      Mantencion.create!(fecha: Date.new(2026, 9, 3), area: "P513",
+        especialidad: "Eléctrico", actividad: "Actividad #{index}", estado: 0)
+    end
+    get area_mantenciones_url(area: "P513", year: 2026)
+    assert_response :success
+    assert_select "#areaTotal .h2", text: "30"
+    next_page = css_select(".pagination a").filter_map { |link| link["href"] }.find { |href| href.include?("page=2") }
+    assert next_page
+    assert_includes next_page, "area=P513"
+    assert_includes next_page, "year=2026"
+    get next_page
+    assert_response :success
+    assert_select "#areaTotal .h2", text: "30"
+    assert_select "#mantencion_#{@mantencion.id}", count: 0
+  end
+
   test "muestra el listado y el acceso desde Informe" do
     get mantenciones_url
 

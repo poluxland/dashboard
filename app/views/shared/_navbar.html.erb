@@ -92,6 +92,11 @@
                           data: { turbo: false } %>
             </li>
             <li>
+              <%= link_to "Detalle por área", area_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'area'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
               <%= link_to "Desglose", desglose_mantenciones_path,
                           class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'desglose'}",
                           data: { turbo: false } %>

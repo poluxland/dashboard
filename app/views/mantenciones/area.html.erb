@@ -1,0 +1,75 @@
+<% content_for :title, @selected_area.present? ? "Mantenciones · #{@selected_area}" : "Mantenciones por área" %>
+
+<div class="mx-auto pb-4" style="max-width: 1800px;">
+  <div class="bg-dark text-white rounded-4 p-4 mb-3 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+    <div>
+      <p class="small text-uppercase text-white-50 fw-semibold mb-1">Informe de mantenciones</p>
+      <h1 class="h3 fw-bold mb-1">Detalle por área<%= " · #{@selected_area}" if @selected_area.present? %></h1>
+      <p class="mb-0 text-white-50">Selecciona un área para consultar sus actividades, equipos y avance.</p>
+    </div>
+    <%= link_to "Volver a gráficos", graficos_mantenciones_path, class: "btn btn-outline-light fw-semibold", data: { turbo: false } %>
+  </div>
+
+  <%= render "report_filters", report_path: area_mantenciones_path, area_selector: true %>
+
+  <% if @invalid_area %>
+    <div class="alert alert-warning">El área solicitada no existe. Selecciona una de las áreas disponibles.</div>
+  <% elsif @selected_area.blank? %>
+    <div class="alert alert-info"><%= @available_areas.empty? ? "Todavía no hay áreas registradas en las mantenciones." : "Selecciona un área y pulsa Aplicar filtros para ver su información." %></div>
+  <% elsif @total_mantenciones.zero? %>
+    <div class="alert alert-info">No hay mantenciones de esta área para los filtros seleccionados.</div>
+  <% else %>
+    <p class="text-body-secondary">Período consultado: <strong><%= @first_date&.strftime("%d-%m-%Y") %> al <%= @last_date&.strftime("%d-%m-%Y") %></strong>. El resumen y los gráficos consideran todas las actividades que cumplen los filtros.</p>
+    <div class="row g-3 mb-3">
+      <% [
+        ["areaTotal", "Mantenciones", number_with_delimiter(@total_mantenciones)],
+        ["areaCompleted", "Completadas", @completed_mantenciones],
+        ["areaPending", "Pendientes con estado", @pending_count],
+        ["areaUnknown", "Sin estado registrado", @unknown_state_count],
+        ["areaAverage", "Avance promedio", @average_state ? "#{number_with_precision(@average_state, precision: 1)}%" : "—"],
+        ["areaHours", "Horas registradas", @recorded_durations.any? ? "#{number_with_precision(@total_duration, precision: 1)} h" : "—"],
+        ["areaEquipment", "Códigos de equipo", @equipment_count],
+        ["areaOt", "Actividades con OT", @with_ot_count]
+      ].each do |id, label, value| %>
+        <div class="col-6 col-lg-3">
+          <div id="<%= id %>" class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+              <div class="small text-body-secondary mb-1"><%= label %></div>
+              <div class="h2 fw-bold mb-0"><%= value %></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <p class="small text-body-secondary">El avance promedio considera solo actividades con estado registrado. Las horas suman las duraciones informadas en <%= @recorded_durations.size %> de <%= @total_mantenciones %> actividades.</p>
+
+    <div class="row g-3 mb-3">
+      <% [
+        ["Estado de ejecución", "areaEstadoChart", @state_labels, @state_values],
+        ["Planificación", "areaPlanificacionChart", @planning_labels, @planning_values],
+        ["Especialidad", "areaEspecialidadChart", @specialty_labels, @specialty_values]
+      ].each do |title, id, labels, values| %>
+        <div class="col-lg-4"><%= render "chart", title: title, canvas_id: id, type: "doughnut", labels: labels, values: values %></div>
+      <% end %>
+      <div class="col-lg-6">
+        <%= render "chart", title: "Tipos de mantención", canvas_id: "areaTipoChart", labels: @maintenance_type_labels, values: @maintenance_type_values, horizontal: true %>
+      </div>
+      <div class="col-lg-6">
+        <%= render "chart", title: "Equipos con más actividades", subtitle: "Los 12 códigos con más registros del período", canvas_id: "areaEquiposChart", labels: @equipment_labels, values: @equipment_values, horizontal: true %>
+      </div>
+      <div class="col-12">
+        <%= render "chart", title: "Avance promedio por semana", canvas_id: "areaAvanceChart", type: "line", format: "percent", suggested_max: 100, labels: @week_labels, values: @weekly_average_state_values %>
+      </div>
+      <div class="col-12">
+        <%= render "chart", title: "Actividades por semana y planificación", subtitle: "Últimas 38 semanas disponibles del período seleccionado", canvas_id: "areaSemanalChart", type: "line", labels: @weekly_planning_labels, datasets: @weekly_planning_datasets %>
+      </div>
+    </div>
+
+    <h2 class="h5 fw-bold mt-4">Historial de actividades · <%= @selected_area %></h2>
+    <p class="text-body-secondary">Ordenadas desde la más reciente. Usa Ver para consultar la actividad y los comentarios completos.</p>
+    <%= render "records_table" %>
+    <% if @pagy.pages > 1 %>
+      <div class="d-flex justify-content-center mt-4"><%= pagy_bootstrap_nav(@pagy).html_safe %></div>
+    <% end %>
+  <% end %>
+</div>

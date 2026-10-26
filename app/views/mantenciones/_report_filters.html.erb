@@ -1,6 +1,12 @@
   <div class="card border-0 shadow-sm rounded-4 mb-3">
     <div class="card-body p-4">
       <%= form_with url: report_path, method: :get, class: "row g-3 align-items-end", data: { turbo: false } do |form| %>
+        <% if local_assigns[:area_selector] %>
+          <div class="col-sm-6 col-lg-3">
+            <%= form.label :area, "Área", class: "form-label fw-semibold" %>
+            <%= form.select :area, options_for_select(@available_areas, @selected_area), { prompt: "Selecciona un área" }, class: "form-select", required: true %>
+          </div>
+        <% end %>
         <div class="col-sm-6 col-lg-3">
           <%= form.label :especialidad, "Especialidad", class: "form-label fw-semibold" %>
           <%= form.select :especialidad,
@@ -59,7 +65,7 @@
 
         <div class="col-lg-5 d-flex flex-wrap gap-2">
           <%= form.submit "Aplicar filtros", class: "btn btn-primary fw-semibold" %>
-          <%= link_to "Limpiar", report_path, class: "btn btn-outline-secondary", data: { turbo: false } %>
+          <%= link_to "Limpiar", (local_assigns[:area_selector] ? area_mantenciones_path(area: @selected_area) : report_path), class: "btn btn-outline-secondary", data: { turbo: false } %>
         </div>
       <% end %>
     </div>
