@@ -53,9 +53,9 @@ class MantencionesController < ApplicationController
   end
 
   def area
-    area_variants = Mantencion.distinct.pluck(:area).group_by { |value| Mantencion.canonical_identifier(value) }
+    area_variants = Mantencion.distinct.pluck(:area).group_by { |value| Mantencion.canonical_identifier(value)&.first(4) }
     @available_areas = area_variants.keys.compact.sort
-    @selected_area = Mantencion.canonical_identifier(params[:area])
+    @selected_area = Mantencion.canonical_identifier(params[:area])&.first(4)
     @invalid_area = @selected_area.present? && !@available_areas.include?(@selected_area)
     scope = @selected_area.present? && !@invalid_area ? Mantencion.where(area: area_variants[@selected_area]) : Mantencion.none
     scope = report_scope(scope)

@@ -5,7 +5,7 @@
     <div>
       <p class="small text-uppercase text-white-50 fw-semibold mb-1">Informe de mantenciones</p>
       <h1 class="h3 fw-bold mb-1">Detalle por área<%= " · #{@selected_area}" if @selected_area.present? %></h1>
-      <p class="mb-0 text-white-50">Selecciona un área para consultar sus actividades, equipos y avance.</p>
+      <p class="mb-0 text-white-50">Las áreas se agrupan por sus primeros cuatro caracteres: P513 incluye P5133, P513X y todos sus derivados.</p>
     </div>
     <%= link_to "Volver a gráficos", graficos_mantenciones_path, class: "btn btn-outline-light fw-semibold", data: { turbo: false } %>
   </div>

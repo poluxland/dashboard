@@ -47,6 +47,34 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", area_mantenciones_path(area: "P416"), text: "Limpiar"
   end
 
+  test "detalle agrupa áreas por los primeros cuatro caracteres y filtra el grupo completo" do
+    records = %w[P513 P5133 P513X P513-01 P514X P51].map.with_index do |area, index|
+      Mantencion.create!(fecha: Date.new(2026, 9, 3), especialidad: "Eléctrico",
+        area: area, actividad: "Actividad #{area}", estado: index.zero? ? 100 : 0)
+    end
+    get area_mantenciones_url(area: "P513")
+    assert_response :success
+    assert_select "select[name='area'] option[value='P513']", count: 1
+    assert_select "select[name='area'] option[value='P5133']", count: 0
+    assert_select "select[name='area'] option[value='P513X']", count: 0
+    assert_select "select[name='area'] option[value='P514']", count: 1
+    assert_select "select[name='area'] option[value='P51']", count: 1
+    assert_select "#areaTotal .h2", text: "4"
+    assert_select "#areaCompleted .h2", text: "1"
+    assert_select "#areaPending .h2", text: "3"
+    assert_select "#areaEstadoChartCard .chart-data li", text: "No iniciada (0%): 3"
+    records.first(4).each { |record| assert_select "#mantencion_#{record.id}" }
+    records.last(2).each { |record| assert_select "#mantencion_#{record.id}", count: 0 }
+
+    get area_mantenciones_url(area: " p513x ", year: 2026, semana: 36, especialidad: "electrica")
+    assert_select "select[name='area'] option[selected][value='P513']"
+    assert_select "#areaTotal .h2", text: "4"
+
+    get area_mantenciones_url(area: "P514")
+    assert_select "#areaTotal .h2", text: "1"
+    assert_select "#mantencion_#{records[4].id}"
+  end
+
   test "detalle por área distingue estados y duraciones desconocidos" do
     Mantencion.create!(fecha: Date.new(2026, 9, 3), especialidad: "Eléctrico",
       area: "P513", actividad: "Inspección pendiente")
