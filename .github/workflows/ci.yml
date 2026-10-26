@@ -19,6 +19,9 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      - name: Audit Ruby dependencies for known vulnerabilities
+        run: bundle exec bundler-audit check --update
+
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
@@ -35,8 +38,19 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bin/importmap audit
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      - name: Install Yarn
+        run: npm install --global yarn@1.22.22
+
+      - name: Audit JavaScript dependencies
+        run: |
+          yarn install --frozen-lockfile
+          yarn audit
+          bin/importmap audit
 
   lint:
     runs-on: ubuntu-24.04
@@ -84,6 +98,14 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      - name: Install Yarn
+        run: npm install --global yarn@1.22.22
 
       - name: Run tests
         env:
