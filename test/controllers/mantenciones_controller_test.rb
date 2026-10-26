@@ -104,6 +104,48 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#mantencion_#{@mantencion.id}", count: 0
   end
 
+  test "exporta todo el historial del grupo con filtros y valores completos" do
+    records = 30.times.map do |index|
+      Mantencion.create!(fecha: Date.new(2026, 9, 3), area: index.even? ? "P513" : "P513X",
+        especialidad: "Eléctrico", actividad: "Actividad #{index} " * 10,
+        comentarios: "=Texto completo #{index}", numero_ot: "000123", estado: 50, duracion: 2.5)
+    end
+    Mantencion.create!(fecha: Date.new(2025, 9, 3), area: "P5133", especialidad: "Eléctrico", actividad: "Otro año")
+    Mantencion.create!(fecha: Date.new(2026, 9, 3), area: "P513", especialidad: "Mecánico", actividad: "Otra especialidad")
+    Mantencion.create!(fecha: Date.new(2026, 9, 10), area: "P513", especialidad: "Eléctrico", actividad: "Otra semana")
+    filters = { area: "P513", year: 2026, semana: 36, especialidad: "electrica" }
+    get area_mantenciones_url(**filters, page: 2)
+    assert_select "a[href=?]", area_mantenciones_path(**filters, format: :xlsx), text: "Descargar Excel"
+
+    get area_mantenciones_url(**filters, format: :xlsx, page: 2)
+    assert_response :success
+    assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response.media_type
+    assert_match(/attachment; filename=mantenciones_p513_\d{8}\.xlsx/, response.headers["Content-Disposition"])
+    Tempfile.create([ "area-export", ".xlsx" ]) do |file|
+      file.binmode
+      file.write(response.body)
+      file.flush
+      sheet = Roo::Excelx.new(file.path).sheet(0)
+      assert_equal 31, sheet.last_row
+      assert_equal "Comentarios", sheet.cell(1, 12)
+      assert_equal records.last.actividad, sheet.cell(2, 7)
+      assert_equal records.last.comentarios, sheet.cell(2, 12)
+      assert_equal "000123", sheet.cell(2, 10)
+      assert_equal Date.new(2026, 9, 3), sheet.cell(2, 2)
+      assert_equal 0.5, sheet.cell(2, 9)
+      assert_equal 2.5, sheet.cell(2, 11)
+      assert_nil sheet.formula(2, 12)
+      assert_equal [ "P513", "P513X" ], (2..31).map { |row| sheet.cell(row, 4) }.uniq.sort
+    end
+  end
+
+  test "no exporta sin un área válida" do
+    [ nil, "NO-EXISTE" ].each do |area|
+      get area_mantenciones_url(area: area, format: :xlsx)
+      assert_response :unprocessable_entity
+    end
+  end
+
   test "muestra el listado y el acceso desde Informe" do
     get mantenciones_url
 

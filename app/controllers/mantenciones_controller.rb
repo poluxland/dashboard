@@ -59,6 +59,15 @@ class MantencionesController < ApplicationController
     @invalid_area = @selected_area.present? && !@available_areas.include?(@selected_area)
     scope = @selected_area.present? && !@invalid_area ? Mantencion.where(area: area_variants[@selected_area]) : Mantencion.none
     scope = report_scope(scope)
+    if request.format.xlsx?
+      return head :unprocessable_entity if @selected_area.blank? || @invalid_area
+
+      @mantenciones_xlsx = scope.order(fecha: :desc, id: :desc)
+      response.headers["Content-Disposition"] =
+        "attachment; filename=mantenciones_#{@selected_area.parameterize}_#{Date.current.strftime('%Y%m%d')}.xlsx"
+      return render :area
+    end
+
     records = scope.to_a
     build_chart_data(records)
     @pending_count = records.count { |record| record.estado.present? && record.estado < 100 }

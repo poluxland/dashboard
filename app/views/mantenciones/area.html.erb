@@ -65,7 +65,13 @@
       </div>
     </div>
 
-    <h2 class="h5 fw-bold mt-4">Historial de actividades · <%= @selected_area %></h2>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 mb-2">
+      <h2 class="h5 fw-bold mb-0">Historial de actividades · <%= @selected_area %></h2>
+      <%= link_to "Descargar Excel",
+                  area_mantenciones_path(format: :xlsx, area: @selected_area, year: @selected_year, semana: @selected_week, especialidad: @selected_specialty),
+                  class: "btn btn-success", data: { turbo: false } %>
+    </div>
+    <p class="small text-body-secondary">El Excel incluye todo el historial que cumple los filtros, con actividades y comentarios completos.</p>
     <p class="text-body-secondary">Ordenadas desde la más reciente. Usa Ver para consultar la actividad y los comentarios completos.</p>
     <%= render "records_table" %>
     <% if @pagy.pages > 1 %>

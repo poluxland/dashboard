@@ -1,0 +1,26 @@
+workbook = xlsx_package.workbook
+header = workbook.styles.add_style(b: true, fg_color: "FFFFFF", bg_color: "183153", alignment: { wrap_text: true })
+text = workbook.styles.add_style(alignment: { wrap_text: true, vertical: :top })
+date = workbook.styles.add_style(format_code: "dd/mm/yyyy")
+percentage = workbook.styles.add_style(format_code: "0.0%")
+hours = workbook.styles.add_style(format_code: "0.00")
+
+workbook.add_worksheet(name: "Historial", escape_formulas: true) do |sheet|
+  sheet.add_row [ "Semana", "Fecha", "Especialidad", "Área", "Código", "Tipo de mantención",
+                  "Actividad", "Planificación", "Estado", "N° OT", "Duración (h)", "Comentarios" ], style: header
+  @mantenciones_xlsx.each do |record|
+    sheet.add_row [ record.semana, record.fecha, record.especialidad, record.area, record.codigo,
+                   record.tipo_mantencion, record.actividad, record.planificacion,
+                   record.estado.nil? ? nil : record.estado.to_f / 100,
+                   record.numero_ot, record.duracion&.to_f, record.comentarios ],
+                 types: [ :integer, :date, :string, :string, :string, :string, :string, :string, :float, :string, :float, :string ],
+                 style: [ nil, date, text, text, text, text, text, text, percentage, text, hours, text ]
+  end
+  sheet.column_widths 10, 14, 18, 16, 18, 28, 60, 20, 14, 20, 18, 60
+  sheet.auto_filter = "A1:L#{sheet.rows.size}"
+  sheet.sheet_view.pane do |pane|
+    pane.top_left_cell = "A2"
+    pane.state = :frozen
+    pane.y_split = 1
+  end
+end
