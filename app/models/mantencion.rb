@@ -135,6 +135,11 @@ class Mantencion < ApplicationRecord
       planning_label == "Plan" ? "Correctivo Programado" : "Correctivo No programado"
     end
 
+    def canonical_area(value)
+      identifier = canonical_identifier(value)
+      identifier&.match?(/\A[0-9]{3}/) ? "P#{identifier}" : identifier
+    end
+
     def canonical_identifier(value)
       value.to_s.squish.upcase.presence
     end
@@ -158,7 +163,7 @@ class Mantencion < ApplicationRecord
     normalized_type = self.class.canonical_maintenance_type(tipo_mantencion, planning: planificacion)
     self.planificacion = self.class.canonical_planning(planificacion, maintenance_type: normalized_type)
     self.tipo_mantencion = normalized_type
-    self.area = self.class.canonical_identifier(area)
+    self.area = self.class.canonical_area(area)
     self.codigo = self.class.canonical_identifier(codigo)
     self.numero_ot = numero_ot.to_s.squish.presence
   end

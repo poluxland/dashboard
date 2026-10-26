@@ -1,6 +1,30 @@
 require "test_helper"
 
 class MantencionTest < ActiveSupport::TestCase
+  test "agrega P a áreas con tres dígitos iniciales sin modificar códigos" do
+    { "513" => "P513", "5133" => "P5133", " 513x " => "P513X",
+      "P513" => "P513", "51X" => "51X", "A513" => "A513", nil => nil }.each do |input, expected|
+      record = Mantencion.new(area: input, codigo: "513X")
+      record.validate
+      assert_equal expected, record.area if expected
+      assert_nil record.area unless expected
+      assert_equal "513X", record.codigo
+    end
+  end
+
+  test "migración corrige solo áreas que comienzan con tres dígitos" do
+    require Rails.root.join("db/migrate/20261026180000_prefix_numeric_mantencion_areas")
+    record = mantenciones(:one)
+    record.update_columns(area: "513X")
+    original = mantenciones(:two).attributes
+    migration = PrefixNumericMantencionAreas.new
+    migration.suppress_messages { migration.up }
+    assert_equal "P513X", record.reload.area
+    assert_equal original, mantenciones(:two).reload.attributes
+    migration.suppress_messages { migration.up }
+    assert_equal "P513X", record.reload.area
+  end
+
   test "completa la semana desde la fecha" do
     mantencion = Mantencion.new(
       fecha: Date.new(2026, 1, 2),
