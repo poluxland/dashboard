@@ -24,8 +24,11 @@ Las pruebas usan entrega simulada, sin correos reales.
   en su producto y en el total. Stock, despachos y bigbags de piso se ingresan en toneladas.
 - Solubles, plastificado y tolvas se muestran aparte para evitar duplicar inventario.
 - Plastificado: pallets × 1,8 t. Producción Haver/Vento: sacos × 0,025 t;
-  producción Bigbag: bolsas × 1,5 t. Rendimiento = toneladas / horas. Los nuevos datos se ingresan como enteros.
-  Pantalla y correo muestran números redondeados sin decimales y con puntos entre miles;
+  producción Bigbag: bolsas × 1,5 t. Rendimiento = toneladas / horas. Medidas, horas y cantidades en toneladas admiten decimales;
+  sacos, bolsas, pallets y enjuagues se ingresan como enteros.
+  Pantalla y correo muestran las toneladas sin decimales y con puntos entre miles;
+  las medidas y horas conservan hasta dos decimales cuando los necesitan.
+  Cumplimiento y toneladas estimadas de tolvas se truncan como en el original;
   los cálculos conservan su precisión y no se modifican los registros históricos.
 - Tolvas: capacidad × nivel / 100; 75 t para tolvas 4 y 5 de Silos 3000, 150 t las demás.
 - Comparación TM/TT/TN: misma fecha declarada, último registro de cada turno anterior
@@ -33,3 +36,21 @@ Las pruebas usan entrega simulada, sin correos reales.
 
 El correo HTML y la vista web comparten el reporte y los cálculos del modelo.
 La fecha debe corresponder al día operativo elegido por quien registra el turno.
+
+## Orden del reporte
+
+1. Inventario por tipo (TM/TT/TN).
+2. Inventario de sacos, incluidos solubles y plastificado (TM/TT/TN).
+3. Inventario de bigbags (TM/TT/TN).
+4. Inventario de silos: producto seleccionado, toneladas y medidas.
+5. Inventario total combinado: silos y piso por producto.
+6. Despachos.
+7. Producciones: unidades, cumplimiento, horas, rendimiento y comentarios.
+8. Nivel de tolvas.
+9. Calles operativas.
+10. Estado de calles: estado, cemento y comentarios en la misma fila.
+11. Enjuagues y observaciones.
+
+Web y ambos formatos de correo comparten las tablas de `EnvasadoraReportPresenter`.
+Las etiquetas de inventario combinado indican los silos según su cemento seleccionado,
+no una asignación fija. El formulario de tolvas mantiene dos columnas.

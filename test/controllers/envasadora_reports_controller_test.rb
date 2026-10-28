@@ -31,7 +31,7 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
       post send_email_envasadora_report_path(report)
     end
     mail = ActionMailer::Base.deliveries.last
-    assert_includes mail.text_part.decoded, "Silo 19 (HPM)"
+    assert_includes mail.text_part.decoded, "19 (HPM)"
     assert_includes mail.html_part.decoded, "HPM"
     assert_includes mail.html_part.decoded, "2.000"
     assert_includes mail.text_part.decoded, "2.000"

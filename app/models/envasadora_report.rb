@@ -26,7 +26,11 @@ class EnvasadoraReport < ApplicationRecord
   RECIPIENTS = JSON.parse(Rails.root.join("config/envasadora_recipients.json").read).freeze
   INPUT_FIELDS = (FIELDS.map { |f| f.fetch("name") } + SILOS.flat_map { |id, s| s[:readings] + [ "silo#{id}_cement" ] } + %w[date turno observations]).freeze
 
-  # Keep historical readings intact; new or edited quantities must be whole numbers.
+  DECIMAL_FIELDS = (SILOS.values.flat_map { |silo| silo[:readings] } +
+    GROUPS.values_at("Stock", "Despacho").flatten.map { |field| field["name"] } +
+    %w[horas_haver horas_vento horas_bigbag]).freeze
+
+  # Unit counts remain whole; measurements, hours and tonnages may have decimals.
   validate :whole_number_inputs
 
   validates :date, :author_email, presence: true
@@ -75,7 +79,7 @@ class EnvasadoraReport < ApplicationRecord
 
   def whole_number_inputs
     numeric_fields = FIELDS.select { |field| field["kind"] == "number" }.map { |field| field["name"] } + SILOS.values.flat_map { |silo| silo[:readings] }
-    numeric_fields.each do |field|
+    (numeric_fields - DECIMAL_FIELDS).each do |field|
       next unless new_record? || will_save_change_to_attribute?(field)
 
       value = public_send(field)

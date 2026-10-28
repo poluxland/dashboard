@@ -1,32 +1,29 @@
 <div style="font-family:Arial,sans-serif;color:#243447;max-width:1100px;margin:auto">
-<h1>Reporte envasadora</h1><p><strong><%= report.date %> · <%= EnvasadoraReport::SHIFTS[report.turno] %></strong><br>Registrado por <%= report.author_email %></p>
-<h2>Inventario por tipo de cemento</h2>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><thead><tr><th>Cemento</th><th>Silos (t)</th><th>Piso (t)</th><th>Total (t)</th></tr></thead><tbody>
-<% report.inventory.each do |cement, amounts| %><tr><th><%= cement %></th><% amounts.values.each do |value| %><td align="right"><%= envasadora_number(value) %></td><% end %></tr><% end %>
-<tr><th colspan="3">Inventario total</th><td align="right"><strong><%= envasadora_number(report.total_tons) %> t</strong></td></tr></tbody></table>
-<p>El piso conserva los componentes del reporte original e incluye Bigbag Plus. Solubles, plastificado y tolvas se muestran aparte y no se vuelven a sumar al inventario.</p>
-<h2>Medidas de silos</h2>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><thead><tr><th>Silo</th><th>Medida 1 (m)</th><th>Medida 2 (m)</th><th>Cemento</th><th>Stock (t)</th></tr></thead><tbody>
-<% EnvasadoraReport::SILOS.each do |id, silo| %><tr><th><%= id %></th><% 2.times do |index| %><td><%= silo[:readings][index] ? envasadora_number(report.public_send(silo[:readings][index])) : "—" %></td><% end %><td><%= report.public_send("silo#{id}_cement") %></td><td><%= envasadora_number(report.silo_tons(id)) %></td></tr><% end %>
-</tbody></table>
-<h2>Inventario por turno (t)</h2><p>Fecha <%= report.date %>. Cada columna es una fotografía del stock; no se suman entre turnos. — indica un turno sin registro anterior a este reporte.</p>
-<% daily = report.daily_reports.transform_values(&:inventory) %>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><thead><tr><th>Cemento</th><% EnvasadoraReport::SHIFTS.each_key do |shift| %><th><%= shift %></th><% end %></tr></thead><tbody>
-<% EnvasadoraReport::CEMENTS.each do |cement| %><tr><th><%= cement %></th><% EnvasadoraReport::SHIFTS.each_key do |shift| %><td><%= daily[shift] ? envasadora_number(daily[shift][cement][:total]) : "—" %></td><% end %></tr><% end %>
-<tr><th>Total</th><% EnvasadoraReport::SHIFTS.each_key do |shift| %><td><%= daily[shift] ? envasadora_number(daily[shift].values.sum { |row| row[:total] }) : "—" %></td><% end %></tr>
-</tbody></table>
-<h2>Rendimiento de producción</h2>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><tr><th>Equipo</th><th>Producción (t)</th><th>Horas</th><th>t/h</th><th>Cumplimiento meta</th></tr>
-<% [["Haver", :prodhaver, :horas_haver, 0.025, 12000], ["Vento", :prodvento, :horas_vento, 0.025, 7000], ["Bigbag", :prodbb, :horas_bigbag, 1.5, 125]].each do |name, quantity, hours_field, factor, goal| %>
-<% tons = report.public_send(quantity) * factor; hours = report.public_send(hours_field) %>
-<tr><th><%= name %></th><td><%= envasadora_number(tons) %></td><td><%= envasadora_number(hours) %></td><td><%= hours.positive? ? envasadora_number(tons / hours) : "—" %></td><td><%= envasadora_number([report.public_send(quantity) * 100 / goal, 100].min) %>%</td></tr><% end %></table>
-<h2>Stock en tolvas</h2>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><tr><th>Tolva</th><th>Cemento</th><th>Nivel</th><th>Stock estimado (t)</th></tr>
-<% EnvasadoraReport::HOPPERS.each do |label, cement, level, capacity| %><tr><th><%= label %></th><td><%= report.public_send(cement).presence || "Sin informar" %></td><td><%= envasadora_number(report.public_send(level)) %>%</td><td><%= envasadora_number(report.public_send(level) * capacity / 100) %></td></tr><% end %></table>
-<% EnvasadoraReport::GROUPS.each do |title, fields| %>
-<h2><%= title %><%= " (t)" if ["Stock", "Despacho"].include?(title) %></h2>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><tbody>
-<% fields.each do |field| %><tr><th align="left"><%= field["label"] %></th><td><% value = report.public_send(field["name"]) %><%= value.is_a?(Numeric) ? envasadora_number(value) : value.presence || "Sin informar" %><% if title == "Plastificado" %> pallets · <%= envasadora_number(value * 1.8) %> t<% end %></td></tr><% end %>
-</tbody></table><% end %>
-<% if report.observations.present? %><h2>Observaciones</h2><%= simple_format(report.observations) %><% end %>
+  <h1>Reporte envasadora</h1>
+  <p><strong><%= report.date %> · <%= EnvasadoraReport::SHIFTS[report.turno] %></strong><br>
+    Registrado: <%= report.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %><br>
+    Autor: <%= report.author_email %></p>
+  <p>TM, TT y TN corresponden a la misma fecha. — indica que no hay un registro previo de ese turno. Cada columna muestra el stock del turno; no se suman entre turnos.</p>
+  <% EnvasadoraReportPresenter.new(report).tables.each do |table| %>
+    <section style="margin:24px 0">
+      <h2 style="font-size:20px;margin-bottom:10px"><%= table[:title] %></h2>
+      <div style="overflow-x:auto">
+        <table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse;border-color:#d5dce3;font-size:14px">
+          <thead style="background-color:#edf2f6"><tr><% table[:headers].each do |header| %><th scope="col" style="text-align:left"><%= header %></th><% end %></tr></thead>
+          <tbody>
+            <% table[:rows].each_with_index do |row, index| %>
+              <tr style="background-color:<%= index.even? ? '#ffffff' : '#f7f9fb' %>">
+                <% row.each_with_index do |cell, column| %>
+                  <% if column.zero? %><th scope="row" style="text-align:left;font-weight:normal"><%= cell %></th>
+                  <% else %><td><%= cell %></td><% end %>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+  <p style="font-size:12px;color:#526171">El inventario combinado suma silos y piso, incluido Bigbag Plus cuando existe stock. Solubles, plastificado y tolvas se detallan aparte y no se vuelven a sumar. Toneladas sin decimales; medidas y horas conservan sus decimales. Tolvas y cumplimiento mantienen el criterio de truncamiento del reporte original.</p>
+  <% if report.observations.present? %><h2>Observaciones</h2><%= simple_format(report.observations) %><% end %>
 </div>
