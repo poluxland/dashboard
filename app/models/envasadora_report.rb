@@ -30,6 +30,17 @@ class EnvasadoraReport < ApplicationRecord
     GROUPS.values_at("Stock", "Despacho").flatten.map { |field| field["name"] } +
     %w[horas_haver horas_vento horas_bigbag]).freeze
 
+  %w[s28c3op s28c4op s28c5op s27c6op s30c1op s30c4op s30c5op].each do |field|
+    attribute field, :string, default: "Operativa"
+  end
+  {
+    s28c3cemento: "Ultra", s28c4cemento: "Ultra", s28c5cemento: "Ultra",
+    s27c7cemento: "Especial", s30c1cemento: "Extra",
+    s30c4cemento: "Ultra", s30c5cemento: "Ultra"
+  }.each do |field, cement|
+    attribute field, :string, default: cement
+  end
+
   # Unit counts remain whole; measurements, hours and tonnages may have decimals.
   validate :whole_number_inputs
 
