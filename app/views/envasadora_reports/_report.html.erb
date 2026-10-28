@@ -3,7 +3,6 @@
   <p><strong><%= report.date %> · <%= EnvasadoraReport::SHIFTS[report.turno] %></strong><br>
     Registrado: <%= report.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %><br>
     Autor: <%= report.author_email %></p>
-  <p>TM, TT y TN corresponden a la misma fecha. — indica que no hay un registro previo de ese turno. Cada columna muestra el stock del turno; no se suman entre turnos.</p>
   <% EnvasadoraReportPresenter.new(report).tables.each do |table| %>
     <section style="margin:24px 0">
       <h2 style="font-size:20px;margin-bottom:10px"><%= table[:title] %></h2>

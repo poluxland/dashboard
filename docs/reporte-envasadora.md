@@ -43,8 +43,8 @@ La fecha debe corresponder al día operativo elegido por quien registra el turno
 2. Inventario de sacos, incluidos solubles y plastificado (TM/TT/TN).
 3. Inventario de bigbags (TM/TT/TN).
 4. Inventario de silos: producto seleccionado, toneladas y medidas.
-5. Inventario total combinado: silos y piso por producto.
-6. Despachos.
+5. Inventario total combinado: silos y piso por producto (TM/TT/TN).
+6. Despachos (TM/TT/TN).
 7. Producciones: unidades, cumplimiento, horas, rendimiento y comentarios.
 8. Nivel de tolvas.
 9. Calles operativas.
@@ -52,5 +52,5 @@ La fecha debe corresponder al día operativo elegido por quien registra el turno
 11. Enjuagues y observaciones.
 
 Web y ambos formatos de correo comparten las tablas de `EnvasadoraReportPresenter`.
-Las etiquetas de inventario combinado indican los silos según su cemento seleccionado,
-no una asignación fija. El formulario de tolvas mantiene dos columnas.
+Cada columna del inventario combinado agrupa los silos según el cemento seleccionado
+en el registro de ese turno. El formulario de tolvas mantiene dos columnas.

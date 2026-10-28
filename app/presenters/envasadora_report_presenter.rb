@@ -108,21 +108,21 @@ class EnvasadoraReportPresenter
   end
 
   def combined_table
-    inventory = @report.inventory
     rows = @cements.flat_map do |cement|
-      ids = EnvasadoraReport::SILOS.keys.select { |id| @report.public_send("silo#{id}_cement") == cement }
-      label = "Cemento #{cement} en silos"
-      label += " (#{ids.join('-')})" if ids.any?
-      [ [ label, number(inventory[cement][:silo]) ], [ "Cemento #{cement} en piso", number(inventory[cement][:floor]) ] ]
+      { silo: "silos", floor: "piso" }.map do |component, label|
+        [ "Cemento #{cement} en #{label}" ] + EnvasadoraReport::SHIFTS.keys.map do |shift|
+          @inventories[shift] ? number(@inventories[shift][cement][component]) : "—"
+        end
+      end
     end
-    rows << [ "Total combinado", number(@report.total_tons) ]
-    table("Inventario Total combinado", [ "Producto", "Stock (t)" ], rows)
+    rows << [ "Total combinado" ] + EnvasadoraReport::SHIFTS.keys.map { |shift| @daily[shift] ? number(@daily[shift].total_tons) : "—" }
+    table("Inventario Total combinado", [ "Producto (t)", "TM", "TT", "TN" ], rows)
   end
 
   def dispatch_table
     order = %w[especial_sacos extra_sacos especial_bigbag extra_bigbag super_bigbag ultra_bigbag especial_granel extra_granel super_3300_granel super_4200_granel]
     labels = EnvasadoraReport::GROUPS.fetch("Despacho").index_by { |field| field["name"] }
-    table("Despachos", [ "Producto", "Toneladas" ], order.map { |field| [ labels.fetch(field)["label"], number(@report.public_send(field)) ] })
+    shift_table("Despachos", order.map { |field| [ labels.fetch(field)["label"], field, 1 ] })
   end
 
   def production_table

@@ -28,8 +28,24 @@ class EnvasadoraReportPresenterTest < ActiveSupport::TestCase
     tables = EnvasadoraReportPresenter.new(report).tables.index_by { |table| table[:title] }
     assert_equal [ "Especial", "245", "300", "—" ], tables["Inventario de Sacos"][:rows].first
     assert_equal [ "Bigbag extra piso", "48", "60", "—" ], tables["Inventario de Big Bags"][:rows].first
-    assert_includes tables["Inventario Total combinado"][:rows], [ "Cemento HPM en silos (19)", "1.400" ]
-    assert_includes tables["Inventario Total combinado"][:rows], [ "Cemento Extra en silos (21)", "650" ]
+    assert_includes tables["Inventario Total combinado"][:rows], [ "Cemento HPM en silos", "0", "1.400", "—" ]
+    assert_includes tables["Inventario Total combinado"][:rows], [ "Cemento Extra en silos", "2.050", "650", "—" ]
+  end
+
+  test "dispatch and combined inventory show independent values for all three shifts" do
+    sample(especial_sacos: 213)
+    sample(turno: "TT", especial_sacos: 150, silo19_cement: "HPM", especialsacos: 300)
+    report = sample(turno: "TN", especial_sacos: 80, silo19_cement: "Ultra", especialsacos: 100)
+    tables = EnvasadoraReportPresenter.new(report).tables.index_by { |table| table[:title] }
+    assert_equal [ "Producto (t)", "TM", "TT", "TN" ], tables["Despachos"][:headers]
+    assert_equal [ "Especial sacos", "213", "150", "80" ], tables["Despachos"][:rows].first
+    combined = tables["Inventario Total combinado"]
+    assert_equal [ "Producto (t)", "TM", "TT", "TN" ], combined[:headers]
+    assert_includes combined[:rows], [ "Cemento Extra en silos", "2.050", "650", "650" ]
+    assert_includes combined[:rows], [ "Cemento Ultra en silos", "1.800", "1.800", "3.200" ]
+    assert_includes combined[:rows], [ "Cemento HPM en silos", "0", "1.400", "0" ]
+    assert_includes combined[:rows], [ "Cemento Especial en piso", "311", "366", "166" ]
+    assert_equal [ "Total combinado", "13.091", "13.146", "12.946" ], combined[:rows].last
   end
 
   test "fractional measures and sub-hour production remain visible and meaningful" do
