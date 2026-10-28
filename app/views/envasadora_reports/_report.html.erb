@@ -23,6 +23,5 @@
       </div>
     </section>
   <% end %>
-  <p style="font-size:12px;color:#526171">El inventario combinado suma silos y piso, incluido Bigbag Plus cuando existe stock. Solubles, plastificado y tolvas se detallan aparte y no se vuelven a sumar. Toneladas sin decimales; medidas y horas conservan sus decimales. Tolvas y cumplimiento mantienen el criterio de truncamiento del reporte original.</p>
   <% if report.observations.present? %><h2>Observaciones</h2><%= simple_format(report.observations) %><% end %>
 </div>

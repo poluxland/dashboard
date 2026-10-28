@@ -8,7 +8,4 @@ Autor: <%= @report.author_email %>
 <% table[:rows].each do |row| %><%= row.join(" | ") %>
 <% end %>
 <% end %>
-Toneladas sin decimales; medidas y horas conservan sus decimales.
-Tolvas y cumplimiento mantienen el truncamiento del reporte original.
-El total incluye Bigbag Plus; solubles, plastificado y tolvas no se vuelven a sumar.
 Observaciones: <%= @report.observations %>
