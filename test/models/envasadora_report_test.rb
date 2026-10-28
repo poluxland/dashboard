@@ -37,6 +37,13 @@ class EnvasadoraReportTest < ActiveSupport::TestCase
     assert_equal 5000, daily.fetch("TT").inventory["Ultra"][:total]
   end
 
+  test "new measurements stock and hours must be whole numbers" do
+    [ { silo19a: "10.5" }, { extrsacos: "1200.5" }, { horas_haver: "1.5" } ].each do |attributes|
+      assert_not build_report(**attributes).valid?, attributes.inspect
+    end
+    assert build_report(extrsacos: "12000", horas_haver: "2").valid?
+  end
+
   test "single reading silos and decimals use their own capacity" do
     report = build_report(silo27: "29.5", silo28: "19.25", silo19a: "29.5", silo19b: "29")
     assert_equal 230, report.silo_tons(27)

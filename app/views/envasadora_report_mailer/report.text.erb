@@ -3,17 +3,17 @@ Autor: <%= @report.author_email %>
 
 Inventario (toneladas):
 <% @report.inventory.each do |cement, values| %>
-<%= cement %>: silos <%= values[:silo] %> + piso <%= values[:floor] %> = <%= values[:total] %> t
+<%= cement %>: silos <%= envasadora_number(values[:silo]) %> + piso <%= envasadora_number(values[:floor]) %> = <%= envasadora_number(values[:total]) %> t
 <% end %>
-TOTAL: <%= @report.total_tons %> t
+TOTAL: <%= envasadora_number(@report.total_tons) %> t
 
 Medidas:
 <% EnvasadoraReport::SILOS.each do |id, silo| %>
-Silo <%= id %> (<%= @report.public_send("silo#{id}_cement") %>): <%= silo[:readings].map { |f| @report.public_send(f) }.join(" / ") %> m; <%= @report.silo_tons(id) %> t
+Silo <%= id %> (<%= @report.public_send("silo#{id}_cement") %>): <%= silo[:readings].map { |f| envasadora_number(@report.public_send(f)) }.join(" / ") %> m; <%= envasadora_number(@report.silo_tons(id)) %> t
 <% end %>
 <% EnvasadoraReport::GROUPS.each do |title, fields| %>
 <%= title %>
-<% fields.each do |field| %><%= field["label"] %>: <%= @report.public_send(field["name"]) %>
+<% fields.each do |field| %><%= field["label"] %>: <% value = @report.public_send(field["name"]) %><%= value.is_a?(Numeric) ? envasadora_number(value) : value %>
 <% end %>
 <% end %>
 Observaciones: <%= @report.observations %>

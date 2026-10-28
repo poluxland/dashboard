@@ -17,7 +17,7 @@ class EnvasadoraReportsTest < ApplicationSystemTestCase
     page.save_screenshot(Rails.root.join("tmp/envasadora-form.png"))
     click_on "Guardar y revisar reporte"
     assert_text "Reporte guardado"
-    assert_selector "tr", text: /HPM.*2[.,]?000[.,]00/
+    assert_selector "tr", text: /HPM.*2\.000/
     assert_button "Enviar reporte por correo"
     page.scroll_to(:top)
     page.save_screenshot(Rails.root.join("tmp/envasadora-report.png"))

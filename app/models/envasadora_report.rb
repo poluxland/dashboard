@@ -26,6 +26,9 @@ class EnvasadoraReport < ApplicationRecord
   RECIPIENTS = JSON.parse(Rails.root.join("config/envasadora_recipients.json").read).freeze
   INPUT_FIELDS = (FIELDS.map { |f| f.fetch("name") } + SILOS.flat_map { |id, s| s[:readings] + [ "silo#{id}_cement" ] } + %w[date turno observations]).freeze
 
+  # Keep historical readings intact; new or edited quantities must be whole numbers.
+  validate :whole_number_inputs
+
   validates :date, :author_email, presence: true
   validates :turno, inclusion: { in: SHIFTS.keys }
   SILOS.each do |id, silo|
@@ -68,6 +71,16 @@ class EnvasadoraReport < ApplicationRecord
     earlier = SHIFTS.keys.take(SHIFTS.keys.index(turno))
     reports = self.class.where(date: date, turno: earlier).where("created_at <= ?", created_at).order(:created_at, :id).index_by(&:turno)
     reports.merge(turno => self)
+  end
+
+  def whole_number_inputs
+    numeric_fields = FIELDS.select { |field| field["kind"] == "number" }.map { |field| field["name"] } + SILOS.values.flat_map { |silo| silo[:readings] }
+    numeric_fields.each do |field|
+      next unless new_record? || will_save_change_to_attribute?(field)
+
+      value = public_send(field)
+      errors.add(field, "debe ser un número entero") if value.is_a?(Numeric) && value != value.to_i
+    end
   end
 
   def recipients

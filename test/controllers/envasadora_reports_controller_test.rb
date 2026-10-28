@@ -33,6 +33,9 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     mail = ActionMailer::Base.deliveries.last
     assert_includes mail.text_part.decoded, "Silo 19 (HPM)"
     assert_includes mail.html_part.decoded, "HPM"
+    assert_includes mail.html_part.decoded, "2.000"
+    assert_includes mail.text_part.decoded, "2.000"
+    assert_not_includes mail.html_part.decoded, "2000,00"
     assert report.reload.sent_at
     assert_nil another.reload.sent_at
     assert_no_difference "ActionMailer::Base.deliveries.size" do
