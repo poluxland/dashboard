@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   get "/auth/failure", to: "sessions#failure"
   delete "/logout", to: "sessions#destroy", as: :logout
 
+  resources :envasadora_reports, path: "reporte-envasadora", only: [ :index, :new, :create, :show, :edit, :update ] do
+    post :send_email, on: :member
+  end
+
   resources :shift_reports, only: [ :index, :new, :create, :show ] do
     post :send_email, on: :member
   end

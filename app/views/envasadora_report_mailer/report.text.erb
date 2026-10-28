@@ -1,0 +1,19 @@
+Reporte envasadora — <%= @report.date %> — <%= @report.turno %>
+Autor: <%= @report.author_email %>
+
+Inventario (toneladas):
+<% @report.inventory.each do |cement, values| %>
+<%= cement %>: silos <%= values[:silo] %> + piso <%= values[:floor] %> = <%= values[:total] %> t
+<% end %>
+TOTAL: <%= @report.total_tons %> t
+
+Medidas:
+<% EnvasadoraReport::SILOS.each do |id, silo| %>
+Silo <%= id %> (<%= @report.public_send("silo#{id}_cement") %>): <%= silo[:readings].map { |f| @report.public_send(f) }.join(" / ") %> m; <%= @report.silo_tons(id) %> t
+<% end %>
+<% EnvasadoraReport::GROUPS.each do |title, fields| %>
+<%= title %>
+<% fields.each do |field| %><%= field["label"] %>: <%= @report.public_send(field["name"]) %>
+<% end %>
+<% end %>
+Observaciones: <%= @report.observations %>

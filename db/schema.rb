@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -82,6 +82,114 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.string "operador_bodega"
     t.integer "rollos_entregados"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "envasadora_reports", force: :cascade do |t|
+    t.date "date", null: false
+    t.string "turno", null: false
+    t.string "author_email", null: false
+    t.datetime "sent_at"
+    t.text "observations"
+    t.string "silo19_cement", default: "Extra", null: false
+    t.decimal "silo19a", precision: 10, scale: 2, null: false
+    t.decimal "silo19b", precision: 10, scale: 2, null: false
+    t.string "silo20_cement", default: "S4200", null: false
+    t.decimal "silo20a", precision: 10, scale: 2, null: false
+    t.decimal "silo20b", precision: 10, scale: 2, null: false
+    t.string "silo21_cement", default: "Extra", null: false
+    t.decimal "silo21a", precision: 10, scale: 2, null: false
+    t.decimal "silo21b", precision: 10, scale: 2, null: false
+    t.string "silo22_cement", default: "Ultra", null: false
+    t.decimal "silo22a", precision: 10, scale: 2, null: false
+    t.decimal "silo22b", precision: 10, scale: 2, null: false
+    t.string "silo27_cement", default: "Especial", null: false
+    t.decimal "silo27", precision: 10, scale: 2, null: false
+    t.string "silo28_cement", default: "Ultra", null: false
+    t.decimal "silo28", precision: 10, scale: 2, null: false
+    t.decimal "enjuagues_super", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "enjuagues_super4", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_especial", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_especial_soluble_completo", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_especial_lados", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_especial_zunchos", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_extra", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_extra_soluble_completo", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "plastificado_extra_zunchos", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "especial_sacos", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "especial_bigbag", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "especial_granel", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "extra_sacos", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "extra_bigbag", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "super_bigbag", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "ultra_bigbag", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "extra_granel", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "super_3300_granel", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "super_4200_granel", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "especialsacos", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "especial_sacos_soluble", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "extrsacos", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "extra_sacos_soluble", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbagextra", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbag_extra_retiro", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbagextra1350", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbagextra1", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbagespecial", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbagsuper", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bigbagplus", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "tolvacalle5"
+    t.decimal "otros", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silos3000tolva1"
+    t.decimal "ns30001", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silos3000tolva4"
+    t.decimal "ns30002", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silos3000tolva5"
+    t.decimal "ns30003", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silosbigbag1"
+    t.decimal "nbb1", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silosbigbag2"
+    t.decimal "nbb2", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silosvento1"
+    t.decimal "nvento1", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silovento2"
+    t.decimal "nvento2", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "silovento3"
+    t.decimal "nvento3", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "callesilo28", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "callesplanta1", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "callesilo27", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "s28c3op"
+    t.string "s28c3cemento"
+    t.string "s28c3nota"
+    t.string "s28c4op"
+    t.string "s28c4cemento"
+    t.string "s28c4nota"
+    t.string "s28c5op"
+    t.string "s28c5cemento"
+    t.string "s28c5nota"
+    t.string "s27c6op"
+    t.string "s27c7cemento"
+    t.string "s27c7nota"
+    t.string "s30c1op"
+    t.string "s30c1cemento"
+    t.string "s30c1nota"
+    t.string "s30c4op"
+    t.string "s30c4cemento"
+    t.string "s30c4nota"
+    t.string "s30c5op"
+    t.string "s30c5cemento"
+    t.string "s30c5nota"
+    t.decimal "prodhaver", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "prodvento", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "prodbb", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "horas_haver", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "horas_vento", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "horas_bigbag", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "comentarios_haver"
+    t.string "comentarios_vento"
+    t.string "comentarios_bigbag"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date", "turno"], name: "index_envasadora_reports_on_date_and_turno"
   end
 
   create_table "estado_equipos", force: :cascade do |t|

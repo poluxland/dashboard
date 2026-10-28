@@ -1,0 +1,32 @@
+<div style="font-family:Arial,sans-serif;color:#243447;max-width:1100px;margin:auto">
+<h1>Reporte envasadora</h1><p><strong><%= report.date %> · <%= EnvasadoraReport::SHIFTS[report.turno] %></strong><br>Registrado por <%= report.author_email %></p>
+<h2>Inventario por tipo de cemento</h2>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><thead><tr><th>Cemento</th><th>Silos (t)</th><th>Piso (t)</th><th>Total (t)</th></tr></thead><tbody>
+<% report.inventory.each do |cement, amounts| %><tr><th><%= cement %></th><% amounts.values.each do |value| %><td align="right"><%= number_with_precision(value, precision: 2) %></td><% end %></tr><% end %>
+<tr><th colspan="3">Inventario total</th><td align="right"><strong><%= number_with_precision(report.total_tons, precision: 2) %> t</strong></td></tr></tbody></table>
+<p>El piso conserva los componentes del reporte original e incluye Bigbag Plus. Solubles, plastificado y tolvas se muestran aparte y no se vuelven a sumar al inventario.</p>
+<h2>Medidas de silos</h2>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><thead><tr><th>Silo</th><th>Medida 1 (m)</th><th>Medida 2 (m)</th><th>Cemento</th><th>Stock (t)</th></tr></thead><tbody>
+<% EnvasadoraReport::SILOS.each do |id, silo| %><tr><th><%= id %></th><% 2.times do |index| %><td><%= silo[:readings][index] ? number_with_precision(report.public_send(silo[:readings][index]), precision: 2) : "—" %></td><% end %><td><%= report.public_send("silo#{id}_cement") %></td><td><%= number_with_precision(report.silo_tons(id), precision: 2) %></td></tr><% end %>
+</tbody></table>
+<h2>Inventario por turno (t)</h2><p>Fecha <%= report.date %>. Cada columna es una fotografía del stock; no se suman entre turnos. — indica un turno sin registro anterior a este reporte.</p>
+<% daily = report.daily_reports.transform_values(&:inventory) %>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><thead><tr><th>Cemento</th><% EnvasadoraReport::SHIFTS.each_key do |shift| %><th><%= shift %></th><% end %></tr></thead><tbody>
+<% EnvasadoraReport::CEMENTS.each do |cement| %><tr><th><%= cement %></th><% EnvasadoraReport::SHIFTS.each_key do |shift| %><td><%= daily[shift] ? number_with_precision(daily[shift][cement][:total], precision: 2) : "—" %></td><% end %></tr><% end %>
+<tr><th>Total</th><% EnvasadoraReport::SHIFTS.each_key do |shift| %><td><%= daily[shift] ? number_with_precision(daily[shift].values.sum { |row| row[:total] }, precision: 2) : "—" %></td><% end %></tr>
+</tbody></table>
+<h2>Rendimiento de producción</h2>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><tr><th>Equipo</th><th>Producción (t)</th><th>Horas</th><th>t/h</th><th>Cumplimiento meta</th></tr>
+<% [["Haver", :prodhaver, :horas_haver, 0.025, 12000], ["Vento", :prodvento, :horas_vento, 0.025, 7000], ["Bigbag", :prodbb, :horas_bigbag, 1.5, 125]].each do |name, quantity, hours_field, factor, goal| %>
+<% tons = report.public_send(quantity) * factor; hours = report.public_send(hours_field) %>
+<tr><th><%= name %></th><td><%= number_with_precision(tons, precision: 2) %></td><td><%= hours %></td><td><%= hours.positive? ? number_with_precision(tons / hours, precision: 2) : "—" %></td><td><%= number_with_precision([report.public_send(quantity) * 100 / goal, 100].min, precision: 1) %>%</td></tr><% end %></table>
+<h2>Stock en tolvas</h2>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><tr><th>Tolva</th><th>Cemento</th><th>Nivel</th><th>Stock estimado (t)</th></tr>
+<% EnvasadoraReport::HOPPERS.each do |label, cement, level, capacity| %><tr><th><%= label %></th><td><%= report.public_send(cement).presence || "Sin informar" %></td><td><%= report.public_send(level) %>%</td><td><%= number_with_precision(report.public_send(level) * capacity / 100, precision: 2) %></td></tr><% end %></table>
+<% EnvasadoraReport::GROUPS.each do |title, fields| %>
+<h2><%= title %><%= " (t)" if ["Stock", "Despacho"].include?(title) %></h2>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse"><tbody>
+<% fields.each do |field| %><tr><th align="left"><%= field["label"] %></th><td><% value = report.public_send(field["name"]) %><%= value.is_a?(Numeric) ? number_with_precision(value, precision: 2) : value.presence || "Sin informar" %><% if title == "Plastificado" %> pallets · <%= number_with_precision(value * 1.8, precision: 2) %> t<% end %></td></tr><% end %>
+</tbody></table><% end %>
+<% if report.observations.present? %><h2>Observaciones</h2><%= simple_format(report.observations) %><% end %>
+</div>

@@ -1,0 +1,4 @@
+<div class="d-flex gap-2 mb-3"><%= link_to "Volver", envasadora_reports_path, class: "btn btn-outline-secondary" %><%= link_to "Nuevo reporte", new_envasadora_report_path, class: "btn btn-outline-primary" %>
+<% if @report.sent_at? %><span class="badge bg-success align-self-center">Correo enviado <%= @report.sent_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %></span><% elsif @report.author_email == current_user[:email] %><%= link_to "Editar reporte", edit_envasadora_report_path(@report), class: "btn btn-outline-primary" %><%= button_to "Enviar reporte por correo", send_email_envasadora_report_path(@report), class: "btn btn-primary" %><% end %></div>
+<details class="mb-3"><summary>Destinatarios del correo (<%= @report.recipients.size %>)</summary><p><%= @report.recipients.join(", ") %></p></details>
+<%= render "report", report: @report %>

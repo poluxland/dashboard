@@ -1,0 +1,6 @@
+<div class="d-flex justify-content-between mb-3"><h1 class="h3">Reporte envasadora</h1><%= link_to "Nuevo reporte", new_envasadora_report_path, class: "btn btn-primary" %></div>
+<p>Últimos 100 registros de medidas, inventario y operación.</p>
+<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Fecha</th><th>Turno</th><th>Autor</th><th>Inventario (t)</th><th>Correo</th><th></th></tr></thead><tbody>
+<% @reports.each do |report| %><tr><td><%= report.date %></td><td><%= report.turno %></td><td><%= report.author_email %></td><td><%= number_with_precision(report.total_tons, precision: 2) %></td><td><%= report.sent_at? ? "Enviado" : "Pendiente" %></td><td><%= link_to "Ver reporte", report %></td></tr><% end %>
+<% if @reports.empty? %><tr><td colspan="6">Todavía no hay reportes.</td></tr><% end %>
+</tbody></table></div>

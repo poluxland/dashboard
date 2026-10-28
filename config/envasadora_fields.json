@@ -1,0 +1,724 @@
+{
+  "Enjuagues": [
+    {
+      "name": "enjuagues_super",
+      "label": "Enjuagues Super 3.300",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "enjuagues_super4",
+      "label": "Enjuagues Super 4.200",
+      "kind": "number",
+      "choices": null
+    }
+  ],
+  "Plastificado": [
+    {
+      "name": "plastificado_especial",
+      "label": "Plast. especial",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "plastificado_especial_soluble_completo",
+      "label": "Plast. especial soluble completo",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "plastificado_especial_lados",
+      "label": "Plast. especial lados",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "plastificado_especial_zunchos",
+      "label": "Plast. especial zuncho",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "plastificado_extra",
+      "label": "Plast. extra",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "plastificado_extra_soluble_completo",
+      "label": "Plast. extra soluble completo",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "plastificado_extra_zunchos",
+      "label": "Plast. extra zunchos",
+      "kind": "number",
+      "choices": null
+    }
+  ],
+  "Despacho": [
+    {
+      "name": "especial_sacos",
+      "label": "Especial sacos",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "especial_bigbag",
+      "label": "Especial bigbag",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "especial_granel",
+      "label": "Especial granel",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "extra_sacos",
+      "label": "Extra sacos",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "extra_bigbag",
+      "label": "Extra bigbag",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "super_bigbag",
+      "label": "Super bigbag",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "ultra_bigbag",
+      "label": "Ultra bigbag",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "extra_granel",
+      "label": "Extra granel",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "super_3300_granel",
+      "label": "Ultra granel",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "super_4200_granel",
+      "label": "Super 4200 granel",
+      "kind": "number",
+      "choices": null
+    }
+  ],
+  "Stock": [
+    {
+      "name": "especialsacos",
+      "label": "Especial sacos",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "especial_sacos_soluble",
+      "label": "Especial sacos soluble",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "extrsacos",
+      "label": "Extra sacos",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "extra_sacos_soluble",
+      "label": "Extra sacos soluble",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbagextra",
+      "label": "Bigbag extra piso",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbag_extra_retiro",
+      "label": "Bigbag Ultra",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbagextra1350",
+      "label": "Bigbag extra 1350",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbagextra1",
+      "label": "Bigbag extra 1000",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbagespecial",
+      "label": "Bigbag especial",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbagsuper",
+      "label": "Bigbag super",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "bigbagplus",
+      "label": "Bigbag plus",
+      "kind": "number",
+      "choices": null
+    }
+  ],
+  "Nivel tolvas": [
+    {
+      "name": "tolvacalle5",
+      "label": "Tolva calle 5",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "otros",
+      "label": "Silo 28 tolva calle 5",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silos3000tolva1",
+      "label": "Silos 3000 tolva 1",
+      "kind": "select",
+      "choices": [
+        "Extramix",
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "ns30001",
+      "label": "Nivel tolva 1",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silos3000tolva4",
+      "label": "Silos 3000 tolva 4",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "ns30002",
+      "label": "Nivel tolva 4",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silos3000tolva5",
+      "label": "Silos 3000 tolva 5",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "ns30003",
+      "label": "Nivel tolva 5",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silosbigbag1",
+      "label": "Silos bigbag 1",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "nbb1",
+      "label": "Nivel bigbag silo 1",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silosbigbag2",
+      "label": "Silos bigbag 2",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "nbb2",
+      "label": "Nivel bigbag silo 2",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silosvento1",
+      "label": "Silos vento 1",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "nvento1",
+      "label": "Nivel Silo 1",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silovento2",
+      "label": "Silos vento 2",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "nvento2",
+      "label": "Nivel Silo 2",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    {
+      "name": "silovento3",
+      "label": "Silos vento 3",
+      "kind": "select",
+      "choices": [
+        "Especial",
+        "Extra",
+        "Ultra",
+        "S3300",
+        "S4200",
+        "Plus",
+        "S3300 (AR)",
+        "HPM"
+      ]
+    },
+    {
+      "name": "nvento3",
+      "label": "Nivel Silo 3",
+      "kind": "select",
+      "choices": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ]
+    }
+  ],
+  "Calles operativas": [
+    {
+      "name": "callesilo28",
+      "label": "Calles silo 28",
+      "kind": "select",
+      "choices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "name": "callesplanta1",
+      "label": "Calles planta 1",
+      "kind": "select",
+      "choices": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "callesilo27",
+      "label": "Calles silo 27",
+      "kind": "select",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "Estado Calles": [
+    {
+      "name": "s28c3op",
+      "label": "Silo 28 Calle 3",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s28c3cemento",
+      "label": "Silo 28 Calle 3 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s28c3nota",
+      "label": "Silo 28 Calle 3 · Comentarios",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "s28c4op",
+      "label": "Silo 28 Calle 4",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s28c4cemento",
+      "label": "Silo 28 Calle 4 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s28c4nota",
+      "label": "Silo 28 Calle 4 · Comentarios",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "s28c5op",
+      "label": "Silo 28 Calle 5",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s28c5cemento",
+      "label": "Silo 28 Calle 5 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s28c5nota",
+      "label": "Silo 28 Calle 5 · Comentarios",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "s27c6op",
+      "label": "Silo 27 Calle 6",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s27c7cemento",
+      "label": "Silo 27 Calle 6 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s27c7nota",
+      "label": "Silo 27 Calle 6 · Comentarios",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "s30c1op",
+      "label": "Silos 3000 Calle 1",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s30c1cemento",
+      "label": "Silos 3000 Calle 1 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s30c1nota",
+      "label": "Silos 3000 Calle 1 · Comentarios",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "s30c4op",
+      "label": "Silos 3000 Calle 4",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s30c4cemento",
+      "label": "Silos 3000 Calle 4 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s30c4nota",
+      "label": "Silos 3000 Calle 4 · Comentarios",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "s30c5op",
+      "label": "Silos 3000 Calle 5",
+      "kind": "select",
+      "choices": [
+        "Operativa",
+        "Fuera de servicio"
+      ]
+    },
+    {
+      "name": "s30c5cemento",
+      "label": "Silos 3000 Calle 5 · Cemento",
+      "kind": "select",
+      "choices": [
+        "Extra",
+        "Ultra",
+        "Especial",
+        "S3300",
+        "S4200",
+        "HPM"
+      ]
+    },
+    {
+      "name": "s30c5nota",
+      "label": "Silos 3000 Calle 5 · Comentarios",
+      "kind": "text",
+      "choices": null
+    }
+  ],
+  "Producción": [
+    {
+      "name": "prodhaver",
+      "label": "Producción Haver",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "prodvento",
+      "label": "Producción Vento",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "prodbb",
+      "label": "Producción Bigbag",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "horas_haver",
+      "label": "Horas prod. Haver",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "horas_vento",
+      "label": "Horas prod. Vento",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "horas_bigbag",
+      "label": "Horas prod. Bigbag",
+      "kind": "number",
+      "choices": null
+    },
+    {
+      "name": "comentarios_haver",
+      "label": "Comentarios Haver",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "comentarios_vento",
+      "label": "Comentarios Vento",
+      "kind": "text",
+      "choices": null
+    },
+    {
+      "name": "comentarios_bigbag",
+      "label": "Comentarios Bigbag",
+      "kind": "text",
+      "choices": null
+    }
+  ]
+}
