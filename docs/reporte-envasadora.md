@@ -8,7 +8,8 @@ Ante un error de confirmación, revisar la recepción antes de reintentar.
 
 La implementación adapta Medidas del proyecto ERP-Impromaq. No importa registros
 históricos ni modifica ese proyecto. Destinatarios en `config/envasadora_recipients.json`,
-con la misma incorporación de Helmut para registros de 05:00 a 09:59 de Santiago.
+temporalmente limitada para pruebas a José Jerez, Fernando González y Claudio Villanueva,
+sin destinatarios adicionales por horario.
 Las pruebas usan entrega simulada, sin correos reales.
 
 ## Cálculos
