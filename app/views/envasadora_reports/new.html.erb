@@ -14,7 +14,7 @@
       <% if ["Stock", "Despacho"].include?(title) %><p class="text-muted">Cantidades en toneladas.</p><% end %>
       <% if title == "Plastificado" %><p class="text-muted">Cantidades en pallets (1,8 toneladas por pallet).</p><% end %>
       <% if title == "Producción" %><p class="text-muted">Haver y Vento: cantidad de sacos de 25 kg. Bigbag: cantidad de bolsas de 1,5 t. Horas admite decimales.</p><% end %>
-      <div class="row"><% fields.each do |field| %><div class="col-md-4 mb-3">
+      <div class="row"><% fields.each do |field| %><div class="<%= title == "Nivel tolvas" ? "col-md-6" : "col-md-4" %> mb-3">
         <%= f.label field["name"], field["label"], class: "form-label" %>
         <% if field["choices"] %><%= f.select field["name"], field["choices"], { include_blank: field["choices"].first.is_a?(String) ? "Sin informar" : false }, class: "form-select" %>
         <% elsif field["kind"] == "number" %><%= f.number_field field["name"], min: 0, step: "0.01", required: true, class: "form-control" %>
