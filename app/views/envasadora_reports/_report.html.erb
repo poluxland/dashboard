@@ -7,14 +7,14 @@
     <section style="margin:24px 0">
       <h2 style="font-size:20px;margin-bottom:10px"><%= table[:title] %></h2>
       <div style="overflow-x:auto">
-        <table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse;border-color:#d5dce3;font-size:14px">
-          <thead style="background-color:#edf2f6"><tr><% table[:headers].each do |header| %><th scope="col" style="text-align:left"><%= header %></th><% end %></tr></thead>
+        <table border="0" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #d5dce3;font-size:14px">
+          <thead style="background-color:#edf2f6"><tr><% table[:headers].each do |header| %><th scope="col" style="text-align:left;border:0;border-bottom:1px solid #d5dce3;padding:8px"><%= header %></th><% end %></tr></thead>
           <tbody>
             <% table[:rows].each_with_index do |row, index| %>
               <tr style="background-color:<%= index.even? ? '#ffffff' : '#f7f9fb' %>">
                 <% row.each_with_index do |cell, column| %>
-                  <% if column.zero? %><th scope="row" style="text-align:left;font-weight:normal"><%= cell %></th>
-                  <% else %><td><%= cell %></td><% end %>
+                  <% if column.zero? %><th scope="row" style="text-align:left;font-weight:normal;border:0;border-bottom:1px solid #edf2f6;padding:8px"><%= cell %></th>
+                  <% else %><td style="border:0;border-bottom:1px solid #edf2f6;padding:8px"><%= cell %></td><% end %>
                 <% end %>
               </tr>
             <% end %>
