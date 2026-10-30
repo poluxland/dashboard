@@ -1,0 +1,111 @@
+<% content_for :title, "Productividad y detenciones · Envasadora" %>
+<div class="py-4" data-controller="envasadora-dashboard" data-envasadora-dashboard-charts-value="<%= @dashboard.charts.to_json %>">
+  <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">Productividad y detenciones</h1>
+      <p class="text-body-secondary mb-0">Envasadora PTM · Producción Haver y eventos de VentoHaver TPT</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <%= link_to "Reportes de turno", envasadora_reports_path, class: "btn btn-outline-primary" %>
+      <%= link_to "Cargas VentoHaver TPT", tpt_imports_path, class: "btn btn-outline-secondary" %>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 mb-4"><div class="card-body p-4">
+    <%= form_with url: envasadora_dashboard_path, method: :get, data: { turbo: false } do |form| %>
+      <div class="d-flex gap-2 flex-wrap mb-3" aria-label="Períodos rápidos">
+        <% { "7" => "Últimos 7 días", "30" => "Últimos 30 días", "month" => "Mes actual", "previous" => "Mes anterior", "all" => "Todo" }.each do |period, label| %>
+          <%= button_tag label, name: :period, value: period, class: "btn btn-sm btn-outline-primary" %>
+        <% end %>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-sm-6 col-lg-3"><%= form.label :from, "Desde", class: "form-label" %><%= form.date_field :from, value: @dashboard.from, required: true, class: "form-control" %></div>
+        <div class="col-sm-6 col-lg-3"><%= form.label :to, "Hasta", class: "form-label" %><%= form.date_field :to, value: @dashboard.to, required: true, class: "form-control" %></div>
+        <div class="col-sm-6 col-lg-4"><%= form.label :pareto, "Agrupar Pareto por", class: "form-label" %><%= form.select :pareto, EnvasadoraDashboard::PARETO_MODES.map { |key, label| [label, key] }, { selected: @dashboard.pareto_mode }, class: "form-select" %></div>
+        <div class="col-sm-6 col-lg-2"><%= form.label :top, "Mostrar causas", class: "form-label" %><%= form.number_field :top, value: @dashboard.limit, min: 5, max: 25, class: "form-control" %></div>
+      </div>
+      <fieldset class="mb-3"><legend class="fs-6 fw-semibold mb-2">Turnos</legend>
+        <% EnvasadoraDashboard::SHIFTS.each do |shift| %><div class="form-check form-check-inline"><%= check_box_tag "shifts[]", shift, @dashboard.shifts.include?(shift), id: "dashboard_shift_#{shift}", class: "form-check-input" %><%= label_tag "dashboard_shift_#{shift}", shift, class: "form-check-label" %></div><% end %>
+      </fieldset>
+      <fieldset class="mb-3"><legend class="fs-6 fw-semibold mb-2">Días de la semana</legend>
+        <% EnvasadoraDashboard::DAYS.each_with_index do |day, index| %><div class="form-check form-check-inline"><%= check_box_tag "weekdays[]", index + 1, @dashboard.weekdays.include?(index + 1), id: "dashboard_day_#{index + 1}", class: "form-check-input" %><%= label_tag "dashboard_day_#{index + 1}", day, class: "form-check-label" %></div><% end %>
+      </fieldset>
+      <div class="d-flex gap-3 flex-wrap align-items-center">
+        <div class="form-check">
+          <%= hidden_field_tag :exclude_unscheduled, "0" %>
+          <%= check_box_tag :exclude_unscheduled, "1", @dashboard.exclude_unscheduled, class: "form-check-input" %>
+          <%= label_tag :exclude_unscheduled, "Excluir tiempo no programado del Pareto y del detalle de detenciones", class: "form-check-label" %>
+        </div>
+        <%= form.submit "Aplicar filtros", class: "btn btn-primary ms-lg-auto" %>
+        <%= link_to "Restablecer", envasadora_dashboard_path, class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+    <p class="small text-body-secondary mt-3 mb-0">Consulta: <%= l @dashboard.from %> al <%= l @dashboard.to %>. Los períodos rápidos se basan en la última fecha con datos. Sin selección de turnos o días se incluyen todos.</p>
+  </div></div>
+
+  <% if @dashboard.rows.empty? %>
+    <div class="alert alert-info">No hay datos para este período y filtros. Registra un reporte de turno o carga los eventos TPT desde sus secciones habituales.</div>
+  <% end %>
+  <% if @dashboard.negative_count.positive? %><div class="alert alert-warning"><%= @dashboard.negative_count %> eventos con duración negativa excluidos de este informe.</div><% end %>
+  <% if @dashboard.missing_hours_count.positive? %><p class="small text-body-secondary"><%= @dashboard.missing_hours_count %> turnos declaran producción sin horas Haver. Completa esas horas para calcular la producción por hora del período.</p><% end %>
+  <% if @dashboard.duplicate_report_count.positive? %><p class="small text-body-secondary">Hay varios reportes para algunas fechas y turnos: se usa únicamente el último guardado (<%= @dashboard.duplicate_report_count %> versiones anteriores omitidas).</p><% end %>
+  <% if @dashboard.tpt_only_count.positive? || @dashboard.production_only_count.positive? %>
+    <p class="small text-body-secondary"><%= @dashboard.tpt_only_count %> turnos tienen TPT sin reporte de producción y <%= @dashboard.production_only_count %> tienen reporte sin TPT. Un guion indica que falta el dato.</p>
+  <% end %>
+
+  <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+    <% dashboard_kpis(@dashboard).each do |label, value, description| %>
+      <div class="col"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
+        <div class="small text-body-secondary mb-2"><%= label %></div>
+        <div class="h3 fw-bold mb-1"><%= value %></div>
+        <div class="small text-body-secondary"><%= description %></div>
+      </div></div></div>
+    <% end %>
+  </div>
+
+  <details class="card border-0 bg-body-tertiary rounded-4 mb-4"><summary class="p-3 fw-semibold">Horarios, fuentes y cálculo de indicadores</summary><div class="px-3 pb-3 small">
+    <p>Producción: sacos Haver del último Reporte envasadora guardado por fecha y turno, incluidos reportes pendientes de envío. Producción por hora usa las horas Haver declaradas; si no hay horas, se muestra un guion. Los inventarios no se suman como producción.</p>
+    <p>TM 06:00–14:00, TT 14:00–22:00 y TN 22:00–06:00 del día siguiente. TN pertenece a la fecha en que empieza. Programa: lunes a viernes, 8 horas por turno; sábado, solo TM de 06:00 a 12:00; domingo, sin programación. Los filtros por día usan la fecha del turno.</p>
+    <p>Disponibilidad observada = tiempo registrado en marcha ÷ tiempo de operación registrado. Se consideran los eventos Correr, Parada planificada y Parada no planificada dentro del horario programado; No programada queda fuera de esa base. Las horas sin registros no se suponen operativas. La cobertura compara el tiempo observado con las horas programadas del turno.</p>
+    <p>MTBF = horas operativas observadas ÷ paradas no planificadas. MTTR = minutos de parada no planificada ÷ número de paradas. Una parada que cruza turnos se cuenta una sola vez en el total consultado y su duración se reparte entre los turnos. La confiabilidad estima e^(−8/MTBF), suponiendo una tasa constante de fallas; no es una garantía de operación.</p>
+    <p class="mb-0">El Pareto suma duraciones de eventos por su clasificación TPT. No hay una columna separada de equipo o diagnóstico de falla en el archivo. Los indicadores de tiempo usan la unión de intervalos para evitar contar dos veces eventos superpuestos; por eso el Pareto puede diferir del tiempo detenido si existen superposiciones.</p>
+  </div></details>
+
+  <p class="alert alert-warning" hidden data-envasadora-dashboard-target="error">No se pudieron cargar los gráficos. Los valores del informe siguen disponibles en las tablas.</p>
+  <div class="card border-0 shadow-sm rounded-4 mb-4"><div class="card-body p-4">
+    <h2 class="h5 fw-bold"><%= @dashboard.production_title %></h2>
+    <% if @dashboard.production_shift_count.zero? %><p class="text-body-secondary">Sin reportes de producción para este período.</p><% end %>
+    <div style="height: 340px;"><canvas data-envasadora-dashboard-target="production" aria-label="Producción por período y turno, en sacos" role="img"></canvas></div>
+  </div></div>
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4">
+      <h2 class="h5 fw-bold">Producción promedio por día y turno</h2>
+      <p class="small text-body-secondary">Promedio de sacos de los turnos con reporte; incluye ceros declarados.</p>
+      <div style="height: 350px;"><canvas data-envasadora-dashboard-target="weekday" aria-label="Producción promedio por día de semana y turno, en sacos" role="img"></canvas></div>
+      <details class="mt-3"><summary class="small">Ver promedios</summary><div class="table-responsive"><table class="table table-sm small"><thead><tr><th>Día</th><% EnvasadoraDashboard::SHIFTS.each do |shift| %><th><%= shift %></th><% end %></tr></thead><tbody><% EnvasadoraDashboard::DAYS.each_with_index do |day, index| %><tr><td><%= day %></td><% @dashboard.charts[:weekday][:datasets].each do |series| %><td><%= dashboard_number(series[:data][index]) %></td><% end %></tr><% end %></tbody></table></div></details>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4">
+      <h2 class="h5 fw-bold">Pareto de detenciones por <%= EnvasadoraDashboard::PARETO_MODES[@dashboard.pareto_mode].downcase %></h2>
+      <p class="small text-body-secondary">Minutos y porcentaje acumulado de las causas seleccionadas.</p>
+      <% if @dashboard.pareto.empty? %><p class="text-body-secondary">Sin detenciones para los filtros seleccionados.</p><% end %>
+      <div style="height: 350px;"><canvas data-envasadora-dashboard-target="pareto" aria-label="Pareto de detenciones y porcentaje acumulado" role="img"></canvas></div>
+    </div></div></div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 mb-4"><div class="card-body p-4">
+    <h2 class="h5 fw-bold">Detalle del Pareto</h2>
+    <div class="table-responsive"><table class="table table-striped align-middle" id="envasadora-pareto-detail"><thead><tr><th>#</th><th><%= EnvasadoraDashboard::PARETO_MODES[@dashboard.pareto_mode] %></th><th class="text-end">Minutos</th><th class="text-end">Eventos</th><th class="text-end">%</th><th class="text-end">% acumulado</th></tr></thead><tbody>
+      <% @dashboard.pareto.each_with_index do |row, index| %><tr><td><%= index + 1 %></td><td><%= row[:label] %></td><td class="text-end"><%= dashboard_number(row[:minutes]) %></td><td class="text-end"><%= row[:events] %></td><td class="text-end"><%= dashboard_number(row[:percentage], suffix: "%") %></td><td class="text-end"><%= dashboard_number(row[:cumulative], suffix: "%") %></td></tr><% end %>
+      <% if @dashboard.pareto.empty? %><tr><td colspan="6">Sin detenciones.</td></tr><% end %>
+    </tbody></table></div>
+  </div></div>
+  <div class="card border-0 shadow-sm rounded-4"><div class="card-body p-4">
+    <h2 class="h5 fw-bold">Detalle por turno</h2>
+    <p class="small text-body-secondary">Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
+    <div class="table-responsive"><table class="table table-striped align-middle small" id="envasadora-shift-detail"><thead><tr><th>Fecha</th><th>Día</th><th>Turno</th><th class="text-end">Producción (sacos)</th><th class="text-end">Horas Haver</th><th class="text-end">Min detenidos</th><th class="text-end">Eventos</th><th class="text-end">Disponibilidad</th><th class="text-end">Cobertura TPT</th><th>Mayor detención</th><th>Origen</th></tr></thead><tbody>
+      <% @detail_rows.each do |row| %><tr><td class="text-nowrap"><%= l row[:date] %></td><td><%= EnvasadoraDashboard::DAYS[row[:date].cwday - 1] %></td><td><%= row[:shift] %></td><td class="text-end"><%= dashboard_number(row[:production], precision: 0) %></td><td class="text-end"><%= dashboard_number(row[:hours]) %></td><td class="text-end"><%= row[:observed_seconds].positive? ? dashboard_number(row[:downtime_seconds] / 60) : "—" %></td><td class="text-end"><%= row[:observed_seconds].positive? ? row[:event_count] : "—" %></td><td class="text-end"><%= dashboard_number(row[:availability], suffix: "%") %></td><td class="text-end"><%= dashboard_number(row[:coverage], suffix: "%") %></td><td><%= row[:major_cause] ? "#{row[:major_cause].first} (#{dashboard_number(row[:major_cause].last / 60)} min)" : "—" %></td><td><% if row[:report] %><%= link_to "Reporte", envasadora_report_path(row[:report]) %><% end %><% if row[:observed_seconds].positive? %><span class="badge text-bg-light">TPT</span><% end %></td></tr><% end %>
+      <% if @detail_rows.empty? %><tr><td colspan="11">Sin turnos para mostrar.</td></tr><% end %>
+    </tbody></table></div>
+    <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+  </div></div>
+</div>
