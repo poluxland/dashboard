@@ -55,7 +55,7 @@
     <div class="alert alert-info">No hay datos para este período y filtros. Registra un reporte de turno o carga los eventos TPT desde sus secciones habituales.</div>
   <% end %>
   <% if @dashboard.negative_count.positive? %><div class="alert alert-warning"><%= @dashboard.negative_count %> eventos con duración negativa excluidos de este informe.</div><% end %>
-  <% if @dashboard.missing_hours_count.positive? %><p class="small text-body-secondary"><%= @dashboard.missing_hours_count %> turnos declaran producción sin horas Haver. Completa esas horas para calcular la producción por hora del período.</p><% end %>
+  <% if @dashboard.missing_hours_count.positive? %><p class="small text-body-secondary"><%= @dashboard.missing_hours_count %> turnos declaran producción sin horas Haver válidas. El rendimiento por hora del período no se calcula hasta resolver esos datos.</p><% end %>
   <% if @dashboard.duplicate_report_count.positive? %><p class="small text-body-secondary">Hay varios reportes para algunas fechas y turnos: se usa únicamente el último guardado (<%= @dashboard.duplicate_report_count %> versiones anteriores omitidas).</p><% end %>
   <% if @dashboard.tpt_only_count.positive? || @dashboard.production_only_count.positive? %>
     <p class="small text-body-secondary"><%= @dashboard.tpt_only_count %> turnos tienen TPT sin reporte de producción y <%= @dashboard.production_only_count %> tienen reporte sin TPT. Un guion indica que falta el dato.</p>

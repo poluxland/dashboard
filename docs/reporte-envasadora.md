@@ -1,13 +1,13 @@
 # Reporte envasadora
 
-Acceso: menú Informe → Reporte envasadora. Requiere sesión corporativa.
+Acceso: menú Reportes → Envasadora. Requiere sesión corporativa.
 El operador guarda el registro, revisa los totales y pulsa **Enviar reporte por correo**.
 Solo su autor puede editarlo antes del envío o enviarlo. Después del envío queda cerrado. Los reportes guardados conservan sus medidas y cementos;
 un envío confirmado no se repite. Los errores de correo dejan el registro guardado.
 Ante un error de confirmación, revisar la recepción antes de reintentar.
 
-La implementación adapta Medidas del proyecto ERP-Impromaq. No importa registros
-históricos ni modifica ese proyecto. Destinatarios en `config/envasadora_recipients.json`,
+La implementación adapta Medidas del proyecto ERP-Impromaq y permite incorporar
+históricos de su exportación sin modificar ese proyecto. Destinatarios en `config/envasadora_recipients.json`,
 temporalmente limitada para pruebas a José Jerez, Fernando González y Claudio Villanueva,
 sin destinatarios adicionales por horario.
 Las pruebas usan entrega simulada, sin correos reales.
@@ -54,3 +54,32 @@ La fecha debe corresponder al día operativo elegido por quien registra el turno
 Web y ambos formatos de correo comparten las tablas de `EnvasadoraReportPresenter`.
 Cada columna del inventario combinado agrupa los silos según el cemento seleccionado
 en el registro de ese turno. El formulario de tolvas mantiene dos columnas.
+
+## Histórico importado
+
+El histórico de Impromaq-5.xlsx usa solo filas con TM, TT o TN. Según la regla
+confirmada por el usuario, la primera fila del archivo por fecha y turno es la
+más reciente: se descartan las versiones posteriores y las filas sin turno.
+Se conservan archivo, hoja, fila, huella SHA256 y todas las columnas originales,
+incluidos resultados calculados y columnas que no tienen un campo editable.
+
+La carga administrativa usa `EnvasadoraHistoryImporter` y la tarea
+`envasadora:import_history`. Recibe por stdin un JSON comprimido con gzip y
+codificado en base64. `DRY_RUN=1` prepara el resumen sin guardar. Los datos no
+se guardan en Git ni se publican como archivos web. Las huellas de origen
+impiden duplicar una carga idéntica.
+
+Los históricos son de consulta: no se editan ni se envían por correo. Su vista
+muestra valores originales y celdas vacías como guiones; los valores fuera de
+las reglas actuales quedan señalados, sin corregirlos. La lista ofrece filtros
+de fecha/turno y paginación de 50 registros para consultar el histórico completo.
+
+Las horas ausentes o fuera de rango no se consideran horas válidas para el
+rendimiento del dashboard. Tampoco se usan cantidades negativas o campos que
+incumplen las validaciones actuales en sus indicadores. El inventario de la lista
+queda sin dato si faltan componentes o hay mediciones inválidas.
+
+La sustitución del ensayo inicial verifica su ID y sus atributos antes de
+eliminarlo, exige que sea el único registro y agrupa eliminación e inserción en
+una transacción. Si algo cambia o falla, la operación se revierte. El respaldo
+del ensayo se conserva localmente fuera de Git.

@@ -1,8 +1,19 @@
 class EnvasadoraReportsController < ApplicationController
   before_action :set_report, only: [ :show, :edit, :update, :send_email ]
+  before_action :protect_historical_report, only: [ :edit, :update, :send_email ]
 
   def index
-    @reports = EnvasadoraReport.order(date: :desc, created_at: :desc).limit(100)
+    scope = EnvasadoraReport.all
+    scope = scope.where("date >= ?", Date.iso8601(params[:from])) if params[:from].present? && params[:to].blank?
+    if params[:from].present? && params[:to].present?
+      scope = scope.where(date: Date.iso8601(params[:from])..Date.iso8601(params[:to]))
+    elsif params[:to].present?
+      scope = scope.where("date <= ?", Date.iso8601(params[:to]))
+    end
+    scope = scope.where(turno: params[:turno]) if EnvasadoraReport::SHIFTS.key?(params[:turno])
+    @pagy, @reports = pagy(scope.order(date: :desc, created_at: :desc, id: :desc), limit: 50)
+  rescue Date::Error
+    redirect_to envasadora_reports_path, alert: "Usa fechas válidas para consultar el histórico."
   end
 
   def new
@@ -55,6 +66,12 @@ class EnvasadoraReportsController < ApplicationController
   end
 
   private
+
+  def protect_historical_report
+    return unless @report.historical?
+
+    redirect_to @report, alert: "Este reporte es un histórico importado. Se conserva el original y no se edita ni se envía por correo."
+  end
 
   def editable?
     @report.author_email == current_user[:email] && !@report.sent_at?

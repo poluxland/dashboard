@@ -126,8 +126,10 @@ class EnvasadoraDashboard
     chosen.each do |key, report|
       row = @row_map[key]
       next unless row
-      row[:production] = @source_config[:production].sum { |field| report.public_send(field).to_f }
-      row[:hours] = @source_config[:hours].sum { |field| report.public_send(field).to_f }
+      production = @source_config[:production].map { |field| report.value_for_analytics(field) }
+      hours = @source_config[:hours].map { |field| report.value_for_analytics(field) }
+      row[:production] = production.none?(&:nil?) ? production.sum(&:to_f) : nil
+      row[:hours] = hours.none?(&:nil?) ? hours.sum(&:to_f) : nil
       row[:report] = report
     end
   end

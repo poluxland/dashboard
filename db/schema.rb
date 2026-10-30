@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -189,6 +189,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
     t.string "comentarios_bigbag"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source_filename"
+    t.integer "source_row"
+    t.string "source_fingerprint"
+    t.jsonb "source_data", default: {}, null: false
+    t.index ["source_fingerprint"], name: "index_envasadora_reports_on_source_fingerprint", unique: true
     t.index ["date", "turno"], name: "index_envasadora_reports_on_date_and_turno"
   end
 

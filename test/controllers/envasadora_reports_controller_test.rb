@@ -5,6 +5,25 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     @attributes = EnvasadoraReport::SILOS.values.flat_map { |s| s[:readings] }.index_with { 10 }.merge(date: Date.current, turno: "TM", silo19_cement: "HPM")
   end
 
+  test "historic snapshots retain source values and cannot be edited or emailed" do
+    sign_in_with_google
+    report = EnvasadoraReport.create!(@attributes.merge(author_email: "usuario@msindustrial.cl", source_filename: "history.xlsx", source_row: 3, source_fingerprint: "history-controller", source_data: { sheet: "Sheet1", cells: { "Com. Haver" => "Dato histórico <script>bad()</script>" }, issues: [], present_fields: [], invalid_fields: [] }))
+    get envasadora_report_path(report)
+    assert_response :success
+    assert_select "h1", "Reporte envasadora · Histórico"
+    assert_select "button", text: "Enviar reporte por correo", count: 0
+    assert_select "script", text: /bad\(\)/, count: 0
+    assert_includes response.body, "Dato histórico &lt;script&gt;bad()&lt;/script&gt;"
+    get edit_envasadora_report_path(report)
+    assert_redirected_to envasadora_report_path(report)
+    patch envasadora_report_path(report), params: { envasadora_report: { prodhaver: 999 } }
+    assert_redirected_to envasadora_report_path(report)
+    assert_equal 0, report.reload.prodhaver
+    assert_no_difference("ActionMailer::Base.deliveries.size") { post send_email_envasadora_report_path(report) }
+    assert_redirected_to envasadora_report_path(report)
+    assert_nil report.reload.sent_at
+  end
+
   test "authentication required" do
     get envasadora_reports_path
     assert_redirected_to login_path

@@ -1,0 +1,17 @@
+<div class="py-3">
+  <h1 class="h3">Reporte envasadora · Histórico</h1>
+  <p class="fw-semibold"><%= l report.date %> · <%= EnvasadoraReport::SHIFTS[report.turno] %></p>
+  <p class="text-body-secondary">Origen: <%= report.source_filename %> · Hoja <%= report.source_data["sheet"] %> · Fila <%= report.source_row %>.<br>Cargado el <%= report.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %>. Se muestran los valores del archivo original; un guion indica que la celda estaba vacía.</p>
+  <% issues = report.source_data.fetch("issues", []) %>
+  <% if issues.any? %><details class="alert alert-warning"><summary>Datos de origen para revisar (<%= issues.size %>)</summary><ul class="mb-0 mt-2"><% issues.each do |issue| %><li><%= issue %></li><% end %></ul></details><% end %>
+  <div class="row g-3">
+    <% EnvasadoraHistoryImporter::COLUMNS.reject { |column| column["group"].nil? }.group_by { |column| column["group"] }.each do |group, columns| %>
+      <div class="col-lg-6"><section class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
+        <h2 class="h5 fw-bold"><%= group %></h2>
+        <div class="table-responsive"><table class="table table-striped align-middle mb-0"><thead><tr><th>Concepto</th><th>Valor original</th></tr></thead><tbody>
+          <% columns.each do |column| %><tr><th scope="row" class="fw-normal"><%= column["header"] %></th><td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= report.source_data.fetch("cells", {})[column["header"]].presence || "—" %></td></tr><% end %>
+        </tbody></table></div>
+      </div></section></div>
+    <% end %>
+  </div>
+</div>

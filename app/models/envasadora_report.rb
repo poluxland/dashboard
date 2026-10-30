@@ -81,6 +81,27 @@ class EnvasadoraReport < ApplicationRecord
     inventory.values.sum { |row| row[:total] }
   end
 
+  def historical?
+    source_fingerprint.present?
+  end
+
+  def value_for_analytics(field)
+    if historical?
+      return unless source_data.fetch("present_fields", []).include?(field)
+      return if source_data.fetch("invalid_fields", []).include?(field)
+    end
+    public_send(field)
+  end
+
+  def inventory_for_display
+    if historical?
+      fields = SILOS.values.flat_map { |silo| silo[:readings] } + FLOOR.values.flatten
+      return if (fields - source_data.fetch("present_fields", [])).any?
+      return if (fields & source_data.fetch("invalid_fields", [])).any?
+    end
+    total_tons
+  end
+
   # A stock snapshot is never added to another shift's snapshot.
   def daily_reports
     earlier = SHIFTS.keys.take(SHIFTS.keys.index(turno))
