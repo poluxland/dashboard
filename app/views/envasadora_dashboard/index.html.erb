@@ -11,6 +11,11 @@
     </div>
   </div>
 
+  <div class="mb-3">
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#envasadora-filters" aria-expanded="false" aria-controls="envasadora-filters">Mostrar / ocultar filtros</button>
+    <p class="small text-body-secondary mt-2 mb-0">Consulta: <%= l @dashboard.from %> al <%= l @dashboard.to %>.</p>
+  </div>
+  <div class="collapse" id="envasadora-filters">
   <div class="card border-0 shadow-sm rounded-4 mb-4"><div class="card-body p-4">
     <%= form_with url: envasadora_dashboard_path, method: :get, data: { turbo: false } do |form| %>
       <div class="d-flex gap-2 flex-wrap mb-3" aria-label="Períodos rápidos">
@@ -47,14 +52,14 @@
         <%= link_to "Restablecer", envasadora_dashboard_path, class: "btn btn-outline-secondary" %>
       </div>
     <% end %>
-    <p class="small text-body-secondary mt-3 mb-0">Consulta: <%= l @dashboard.from %> al <%= l @dashboard.to %>. Los períodos rápidos se basan en la última fecha con datos. Sin selección de turnos o días se incluyen todos.</p>
+    <p class="small text-body-secondary mt-3 mb-0">Los períodos rápidos se basan en la última fecha con datos. Sin selección de turnos o días se incluyen todos.</p>
     <% unless @dashboard.include_missing_reason %><p class="small text-body-secondary mt-2 mb-0">Missing Reason está excluido de los tiempos, indicadores TPT, gráficos y tablas. La producción Haver se mantiene; las horas excluidas no se consideran operativas.</p><% end %>
   </div></div>
+  </div>
 
   <% if @dashboard.rows.empty? %>
     <div class="alert alert-info">No hay datos para este período y filtros. Registra un reporte de turno o carga los eventos TPT desde sus secciones habituales.</div>
   <% end %>
-  <% if @dashboard.negative_count.positive? %><div class="alert alert-warning"><%= @dashboard.negative_count %> eventos con duración negativa excluidos de este informe.</div><% end %>
   <% if @dashboard.missing_hours_count.positive? %><p class="small text-body-secondary"><%= @dashboard.missing_hours_count %> turnos declaran producción sin horas Haver válidas. El rendimiento por hora del período no se calcula hasta resolver esos datos.</p><% end %>
   <% if @dashboard.duplicate_report_count.positive? %><p class="small text-body-secondary">Hay varios reportes para algunas fechas y turnos: se usa únicamente el último guardado (<%= @dashboard.duplicate_report_count %> versiones anteriores omitidas).</p><% end %>
   <% if @dashboard.tpt_only_count.positive? || @dashboard.production_only_count.positive? %>

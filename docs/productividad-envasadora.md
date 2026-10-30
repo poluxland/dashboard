@@ -33,6 +33,10 @@ Filtros: fechas, últimos 7/30 días, mes actual/anterior, todo, turnos, días d
 semana, agrupación del Pareto (razón, estado, impacto), primeras 5–25 causas e
 inclusión del tiempo No programada. Los períodos rápidos se anclan en la última
 fecha con datos. No seleccionar días/turnos equivale a seleccionar todos.
+El panel de filtros permanece cerrado al abrir el informe y se despliega con
+**Mostrar / ocultar filtros**. El período consultado permanece visible fuera
+del panel. Los indicadores, gráficos y tablas siguen visibles. El aviso amarillo
+de duraciones negativas no se muestra aquí; esos eventos siguen excluidos.
 
 Missing Reason queda excluido por defecto del informe TPT completo, incluidos
 tiempos observados, cobertura, disponibilidad, MTBF, MTTR, Pareto y detalle.
