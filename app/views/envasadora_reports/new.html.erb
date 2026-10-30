@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-between mb-3"><h1 class="h3"><%= @report.persisted? ? "Editar reporte envasadora" : "Nuevo reporte envasadora" %></h1><%= link_to "Ver reportes", envasadora_reports_path, class: "btn btn-outline-secondary" %></div>
-<%= form_with model: @report do |f| %>
+<%= form_with model: @report, data: { controller: "envasadora-hours", "envasadora-hours-maximum-value": EnvasadoraReport::MAX_SHIFT_HOURS, "envasadora-hours-saturday-value": EnvasadoraReport::SATURDAY_MORNING_HOURS } do |f| %>
   <% if @report.errors.any? %><div class="alert alert-danger" role="alert"><ul><% @report.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
-  <div class="row mb-4"><div class="col-md-4"><%= f.label :date, "Fecha del turno", class: "form-label" %><%= f.date_field :date, required: true, class: "form-control" %></div><div class="col-md-4"><%= f.label :turno, "Turno", class: "form-label" %><%= f.select :turno, EnvasadoraReport::SHIFTS.map { |key, label| [label, key] }, { include_blank: "Seleccionar turno" }, required: true, class: "form-select" %></div></div>
+  <div class="row mb-4"><div class="col-md-4"><%= f.label :date, "Fecha del turno", class: "form-label" %><%= f.date_field :date, required: true, class: "form-control", data: { "envasadora-hours-target": "date", action: "change->envasadora-hours#updateLimits" } %></div><div class="col-md-4"><%= f.label :turno, "Turno", class: "form-label" %><%= f.select :turno, EnvasadoraReport::SHIFTS.map { |key, label| [label, key] }, { include_blank: "Seleccionar turno" }, required: true, class: "form-select", data: { "envasadora-hours-target": "shift", action: "change->envasadora-hours#updateLimits" } %></div></div>
   <section class="card mb-4"><div class="card-body"><h2 class="h4">Nuevo registro medidas</h2><p class="text-muted">Ingresa las medidas en metros (admite decimales) y selecciona el cemento de cada silo. Los valores iniciales se pueden cambiar. Silos 27 y 28 utilizan una sola medida.</p>
     <div class="table-responsive"><table class="table"><thead><tr><th>Silo</th><th>Medida 1 (m)</th><th>Medida 2 (m)</th><th>Tipo de cemento</th></tr></thead><tbody>
       <% EnvasadoraReport::SILOS.each do |id, silo| %><tr><th scope="row">Silo <%= id %></th>
@@ -14,10 +14,11 @@
       <% if ["Stock", "Despacho"].include?(title) %><p class="text-muted">Cantidades en toneladas; admite decimales.</p><% end %>
       <% if title == "Plastificado" %><p class="text-muted">Cantidades en pallets (1,8 toneladas por pallet).</p><% end %>
       <% if title == "Producción" %><p class="text-muted">Haver y Vento: cantidad de sacos de 25 kg. Bigbag: cantidad de bolsas de 1,5 t. Unidades en números enteros. Las horas admiten decimales, por ejemplo 3,5.</p><% end %>
+      <% if title == "Producción" %><p class="text-muted" id="envasadora-hours-limit" data-envasadora-hours-target="limit">Horas entre 0 y <%= @report.hours_limit %>. Usa decimales, por ejemplo 6,5.</p><% end %>
       <div class="row"><% fields.each do |field| %><div class="<%= title == "Nivel tolvas" ? "col-md-6" : "col-md-4" %> mb-3">
         <%= f.label field["name"], field["label"], class: "form-label" %>
         <% if field["choices"] %><%= f.select field["name"], field["choices"], { include_blank: field["choices"].first.is_a?(String) ? "Sin informar" : false }, class: "form-select" %>
-        <% elsif field["kind"] == "number" %><%= f.number_field field["name"], value: envasadora_input_value(@report.public_send(field["name"])), min: 0, step: EnvasadoraReport::DECIMAL_FIELDS.include?(field["name"]) ? "0.01" : 1, required: true, class: "form-control" %>
+        <% elsif field["kind"] == "number" %><% hour_field = EnvasadoraReport::HOUR_FIELDS.include?(field["name"]) %><%= f.number_field field["name"], value: envasadora_input_value(@report.public_send(field["name"])), min: 0, max: hour_field ? @report.hours_limit : nil, step: EnvasadoraReport::DECIMAL_FIELDS.include?(field["name"]) ? "0.01" : 1, required: true, class: "form-control", aria: hour_field ? { describedby: "envasadora-hours-limit" } : {}, data: hour_field ? { "envasadora-hours-target": "hours" } : {} %>
         <% else %><%= f.text_field field["name"], maxlength: 2000, class: "form-control" %><% end %>
       </div><% end %></div>
     </div></section>

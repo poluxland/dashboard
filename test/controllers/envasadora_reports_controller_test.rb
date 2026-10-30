@@ -72,6 +72,35 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "form limits all production hours and server rejects overlong shifts" do
+    sign_in_with_google
+    get new_envasadora_report_path
+    EnvasadoraReport::HOUR_FIELDS.each do |field|
+      assert_select "input[name='envasadora_report[#{field}]'][min='0'][max='8'][step='0.01']", count: 1
+    end
+    assert_no_difference("EnvasadoraReport.count") do
+      post envasadora_reports_path, params: { envasadora_report: @attributes.merge(date: "2026-10-26", horas_haver: "65") }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".alert-danger"
+    assert_no_difference("EnvasadoraReport.count") do
+      post envasadora_reports_path, params: { envasadora_report: @attributes.merge(date: "2026-10-31", turno: "TM", horas_vento: "6.5") }
+    end
+    assert_response :unprocessable_entity
+    assert_select "input[name='envasadora_report[horas_vento]'][max='6']", count: 1
+  end
+
+  test "corrected historical hours recalculate the displayed hourly tonnage" do
+    sign_in_with_google
+    report = EnvasadoraReport.new(@attributes.merge(date: "2026-10-26", turno: "TT", author_email: "Histórico Excel", prodhaver: 14808, horas_haver: 65, source_fingerprint: "corrected-rate", source_data: { "present_fields" => %w[prodhaver horas_haver], "invalid_fields" => [ "horas_haver" ], "cells" => { "Horas Haver" => "65.0", "Haver Ton/h" => "5.7" } }))
+    report.save!(validate: false)
+    report.correct_historical_hours!("horas_haver", "6.5", reason: "Corrección solicitada")
+    get envasadora_report_path(report)
+    assert_response :success
+    assert_select "tr", text: /Horas Haver.*6,5.*Original: 65.0/
+    assert_select "tr", text: /Haver Ton\/h.*56,95.*Recalculado.*Original: 5.7/
+  end
+
   test "author can correct a draft but sent reports and other authors are protected" do
     sign_in_with_google
     report = EnvasadoraReport.create!(@attributes.merge(author_email: "usuario@msindustrial.cl"))

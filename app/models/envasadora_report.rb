@@ -1,6 +1,9 @@
 class EnvasadoraReport < ApplicationRecord
   CEMENTS = [ "Especial", "Extra", "Ultra", "S3300", "S4200", "Plus", "S3300 (AR)", "HPM", "Extramix" ].freeze
   SHIFTS = { "TM" => "Turno Mañana", "TT" => "Turno Tarde", "TN" => "Turno Noche" }.freeze
+  HOUR_FIELDS = %w[horas_haver horas_vento horas_bigbag].freeze
+  MAX_SHIFT_HOURS = 8
+  SATURDAY_MORNING_HOURS = 6
   GROUPS = JSON.parse(Rails.root.join("config/envasadora_fields.json").read).freeze
   FIELDS = GROUPS.values.flatten.freeze
   SILOS = {
@@ -63,6 +66,11 @@ class EnvasadoraReport < ApplicationRecord
     validates cement, presence: true, if: -> { public_send(level).to_d.positive? }
   end
   validates :observations, length: { maximum: 10000 }
+  validates(*HOUR_FIELDS, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: :hours_limit })
+
+  def hours_limit
+    date&.saturday? && turno == "TM" ? SATURDAY_MORNING_HOURS : MAX_SHIFT_HOURS
+  end
 
   def silo_tons(id)
     silo = SILOS.fetch(id)
@@ -83,6 +91,26 @@ class EnvasadoraReport < ApplicationRecord
 
   def historical?
     source_fingerprint.present?
+  end
+
+  def correct_historical_hours!(field, value, reason:)
+    raise ArgumentError, "El campo debe corresponder a horas de un histórico." unless historical? && HOUR_FIELDS.include?(field)
+    number = BigDecimal(value.to_s)
+    raise ArgumentError, "Las horas deben estar entre 0 y #{hours_limit}." unless number.finite? && number >= 0 && number <= hours_limit
+    raise ArgumentError, "Debes indicar el motivo de la corrección." if reason.blank?
+
+    with_lock do
+      next if public_send(field) == number && !source_data.fetch("invalid_fields", []).include?(field)
+      data = source_data.deep_dup
+      data["corrections"] ||= []
+      data["corrections"] << { "field" => field, "previous" => public_send(field).to_s("F"), "value" => number.to_s("F"), "reason" => reason, "at" => Time.current.iso8601 }
+      data["present_fields"] = (data.fetch("present_fields", []) + [ field ]).uniq
+      data["invalid_fields"] = data.fetch("invalid_fields", []) - [ field ]
+      label = { "horas_haver" => "Horas Haver", "horas_vento" => "Horas Vento", "horas_bigbag" => "Horas Bigbag" }.fetch(field)
+      data["issues"] = data.fetch("issues", []).reject { |issue| issue.downcase.start_with?("#{label.downcase}:", "#{field.humanize.downcase} ") }
+      # A targeted correction must not rewrite unrelated legacy source values.
+      update_columns(field => number, "source_data" => data, "updated_at" => Time.current)
+    end
   end
 
   def value_for_analytics(field)

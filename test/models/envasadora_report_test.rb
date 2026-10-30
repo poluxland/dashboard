@@ -51,6 +51,34 @@ class EnvasadoraReportTest < ActiveSupport::TestCase
     assert_equal 75, report.silo_tons(19)
   end
 
+  test "production hours reject values above the shift limit and accept decimal hours" do
+    EnvasadoraReport::HOUR_FIELDS.each do |field|
+      assert build_report(date: Date.new(2026, 10, 26), field => "6.5").valid?
+      assert build_report(date: Date.new(2026, 10, 26), field => "8").valid?
+      assert_not build_report(date: Date.new(2026, 10, 26), field => "8.01").valid?
+      assert_not build_report(date: Date.new(2026, 10, 26), field => "65").valid?
+      assert_not build_report(date: Date.new(2026, 10, 26), field => "-1").valid?
+      assert build_report(date: Date.new(2026, 10, 31), turno: "TM", field => "6").valid?
+      assert_not build_report(date: Date.new(2026, 10, 31), turno: "TM", field => "6.01").valid?
+    end
+  end
+
+  test "historical hours correction restores analytics and preserves original and audit" do
+    record = build_report(date: Date.new(2026, 10, 26), turno: "TT", horas_haver: 65, source_fingerprint: "correction-test",
+      source_data: { "cells" => { "Horas Haver" => "65.0" }, "invalid_fields" => [ "horas_haver" ], "present_fields" => [ "horas_haver" ], "issues" => [ "Horas Haver: valor 65.0 fuera del rango esperado; se conserva el original.", "Otro dato" ] })
+    record.save!(validate: false)
+    record.correct_historical_hours!("horas_haver", "6.5", reason: "Corrección solicitada por el usuario")
+    record.reload
+    assert_equal BigDecimal("6.5"), record.value_for_analytics("horas_haver")
+    assert_equal "65.0", record.source_data["cells"]["Horas Haver"]
+    assert_equal [ "Otro dato" ], record.source_data["issues"]
+    assert_equal 1, record.source_data["corrections"].size
+    assert_equal "65.0", record.source_data["corrections"].sole["previous"]
+    record.correct_historical_hours!("horas_haver", "6.5", reason: "Reintento")
+    assert_equal 1, record.reload.source_data["corrections"].size
+    assert_raises(ArgumentError) { record.correct_historical_hours!("horas_haver", "65", reason: "Inválido") }
+  end
+
   test "missing readings invalid cement negative stock and out of range values are rejected" do
     [ { silo19a: nil }, { silo28: 21 }, { silo27: -1 }, { silo19_cement: "Unknown" }, { extrsacos: -1 }, { ns30001: 15 } ].each do |attributes|
       assert_not build_report(**attributes).valid?, attributes.inspect

@@ -26,6 +26,9 @@ Las pruebas usan entrega simulada, sin correos reales.
 - Plastificado: pallets × 1,8 t. Producción Haver/Vento: sacos × 0,025 t;
   producción Bigbag: bolsas × 1,5 t. Rendimiento = toneladas / horas. Medidas, horas y cantidades en toneladas admiten decimales;
   sacos, bolsas, pallets y enjuagues se ingresan como enteros.
+  Haver, Vento y Bigbag admiten de 0 a 8 horas por turno; sábado TM, de 0 a 6.
+  El formulario actualiza los máximos al cambiar fecha/turno y el modelo valida
+  el límite también en el servidor.
   Pantalla y correo muestran las toneladas sin decimales y con puntos entre miles;
   las medidas y horas conservan hasta dos decimales cuando los necesitan.
   Cumplimiento y toneladas estimadas de tolvas se truncan como en el original;
@@ -83,3 +86,8 @@ La sustitución del ensayo inicial verifica su ID y sus atributos antes de
 eliminarlo, exige que sea el único registro y agrupa eliminación e inserción en
 una transacción. Si algo cambia o falla, la operación se revierte. El respaldo
 del ensayo se conserva localmente fuera de Git.
+
+Las correcciones administrativas puntuales de horas guardan valor anterior,
+valor corregido, motivo y fecha en `source_data.corrections`. La celda original
+se conserva, la vista identifica el cambio y el valor corregido se habilita
+para los indicadores. La corrección no habilita edición o envío de históricos.
