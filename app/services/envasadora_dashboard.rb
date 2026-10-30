@@ -10,7 +10,7 @@ class EnvasadoraDashboard
   DAYS = %w[Lun Mar Mié Jue Vie Sáb Dom].freeze
   PARETO_MODES = { "reason" => "Razón TPT", "production_state" => "Estado de producción", "impact" => "Impacto" }.freeze
 
-  attr_reader :from, :to, :shifts, :weekdays, :source, :pareto_mode, :limit, :exclude_unscheduled,
+  attr_reader :from, :to, :shifts, :weekdays, :source, :pareto_mode, :limit, :exclude_unscheduled, :include_missing_reason,
               :rows, :pareto, :charts, :production_title, :negative_count, :duplicate_report_count,
               :available_from, :available_to, :shift_starts
 
@@ -22,6 +22,7 @@ class EnvasadoraDashboard
     @pareto_mode = PARETO_MODES.key?(@params["pareto"]) ? @params["pareto"] : "reason"
     @limit = @params.fetch("top", 10).to_i.clamp(5, 25)
     @exclude_unscheduled = @params.fetch("exclude_unscheduled", "1") == "1"
+    @include_missing_reason = @params["include_missing_reason"] == "1"
     @shifts = selected(@params["shifts"], SHIFTS)
     @weekdays = selected(@params["weekdays"], (1..7).map(&:to_s)).map(&:to_i)
     dates = [ EnvasadoraReport.minimum(:date), EnvasadoraReport.maximum(:date),
@@ -139,11 +140,13 @@ class EnvasadoraDashboard
     return if windows.empty?
     lower = windows.first[:start]
     upper = windows.last[:finish]
-    TptEvent.where(started_at: lower...upper).where("duration_seconds < 0").pluck(:started_at).each do |time|
+    scope = TptEvent.all
+    scope = scope.where("LOWER(BTRIM(reason)) <> ?", "missing reason") unless @include_missing_reason
+    scope.where(started_at: lower...upper).where("duration_seconds < 0").pluck(:started_at).each do |time|
       index = windows.bsearch_index { |row| row[:finish] > time }
       @negative_count += 1 if index && windows[index][:start] <= time
     end
-    events = TptEvent.nonnegative.where("started_at < ? AND started_at + duration_seconds * INTERVAL '1 second' > ?", upper, lower).order(:started_at, :id)
+    events = scope.nonnegative.where("started_at < ? AND started_at + duration_seconds * INTERVAL '1 second' > ?", upper, lower).order(:started_at, :id)
     events.each do |event|
       start = event.started_at.utc
       finish = start + event.duration_seconds.to_r

@@ -98,6 +98,33 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     assert_nil result.production_per_hour
   end
 
+  test "excludes Missing Reason by default from all TPT aggregates and restores it on request" do
+    report(production: 100)
+    event(at: Time.utc(2026, 10, 15, 6), seconds: 3600, impact: "Correr", reason: "Running Normally")
+    event(at: Time.utc(2026, 10, 15, 7), seconds: 1800, reason: "Cintas Haver")
+    event(at: Time.utc(2026, 10, 15, 7, 30), seconds: 3600, reason: " Missing reason ")
+    excluded = dashboard
+    included = dashboard(include_missing_reason: "1")
+    assert_not excluded.include_missing_reason
+    assert included.include_missing_reason
+    assert_equal 100, excluded.production_total
+    assert_equal excluded.production_total, included.production_total
+    assert_equal 1, excluded.rows.sole[:event_count]
+    assert_equal 2, included.rows.sole[:event_count]
+    assert_in_delta 90 * 60, excluded.rows.sole[:observed_seconds]
+    assert_in_delta 150 * 60, included.rows.sole[:observed_seconds]
+    assert_in_delta 100.0 * 60 / 90, excluded.availability
+    assert_in_delta 40, included.availability
+    assert_in_delta 1, excluded.mtbf
+    assert_in_delta 0.5, included.mtbf
+    assert_in_delta 30, excluded.mttr
+    assert_in_delta 45, included.mttr
+    assert_equal [ "Cintas Haver" ], excluded.charts[:pareto][:labels]
+    assert_includes included.charts[:pareto][:labels], " Missing reason "
+    assert_in_delta 30, dashboard(include_missing_reason: "0").pareto.sole[:minutes]
+    assert_equal 3, @import.tpt_events.count
+  end
+
   test "pareto retains remaining causes as Others and cumulative totals reconcile" do
     7.times { |number| event(at: Time.utc(2026, 10, 15, 8) + number * 60, seconds: 60, reason: "Razón #{number}") }
     result = dashboard(top: "5")

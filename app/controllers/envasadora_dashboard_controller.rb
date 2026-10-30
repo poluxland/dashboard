@@ -14,6 +14,6 @@ class EnvasadoraDashboardController < ApplicationController
   private
 
   def filter_params
-    params.permit(:from, :to, :period, :pareto, :top, :exclude_unscheduled, shifts: [], weekdays: []).to_h
+    params.permit(:from, :to, :period, :pareto, :top, :exclude_unscheduled, :include_missing_reason, shifts: [], weekdays: []).to_h
   end
 end

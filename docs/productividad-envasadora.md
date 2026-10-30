@@ -34,6 +34,13 @@ semana, agrupación del Pareto (razón, estado, impacto), primeras 5–25 causas
 inclusión del tiempo No programada. Los períodos rápidos se anclan en la última
 fecha con datos. No seleccionar días/turnos equivale a seleccionar todos.
 
+Missing Reason queda excluido por defecto del informe TPT completo, incluidos
+tiempos observados, cobertura, disponibilidad, MTBF, MTTR, Pareto y detalle.
+La casilla **Incluir Missing reason**, debajo de la opción de tiempo no programado,
+permite incorporarlo al aplicar filtros. La producción Haver no cambia. Excluir
+estas horas no las convierte en tiempo operativo; los eventos originales se
+conservan. Se reconoce la razón sin distinguir mayúsculas ni espacios extremos.
+
 TPT no proporciona una columna independiente de equipo y otra de diagnóstico de
 falla. Por eso se conserva su clasificación real sin inventar esa separación.
 Las causas restantes se agrupan en Otros para que el Pareto llegue al 100%.

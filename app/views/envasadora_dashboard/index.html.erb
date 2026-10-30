@@ -31,16 +31,24 @@
         <% EnvasadoraDashboard::DAYS.each_with_index do |day, index| %><div class="form-check form-check-inline"><%= check_box_tag "weekdays[]", index + 1, @dashboard.weekdays.include?(index + 1), id: "dashboard_day_#{index + 1}", class: "form-check-input" %><%= label_tag "dashboard_day_#{index + 1}", day, class: "form-check-label" %></div><% end %>
       </fieldset>
       <div class="d-flex gap-3 flex-wrap align-items-center">
-        <div class="form-check">
-          <%= hidden_field_tag :exclude_unscheduled, "0" %>
-          <%= check_box_tag :exclude_unscheduled, "1", @dashboard.exclude_unscheduled, class: "form-check-input" %>
-          <%= label_tag :exclude_unscheduled, "Excluir tiempo no programado del Pareto y del detalle de detenciones", class: "form-check-label" %>
+        <div>
+          <div class="form-check">
+            <%= hidden_field_tag :exclude_unscheduled, "0" %>
+            <%= check_box_tag :exclude_unscheduled, "1", @dashboard.exclude_unscheduled, class: "form-check-input" %>
+            <%= label_tag :exclude_unscheduled, "Excluir tiempo no programado del Pareto y del detalle de detenciones", class: "form-check-label" %>
+          </div>
+          <div class="form-check mt-2">
+            <%= hidden_field_tag :include_missing_reason, "0" %>
+            <%= check_box_tag :include_missing_reason, "1", @dashboard.include_missing_reason, class: "form-check-input" %>
+            <%= label_tag :include_missing_reason, "Incluir Missing reason", class: "form-check-label" %>
+          </div>
         </div>
         <%= form.submit "Aplicar filtros", class: "btn btn-primary ms-lg-auto" %>
         <%= link_to "Restablecer", envasadora_dashboard_path, class: "btn btn-outline-secondary" %>
       </div>
     <% end %>
     <p class="small text-body-secondary mt-3 mb-0">Consulta: <%= l @dashboard.from %> al <%= l @dashboard.to %>. Los períodos rápidos se basan en la última fecha con datos. Sin selección de turnos o días se incluyen todos.</p>
+    <% unless @dashboard.include_missing_reason %><p class="small text-body-secondary mt-2 mb-0">Missing Reason está excluido de los tiempos, indicadores TPT, gráficos y tablas. La producción Haver se mantiene; las horas excluidas no se consideran operativas.</p><% end %>
   </div></div>
 
   <% if @dashboard.rows.empty? %>

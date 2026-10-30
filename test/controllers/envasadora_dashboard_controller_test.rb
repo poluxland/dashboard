@@ -43,4 +43,20 @@ class EnvasadoraDashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select ".alert-danger", text: /fechas válidas/
   end
+
+  test "Missing Reason is opt in and the checkbox follows the submitted filter" do
+    sign_in_with_google
+    imported = TptImport.create!(filename: "missing.xlsx", author_email: "test@msindustrial.cl")
+    imported.tpt_events.create!(source_row: 11, impact: "Parada no planificada", production_state: "Abajo", reason: "Missing Reason", started_at: Time.utc(2026, 10, 15, 8), duration_seconds: 60, source_fingerprint: "missing-reason-filter")
+    filters = { from: "2026-10-15", to: "2026-10-15" }
+    get envasadora_dashboard_path, params: filters
+    assert_response :success
+    assert_select "input[type=checkbox][name=include_missing_reason]:not([checked])", count: 1
+    assert_select "#envasadora-pareto-detail tbody", text: /Missing Reason/, count: 0
+    get envasadora_dashboard_path, params: filters.merge(include_missing_reason: "1")
+    assert_response :success
+    assert_select "input[type=checkbox][name=include_missing_reason][checked]", count: 1
+    assert_select "#envasadora-pareto-detail tbody", text: /Missing Reason/
+    assert_select "label[for=include_missing_reason]", "Incluir Missing reason"
+  end
 end
