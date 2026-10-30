@@ -18,15 +18,15 @@
           <%= button_tag label, name: :period, value: period, class: "btn btn-sm btn-outline-primary" %>
         <% end %>
       </div>
-      <div class="row g-3 mb-3">
-        <div class="col-sm-6 col-lg-3"><%= form.label :from, "Desde", class: "form-label" %><%= form.date_field :from, value: @dashboard.from, required: true, class: "form-control" %></div>
-        <div class="col-sm-6 col-lg-3"><%= form.label :to, "Hasta", class: "form-label" %><%= form.date_field :to, value: @dashboard.to, required: true, class: "form-control" %></div>
-        <div class="col-sm-6 col-lg-4"><%= form.label :pareto, "Agrupar Pareto por", class: "form-label" %><%= form.select :pareto, EnvasadoraDashboard::PARETO_MODES.map { |key, label| [label, key] }, { selected: @dashboard.pareto_mode }, class: "form-select" %></div>
-        <div class="col-sm-6 col-lg-2"><%= form.label :top, "Mostrar causas", class: "form-label" %><%= form.number_field :top, value: @dashboard.limit, min: 5, max: 25, class: "form-control" %></div>
-      </div>
       <details class="card border-0 bg-body-tertiary rounded-4 mb-3" id="envasadora-filters">
         <summary class="p-3 fw-semibold">Turnos, días y filtros adicionales</summary>
         <div class="px-3 pb-3">
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-lg-3"><%= form.label :from, "Desde", class: "form-label" %><%= form.date_field :from, value: @dashboard.from, required: true, class: "form-control" %></div>
+            <div class="col-sm-6 col-lg-3"><%= form.label :to, "Hasta", class: "form-label" %><%= form.date_field :to, value: @dashboard.to, required: true, class: "form-control" %></div>
+            <div class="col-sm-6 col-lg-4"><%= form.label :pareto, "Agrupar Pareto por", class: "form-label" %><%= form.select :pareto, EnvasadoraDashboard::PARETO_MODES.map { |key, label| [label, key] }, { selected: @dashboard.pareto_mode }, class: "form-select" %></div>
+            <div class="col-sm-6 col-lg-2"><%= form.label :top, "Mostrar causas", class: "form-label" %><%= form.number_field :top, value: @dashboard.limit, min: 5, max: 25, class: "form-control" %></div>
+          </div>
           <fieldset class="mb-3"><legend class="fs-6 fw-semibold mb-2">Turnos</legend>
             <% EnvasadoraDashboard::SHIFTS.each do |shift| %><div class="form-check form-check-inline"><%= check_box_tag "shifts[]", shift, @dashboard.shifts.include?(shift), id: "dashboard_shift_#{shift}", class: "form-check-input" %><%= label_tag "dashboard_shift_#{shift}", shift, class: "form-check-label" %></div><% end %>
           </fieldset>
@@ -49,12 +49,12 @@
           </div>
           <p class="small text-body-secondary mt-3 mb-0">Sin selección de turnos o días se incluyen todos.</p>
           <% unless @dashboard.include_missing_reason %><p class="small text-body-secondary mt-2 mb-0">Missing Reason está excluido de los tiempos, indicadores TPT, gráficos y tablas. La producción Haver se mantiene; las horas excluidas no se consideran operativas.</p><% end %>
+          <div class="d-flex gap-2 flex-wrap mt-3">
+            <%= form.submit "Aplicar filtros", class: "btn btn-primary" %>
+            <%= link_to "Restablecer", envasadora_dashboard_path, class: "btn btn-outline-secondary" %>
+          </div>
         </div>
       </details>
-      <div class="d-flex gap-2 flex-wrap">
-        <%= form.submit "Aplicar filtros", class: "btn btn-primary" %>
-        <%= link_to "Restablecer", envasadora_dashboard_path, class: "btn btn-outline-secondary" %>
-      </div>
     <% end %>
     <p class="small text-body-secondary mt-3 mb-0">Consulta: <%= l @dashboard.from %> al <%= l @dashboard.to %>. Los períodos rápidos se basan en la última fecha con datos.</p>
   </div></div>
