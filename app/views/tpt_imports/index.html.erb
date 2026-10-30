@@ -1,0 +1,38 @@
+<% content_for :title, "VentoHaver TPT" %>
+<div class="mx-auto py-4" style="max-width: 1100px;">
+  <h1 class="h3">VentoHaver TPT</h1>
+  <p class="text-body-secondary">Historial de eventos de la máquina y cargas periódicas desde Excel.</p>
+  <div class="card shadow-sm mb-4"><div class="card-body">
+    <h2 class="h5">Subir informe</h2>
+    <p>Puedes subir el Excel original, sin eliminar filas. Se detectan los encabezados y se omiten los subtotales sin hora de inicio. Los eventos ya cargados no se duplican.</p>
+    <%= form_with url: tpt_imports_path, multipart: true, data: { turbo: false } do |form| %>
+      <%= form.label :archivo, "Archivo Excel (.xlsx, máximo 10 MB)", class: "form-label" %>
+      <%= form.file_field :archivo, accept: ".xlsx", required: true, class: "form-control mb-3" %>
+      <%= form.submit "Importar eventos", class: "btn btn-primary" %>
+    <% end %>
+  </div></div>
+
+  <h2 class="h5">Histórico acumulado · <%= number_with_delimiter(@event_count) %> eventos</h2>
+  <p class="small text-body-secondary">Horas calculadas desde los eventos únicos cargados; no se suman porcentajes del archivo.</p>
+  <% if @negative_count.positive? %>
+    <div class="alert alert-warning"><%= @negative_count %> eventos tienen duración negativa en el archivo de origen. Se conservan para revisión y se excluyen de las horas acumuladas.</div>
+  <% end %>
+  <div class="row g-3 mb-4">
+    <% @hours_by_impact.each do |impact, seconds| %>
+      <div class="col-sm-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="small text-body-secondary"><%= impact %></div>
+        <div class="h4 mb-0"><%= number_with_precision(seconds / 3600, precision: 2) %> h</div>
+      </div></div></div>
+    <% end %>
+  </div>
+  <h2 class="h5">Últimas 30 cargas</h2>
+  <div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Carga</th><th>Archivo</th><th>Usuario</th><th>Nuevos</th><th>Duplicados</th><th>Revisar</th></tr></thead>
+    <tbody>
+      <% @imports.each do |report| %>
+        <tr><td><%= report.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %></td><td><%= link_to report.filename, tpt_import_path(report) %></td><td><%= report.author_email %></td><td><%= report.imported_count %></td><td><%= report.duplicate_count %></td><td><%= report.issues.size %></td></tr>
+      <% end %>
+      <% if @imports.empty? %><tr><td colspan="6">Todavía no hay cargas. Selecciona el primer informe para comenzar.</td></tr><% end %>
+    </tbody>
+  </table></div>
+</div>

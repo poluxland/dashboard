@@ -1,0 +1,16 @@
+<% content_for :title, "Carga VentoHaver TPT" %>
+<div class="py-4">
+  <%= link_to "Volver a VentoHaver TPT", tpt_imports_path, class: "btn btn-outline-secondary mb-3" %>
+  <h1 class="h3">Resultado de la carga</h1>
+  <p><%= @report.filename %></p>
+  <p><%= @report.imported_count %> eventos nuevos · <%= @report.duplicate_count %> duplicados omitidos · <%= @report.summary_count %> subtotales omitidos · <%= @report.issues.size %> filas para revisar.</p>
+  <% if @report.issues.any? %>
+    <details class="alert alert-warning"><summary>Ver filas para revisar (<%= @report.issues.size %>)</summary><ul class="mt-2 mb-0"><% @report.issues.each do |issue| %><li><%= issue %></li><% end %></ul></details>
+  <% end %>
+  <p class="small text-body-secondary">Hora de inicio tal como aparece en el informe, sin conversión de zona horaria. Las duraciones negativas se conservan y se excluyen de las horas acumuladas.</p>
+  <div class="table-responsive"><table class="table table-striped">
+    <thead><tr><th>Fila Excel</th><th>Hora de inicio</th><th>Impacto</th><th>Estado de producción</th><th>Razón</th><th>Duración (s)</th></tr></thead>
+    <tbody><% @events.each do |event| %><tr class="<%= 'table-warning' if event.duration_seconds.negative? %>"><td><%= event.source_row %></td><td class="text-nowrap"><%= event.started_at.utc.strftime("%d/%m/%Y %H:%M:%S.%6N") %></td><td><%= event.impact %></td><td><%= event.production_state %></td><td><%= event.reason %></td><td><%= number_with_precision(event.duration_seconds, precision: 6) %></td></tr><% end %></tbody>
+  </table></div>
+  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+</div>

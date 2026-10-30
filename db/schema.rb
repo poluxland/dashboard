@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -324,6 +324,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "tpt_events", force: :cascade do |t|
+    t.bigint "tpt_import_id", null: false
+    t.integer "source_row", null: false
+    t.string "impact", null: false
+    t.string "production_state", null: false
+    t.string "reason", null: false
+    t.datetime "started_at", null: false
+    t.decimal "duration_seconds", precision: 20, scale: 6, null: false
+    t.string "source_fingerprint", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_fingerprint"], name: "index_tpt_events_on_source_fingerprint", unique: true
+    t.index ["started_at"], name: "index_tpt_events_on_started_at"
+    t.index ["tpt_import_id"], name: "index_tpt_events_on_tpt_import_id"
+  end
+
+  create_table "tpt_imports", force: :cascade do |t|
+    t.string "filename", null: false
+    t.string "author_email", null: false
+    t.integer "imported_count", default: 0, null: false
+    t.integer "duplicate_count", default: 0, null: false
+    t.integer "summary_count", default: 0, null: false
+    t.jsonb "issues", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "works", force: :cascade do |t|
     t.string "area"
     t.datetime "created_at", null: false
@@ -349,4 +376,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "indicator_readings", "people"
+  add_foreign_key "tpt_events", "tpt_imports"
 end

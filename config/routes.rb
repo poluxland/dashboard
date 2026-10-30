@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :tpt_imports, path: "ventohaver-tpt", only: [ :index, :create, :show ]
   get "/login", to: "sessions#new", as: :login
   get "/auth/google_oauth2/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
