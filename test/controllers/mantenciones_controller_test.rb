@@ -454,8 +454,8 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#mantencion_#{mantenciones(:two).id}", count: 1
     assert_select "#mantencion_#{record.id}", count: 0
-    assert_select "#worksDropdown + ul li a", text: "Reprogramado"
-    assert_select "#worksDropdown + ul li a", text: "Adicional"
+    assert_select "#mantenimientoDropdown + ul li a", text: "Reprogramado"
+    assert_select "#mantenimientoDropdown + ul li a", text: "Adicional"
   end
 
   test "weekly planning chart only displays the latest 38 weeks" do

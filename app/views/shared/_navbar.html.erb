@@ -20,20 +20,20 @@
     <div class="collapse navbar-collapse" id="mainNavbar">
       <ul class="navbar-nav ms-auto">
 
-        <!-- Menú OTs -->
+        <!-- Menú Mantenimiento -->
         <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle <%= 'active' if controller_name == 'ots' %>"
+            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones].include?(controller_name) %>"
             href="#"
-            id="otsDropdown"
+            id="mantenimientoDropdown"
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            OTs
+            Mantenimiento
           </a>
 
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="otsDropdown">
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mantenimientoDropdown">
             <li>
               <%= link_to "OTs año", ots_path(current_year: 1), class: "dropdown-item", data: { turbo: false } %>
             </li>
@@ -49,26 +49,7 @@
             <li>
               <%= link_to "Backlog", backlog_ots_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
-          </ul>
-        </li>
-
-        <!-- Menú Informe -->
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[works mantenciones].include?(controller_name) %>"
-            href="#"
-            id="worksDropdown"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Informe
-          </a>
-
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
-            <li><%= link_to "VentoHaver TPT", tpt_imports_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Reporte envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Cierre de turno", new_shift_report_path, class: "dropdown-item" %></li>
+            <li><hr class="dropdown-divider"></li>
             <li>
               <%= link_to "Mantenciones",
                           mantenciones_path,
@@ -120,7 +101,26 @@
                           class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Adicional'}",
                           data: { turbo: false } %>
             </li>
+          </ul>
+        </li>
 
+        <!-- Menú Informe -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle <%= 'active' if %w[works tpt_imports envasadora_reports shift_reports].include?(controller_name) %>"
+            href="#"
+            id="worksDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Informe
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
+            <li><%= link_to "VentoHaver TPT", tpt_imports_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Reporte envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Cierre de turno", new_shift_report_path, class: "dropdown-item" %></li>
             <% if main_app.respond_to?(:compact_works_path) %>
               <li>
                 <%= link_to "Compacta", compact_works_path, class: "dropdown-item", data: { turbo: false } %>
@@ -219,20 +219,20 @@
           </ul>
         </li>
 
-        <!-- Indicadores -->
+        <!-- APR -->
         <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle <%= 'active' if %w[monthly_records indicator_readings people].include?(controller_name) || current_page?(monthly_records_path) %>"
             href="#"
-            id="indicadoresDropdown"
+            id="aprDropdown"
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Indicadores
+            APR
           </a>
 
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="indicadoresDropdown">
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="aprDropdown">
             <li>
               <%= link_to "Registros Mensuales",
                           monthly_records_path,
