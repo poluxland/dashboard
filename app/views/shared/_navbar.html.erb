@@ -20,92 +20,6 @@
     <div class="collapse navbar-collapse" id="mainNavbar">
       <ul class="navbar-nav ms-auto">
 
-        <!-- Menú Mantenimiento -->
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones tpt_imports].include?(controller_name) %>"
-            href="#"
-            id="mantenimientoDropdown"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Mantenimiento
-          </a>
-
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mantenimientoDropdown">
-            <li>
-              <%= link_to "OTs año", ots_path(current_year: 1), class: "dropdown-item", data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "OTs", ots_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Compacta", compact_ots_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Gráficos", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Backlog", backlog_ots_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <%= link_to "Mantenciones",
-                          mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad].blank? && params[:pendientes].blank? && params[:planificacion].blank?}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "M. Eléctrica",
-                          mantenciones_path(especialidad: "electrica"),
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad] == 'electrica'}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "M. Mecánica",
-                          mantenciones_path(especialidad: "mecanica"),
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad] == 'mecanica'}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Gráficos de mantenciones",
-                          graficos_mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'graficos'}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Detalle por área", area_mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'area'}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Desglose", desglose_mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'desglose'}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Pendientes",
-                          pendientes_mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:pendientes] == '1'}",
-                          data: { turbo: false } %>
-            </li>
-
-            <li>
-              <%= link_to "Reprogramado", reprogramado_mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Reprogramado'}",
-                          data: { turbo: false } %>
-            </li>
-            <li>
-              <%= link_to "Adicional", adicional_mantenciones_path,
-                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Adicional'}",
-                          data: { turbo: false } %>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li><%= link_to "VentoHaver TPT", tpt_imports_path, class: "dropdown-item" %></li>
-          </ul>
-        </li>
-
         <!-- Menú Reportes -->
         <li class="nav-item dropdown">
           <a
@@ -199,6 +113,92 @@
                           class: "dropdown-item",
                           data: { turbo: false } %>
             </li>
+          </ul>
+        </li>
+
+        <!-- Menú Mantenimiento -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones tpt_imports].include?(controller_name) %>"
+            href="#"
+            id="mantenimientoDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Mantenimiento
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mantenimientoDropdown">
+            <li>
+              <%= link_to "OTs año", ots_path(current_year: 1), class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "OTs", ots_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Compacta", compact_ots_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Gráficos", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Backlog", backlog_ots_path, class: "dropdown-item", data: { turbo: false } %>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <%= link_to "Mantenciones",
+                          mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad].blank? && params[:pendientes].blank? && params[:planificacion].blank?}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "M. Eléctrica",
+                          mantenciones_path(especialidad: "electrica"),
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad] == 'electrica'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "M. Mecánica",
+                          mantenciones_path(especialidad: "mecanica"),
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:especialidad] == 'mecanica'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Gráficos de mantenciones",
+                          graficos_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'graficos'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Detalle por área", area_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'area'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Desglose", desglose_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'desglose'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Pendientes",
+                          pendientes_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:pendientes] == '1'}",
+                          data: { turbo: false } %>
+            </li>
+
+            <li>
+              <%= link_to "Reprogramado", reprogramado_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Reprogramado'}",
+                          data: { turbo: false } %>
+            </li>
+            <li>
+              <%= link_to "Adicional", adicional_mantenciones_path,
+                          class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Adicional'}",
+                          data: { turbo: false } %>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><%= link_to "VentoHaver TPT", tpt_imports_path, class: "dropdown-item" %></li>
           </ul>
         </li>
 
