@@ -1,6 +1,6 @@
 # VentoHaver TPT
 
-Disponible para usuarios autenticados en Informe → VentoHaver TPT (`/ventohaver-tpt`).
+Disponible para usuarios autenticados en Mantenimiento → VentoHaver TPT (`/ventohaver-tpt`).
 Acepta cargas manuales periódicas XLSX de hasta 10 MB para una única máquina.
 No requiere modificar el informe original.
 

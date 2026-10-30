@@ -23,7 +23,7 @@
         <!-- Menú Mantenimiento -->
         <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones].include?(controller_name) %>"
+            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones tpt_imports].include?(controller_name) %>"
             href="#"
             id="mantenimientoDropdown"
             role="button"
@@ -101,46 +101,29 @@
                           class: "dropdown-item #{'active' if controller_name == 'mantenciones' && action_name == 'index' && params[:planificacion] == 'Adicional'}",
                           data: { turbo: false } %>
             </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><%= link_to "VentoHaver TPT", tpt_imports_path, class: "dropdown-item" %></li>
           </ul>
         </li>
 
-        <!-- Menú Informe -->
+        <!-- Menú Reportes -->
         <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[works tpt_imports envasadora_reports shift_reports].include?(controller_name) %>"
+            class="nav-link dropdown-toggle <%= 'active' if %w[works envasadora_reports shift_reports].include?(controller_name) %>"
             href="#"
             id="worksDropdown"
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Informe
+            Reportes
           </a>
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
-            <li><%= link_to "VentoHaver TPT", tpt_imports_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Reporte envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
             <li><%= link_to "Cierre de turno", new_shift_report_path, class: "dropdown-item" %></li>
-            <% if main_app.respond_to?(:compact_works_path) %>
-              <li>
-                <%= link_to "Compacta", compact_works_path, class: "dropdown-item", data: { turbo: false } %>
-              </li>
-            <% end %>
-
-            <% if main_app.respond_to?(:graficos_works_path) %>
-              <li>
-                <%= link_to "Gráficos", graficos_works_path, class: "dropdown-item", data: { turbo: false } %>
-              </li>
-            <% end %>
-
-            <% if main_app.respond_to?(:backlog_works_path) %>
-              <li>
-                <%= link_to "Backlog", backlog_works_path, class: "dropdown-item", data: { turbo: false } %>
-              </li>
-            <% end %>
-
             <li>
-              <%= link_to "Informes técnicos", works_path, class: "dropdown-item", data: { turbo: false } %>
+              <%= link_to "Técnico", works_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
           </ul>
         </li>
