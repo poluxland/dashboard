@@ -39,6 +39,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   end
 
   test "splits events at shift boundaries and midnight and counts each failure once" do
+    %w[TM TT TN].each { |shift| report(shift: shift) }
     event(at: Time.utc(2026, 10, 15, 13, 30), seconds: 3600)
     event(at: Time.utc(2026, 10, 14, 23, 30), seconds: 3600, reason: "Rotativa")
     result = dashboard
@@ -51,6 +52,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   end
 
   test "clips events to selected shifts and dates and excludes negatives" do
+    report
     event(at: Time.utc(2026, 10, 15, 5, 30), seconds: 7200)
     event(at: Time.utc(2026, 10, 15, 7), seconds: -1)
     result = dashboard(shifts: [ "TM" ])
@@ -61,6 +63,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   end
 
   test "availability uses observed scheduled intervals and does not treat missing coverage as running" do
+    report
     event(at: Time.utc(2026, 10, 15, 6), seconds: 3600, impact: "Correr", reason: "Running Normally")
     event(at: Time.utc(2026, 10, 15, 7), seconds: 1800)
     event(at: Time.utc(2026, 10, 15, 7, 15), seconds: 1800)
@@ -82,8 +85,8 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     result = dashboard
     assert_equal 0, result.production_total
     assert_equal 1, result.production_shift_count
-    assert_nil result.rows.find { |row| row[:shift] == "TT" }[:production]
-    assert_equal 1, result.tpt_only_count
+    assert_nil result.rows.find { |row| row[:shift] == "TT" }
+    assert_equal 0, result.tpt_only_count
     assert_equal 1, result.production_only_count
     assert_equal 0, result.charts[:weekday][:datasets].find { |series| series[:label] == "TM" }[:data][3]
     assert_nil result.charts[:weekday][:datasets].find { |series| series[:label] == "TT" }[:data][3]
@@ -126,6 +129,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   end
 
   test "pareto retains remaining causes as Others and cumulative totals reconcile" do
+    report
     7.times { |number| event(at: Time.utc(2026, 10, 15, 8) + number * 60, seconds: 60, reason: "Razón #{number}") }
     result = dashboard(top: "5")
     assert_equal 6, result.pareto.size
@@ -134,12 +138,30 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     assert_in_delta 100, result.pareto.last[:cumulative]
   end
 
+  test "counts only portions overlapping reported shifts without changing the source event" do
+    report(shift: "TM")
+    report(shift: "TN")
+    @shift_starts = { "TN" => 22, "TM" => 6, "TT" => 14 }
+    original = event(at: Time.utc(2026, 10, 15, 13, 30), seconds: 9.hours)
+    result = dashboard
+    assert_equal %w[TN TM], result.rows.map { |row| row[:shift] }
+    assert_equal 0, result.tpt_only_count
+    assert_in_delta 3600, result.rows.sum { |row| row[:observed_seconds] }
+    assert_in_delta 60, result.pareto.sole[:minutes]
+    assert_equal 1, result.pareto.sole[:events]
+    assert_in_delta 60, result.mttr
+    assert_equal 9.hours, original.reload.duration_seconds
+    assert_equal 1, @import.tpt_events.count
+  end
+
   test "rejects invalid dates and reversed periods" do
     assert_raises(EnvasadoraDashboard::InvalidFilter) { dashboard(from: "2026-02-30") }
     assert_raises(EnvasadoraDashboard::InvalidFilter) { dashboard(from: "2026-10-16", to: "2026-10-15") }
   end
 
   test "TN belongs to start date and Saturday TM coverage uses six programmed hours" do
+    report(shift: "TN")
+    report(date: Date.new(2026, 10, 17), shift: "TM")
     schedule = { "TN" => 22, "TM" => 6, "TT" => 14 }
     event(at: Time.utc(2026, 10, 16, 1), seconds: 3600)
     result = EnvasadoraDashboard.new({ from: "2026-10-15", to: "2026-10-15", shifts: [ "TN" ] }, shift_starts: schedule, default_source: "haver").call

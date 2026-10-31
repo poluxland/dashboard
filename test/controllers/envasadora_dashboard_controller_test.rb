@@ -46,6 +46,8 @@ class EnvasadoraDashboardControllerTest < ActionDispatch::IntegrationTest
 
   test "Missing Reason is opt in and the checkbox follows the submitted filter" do
     sign_in_with_google
+    measurements = EnvasadoraReport::SILOS.values.flat_map { |silo| silo[:readings] }.index_with { 10 }
+    EnvasadoraReport.create!(measurements.merge(date: Date.new(2026, 10, 15), turno: "TM", prodhaver: 100, horas_haver: 2, author_email: "test@msindustrial.cl"))
     imported = TptImport.create!(filename: "missing.xlsx", author_email: "test@msindustrial.cl")
     imported.tpt_events.create!(source_row: 11, impact: "Parada no planificada", production_state: "Abajo", reason: "Missing Reason", started_at: Time.utc(2026, 10, 15, 8), duration_seconds: 60, source_fingerprint: "missing-reason-filter")
     filters = { from: "2026-10-15", to: "2026-10-15" }

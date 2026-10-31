@@ -10,7 +10,9 @@ no incorpora otra carga de Excel ni modifica los reportes de origen.
 - Producción: `prodhaver` (sacos) y `horas_haver` del último reporte guardado por
   fecha y turno. Incluye borradores y enviados; no suma versiones del mismo turno.
   No usa inventarios, despachos, producción Vento ni Bigbag.
-- Detenciones: eventos de `TptEvent`. Excluye duraciones negativas y muestra su
+- Detenciones: eventos de `TptEvent`, solo en turnos que tienen reporte de envasadora.
+  Si un evento abarca varios turnos, solo se cuentan los tramos con reporte,
+  conservando el evento original. Excluye duraciones negativas y muestra su
   cantidad para el período, días y turnos consultados. Omite eventos de duración cero.
 - Horario confirmado: TM 06:00–14:00, TT 14:00–22:00, TN 22:00–06:00.
   TN se asigna a la fecha en que empieza, incluso después de medianoche.

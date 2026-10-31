@@ -40,6 +40,7 @@ class EnvasadoraDashboard
   def call
     build_rows
     add_production
+    @row_map.select! { |_key, row| row[:report].present? }
     add_events
     finalize_rows
     build_pareto

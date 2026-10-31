@@ -64,8 +64,8 @@
   <% end %>
   <% if @dashboard.missing_hours_count.positive? %><p class="small text-body-secondary"><%= @dashboard.missing_hours_count %> turnos declaran producción sin horas Haver válidas. El rendimiento por hora del período no se calcula hasta resolver esos datos.</p><% end %>
   <% if @dashboard.duplicate_report_count.positive? %><p class="small text-body-secondary">Hay varios reportes para algunas fechas y turnos: se usa únicamente el último guardado (<%= @dashboard.duplicate_report_count %> versiones anteriores omitidas).</p><% end %>
-  <% if @dashboard.tpt_only_count.positive? || @dashboard.production_only_count.positive? %>
-    <p class="small text-body-secondary"><%= @dashboard.tpt_only_count %> turnos tienen TPT sin reporte de producción y <%= @dashboard.production_only_count %> tienen reporte sin TPT. Un guion indica que falta el dato.</p>
+  <% if @dashboard.production_only_count.positive? %>
+    <p class="small text-body-secondary"><%= pluralize(@dashboard.production_only_count, "turno tiene", "turnos tienen") %> reporte de producción sin datos TPT para los filtros seleccionados. Un guion indica que falta el dato.</p>
   <% end %>
 
   <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
