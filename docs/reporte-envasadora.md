@@ -8,8 +8,9 @@ Ante un error de confirmación, revisar la recepción antes de reintentar.
 
 La implementación adapta Medidas del proyecto ERP-Impromaq y permite incorporar
 históricos de su exportación sin modificar ese proyecto. Destinatarios en `config/envasadora_recipients.json`,
-temporalmente limitada para pruebas a José Jerez, Fernando González y Claudio Villanueva,
-sin destinatarios adicionales por horario.
+con la lista completa de 46 destinatarios. Helmut Brandau se incorpora a los
+reportes creados entre las 05:00 y las 09:59 de Santiago. El asunto es
+**Reporte envasadora — fecha — turno**, sin la etiqueta de prueba.
 Las pruebas usan entrega simulada, sin correos reales.
 
 ## Cálculos

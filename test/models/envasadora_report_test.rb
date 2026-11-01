@@ -6,6 +6,21 @@ class EnvasadoraReportTest < ActiveSupport::TestCase
     EnvasadoraReport.new(measurements.merge(date: Date.current, turno: "TM", author_email: "usuario@msindustrial.cl").merge(attributes))
   end
 
+  test "uses full production recipients and includes Helmut only for morning creation times in Santiago" do
+    assert_equal 46, EnvasadoraReport::RECIPIENTS.size
+    assert_equal 46, EnvasadoraReport::RECIPIENTS.map(&:downcase).uniq.size
+    assert_includes EnvasadoraReport::RECIPIENTS, "supervisor.envasadora@msindustrial.cl"
+    assert_includes EnvasadoraReport::RECIPIENTS, "miguel.basulto@meloncementos.cl"
+    zone = ActiveSupport::TimeZone["America/Santiago"]
+    { "04:59:59" => false, "05:00:00" => true, "09:59:59" => true, "10:00:00" => false }.each do |time, includes_helmut|
+      report = build_report(created_at: zone.parse("2026-11-01 #{time}").utc)
+      assert_equal includes_helmut, report.recipients.include?("helmut.brandau@meloncementos.cl"), time
+      assert_equal includes_helmut ? 47 : 46, report.recipients.size
+    end
+    assert_equal 46, build_report.recipients.size
+    assert_equal 46, EnvasadoraReport::RECIPIENTS.size
+  end
+
   test "defaults retain original silo stock and changing cement moves only that stock" do
     report = build_report(extrsacos: 25)
     assert report.valid?, report.errors.full_messages.join(", ")

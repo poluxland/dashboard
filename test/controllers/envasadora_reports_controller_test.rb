@@ -50,6 +50,8 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
       post send_email_envasadora_report_path(report)
     end
     mail = ActionMailer::Base.deliveries.last
+    assert_equal "Reporte envasadora — #{report.date} — #{report.turno}", mail.subject
+    assert_equal report.recipients.sort, mail.to.sort
     assert_includes mail.text_part.decoded, "19 (HPM)"
     assert_includes mail.html_part.decoded, "HPM"
     assert_includes mail.html_part.decoded, "2.000"

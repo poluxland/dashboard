@@ -148,6 +148,8 @@ class EnvasadoraReport < ApplicationRecord
   end
 
   def recipients
-    RECIPIENTS.dup
+    result = RECIPIENTS.dup
+    result << "helmut.brandau@meloncementos.cl" if created_at&.in_time_zone("America/Santiago")&.hour&.between?(5, 9)
+    result
   end
 end
