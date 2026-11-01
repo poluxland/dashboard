@@ -21,14 +21,16 @@ class EnvasadoraDashboardControllerTest < ActionDispatch::IntegrationTest
   test "filters and joins production Haver with TPT while escaping reason labels" do
     sign_in_with_google
     measurements = EnvasadoraReport::SILOS.values.flat_map { |silo| silo[:readings] }.index_with { 10 }
-    report = EnvasadoraReport.create!(measurements.merge(date: Date.new(2026, 10, 15), turno: "TN", prodhaver: 1234, prodvento: 9999, horas_haver: 2, author_email: "test@msindustrial.cl"))
+    report = EnvasadoraReport.create!(measurements.merge(date: Date.new(2026, 10, 15), turno: "TN", prodhaver: 1234, prodvento: 9999, prodbb: 77, horas_haver: 2, author_email: "test@msindustrial.cl"))
     imported = TptImport.create!(filename: "test.xlsx", author_email: report.author_email)
     imported.tpt_events.create!(source_row: 11, impact: "Parada no planificada", production_state: "Abajo", reason: "<script>bad()</script>", started_at: Time.utc(2026, 10, 16, 1), duration_seconds: 60, source_fingerprint: "controller-test")
     get envasadora_dashboard_path, params: { from: "2026-10-15", to: "2026-10-15", shifts: [ "TN" ] }
     assert_response :success
     assert_select "#envasadora-shift-detail tbody tr", count: 1
     assert_select "#envasadora-shift-detail tbody", text: /1.234/
-    assert_select "#envasadora-shift-detail tbody", text: /9.999/, count: 0
+    assert_select "#envasadora-shift-detail tbody td:nth-child(4)", text: "1.234"
+    assert_select "#envasadora-shift-detail tbody td:nth-child(5)", text: "9.999"
+    assert_select "#envasadora-shift-detail tbody td:nth-child(6)", text: "77"
     assert_select "#envasadora-pareto-detail script", count: 0
     assert_includes response.body, "&lt;script&gt;bad()&lt;/script&gt;"
     assert_select "a[href=?]", envasadora_report_path(report)

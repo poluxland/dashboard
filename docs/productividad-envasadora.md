@@ -28,7 +28,8 @@ Reproduce las visualizaciones del dashboard de referencia
 de la aplicación: producción por día/semana/mes y turno, promedios por día de la
 semana y turno, Pareto con porcentaje acumulado, detalle del Pareto y detalle por
 turno con enlace al reporte de origen. Cada cuadro identifica su fuente. El detalle
-por turno muestra solo fecha, día, turno, producción y horas Haver del Reporte
+por turno muestra solo fecha, día, turno, producción Haver y Vento (sacos),
+producción Bigbag (unidades) y horas Haver del Reporte
 de envasadora, sin columnas de detenciones, disponibilidad o cobertura TPT.
 La tabla pagina en 60 filas; los totales y
 gráficos siempre usan todo el período. Los gráficos se cargan mediante Stimulus

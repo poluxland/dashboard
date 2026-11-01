@@ -118,19 +118,21 @@
   </div></div>
   <div class="card border-0 shadow-sm rounded-4"><div class="card-body p-4">
     <h2 class="h5 fw-bold">Detalle por turno</h2>
-    <p class="small text-body-secondary">Fuente: Reporte de envasadora · producción y horas Haver declaradas. Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
-    <div class="table-responsive"><table class="table table-striped align-middle small" id="envasadora-shift-detail"><thead><tr><th>Fecha</th><th>Día</th><th>Turno</th><th class="text-end">Producción (sacos)</th><th class="text-end">Horas Haver</th><th>Reporte</th></tr></thead><tbody>
+    <p class="small text-body-secondary">Fuente: Reporte de envasadora · producción Haver, Vento y Bigbag, y horas Haver declaradas. Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
+    <div class="table-responsive"><table class="table table-striped align-middle small" id="envasadora-shift-detail"><thead><tr><th>Fecha</th><th>Día</th><th>Turno</th><th class="text-end">Prod. Haver (sacos)</th><th class="text-end">Prod. Vento (sacos)</th><th class="text-end">Prod. Bigbag (unid.)</th><th class="text-end">Horas Haver</th><th>Reporte</th></tr></thead><tbody>
       <% @detail_rows.each do |row| %>
         <tr>
           <td class="text-nowrap"><%= l row[:date] %></td>
           <td><%= EnvasadoraDashboard::DAYS[row[:date].cwday - 1] %></td>
           <td><%= row[:shift] %></td>
-          <td class="text-end"><%= dashboard_number(row[:production], precision: 0) %></td>
-          <td class="text-end"><%= dashboard_number(row[:hours]) %></td>
+          <% %w[prodhaver prodvento prodbb].each do |field| %>
+            <td class="text-end"><%= dashboard_number(row[:report].value_for_analytics(field), precision: 0) %></td>
+          <% end %>
+          <td class="text-end"><%= dashboard_number(row[:report].value_for_analytics("horas_haver")) %></td>
           <td><%= link_to "Ver reporte", envasadora_report_path(row[:report]) %></td>
         </tr>
       <% end %>
-      <% if @detail_rows.empty? %><tr><td colspan="6">Sin turnos para mostrar.</td></tr><% end %>
+      <% if @detail_rows.empty? %><tr><td colspan="8">Sin turnos para mostrar.</td></tr><% end %>
     </tbody></table></div>
     <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
   </div></div>
