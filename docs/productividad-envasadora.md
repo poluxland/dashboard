@@ -27,7 +27,10 @@ Reproduce las visualizaciones del dashboard de referencia
 <https://dashboard-envasadora-ptm.netlify.app/> con Bootstrap, tarjetas y navegación
 de la aplicación: producción por día/semana/mes y turno, promedios por día de la
 semana y turno, Pareto con porcentaje acumulado, detalle del Pareto y detalle por
-turno con enlace al reporte de origen. La tabla pagina en 60 filas; los totales y
+turno con enlace al reporte de origen. Cada cuadro identifica su fuente. El detalle
+por turno muestra solo fecha, día, turno, producción y horas Haver del Reporte
+de envasadora, sin columnas de detenciones, disponibilidad o cobertura TPT.
+La tabla pagina en 60 filas; los totales y
 gráficos siempre usan todo el período. Los gráficos se cargan mediante Stimulus
 y Chart.js 4.4.3, la misma versión usada por otros gráficos de la aplicación.
 
