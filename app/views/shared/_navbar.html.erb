@@ -21,20 +21,21 @@
       <ul class="navbar-nav ms-auto">
 
         <!-- Menú Reportes -->
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[works envasadora_reports envasadora_dashboard shift_reports].include?(controller_name) %>"
-            href="#"
+        <li class="nav-item dropdown d-flex align-items-center">
+          <%= link_to "Reportes", new_envasadora_report_path,
+                      class: "nav-link #{'active' if %w[works envasadora_reports envasadora_dashboard shift_reports].include?(controller_name)}" %>
+          <button
+            class="nav-link dropdown-toggle dropdown-toggle-split border-0 bg-transparent ps-1"
+            type="button"
             id="worksDropdown"
-            role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
-          >
-            Reportes
-          </a>
+            aria-label="Más reportes"
+          ></button>
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
-            <li><%= link_to "Envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Nueva envasadora", new_envasadora_report_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Historial envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
             <li><%= link_to "Cierre de turno", new_shift_report_path, class: "dropdown-item" %></li>
             <li>
               <%= link_to "Técnico", works_path, class: "dropdown-item", data: { turbo: false } %>
