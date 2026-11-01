@@ -21,17 +21,16 @@
       <ul class="navbar-nav ms-auto">
 
         <!-- Menú Reportes -->
-        <li class="nav-item dropdown d-flex align-items-center">
-          <%= link_to "Reportes", new_envasadora_report_path,
-                      class: "nav-link #{'active' if %w[works envasadora_reports envasadora_dashboard shift_reports].include?(controller_name)}" %>
+        <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle dropdown-toggle-split border-0 bg-transparent ps-1"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[works envasadora_reports envasadora_dashboard shift_reports].include?(controller_name) %>"
             type="button"
             id="worksDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
-            aria-label="Más reportes"
-          ></button>
+          >
+            Reportes
+          </button>
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
             <li><%= link_to "Nueva envasadora", new_envasadora_report_path, class: "dropdown-item" %></li>
