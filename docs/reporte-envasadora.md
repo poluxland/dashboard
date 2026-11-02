@@ -16,6 +16,10 @@ reportes creados entre las 05:00 y las 09:59 de Santiago. El asunto es
 **Reporte envasadora — fecha — turno**, sin la etiqueta de prueba.
 Las pruebas usan entrega simulada, sin correos reales.
 
+Los campos numéricos de un reporte nuevo comienzan vacíos y son obligatorios.
+El operador debe escribir 0 explícitamente cuando corresponda. Los valores
+ingresados se conservan al corregir errores; editar un reporte mantiene sus datos.
+
 ## Cálculos
 
 - Silos 19–22: `(30 - promedio(medida1, medida2)) × 100` toneladas.

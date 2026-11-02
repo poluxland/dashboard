@@ -2,7 +2,7 @@ require "test_helper"
 
 class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @attributes = EnvasadoraReport::SILOS.values.flat_map { |s| s[:readings] }.index_with { 10 }.merge(date: Date.current, turno: "TM", silo19_cement: "HPM")
+    @attributes = EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.index_with(0).merge(EnvasadoraReport::SILOS.values.flat_map { |s| s[:readings] }.index_with { 10 }).merge(date: Date.current, turno: "TM", silo19_cement: "HPM")
   end
 
   test "historic snapshots retain source values and cannot be edited or emailed" do
@@ -25,6 +25,30 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to envasadora_report_path(report)
     assert_nil report.reload.sent_at
+  end
+
+  test "new form starts blank and rejects omitted numbers while preserving explicitly entered zeros" do
+    sign_in_with_google
+    get new_envasadora_report_path
+    assert_response :success
+    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.each do |field|
+      assert_select "input[name='envasadora_report[#{field}]'][required]" do |inputs|
+        assert inputs.first["value"].blank?, field
+      end
+    end
+    assert_no_difference("EnvasadoraReport.count") do
+      post envasadora_reports_path, params: { envasadora_report: @attributes.except("prodhaver") }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".alert-danger"
+    assert_select "input[name='envasadora_report[prodhaver]']" do |inputs|
+      assert inputs.first["value"].blank?
+    end
+    assert_select "input[name='envasadora_report[prodvento]'][value='0']"
+    assert_no_difference("EnvasadoraReport.count") do
+      post envasadora_reports_path, params: { envasadora_report: @attributes.merge(prodhaver: "") }
+    end
+    assert_response :unprocessable_entity
   end
 
   test "authentication required" do

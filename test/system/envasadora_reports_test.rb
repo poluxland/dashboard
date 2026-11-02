@@ -10,6 +10,7 @@ class EnvasadoraReportsTest < ApplicationSystemTestCase
     visit "/auth/google_oauth2/callback"
     visit new_envasadora_report_path
     select "Turno Mañana", from: "Turno"
+    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.each { |field| fill_in "envasadora_report_#{field}", with: "0" }
     EnvasadoraReport::SILOS.each do |_id, silo|
       silo[:readings].each { |field| fill_in "envasadora_report_#{field}", with: "10" }
     end

@@ -30,6 +30,8 @@ class EnvasadoraReport < ApplicationRecord
     fernando.gonzalez@msindustrial.cl
   ].freeze
   RECIPIENTS = JSON.parse(Rails.root.join("config/envasadora_recipients.json").read).freeze
+  REQUIRED_NUMERIC_FIELDS = (FIELDS.select { |field| field["kind"] == "number" }.map { |field| field["name"] } +
+                             SILOS.values.flat_map { |silo| silo[:readings] }).freeze
   INPUT_FIELDS = (FIELDS.map { |f| f.fetch("name") } + SILOS.flat_map { |id, s| s[:readings] + [ "silo#{id}_cement" ] } + %w[date turno observations]).freeze
 
   DECIMAL_FIELDS = (SILOS.values.flat_map { |silo| silo[:readings] } +

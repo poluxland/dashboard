@@ -17,11 +17,11 @@ class EnvasadoraReportsController < ApplicationController
   end
 
   def new
-    @report = EnvasadoraReport.new(date: Time.current.in_time_zone("America/Santiago").to_date)
+    @report = EnvasadoraReport.new(blank_numeric_attributes.merge(date: Time.current.in_time_zone("America/Santiago").to_date))
   end
 
   def create
-    @report = EnvasadoraReport.new(params.require(:envasadora_report).permit(*EnvasadoraReport::INPUT_FIELDS))
+    @report = EnvasadoraReport.new(blank_numeric_attributes.merge(params.require(:envasadora_report).permit(*EnvasadoraReport::INPUT_FIELDS).to_h))
     @report.author_email = current_user[:email]
     if @report.save
       redirect_to @report, notice: "Reporte guardado. Revisa los totales y envía el correo."
@@ -69,6 +69,10 @@ class EnvasadoraReportsController < ApplicationController
   end
 
   private
+
+  def blank_numeric_attributes
+    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.index_with(nil)
+  end
 
   def protect_historical_report
     return unless @report.historical?
