@@ -24,6 +24,11 @@ class EnvasadoraReport < ApplicationRecord
     [ "Vento 3", "silovento3", "nvento3", 150 ]
   ].freeze
   FLOOR = { "Extra" => %w[extrsacos bigbagextra bigbagextra1 bigbagextra1350], "Ultra" => %w[bigbag_extra_retiro], "Especial" => %w[especialsacos bigbagespecial], "S4200" => %w[bigbagsuper], "Plus" => %w[bigbagplus] }.freeze
+  INTERNAL_RECIPIENTS = %w[
+    claudio.villanueva@msindustrial.cl
+    jose.jerez@msindustrial.cl
+    fernando.gonzalez@msindustrial.cl
+  ].freeze
   RECIPIENTS = JSON.parse(Rails.root.join("config/envasadora_recipients.json").read).freeze
   INPUT_FIELDS = (FIELDS.map { |f| f.fetch("name") } + SILOS.flat_map { |id, s| s[:readings] + [ "silo#{id}_cement" ] } + %w[date turno observations]).freeze
 

@@ -53,13 +53,16 @@ class EnvasadoraReportsController < ApplicationController
   def send_email
     return redirect_to @report, alert: "Solo el autor puede enviar este reporte." unless @report.author_email == current_user[:email]
 
+    audience = params.fetch(:audience, "normal")
+    return redirect_to @report, alert: "Selecciona un envío normal o interno." unless %w[normal internal].include?(audience)
+
     @report.with_lock do
       unless @report.sent_at?
-        EnvasadoraReportMailer.report(@report).deliver_now
+        EnvasadoraReportMailer.report(@report, internal: audience == "internal").deliver_now
         @report.update!(sent_at: Time.current)
       end
     end
-    redirect_to @report, notice: "Reporte envasadora enviado."
+    redirect_to @report, notice: audience == "internal" ? "Reporte enviado a los 3 destinatarios internos." : "Reporte envasadora enviado a la lista completa."
   rescue StandardError => error
     Rails.logger.error("Envasadora report delivery failed: #{error.class}")
     redirect_to @report, alert: "No se pudo confirmar el envío. El reporte sigue guardado; verifica la recepción antes de reintentar."

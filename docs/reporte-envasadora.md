@@ -1,7 +1,10 @@
 # Reporte envasadora
 
 Acceso: menú Reportes → Envasadora. Requiere sesión corporativa.
-El operador guarda el registro, revisa los totales y pulsa **Enviar reporte por correo**.
+El operador guarda el registro, revisa los totales y elige **Enviar reporte por correo**
+(lista completa) o **Enviar correo interno** (solo Claudio Villanueva, José Jerez
+y Fernando González, todos @msindustrial.cl). Ambos envíos cierran el reporte
+y comparten la protección contra duplicados; son opciones alternativas.
 Solo su autor puede editarlo antes del envío o enviarlo. Después del envío queda cerrado. Los reportes guardados conservan sus medidas y cementos;
 un envío confirmado no se repite. Los errores de correo dejan el registro guardado.
 Ante un error de confirmación, revisar la recepción antes de reintentar.

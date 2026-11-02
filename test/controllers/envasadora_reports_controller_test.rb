@@ -19,7 +19,10 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     patch envasadora_report_path(report), params: { envasadora_report: { prodhaver: 999 } }
     assert_redirected_to envasadora_report_path(report)
     assert_equal 0, report.reload.prodhaver
-    assert_no_difference("ActionMailer::Base.deliveries.size") { post send_email_envasadora_report_path(report) }
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_envasadora_report_path(report)
+      post send_email_envasadora_report_path(report), params: { audience: "internal" }
+    end
     assert_redirected_to envasadora_report_path(report)
     assert_nil report.reload.sent_at
   end
@@ -64,6 +67,38 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     end
     get envasadora_reports_path
     assert_response :success
+  end
+
+  test "internal email uses only the fixed internal list and cannot be resent through either button" do
+    sign_in_with_google
+    report = EnvasadoraReport.create!(@attributes.merge(author_email: "usuario@msindustrial.cl", created_at: Time.zone.parse("2026-11-02 09:00")))
+    get envasadora_report_path(report)
+    assert_select "button", text: "Enviar reporte por correo", count: 1
+    assert_select "button", text: "Enviar correo interno", count: 1
+    assert_difference("ActionMailer::Base.deliveries.size", 1) do
+      post send_email_envasadora_report_path(report), params: { audience: "internal", recipient: "otro@example.com" }
+    end
+    mail = ActionMailer::Base.deliveries.last
+    assert_equal %w[claudio.villanueva@msindustrial.cl fernando.gonzalez@msindustrial.cl jose.jerez@msindustrial.cl], mail.to.sort
+    assert_empty Array(mail.cc)
+    assert_empty Array(mail.bcc)
+    assert_equal "Reporte envasadora — #{report.date} — #{report.turno}", mail.subject
+    assert report.reload.sent_at
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_envasadora_report_path(report), params: { audience: "internal" }
+      post send_email_envasadora_report_path(report)
+    end
+    get envasadora_report_path(report)
+    assert_select "button", text: "Enviar correo interno", count: 0
+  end
+
+  test "unrecognized email audience does not send or close the report" do
+    sign_in_with_google
+    report = EnvasadoraReport.create!(@attributes.merge(author_email: "usuario@msindustrial.cl"))
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_envasadora_report_path(report), params: { audience: "someone@example.com" }
+    end
+    assert_nil report.reload.sent_at
   end
 
   test "invalid measurements rerender without saving or sending" do
@@ -123,6 +158,7 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     sign_in_with_google
     assert_no_difference "ActionMailer::Base.deliveries.size" do
       post send_email_envasadora_report_path(report)
+      post send_email_envasadora_report_path(report), params: { audience: "internal" }
     end
     assert_nil report.reload.sent_at
   end
