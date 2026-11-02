@@ -1,0 +1,44 @@
+<% work.prepare_inspections %>
+<section class="card mb-4">
+  <div class="card-body">
+    <h2 class="h5">Inspecciones del trabajo</h2>
+    <p class="text-muted">Selecciona una o varias. Puedes guardar respuestas pendientes y continuar después. Sin selección, se guarda un informe técnico libre.</p>
+    <%= f.fields_for :inspections do |inspection_fields| %>
+      <% inspection = inspection_fields.object %>
+      <div class="border rounded p-3 mb-3" data-inspection>
+        <%= inspection_fields.hidden_field :template_key %>
+        <div class="form-check">
+          <%= inspection_fields.check_box :enabled, class: "form-check-input", data: { inspection_toggle: true }, aria: { controls: "inspection-#{inspection.template_key}" } %>
+          <%= inspection_fields.label :enabled, inspection.title, class: "form-check-label fw-semibold" %>
+        </div>
+        <fieldset id="inspection-<%= inspection.template_key %>" class="mt-3" data-inspection-questions <%= "hidden disabled" unless inspection.enabled? %>>
+          <legend class="visually-hidden"><%= inspection.title %></legend>
+          <%= inspection_fields.fields_for :items do |item_fields| %>
+            <% item = item_fields.object %>
+            <div class="border-top pt-3 mt-3">
+              <%= item_fields.hidden_field :position %>
+              <p class="fw-semibold"><%= item.position + 1 %>. <%= item.question %></p>
+              <div class="row g-2">
+                <div class="col-md-3">
+                  <%= item_fields.label :answer, "Resultado", class: "form-label" %>
+                  <%= item_fields.select :answer, WorkInspectionItem::ANSWERS.map { |value, label| [label, value] }, { include_blank: "Sin responder" }, class: "form-select" %>
+                </div>
+                <div class="col-md-5">
+                  <%= item_fields.label :observations, "Observaciones", class: "form-label" %>
+                  <%= item_fields.text_area :observations, rows: 2, class: "form-control" %>
+                </div>
+                <div class="col-md-4">
+                  <%= item_fields.label :fotos_uploads, "Fotos del ítem", class: "form-label" %>
+                  <%= item_fields.file_field :fotos_uploads, multiple: true, accept: "image/png,image/jpeg,image/webp", class: "form-control", data: { compress_photo: true } %>
+                  <% item.fotos.each do |photo| %>
+                    <%= link_to photo.filename, rails_blob_path(photo, disposition: "inline"), class: "d-block small", target: "_blank", rel: "noopener" %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </fieldset>
+      </div>
+    <% end %>
+  </div>
+</section>

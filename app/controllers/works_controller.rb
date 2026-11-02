@@ -4,6 +4,21 @@ class WorksController < ApplicationController
   # GET /works or /works.json
   def index
     @works = Work.with_attached_fotos.with_attached_fotos_antes.with_attached_fotos_despues.order(fecha: :desc, id: :desc)
+    @works = @works.includes(inspections: { items: { fotos_attachments: :blob } })
+    if WorkInspection::CATALOG.key?(params[:inspection_type])
+      @works = @works.where(id: WorkInspection.where(template_key: params[:inspection_type], enabled: true).select(:work_id))
+    end
+    %i[planta area tag].each do |field|
+      @works = @works.where("works.#{field} ILIKE ?", "%#{Work.sanitize_sql_like(params[field].to_s.strip)}%") if params[field].present?
+    end
+    if params[:inspection_state].present?
+      @works = @works.select do |work|
+        work.selected_inspections.any? do |inspection|
+          (!WorkInspection::CATALOG.key?(params[:inspection_type]) || inspection.template_key == params[:inspection_type]) &&
+            inspection.summary[:state] == params[:inspection_state]
+        end
+      end
+    end
   end
 
   # GET /works/1 or /works/1.json
@@ -81,7 +96,7 @@ class WorksController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_work
-      @work = Work.find(params.expect(:id))
+      @work = Work.includes(inspections: { items: { fotos_attachments: :blob } }).find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.
@@ -94,7 +109,9 @@ class WorksController < ApplicationController
           :seguridad,
           :descripcion,
           :personal,
-          { fotos: [], fotos_antes: [], fotos_despues: [] }
+          { fotos: [], fotos_antes: [], fotos_despues: [],
+            inspections_attributes: [ [ :id, :template_key, :enabled,
+              { items_attributes: [ [ :id, :position, :answer, :observations, { fotos_uploads: [] } ] ] } ] ] }
         ]
       )
 

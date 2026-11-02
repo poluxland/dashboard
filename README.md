@@ -50,3 +50,20 @@ heroku config:set GOOGLE_CLIENT_ID="..." GOOGLE_CLIENT_SECRET="..." GOOGLE_WORKS
 ```
 
 No publiques ni guardes `GOOGLE_CLIENT_SECRET` en el repositorio.
+
+## Inspecciones en Works
+
+Ejecuta `bin/rails db:migrate` antes de iniciar la aplicación con esta versión.
+Un trabajo admite varias inspecciones o un informe libre, sin inspecciones.
+Las siete plantillas y sus preguntas están en `config/work_inspections.json`;
+las preguntas se guardan junto con las respuestas para conservar su texto.
+Desmarcar una inspección la oculta del informe sin eliminar sus respuestas ni fotos.
+
+El listado `/works` permite filtrar por inspección, estado, planta, área y equipo.
+El cumplimiento excluye pendientes y respuestas «No aplica»; se identifica como
+provisional mientras queden preguntas sin responder. El informe y el correo
+incluyen las respuestas y las fotos de cada ítem seleccionado.
+
+Las fotos nuevas se optimizan en el navegador antes del envío: lado mayor de
+1600 píxeles como máximo y JPEG al 72%, conservando el original si ya pesa menos.
+La carga espera a que termine la optimización. Las fotos existentes se conservan.

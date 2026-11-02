@@ -6,7 +6,11 @@ class WorkMailer < ApplicationMailer
 
   def technical_report(work, recipient:)
     @work = work
-    photos = PHOTO_GROUPS.keys.flat_map { |field| work.public_send(field).to_a }
+    inspection_groups = work.selected_inspections.flat_map do |inspection|
+      inspection.items.map { |item| [ "#{inspection.title} · #{item.question}", item.fotos.to_a ] }
+    end
+    groups = PHOTO_GROUPS.map { |field, label| [ label, work.public_send(field).to_a ] } + inspection_groups.reject { |_, photos| photos.empty? }
+    photos = groups.flat_map(&:last)
     raise PhotosTooLarge if photos.sum(&:byte_size) > MAX_PHOTO_BYTES
 
     attachments.inline["impromaq-logo.png"] = {
@@ -14,9 +18,9 @@ class WorkMailer < ApplicationMailer
       content: File.binread(Rails.root.join("app/assets/images/impromaq-logo.png"))
     }
 
-    @photo_groups = PHOTO_GROUPS.map do |field, label|
-      names = work.public_send(field).map do |photo|
-        filename = "#{field}-#{photo.id}-#{photo.filename}"
+    @photo_groups = groups.each_with_index.map do |(label, group_photos), index|
+      names = group_photos.map do |photo|
+        filename = "#{index}-#{photo.id}-#{photo.filename}"
         attachments.inline[filename] = { mime_type: photo.content_type, content: photo.download }
         filename
       end

@@ -150,6 +150,71 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_match "No se pudo confirmar", response.body
   end
 
+  test "creates multiple partial inspections and preserves item evidence when editing" do
+    post works_url, params: { work: { planta: "Prueba", inspections_attributes: {
+      "0" => { template_key: "seguridad", enabled: "1", items_attributes: {
+        "0" => { position: "0", answer: "no", observations: "Falta AST", fotos_uploads: [ image_blob("ast.png").signed_id ] }
+      } },
+      "1" => { template_key: "molino1", enabled: "1" },
+      "2" => { template_key: "molino2", enabled: "0" }
+    } } }
+    report = Work.order(:id).last
+    assert_redirected_to work_url(report)
+    assert_equal 2, report.inspections.count
+    inspection = report.inspections.find_by!(template_key: "seguridad")
+    assert_equal 7, inspection.items.count
+    item = inspection.items.first
+    assert_equal "no", item.answer
+    assert_equal "Falta AST", item.observations
+    assert_equal 1, item.fotos.count
+    patch work_url(report), params: { work: { inspections_attributes: {
+      "0" => { id: inspection.id, template_key: "seguridad", enabled: "1", items_attributes: {
+        "0" => { id: item.id, position: "0", answer: "yes", fotos_uploads: [ "", image_blob("ast-nuevo.png").signed_id ] }
+      } }
+    } } }
+    assert_redirected_to work_url(report)
+    assert_equal "yes", item.reload.answer
+    assert_equal 2, item.fotos.count
+    get work_url(report)
+    assert_select "h2", "Inspección de Seguridad"
+    assert_match "Incompleta", response.body
+    get work_url(report, format: :json)
+    assert_equal 2, response.parsed_body["inspections"].size
+    patch work_url(report), params: { work: { inspections_attributes: {
+      "0" => { id: inspection.id, enabled: "0" }
+    } } }
+    assert_redirected_to work_url(report)
+    assert_not inspection.reload.enabled?
+    assert_equal 2, item.reload.fotos.count
+    assert_equal "yes", item.answer
+  end
+
+  test "filters inspection reports and rejects invalid nested answers" do
+    inspection = @work.inspections.create!(template_key: "seguridad")
+    get works_url, params: { inspection_type: "seguridad", inspection_state: "Sin iniciar" }
+    assert_select "tr#work_#{@work.id}", count: 1
+    get works_url, params: { inspection_type: "molino1" }
+    assert_select "tr#work_#{@work.id}", count: 0
+    patch work_url(@work), params: { work: { inspections_attributes: {
+      "0" => { id: inspection.id, items_attributes: {
+        "0" => { id: inspection.items.first.id, answer: "invalid" }
+      } }
+    } } }
+    assert_response :unprocessable_entity
+    assert_nil inspection.items.first.reload.answer
+  end
+
+  test "email includes inspection answers and item photos" do
+    inspection = @work.inspections.create!(template_key: "seguridad")
+    inspection.items.first.update!(answer: "no", observations: "AST pendiente", fotos_uploads: [ image_blob("ast.png").signed_id ])
+    post send_email_work_url(@work), params: { recipient: "destino@example.com" }
+    assert_redirected_to work_url(@work)
+    email = ActionMailer::Base.deliveries.last
+    assert_equal 2, email.attachments.size
+    assert_includes email.html_part.body.decoded, "AST pendiente"
+    assert_includes email.text_part.body.decoded, "No cumple"
+  end
+
   private
 
   def image_blob(filename)

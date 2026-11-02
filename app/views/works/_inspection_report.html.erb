@@ -1,0 +1,31 @@
+<% work.selected_inspections.each do |inspection| %>
+  <% summary = inspection.summary %>
+  <section class="card mb-3">
+    <div class="card-body">
+      <h2 class="h5"><%= inspection.title %></h2>
+      <p>
+        <strong><%= summary[:state] %></strong> · <%= summary[:reviewed] %>/<%= summary[:total] %> revisados ·
+        <%= summary[:failed] %> no cumplen ·
+        Cumplimiento: <%= summary[:compliance] ? "#{summary[:compliance]}%" : "Sin ítems evaluables" %>
+        <%= "(provisional)" if summary[:reviewed] < summary[:total] && summary[:compliance] %>
+      </p>
+      <p class="small text-muted">El cumplimiento considera solo respuestas Cumple / No cumple. No aplica y pendientes se excluyen.</p>
+      <% inspection.items.each do |item| %>
+        <div class="border-top pt-3 mt-3">
+          <h3 class="h6"><%= item.position + 1 %>. <%= item.question %></h3>
+          <p><strong><%= item.answer_label %></strong></p>
+          <%= simple_format(item.observations) if item.observations.present? %>
+          <div class="row g-2">
+            <% item.fotos.each do |photo| %>
+              <div class="col-6 col-md-3">
+                <%= link_to rails_blob_path(photo, disposition: "inline"), target: "_blank", rel: "noopener" do %>
+                  <%= image_tag photo, class: "img-fluid rounded", loading: "lazy", alt: "#{item.question}: #{photo.filename}" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_30_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_02_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -356,6 +356,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_220000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "work_inspection_items", force: :cascade do |t|
+    t.bigint "work_inspection_id", null: false
+    t.integer "position", null: false
+    t.text "question", null: false
+    t.string "answer"
+    t.text "observations"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["work_inspection_id", "position"], name: "index_work_inspection_items_on_work_inspection_id_and_position", unique: true
+    t.index ["work_inspection_id"], name: "index_work_inspection_items_on_work_inspection_id"
+  end
+
+  create_table "work_inspections", force: :cascade do |t|
+    t.bigint "work_id", null: false
+    t.string "template_key", null: false
+    t.string "title", null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["work_id", "template_key"], name: "index_work_inspections_on_work_id_and_template_key", unique: true
+    t.index ["work_id"], name: "index_work_inspections_on_work_id"
+  end
+
   create_table "works", force: :cascade do |t|
     t.string "area"
     t.datetime "created_at", null: false
@@ -382,4 +405,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_220000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "indicator_readings", "people"
   add_foreign_key "tpt_events", "tpt_imports"
+  add_foreign_key "work_inspection_items", "work_inspections"
+  add_foreign_key "work_inspections", "works"
 end

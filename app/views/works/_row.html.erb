@@ -1,17 +1,27 @@
 <tr id="<%= dom_id(work) %>">
-  <td><%= work.fecha&.strftime("%d-%m-%Y") %></td>
-  <td><%= work.planta %></td>
-  <td><%= work.area %></td>
+  <td class="text-nowrap"><%= work.fecha&.strftime("%d-%m-%Y") %></td>
+  <td><%= link_to work.nombre.presence || "Informe sin título", work_path(work) %></td>
+  <td><%= work.planta %><div class="small text-muted"><%= work.area %></div></td>
   <td><%= work.tag %></td>
-  <td><%= work.numero_cotizacion %></td>
-  <td><%= work.solicita %></td>
-  <td><%= work.supervisor %></td>
-  <td><%= work.hora_inicio&.strftime("%H:%M") %></td>
-  <td><%= work.hora_termino&.strftime("%H:%M") %></td>
-  <td><%= truncate(work.nombre.to_s, length: 24) %></td>
+  <td>
+    <% if work.selected_inspections.empty? %>
+      <span class="text-muted">Informe libre</span>
+    <% end %>
+    <% work.selected_inspections.each do |inspection| %>
+      <% summary = inspection.summary %>
+      <div class="mb-2">
+        <div class="small fw-semibold"><%= inspection.title %></div>
+        <span class="badge text-bg-<%= summary[:failed].positive? ? 'danger' : (summary[:state] == 'Cumple' ? 'success' : 'secondary') %>"><%= summary[:state] %></span>
+        <div class="small"><%= summary[:reviewed] %>/<%= summary[:total] %> revisados · <%= summary[:failed] %> no cumplen</div>
+        <% if summary[:compliance] %>
+          <div class="small"><%= summary[:compliance] %>% cumplimiento<%= " (provisional)" if summary[:reviewed] < summary[:total] %></div>
+        <% end %>
+      </div>
+    <% end %>
+  </td>
 
   <td>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
       <% { fotos_antes: "Antes", fotos_despues: "Después", fotos: "Adicionales" }.each do |campo, etiqueta| %>
         <% fotos = work.public_send(campo) %>
         <div class="d-flex flex-column align-items-center gap-1">
@@ -26,6 +36,7 @@
           <% end %>
         </div>
       <% end %>
+      <span class="badge text-bg-light align-self-start">Inspecciones: <%= work.selected_inspections.sum { |inspection| inspection.items.sum { |item| item.fotos.size } } %></span>
     </div>
   </td>
 

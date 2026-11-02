@@ -6,6 +6,13 @@ IMPROMAQ · INFORME TÉCNICO DE MANTENIMIENTO N° <%= @work.id %>
 
 <% end %>
 FOTOGRAFÍAS INCLUIDAS EN EL CORREO
+<% @work.selected_inspections.each do |inspection| %>
+<%= inspection.title %> · <%= inspection.summary[:state] %> · <%= inspection.summary[:reviewed] %>/<%= inspection.summary[:total] %> revisados
+<% inspection.items.each do |item| %>
+<%= item.position + 1 %>. <%= item.question %>: <%= item.answer_label %>
+<%= item.observations %>
+<% end %>
+<% end %>
 <% @photo_groups.each do |label, filenames| %>
 <%= label %>: <%= filenames.size %> imagen(es)
 <% end %>

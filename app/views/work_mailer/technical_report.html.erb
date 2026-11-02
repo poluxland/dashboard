@@ -11,6 +11,15 @@
       </tr>
     <% end %>
   </table>
+  <% @work.selected_inspections.each do |inspection| %>
+    <h2><%= inspection.title %></h2>
+    <% summary = inspection.summary %>
+    <p><%= summary[:state] %> · <%= summary[:reviewed] %>/<%= summary[:total] %> revisados · <%= summary[:failed] %> no cumplen</p>
+    <% inspection.items.each do |item| %>
+      <p><strong><%= item.position + 1 %>. <%= item.question %>: <%= item.answer_label %></strong></p>
+      <%= simple_format(item.observations) %>
+    <% end %>
+  <% end %>
   <% @photo_groups.each do |label, filenames| %>
     <h2 style="font-size:18px;margin-top:24px;">Imágenes · <%= label %></h2>
     <% if filenames.empty? %>

@@ -1,0 +1,100 @@
+{
+  "seguridad": {
+    "title": "Inspección de Seguridad",
+    "items": [
+      "Trabajo cuenta con AST (Análisis Seguro de Trabajo)",
+      "Personal con EPP (Elementos de Protección Personal)",
+      "Bloqueo LOTO/TO aplicado donde corresponda",
+      "Permisos vigentes: trabajos en altura, espacios confinados, carga suspendida",
+      "Orden y limpieza del área",
+      "Señalización y demarcación",
+      "Extintores disponibles y operativos"
+    ]
+  },
+  "moviles": {
+    "title": "Auditoría Equipos Móviles",
+    "items": [
+      "Descanso y condición del operador",
+      "Sin medicación que afecte operación",
+      "Check-list del equipo realizado",
+      "Frenos",
+      "Dirección",
+      "Luces (delanteras y traseras)",
+      "Cinturón de seguridad",
+      "Neumáticos",
+      "Extintor operativo y certificado",
+      "Fugas de fluidos",
+      "Ruidos anormales"
+    ]
+  },
+  "molino1": {
+    "title": "Inspección Molino 1",
+    "items": [
+      "Área 412 (Cintas, tambores, polines, centrado)",
+      "Área 416 (Rosca, regueras, ventiladores, elevador, trampametal, esclusas, filtros, separador)",
+      "Generador de calor",
+      "Estaciones de lubricación entrada",
+      "Estación de lubricación salida",
+      "Estación de lubricación reductor",
+      "Área 418 (válvula AD01, elevador, toma muestras, contrapeso, regueras, chute caída elevador 418)",
+      "Sobre silos cemento especial y cemento extra (filtros, regueras)",
+      "Aseo del edificio",
+      "Iluminación del edificio",
+      "Molino"
+    ]
+  },
+  "molino2": {
+    "title": "Inspección Molino 2",
+    "items": [
+      "Área 422 (Cintas, tambores, polines, centrado cintas)",
+      "Área 428 (regueras, ventiladores, elevador, trampametal, esclusas, filtros, separador, toma muestra)",
+      "Generador de calor",
+      "REALIZO (verificación general)",
+      "Nombre y firma (registro)",
+      "Cement cooler",
+      "Área 428 (rotativa, válvula AD01, elevadores, toma muestras, regueras, ventiladores, elevador, filtros)",
+      "Transporte neumático",
+      "Molino",
+      "Aseo del edificio",
+      "Iluminación del edificio"
+    ]
+  },
+  "alim413": {
+    "title": "Inspección Área Alimentadores 413–421",
+    "items": [
+      "Alimentador clinker (chute traspaso, cinta, centrado de cinta, polines, tambores)",
+      "Alimentador puzolana (chute traspaso, cinta, centrado de cinta, polines, tambores)",
+      "Alimentador yeso (chute traspaso, cinta, centrado de cinta, polines, tambores)",
+      "Chute pantalón (chapaeleta)",
+      "Cinta 421",
+      "Sistema neumático (fugas, manómetros)",
+      "Bomba de aditivo (fugas, cañerías)",
+      "Aseo del edificio",
+      "Iluminación del edificio"
+    ]
+  },
+  "alim423": {
+    "title": "Inspección Área Alimentadores 423",
+    "items": [
+      "Alimentador clinker (chute traspaso, cinta, centrado de cinta, polines, tambores)",
+      "Alimentador puzolana (chute traspaso, cinta, centrado de cinta, polines, tambores)",
+      "Alimentador yeso (chute traspaso, cinta, centrado de cinta, polines, tambores)",
+      "Válvulas 423VV02 (chapaeleta)",
+      "Sistema neumático (fugas, manómetros)",
+      "Bomba de aditivo (fugas, cañerías)",
+      "Aseo del edificio",
+      "Iluminación del edificio"
+    ]
+  },
+  "envasadora": {
+    "title": "Auditoría Planta Envasadora",
+    "items": [
+      "Rotopacker – boquillas, sellado, cilindros 3 posiciones",
+      "Radimat – correas, protección, elevación de sacos",
+      "Báscula de pesaje – celdas y control",
+      "Paletizadora – sensores, fin de carrera, tablero",
+      "Orden y limpieza de planta",
+      "Enfundadora – cadenas, neumáticos, sensores, cilindro seguridad, nivelación de brazos"
+    ]
+  }
+}
