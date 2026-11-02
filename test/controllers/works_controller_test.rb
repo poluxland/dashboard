@@ -150,17 +150,17 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_match "No se pudo confirmar", response.body
   end
 
-  test "creates multiple partial inspections and preserves item evidence when editing" do
+  test "creates one partial inspection and preserves item evidence when editing" do
     post works_url, params: { work: { planta: "Prueba", inspections_attributes: {
       "0" => { template_key: "seguridad", enabled: "1", items_attributes: {
         "0" => { position: "0", answer: "no", observations: "Falta AST", fotos_uploads: [ image_blob("ast.png").signed_id ] }
       } },
-      "1" => { template_key: "molino1", enabled: "1" },
+      "1" => { template_key: "molino1", enabled: "0" },
       "2" => { template_key: "molino2", enabled: "0" }
     } } }
     report = Work.order(:id).last
     assert_redirected_to work_url(report)
-    assert_equal 2, report.inspections.count
+    assert_equal 1, report.inspections.count
     inspection = report.inspections.find_by!(template_key: "seguridad")
     assert_equal 7, inspection.items.count
     item = inspection.items.first
@@ -179,7 +179,7 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", "Inspección de Seguridad"
     assert_match "Incompleta", response.body
     get work_url(report, format: :json)
-    assert_equal 2, response.parsed_body["inspections"].size
+    assert_equal 1, response.parsed_body["inspections"].size
     patch work_url(report), params: { work: { inspections_attributes: {
       "0" => { id: inspection.id, enabled: "0" }
     } } }
@@ -187,6 +187,36 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_not inspection.reload.enabled?
     assert_equal 2, item.reload.fotos.count
     assert_equal "yes", item.answer
+  end
+
+  test "rejects multiple selected inspections without creating a report" do
+    assert_no_difference("Work.count") do
+      post works_url, params: { work: { inspections_attributes: {
+        "0" => { template_key: "seguridad", enabled: "1" },
+        "1" => { template_key: "molino1", enabled: "1" }
+      } } }
+    end
+    assert_response :unprocessable_entity
+    assert_includes response.body, "Solo puedes seleccionar una inspección por trabajo."
+  end
+
+  test "dropdown switches inspections and restores saved answers when switching back" do
+    inspection = @work.inspections.create!(template_key: "seguridad")
+    inspection.items.first.update!(answer: "no", observations: "AST pendiente")
+    patch work_url(@work), params: { work: { inspection_type: "molino1" } }
+    assert_redirected_to work_url(@work)
+    assert_equal [ "molino1" ], @work.reload.selected_inspections.map(&:template_key)
+    assert_equal "no", inspection.items.first.reload.answer
+    patch work_url(@work), params: { work: { inspection_type: "seguridad" } }
+    assert_redirected_to work_url(@work)
+    assert_equal [ "seguridad" ], @work.reload.selected_inspections.map(&:template_key)
+    assert_equal "AST pendiente", inspection.items.first.reload.observations
+    get edit_work_url(@work)
+    assert_select "select[name='work[inspection_type]'] option[selected][value=seguridad]", count: 1
+    assert_select "input[type=checkbox][data-inspection-toggle]", count: 0
+    patch work_url(@work), params: { work: { inspection_type: "" } }
+    assert_redirected_to work_url(@work)
+    assert_empty @work.reload.selected_inspections
   end
 
   test "filters inspection reports and rejects invalid nested answers" do

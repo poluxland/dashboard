@@ -103,7 +103,7 @@ class WorksController < ApplicationController
     def work_params
       attributes = params.expect(
         work: [
-          :fecha, :planta, :numero_cotizacion, :solicita, :supervisor,
+          :inspection_type, :fecha, :planta, :numero_cotizacion, :solicita, :supervisor,
           :hora_inicio, :hora_termino,
           :nombre, :area, :tag, :repuestos, :epp, :hallazgos, :observaciones,
           :seguridad,

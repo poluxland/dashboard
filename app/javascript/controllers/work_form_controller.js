@@ -7,18 +7,22 @@ export default class extends Controller {
     this.pending = new Map()
     this.errors = new Map()
     this.selections = new Map()
-    this.element.querySelectorAll("[data-inspection-toggle]").forEach(toggle => this.toggle(toggle))
+    this.selectInspection()
   }
 
-  toggle(toggle) {
-    const questions = toggle.closest("[data-inspection]").querySelector("[data-inspection-questions]")
-    questions.hidden = questions.disabled = !toggle.checked
-    toggle.setAttribute("aria-expanded", String(toggle.checked))
+  selectInspection() {
+    const selected = this.element.querySelector("[data-inspection-select]").value
+    this.element.querySelectorAll("[data-inspection]").forEach(section => {
+      const enabled = section.dataset.inspection === selected
+      section.hidden = !enabled
+      section.querySelector("[data-inspection-questions]").disabled = !enabled
+      section.querySelector("[data-inspection-enabled]").value = enabled ? "1" : "0"
+    })
   }
 
   change(event) {
     const input = event.target
-    if (input.matches("[data-inspection-toggle]")) this.toggle(input)
+    if (input.matches("[data-inspection-select]")) this.selectInspection()
     if (!input.matches("[data-compress-photo]")) return
     this.errors.delete(input)
     const selection = Symbol()

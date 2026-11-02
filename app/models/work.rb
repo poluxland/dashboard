@@ -2,6 +2,17 @@
 class Work < ApplicationRecord
   has_many :inspections, class_name: "WorkInspection", dependent: :destroy, inverse_of: :work
   accepts_nested_attributes_for :inspections, reject_if: ->(attributes) { attributes["id"].blank? && !ActiveModel::Type::Boolean.new.cast(attributes["enabled"]) }
+  before_validation :select_inspection_type
+  validates :inspection_type, inclusion: { in: WorkInspection::CATALOG.keys }, allow_blank: true
+  validate :single_selected_inspection
+
+  def inspection_type
+    @inspection_type || selected_inspections.first&.template_key.to_s
+  end
+
+  def inspection_type=(value)
+    @inspection_type = value.to_s
+  end
 
   def selected_inspections
     inspections.select(&:enabled?)
@@ -24,6 +35,20 @@ class Work < ApplicationRecord
   PESO_MAX = 10.megabytes
 
   private
+
+  def select_inspection_type
+    return unless instance_variable_defined?(:@inspection_type)
+    return if @inspection_type.present? && !WorkInspection::CATALOG.key?(@inspection_type)
+
+    inspections.each { |inspection| inspection.enabled = inspection.template_key == @inspection_type }
+    if @inspection_type.present? && inspections.none?(&:enabled?)
+      inspections.build(template_key: @inspection_type, enabled: true)
+    end
+  end
+
+  def single_selected_inspection
+    errors.add(:base, "Solo puedes seleccionar una inspección por trabajo.") if selected_inspections.size > 1
+  end
 
   def validar_fotos_tipo_y_peso
     %i[fotos fotos_antes fotos_despues].each do |campo|

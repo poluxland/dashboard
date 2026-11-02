@@ -1,17 +1,18 @@
 <% work.prepare_inspections %>
 <section class="card mb-4">
   <div class="card-body">
-    <h2 class="h5">Inspecciones del trabajo</h2>
-    <p class="text-muted">Selecciona una o varias. Puedes guardar respuestas pendientes y continuar después. Sin selección, se guarda un informe técnico libre.</p>
+    <h2 class="h5">Inspección del trabajo</h2>
+    <p class="text-muted">Selecciona una inspección. Puedes guardar respuestas pendientes y continuar después.</p>
+    <%= f.label :inspection_type, "Tipo de inspección", class: "form-label" %>
+    <%= f.select :inspection_type, WorkInspection::CATALOG.map { |key, template| [template["title"], key] }, { include_blank: "Informe técnico libre (sin inspección)" }, class: "form-select mb-3", data: { inspection_select: true } %>
     <%= f.fields_for :inspections do |inspection_fields| %>
       <% inspection = inspection_fields.object %>
-      <div class="border rounded p-3 mb-3" data-inspection>
+      <% selected = inspection.template_key == work.inspection_type %>
+      <div class="border rounded p-3 mb-3" data-inspection="<%= inspection.template_key %>" <%= "hidden" unless selected %>>
         <%= inspection_fields.hidden_field :template_key %>
-        <div class="form-check">
-          <%= inspection_fields.check_box :enabled, class: "form-check-input", data: { inspection_toggle: true }, aria: { controls: "inspection-#{inspection.template_key}" } %>
-          <%= inspection_fields.label :enabled, inspection.title, class: "form-check-label fw-semibold" %>
-        </div>
-        <fieldset id="inspection-<%= inspection.template_key %>" class="mt-3" data-inspection-questions <%= "hidden disabled" unless inspection.enabled? %>>
+        <%= inspection_fields.hidden_field :enabled, value: selected ? "1" : "0", data: { inspection_enabled: true } %>
+        <h3 class="h6"><%= inspection.title %></h3>
+        <fieldset id="inspection-<%= inspection.template_key %>" class="mt-3" data-inspection-questions <%= "disabled" unless selected %>>
           <legend class="visually-hidden"><%= inspection.title %></legend>
           <%= inspection_fields.fields_for :items do |item_fields| %>
             <% item = item_fields.object %>

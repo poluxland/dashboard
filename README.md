@@ -54,10 +54,11 @@ No publiques ni guardes `GOOGLE_CLIENT_SECRET` en el repositorio.
 ## Inspecciones en Works
 
 Ejecuta `bin/rails db:migrate` antes de iniciar la aplicación con esta versión.
-Un trabajo admite varias inspecciones o un informe libre, sin inspecciones.
+Un trabajo admite una sola inspección, elegida en un desplegable, o un informe libre, sin inspección.
 Las siete plantillas y sus preguntas están en `config/work_inspections.json`;
 las preguntas se guardan junto con las respuestas para conservar su texto.
-Desmarcar una inspección la oculta del informe sin eliminar sus respuestas ni fotos.
+Cambiar de inspección la oculta del informe sin eliminar sus respuestas ni fotos;
+al volver a elegirla se recuperan. El servidor rechaza más de una inspección activa por trabajo.
 
 El listado `/works` permite filtrar por inspección, estado, planta, área y equipo.
 El cumplimiento excluye pendientes y respuestas «No aplica»; se identifica como
