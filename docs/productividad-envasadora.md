@@ -60,7 +60,8 @@ Las causas restantes se agrupan en Otros para que el Pareto llegue al 100%.
 
 - Producción total: sacos Haver reportados. El promedio por turno incluye ceros
   declarados; un turno sin reporte es un dato ausente y no entra al promedio.
-- Producción/hora: sacos / horas Haver declaradas; no usa una duración fija de turno.
+- Producción/hora (Ton/h): sacos Haver × 0,025 / horas Haver declaradas
+  (sacos de 25 kg); no usa una duración fija de turno.
   Si algún turno con producción positiva carece de horas declaradas no se calcula
   el cociente para no dividir toda la producción por una base parcial de horas.
 - Detenido por turno: unión de intervalos detenidos seleccionados / turnos con TPT.

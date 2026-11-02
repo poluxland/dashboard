@@ -10,7 +10,7 @@ module EnvasadoraDashboardHelper
       [ "Producción total", dashboard_number(report.production_total, precision: 0), "sacos · #{report.production_label}" ],
       [ "Turnos con reporte", report.production_shift_count, "Se incluye producción cero declarada" ],
       [ "Producción por turno", dashboard_number(report.production_per_shift), "sacos por turno con reporte" ],
-      [ "Producción por hora", dashboard_number(report.production_per_hour), "sacos/h · horas declaradas en reportes" ],
+      [ "Producción por hora", dashboard_number(report.production_per_hour, suffix: " Ton/h"), "Sacos de 25 kg · horas declaradas en reportes" ],
       [ "Detenido por turno", dashboard_number(report.downtime_per_shift, suffix: " min"), "turnos con registros TPT" ],
       [ "Tiempo detenido", dashboard_number(report.downtime_percentage, suffix: "%"), "del tiempo registrado en TPT" ],
       [ "Disponibilidad observada", dashboard_number(report.availability, suffix: "%"), "sobre tiempo de operación registrado" ],

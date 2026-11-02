@@ -53,7 +53,12 @@ class EnvasadoraDashboard
   def production_total = production_shift_count.positive? ? @rows.sum { |row| row[:production].to_f } : nil
   def production_per_shift = divide(production_total, production_shift_count)
   def missing_hours_count = @rows.count { |row| row[:production].to_f.positive? && !row[:hours].to_f.positive? }
-  def production_per_hour = missing_hours_count.zero? ? divide(production_total, @rows.sum { |row| row[:hours].to_f }) : nil
+  def production_per_hour
+    return unless missing_hours_count.zero?
+
+    sacks_per_hour = divide(production_total, @rows.sum { |row| row[:hours].to_f })
+    sacks_per_hour * 0.025 unless sacks_per_hour.nil?
+  end
   def tpt_shift_count = @rows.count { |row| row[:observed_seconds].positive? }
   def downtime_per_shift = divide(@rows.sum { |row| row[:downtime_seconds] } / 60.0, tpt_shift_count)
   def downtime_percentage = divide(@rows.sum { |row| row[:downtime_seconds] } * 100, @rows.sum { |row| row[:observed_seconds] })

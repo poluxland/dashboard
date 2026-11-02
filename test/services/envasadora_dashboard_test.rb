@@ -32,7 +32,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     assert_equal 1, result.production_shift_count
     assert_equal 1, result.duplicate_report_count
     assert_equal latest, result.rows.sole[:report]
-    assert_equal 60, result.production_per_hour
+    assert_in_delta 1.5, result.production_per_hour
     assert_nil result.availability
     assert_equal 170, dashboard(source: "ambas").production_total
     assert_equal 50, dashboard(source: "vento").production_total

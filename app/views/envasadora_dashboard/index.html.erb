@@ -79,7 +79,7 @@
   </div>
 
   <details class="card border-0 bg-body-tertiary rounded-4 mb-4"><summary class="p-3 fw-semibold">Horarios, fuentes y cálculo de indicadores</summary><div class="px-3 pb-3 small">
-    <p>Producción: sacos Haver del último Reporte envasadora guardado por fecha y turno, incluidos reportes pendientes de envío. Producción por hora usa las horas Haver declaradas; si no hay horas, se muestra un guion. Los inventarios no se suman como producción.</p>
+    <p>Producción: sacos Haver del último Reporte envasadora guardado por fecha y turno, incluidos reportes pendientes de envío. Producción por hora se expresa en Ton/h: sacos Haver × 0,025 ÷ horas Haver declaradas; si no hay horas, se muestra un guion. Los inventarios no se suman como producción.</p>
     <p>TM 06:00–14:00, TT 14:00–22:00 y TN 22:00–06:00 del día siguiente. TN pertenece a la fecha en que empieza. Programa: lunes a viernes, 8 horas por turno; sábado, solo TM de 06:00 a 12:00; domingo, sin programación. Los filtros por día usan la fecha del turno.</p>
     <p>Disponibilidad observada = tiempo registrado en marcha ÷ tiempo de operación registrado. Se consideran los eventos Correr, Parada planificada y Parada no planificada dentro del horario programado; No programada queda fuera de esa base. Las horas sin registros no se suponen operativas. La cobertura compara el tiempo observado con las horas programadas del turno.</p>
     <p>MTBF = horas operativas observadas ÷ paradas no planificadas. MTTR = minutos de parada no planificada ÷ número de paradas. Una parada que cruza turnos se cuenta una sola vez en el total consultado y su duración se reparte entre los turnos. La confiabilidad estima e^(−8/MTBF), suponiendo una tasa constante de fallas; no es una garantía de operación.</p>
