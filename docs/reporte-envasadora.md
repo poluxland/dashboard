@@ -28,7 +28,9 @@ Las pruebas usan entrega simulada, sin correos reales.
   en su producto y en el total. Stock, despachos y bigbags de piso se ingresan en toneladas.
 - Especial en piso = Especial + Especial soluble + Bigbag Especial (toneladas).
   El soluble también aparece desglosado en Inventario de Sacos.
-  Los demás solubles, plastificado y tolvas se muestran aparte.
+- Extra en piso incluye Extra soluble junto a Extra y sus bigbags de piso.
+  El soluble también se conserva desglosado en Inventario de Sacos.
+  Plastificado y tolvas se muestran aparte.
 - Plastificado: pallets × 1,8 t. Producción Haver/Vento: sacos × 0,025 t;
   producción Bigbag: bolsas × 1,5 t. Rendimiento = toneladas / horas. Medidas, horas y cantidades en toneladas admiten decimales;
   sacos, bolsas, pallets y enjuagues se ingresan como enteros.
