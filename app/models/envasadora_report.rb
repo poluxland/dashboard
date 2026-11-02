@@ -2,8 +2,6 @@ class EnvasadoraReport < ApplicationRecord
   CEMENTS = [ "Especial", "Extra", "Ultra", "S3300", "S4200", "Plus", "S3300 (AR)", "HPM", "Extramix" ].freeze
   SHIFTS = { "TM" => "Turno Mañana", "TT" => "Turno Tarde", "TN" => "Turno Noche" }.freeze
   HOUR_FIELDS = %w[horas_haver horas_vento horas_bigbag].freeze
-  MAX_SHIFT_HOURS = 8
-  SATURDAY_MORNING_HOURS = 6
   GROUPS = JSON.parse(Rails.root.join("config/envasadora_fields.json").read).freeze
   FIELDS = GROUPS.values.flatten.freeze
   SILOS = {
@@ -69,7 +67,7 @@ class EnvasadoraReport < ApplicationRecord
   validates(*HOUR_FIELDS, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: :hours_limit })
 
   def hours_limit
-    date&.saturday? && turno == "TM" ? SATURDAY_MORNING_HOURS : MAX_SHIFT_HOURS
+    EnvasadoraShiftSchedule.hours(date, turno)
   end
 
   def silo_tons(id)

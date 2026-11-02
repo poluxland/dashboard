@@ -4,8 +4,6 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   setup do
     @import = TptImport.create!(filename: "test.xlsx", author_email: "test@msindustrial.cl")
     @date = Date.new(2026, 10, 15)
-    # Test schedule only; production schedule is supplied by the application.
-    @shift_starts = { "TN" => -2, "TM" => 6, "TT" => 14 }
   end
 
   def report(date: @date, shift: "TM", production: 100, hours: 2)
@@ -21,7 +19,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   end
 
   def dashboard(params = {})
-    EnvasadoraDashboard.new({ from: @date.iso8601, to: @date.iso8601 }.merge(params), shift_starts: @shift_starts, default_source: "haver").call
+    EnvasadoraDashboard.new({ from: @date.iso8601, to: @date.iso8601 }.merge(params), default_source: "haver").call
   end
 
   test "uses latest report per date and shift without adding inventory or other machines" do
@@ -40,8 +38,8 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
 
   test "splits events at shift boundaries and midnight and counts each failure once" do
     %w[TM TT TN].each { |shift| report(shift: shift) }
-    event(at: Time.utc(2026, 10, 15, 13, 30), seconds: 3600)
-    event(at: Time.utc(2026, 10, 14, 23, 30), seconds: 3600, reason: "Rotativa")
+    event(at: Time.utc(2026, 10, 15, 12, 30), seconds: 3600)
+    event(at: Time.utc(2026, 10, 16, 0, 30), seconds: 3600, reason: "Rotativa")
     result = dashboard
     assert_equal 3, result.rows.size
     assert_in_delta 30, result.rows.find { |row| row[:shift] == "TM" }[:downtime_seconds] / 60
@@ -72,7 +70,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     assert_in_delta 100.0 * 60 / 105, result.availability
     assert_in_delta 30.0 / 60, result.mtbf
     assert_in_delta 22.5, result.mttr
-    assert_in_delta 25, result.rows.sole[:coverage]
+    assert_in_delta 100.0 * 2 / 7, result.rows.sole[:coverage]
     assert_in_delta 45, result.rows.sole[:downtime_seconds] / 60
     included = dashboard(exclude_unscheduled: "0")
     assert_in_delta 60, included.rows.sole[:downtime_seconds] / 60
@@ -141,8 +139,7 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   test "counts only portions overlapping reported shifts without changing the source event" do
     report(shift: "TM")
     report(shift: "TN")
-    @shift_starts = { "TN" => 22, "TM" => 6, "TT" => 14 }
-    original = event(at: Time.utc(2026, 10, 15, 13, 30), seconds: 9.hours)
+    original = event(at: Time.utc(2026, 10, 15, 12, 30), seconds: 9.hours)
     result = dashboard
     assert_equal %w[TN TM], result.rows.map { |row| row[:shift] }
     assert_equal 0, result.tpt_only_count
@@ -154,6 +151,28 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     assert_equal 1, @import.tpt_events.count
   end
 
+  test "assigns complete recorded days using the variable weekday shift boundaries" do
+    expected_hours = { 12 => { "TM" => 8, "TT" => 8, "TN" => 8 },
+                       13 => { "TM" => 7, "TT" => 9, "TN" => 8 },
+                       14 => { "TM" => 7, "TT" => 9, "TN" => 8 },
+                       15 => { "TM" => 7, "TT" => 8, "TN" => 9 },
+                       16 => { "TM" => 7, "TT" => 8, "TN" => 9 } }
+    expected_hours.each do |day, shifts|
+      date = Date.new(2026, 10, day)
+      shifts.each_key { |shift| report(date: date, shift: shift) }
+      event(at: Time.utc(2026, 10, day, 6), seconds: 24.hours, impact: "Correr")
+      result = dashboard(from: date.iso8601, to: date.iso8601)
+      assert_equal 3, result.rows.size
+      result.rows.each do |row|
+        assert_equal date, row[:date]
+        assert_equal shifts.fetch(row[:shift]), row[:planned_hours]
+        assert_in_delta shifts.fetch(row[:shift]).hours, row[:observed_seconds]
+        assert_in_delta 100, row[:coverage]
+      end
+      assert_in_delta 100, result.availability
+    end
+  end
+
   test "rejects invalid dates and reversed periods" do
     assert_raises(EnvasadoraDashboard::InvalidFilter) { dashboard(from: "2026-02-30") }
     assert_raises(EnvasadoraDashboard::InvalidFilter) { dashboard(from: "2026-10-16", to: "2026-10-15") }
@@ -162,18 +181,17 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
   test "TN belongs to start date and Saturday TM coverage uses six programmed hours" do
     report(shift: "TN")
     report(date: Date.new(2026, 10, 17), shift: "TM")
-    schedule = { "TN" => 22, "TM" => 6, "TT" => 14 }
     event(at: Time.utc(2026, 10, 16, 1), seconds: 3600)
-    result = EnvasadoraDashboard.new({ from: "2026-10-15", to: "2026-10-15", shifts: [ "TN" ] }, shift_starts: schedule, default_source: "haver").call
+    result = EnvasadoraDashboard.new({ from: "2026-10-15", to: "2026-10-15", shifts: [ "TN" ] }, default_source: "haver").call
     assert_equal @date, result.rows.sole[:date]
     assert_equal "TN", result.rows.sole[:shift]
     event(at: Time.utc(2026, 10, 17, 6), seconds: 8.hours, impact: "Correr", reason: "Running Normally")
-    saturday = EnvasadoraDashboard.new({ from: "2026-10-17", to: "2026-10-17" }, shift_starts: schedule, default_source: "haver").call
+    saturday = EnvasadoraDashboard.new({ from: "2026-10-17", to: "2026-10-17" }, default_source: "haver").call
     assert_equal 6, saturday.rows.sole[:planned_hours]
     assert_equal 100, saturday.rows.sole[:coverage]
     assert_equal 100, saturday.availability
     event(at: Time.utc(2026, 10, 17, 12), seconds: 3600)
-    after_schedule = EnvasadoraDashboard.new({ from: "2026-10-17", to: "2026-10-17" }, shift_starts: schedule, default_source: "haver").call
+    after_schedule = EnvasadoraDashboard.new({ from: "2026-10-17", to: "2026-10-17" }, default_source: "haver").call
     assert_nil after_schedule.mttr
     assert_equal 100, after_schedule.availability
   end

@@ -78,7 +78,7 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     sign_in_with_google
     get new_envasadora_report_path
     EnvasadoraReport::HOUR_FIELDS.each do |field|
-      assert_select "input[name='envasadora_report[#{field}]'][min='0'][max='8'][step='0.01']", count: 1
+      assert_select "input[name='envasadora_report[#{field}]'][min='0'][max='9'][step='0.01']", count: 1
     end
     assert_no_difference("EnvasadoraReport.count") do
       post envasadora_reports_path, params: { envasadora_report: @attributes.merge(date: "2026-10-26", horas_haver: "65") }

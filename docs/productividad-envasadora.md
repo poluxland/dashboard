@@ -14,12 +14,13 @@ no incorpora otra carga de Excel ni modifica los reportes de origen.
   Si un evento abarca varios turnos, solo se cuentan los tramos con reporte,
   conservando el evento original. Excluye duraciones negativas y muestra su
   cantidad para el período, días y turnos consultados. Omite eventos de duración cero.
-- Horario confirmado: TM 06:00–14:00, TT 14:00–22:00, TN 22:00–06:00.
-  TN se asigna a la fecha en que empieza, incluso después de medianoche.
-- Programa: lunes a viernes, ocho horas por turno. Sábado, TM de 06:00 a 12:00
-  (seis horas); los demás turnos del sábado y el domingo no tienen programación.
-  Los eventos fuera de programa permanecen en el detalle y el Pareto, pero no
-  integran la base programada de disponibilidad/MTBF/MTTR.
+- Horarios por fecha de inicio:
+  - Lunes: TM 06:00–14:00, TT 14:00–22:00, TN 22:00–06:00.
+  - Martes y miércoles: TM 06:00–13:00, TT 13:00–22:00, TN 22:00–06:00.
+  - Jueves y viernes: TM 06:00–13:00, TT 13:00–21:00, TN 21:00–06:00.
+  - Sábado: solo TM 06:00–12:00; domingo sin programación.
+  TN termina al día siguiente y se asigna a la fecha en que empieza.
+  Los eventos se recortan a estas ventanas para su asignación, cobertura e indicadores.
 
 ## Presentación
 
@@ -70,7 +71,7 @@ Las causas restantes se agrupan en Otros para que el Pareto llegue al 100%.
   operación dentro del horario programado. Operación incluye Correr y paradas
   planificadas/no planificadas; excluye No programada. No se supone funcionamiento
   durante períodos sin datos. Cobertura TPT compara el tiempo observado con la
-  duración programada del turno (8 o 6 horas).
+  duración programada del turno (6, 7, 8 o 9 horas según el día y turno).
 - MTBF: horas operativas observadas / eventos de parada no planificada.
 - MTTR: minutos detenidos no planificados / esos mismos eventos.
 - Confiabilidad: `exp(-8 / MTBF)`, estimación para ocho horas bajo una hipótesis

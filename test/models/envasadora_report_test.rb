@@ -78,6 +78,20 @@ class EnvasadoraReportTest < ActiveSupport::TestCase
     end
   end
 
+  test "hour limits follow each weekday shift including nine hour shifts and unprogrammed weekends" do
+    expected = [ [ 8, 8, 8 ], [ 7, 9, 8 ], [ 7, 9, 8 ], [ 7, 8, 9 ], [ 7, 8, 9 ], [ 6, 0, 0 ], [ 0, 0, 0 ] ]
+    expected.each_with_index do |limits, index|
+      date = Date.new(2026, 10, 12) + index
+      %w[TM TT TN].zip(limits).each do |shift, limit|
+        record = build_report(date: date, turno: shift, horas_haver: limit, horas_vento: limit, horas_bigbag: limit)
+        assert_equal limit, record.hours_limit
+        assert record.valid?, record.errors.full_messages.join(", ")
+        record.horas_haver = limit + 0.01
+        assert_not record.valid?, "#{date} #{shift} must reject hours above #{limit}"
+      end
+    end
+  end
+
   test "historical hours correction restores analytics and preserves original and audit" do
     record = build_report(date: Date.new(2026, 10, 26), turno: "TT", horas_haver: 65, source_fingerprint: "correction-test",
       source_data: { "cells" => { "Horas Haver" => "65.0" }, "invalid_fields" => [ "horas_haver" ], "present_fields" => [ "horas_haver" ], "issues" => [ "Horas Haver: valor 65.0 fuera del rango esperado; se conserva el original.", "Otro dato" ] })

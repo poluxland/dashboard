@@ -12,11 +12,10 @@ class EnvasadoraDashboard
 
   attr_reader :from, :to, :shifts, :weekdays, :source, :pareto_mode, :limit, :exclude_unscheduled, :include_missing_reason,
               :rows, :pareto, :charts, :production_title, :negative_count, :duplicate_report_count,
-              :available_from, :available_to, :shift_starts
+              :available_from, :available_to
 
-  def initialize(params = {}, shift_starts:, default_source:)
+  def initialize(params = {}, default_source:)
     @params = params.to_h.stringify_keys
-    @shift_starts = shift_starts
     @source = SOURCES.key?(@params["source"]) ? @params["source"] : default_source
     @source_config = SOURCES.fetch(@source)
     @pareto_mode = PARETO_MODES.key?(@params["pareto"]) ? @params["pareto"] : "reason"
@@ -93,14 +92,13 @@ class EnvasadoraDashboard
     end
   end
 
-  def shift_start(date, shift)
-    Time.utc(date.year, date.month, date.day) + @shift_starts.fetch(shift) * 3600
-  end
-
   def operational_date(time)
     date = time.utc.to_date
     [ date - 1, date, date + 1 ].each do |candidate|
-      return candidate if SHIFTS.any? { |shift| time >= shift_start(candidate, shift) && time < shift_start(candidate, shift) + 8.hours }
+      return candidate if SHIFTS.any? do |shift|
+        start, finish = EnvasadoraShiftSchedule.window(candidate, shift)
+        time >= start && time < finish
+      end
     end
     date
   end
@@ -110,11 +108,11 @@ class EnvasadoraDashboard
     (@from..@to).each do |date|
       next unless @weekdays.include?(date.cwday)
       @shifts.each do |shift|
-        start = shift_start(date, shift)
-        planned_hours = date.sunday? ? 0 : date.saturday? ? (shift == "TM" ? 6 : 0) : 8
+        start, finish = EnvasadoraShiftSchedule.window(date, shift)
+        planned_hours = EnvasadoraShiftSchedule.hours(date, shift)
         @row_map[[ date, shift ]] = {
-          date: date, shift: shift, start: start, finish: start + 8.hours,
-          planned_hours: planned_hours, planned_finish: start + planned_hours.hours,
+          date: date, shift: shift, start: start, finish: finish,
+          planned_hours: planned_hours, planned_finish: finish,
           production: nil, hours: nil, report: nil, observed: [], scheduled: [], stopped: [], selected_stops: [], failures: [],
           failure_ids: [], event_ids: [], causes: Hash.new(0.0)
         }

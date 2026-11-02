@@ -27,7 +27,9 @@ Las pruebas usan entrega simulada, sin correos reales.
 - Plastificado: pallets × 1,8 t. Producción Haver/Vento: sacos × 0,025 t;
   producción Bigbag: bolsas × 1,5 t. Rendimiento = toneladas / horas. Medidas, horas y cantidades en toneladas admiten decimales;
   sacos, bolsas, pallets y enjuagues se ingresan como enteros.
-  Haver, Vento y Bigbag admiten de 0 a 8 horas por turno; sábado TM, de 0 a 6.
+  Haver, Vento y Bigbag admiten horas según el día y turno: lunes 8/8/8;
+  martes y miércoles 7/9/8; jueves y viernes 7/8/9 (TM/TT/TN).
+  Sábado TM admite hasta 6 horas; sábado TT/TN y domingo no tienen horas programadas.
   El formulario actualiza los máximos al cambiar fecha/turno y el modelo valida
   el límite también en el servidor.
   Pantalla y correo muestran las toneladas sin decimales y con puntos entre miles;
