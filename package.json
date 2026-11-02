@@ -1,6 +1,9 @@
 {
   "name": "app",
   "private": "true",
+  "resolutions": {
+    "nodemon/minimatch": "^11.0.1"
+  },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "autoprefixer": "^10.4.21",
