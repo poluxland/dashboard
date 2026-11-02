@@ -48,6 +48,16 @@ class EnvasadoraReportPresenterTest < ActiveSupport::TestCase
     assert_equal [ "Total combinado", "13.091", "13.146", "12.946" ], combined[:rows].last
   end
 
+  test "Especial soluble contributes to floor and combined inventory once" do
+    report = sample(especialsacos: 12, especial_sacos_soluble: 63, bigbagespecial: 36)
+    assert_equal 111, report.inventory["Especial"][:floor]
+    assert_equal 8851, report.inventory["Especial"][:total]
+    tables = EnvasadoraReportPresenter.new(report).tables.index_by { |table| table[:title] }
+    assert_includes tables["Inventario Total combinado"][:rows], [ "Cemento Especial en piso", "111", "—", "—" ]
+    assert_includes tables["Inventario por Tipo"][:rows], [ "Cemento Especial silo y piso", "8.851", "—", "—" ]
+    assert_includes tables["Inventario de Sacos"][:rows], [ "Especial soluble", "63", "—", "—" ]
+  end
+
   test "fractional measures and sub-hour production remain visible and meaningful" do
     report = sample(silo19a: "16.25", horas_haver: "0.5", prodhaver: 1000)
     tables = EnvasadoraReportPresenter.new(report).tables.index_by { |table| table[:title] }
