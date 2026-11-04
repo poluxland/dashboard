@@ -1,3 +1,3 @@
 <div class="mb-4"><h1 class="h3">Mis tareas</h1><p class="text-muted">Hola, <%= current_user[:name] %>. Este es tu trabajo pendiente.</p></div>
-<div class="row g-3"><% @task_groups.each do |title, tasks| %><%= render "tasks/column", title: title, tasks: tasks %><% end %></div>
-<details class="mt-4"><summary class="mb-3">Terminadas (<%= @completed_tasks.size %>)</summary><div class="row"><% @completed_tasks.each do |task| %><div class="col-12 col-lg-4"><%= render "tasks/card", task: task %></div><% end %></div></details>
+<div class="row g-3"><% @task_groups.each do |title, tasks| %><%= render "tasks/column", title: title, tasks: tasks, compact: true %><% end %></div>
+<details class="mt-4"><summary class="mb-3">Terminadas (<%= @completed_tasks.size %>)</summary><div class="row"><% @completed_tasks.each do |task| %><div class="col-12 col-lg-4"><%= render "tasks/card", task: task, compact: true %></div><% end %></div></details>
