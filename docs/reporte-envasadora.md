@@ -60,7 +60,7 @@ La fecha debe corresponder al día operativo elegido por quien registra el turno
 2. Inventario de sacos, incluidos solubles y plastificado (TM/TT/TN).
 3. Inventario de bigbags (TM/TT/TN).
 4. Inventario de silos: producto seleccionado, toneladas y medidas.
-5. Inventario total combinado: silos y piso por producto (TM/TT/TN).
+5. Inventario total combinado: silos y piso por producto, solo del turno reportado.
 6. Despachos (TM/TT/TN).
 7. Producciones: unidades, cumplimiento, horas, rendimiento y comentarios.
 8. Nivel de tolvas.

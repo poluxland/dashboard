@@ -108,15 +108,14 @@ class EnvasadoraReportPresenter
   end
 
   def combined_table
+    inventory = @report.inventory
     rows = @cements.flat_map do |cement|
       { silo: "silos", floor: "piso" }.map do |component, label|
-        [ "Cemento #{cement} en #{label}" ] + EnvasadoraReport::SHIFTS.keys.map do |shift|
-          @inventories[shift] ? number(@inventories[shift][cement][component]) : "—"
-        end
+        [ "Cemento #{cement} en #{label}", number(inventory[cement][component]) ]
       end
     end
-    rows << [ "Total combinado" ] + EnvasadoraReport::SHIFTS.keys.map { |shift| @daily[shift] ? number(@daily[shift].total_tons) : "—" }
-    table("Inventario Total combinado", [ "Producto (t)", "TM", "TT", "TN" ], rows)
+    rows << [ "Total combinado", number(@report.total_tons) ]
+    table("Inventario Total combinado", [ "Producto (t)", @report.turno ], rows)
   end
 
   def dispatch_table
