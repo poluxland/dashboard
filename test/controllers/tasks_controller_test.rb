@@ -69,6 +69,19 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "board supports dragging and saves status via JSON" do
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+    get tasks_path
+    assert_select "section[data-task-status]", count: 3
+    assert_select "article[draggable=true]", count: 1
+    patch task_path(@task), params: { task: { status: "in_progress" } }, as: :json
+    assert_response :success
+    assert_equal "in_progress", @task.reload.status
+    patch task_path(@task), params: { task: { status: "invalid" } }, as: :json
+    assert_response :unprocessable_entity
+    assert_equal "in_progress", @task.reload.status
+  end
+
   test "invalid tasks render errors" do
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     assert_no_difference("Task.count") do

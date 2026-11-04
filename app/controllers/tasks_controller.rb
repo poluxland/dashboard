@@ -29,7 +29,12 @@ class TasksController < ApplicationController
     @task = scope.find(params[:id])
     attributes = task_admin? ? task_params : params.require(:task).permit(:status)
     if @task.update(attributes)
-      redirect_to(task_admin? ? tasks_path : root_path, notice: "Tarea actualizada.")
+      respond_to do |format|
+        format.html { redirect_to(task_admin? ? tasks_path : root_path, notice: "Tarea actualizada.") }
+        format.json { render json: { status: @task.status } }
+      end
+    elsif request.format.json?
+      render json: { errors: @task.errors.full_messages }, status: :unprocessable_entity
     elsif task_admin?
       render :edit, status: :unprocessable_entity
     else

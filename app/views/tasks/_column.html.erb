@@ -1,5 +1,5 @@
-<section class="col-12 col-lg-4"><div class="p-3 h-100" style="background: #eef1f6; border-radius: 16px; min-height: 280px">
+<section class="col-12 col-lg-4" <% if local_assigns[:board_status] %>data-task-status="<%= board_status %>" data-action="dragover->task-board#over dragleave->task-board#leave drop->task-board#drop"<% end %>><div class="p-3 h-100" style="background: #eef1f6; border-radius: 16px; min-height: 280px">
   <h2 class="h6 d-flex justify-content-between mb-3"><%= title %><span class="badge rounded-pill text-bg-secondary"><%= tasks.size %></span></h2>
-  <%= render partial: "tasks/card", collection: tasks, as: :task %>
+  <%= render partial: "tasks/card", collection: tasks, as: :task, locals: { draggable: local_assigns[:board_status].present? } %>
   <% if tasks.empty? %><p class="small text-muted text-center py-4">No hay tareas aquí.</p><% end %>
 </div></section>
