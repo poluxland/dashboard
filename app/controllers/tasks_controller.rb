@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :require_task_admin!, except: [ :show, :update ]
+  before_action :require_task_admin!, except: [ :show, :edit, :update ]
 
   def index
     @group_by = %w[status plant category].include?(params[:group_by]) ? params[:group_by] : "status"
@@ -27,7 +27,7 @@ class TasksController < ApplicationController
   end
 
   def edit
-    @task = Task.find(params[:id])
+    @task = accessible_tasks.find(params[:id])
   end
 
   def update

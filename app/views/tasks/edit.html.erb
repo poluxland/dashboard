@@ -1,2 +1,2 @@
 <h1 class="h3 mb-4">Editar tarea</h1>
-<%= render "form" %>
+<%= render(task_admin? ? "form" : "status_form") %>

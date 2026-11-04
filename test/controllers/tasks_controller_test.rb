@@ -36,7 +36,8 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     get new_task_path
     assert_response :forbidden
     get edit_task_path(@task)
-    assert_response :forbidden
+    assert_response :success
+    assert_select "input[name=?]", "task[title]", count: 0
     assert_no_difference("Task.count") { post tasks_path, params: { task: { title: "Forbidden" } } }
     assert_response :forbidden
     other = Task.create!(title: "Privada", assignee_email: "otro@msindustrial.cl", creator_email: "jose.jerez@msindustrial.cl")

@@ -1,0 +1,6 @@
+<%= form_with model: @task, class: "card card-body shadow-sm mx-auto", style: "max-width:720px" do |f| %>
+  <h2 class="h5"><%= @task.title %></h2>
+  <%= f.label :status, "Estado", class: "form-label" %>
+  <%= f.select :status, Task::STATUSES.map { |value, label| [label, value] }, {}, class: "form-select mb-3" %>
+  <div class="d-flex gap-2"><%= f.submit "Guardar", class: "btn btn-primary" %><%= link_to "Cancelar", root_path, class: "btn btn-outline-secondary" %></div>
+<% end %>
