@@ -33,7 +33,7 @@ class TasksController < ApplicationController
   def update
     scope = accessible_tasks
     @task = scope.find(params[:id])
-    attributes = task_admin? ? task_params : params.require(:task).permit(:status, items_attributes: [ :id, :completed ])
+    attributes = task_admin? ? task_params : task_input.permit(:status, items_attributes: [ :id, :completed ])
     if @task.update(attributes)
       respond_to do |format|
         format.html { redirect_to(task_admin? ? tasks_path : root_path, notice: "Tarea actualizada.") }
@@ -58,7 +58,18 @@ class TasksController < ApplicationController
     head :forbidden unless task_admin?
   end
 
+  def task_input
+    input = params.require(:task)
+    items = input[:items_attributes]
+    # Normalize dynamic form indices before applying the field allowlist.
+    # This also accepts UUID indices from forms opened before the fix.
+    if items.is_a?(ActionController::Parameters) && items.values.all? { |item| item.is_a?(ActionController::Parameters) }
+      input[:items_attributes] = items.values
+    end
+    input
+  end
+
   def task_params
-    params.require(:task).permit(:title, :description, :assignee_email, :due_on, :priority, :status, :category, :plant, items_attributes: [ :id, :title, :due_on, :completed, :_destroy ])
+    task_input.permit(:title, :description, :assignee_email, :due_on, :priority, :status, :category, :plant, items_attributes: [ :id, :title, :due_on, :completed, :_destroy ])
   end
 end

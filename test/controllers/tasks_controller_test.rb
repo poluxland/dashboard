@@ -112,6 +112,32 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "dynamically added checklist rows persist through create and edit" do
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+    get new_task_path
+    template = Nokogiri::HTML(response.body).at_css('template[data-task-items-target="template"]')
+    rows = {}
+    [ "123e4567-e89b-12d3-a456-426614174000", "123e4567-e89b-12d3-a456-426614174001" ].each_with_index do |index, number|
+      template.css("input[name]").each do |input|
+        name = input["name"].gsub("NEW_ITEM", index)
+        rows[name] = case name
+        when /\[title\]$/ then "Paso #{number + 1}"
+        when /\[due_on\]$/ then "2026-11-10"
+        else input["value"]
+        end
+      end
+    end
+    params = Rack::Utils.parse_nested_query(URI.encode_www_form(rows))
+    params["task"].merge!("title" => "Con checklist", "assignee_email" => "usuario@msindustrial.cl")
+    assert_difference("TaskItem.count", 2) { post tasks_path, params: params }
+    assert_redirected_to tasks_path
+    task = Task.order(:id).last
+    assert_equal [ "Paso 1", "Paso 2" ], task.items.order(:id).pluck(:title)
+    patch task_path(task), params: { task: { items_attributes: { "1730000000002" => { title: "Paso 3", due_on: "2026-11-11" } } } }
+    assert_redirected_to tasks_path
+    assert_equal 3, task.items.reload.size
+  end
+
   test "invalid tasks render errors" do
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     assert_no_difference("Task.count") do

@@ -4,7 +4,8 @@ export default class extends Controller {
   static targets = ["list", "template"]
 
   add() {
-    this.listTarget.insertAdjacentHTML("beforeend", this.templateTarget.innerHTML.replaceAll("NEW_ITEM", crypto.randomUUID()))
+    this.nextIndex = Math.max(Date.now(), (this.nextIndex || 0) + 1)
+    this.listTarget.insertAdjacentHTML("beforeend", this.templateTarget.innerHTML.replaceAll("NEW_ITEM", String(this.nextIndex)))
   }
 
   remove(event) {
