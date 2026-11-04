@@ -34,9 +34,9 @@ class WorkMailer < ApplicationMailer
       "Solicita" => work.solicita, "Supervisor" => work.supervisor,
       "Hora inicio" => work.hora_inicio&.strftime("%H:%M"),
       "Hora término" => work.hora_termino&.strftime("%H:%M"),
-      "Trabajo realizado" => work.descripcion, "Repuestos" => work.repuestos,
+      "Observaciones" => work.descripcion, "Repuestos" => work.repuestos,
       "EPP" => work.epp, "Hallazgos" => work.hallazgos,
-      "Observaciones" => work.observaciones, "Seguridad y medio ambiente" => work.seguridad,
+      "Observaciones y recomendaciones" => work.observaciones, "Seguridad y medio ambiente" => work.seguridad,
       "Personal" => work.personal
     }.compact_blank
 

@@ -21,6 +21,30 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='work[fecha]'][value='#{Time.current.in_time_zone('America/Santiago').to_date}']"
   end
 
+  test "free report fields follow the selected inspection while observations stay available" do
+    get new_work_url
+    assert_select "fieldset[data-free-report]:not([hidden]):not([disabled])" do
+      %w[seguridad personal repuestos epp hallazgos observaciones].each do |field|
+        assert_select "textarea[name='work[#{field}]']"
+      end
+      %w[fotos fotos_antes fotos_despues].each do |field|
+        assert_select "input[type=file][name='work[#{field}][]']"
+      end
+      assert_select "textarea[name='work[descripcion]']", count: 0
+    end
+    assert_select "label[for=work_descripcion]", "Observaciones"
+
+    @work.update!(inspection_type: WorkInspection::CATALOG.keys.first)
+    get edit_work_url(@work)
+    assert_select "fieldset[data-free-report][hidden][disabled]"
+    assert_select "textarea[name='work[descripcion]']:not([disabled])"
+    patch work_url(@work), params: { work: { inspection_type: "", descripcion: "Observación común" } }
+    assert_redirected_to work_url(@work)
+    get edit_work_url(@work)
+    assert_select "fieldset[data-free-report]:not([hidden]):not([disabled])"
+    assert_select "textarea[name='work[descripcion]']", "Observación común"
+  end
+
   test "should create work" do
     assert_difference("Work.count") do
       post works_url, params: { work: { descripcion: @work.descripcion, fecha: @work.fecha, hora_inicio: @work.hora_inicio, hora_termino: @work.hora_termino, nombre: @work.nombre, numero_cotizacion: @work.numero_cotizacion, personal: @work.personal, planta: @work.planta, seguridad: @work.seguridad, solicita: @work.solicita, supervisor: @work.supervisor } }

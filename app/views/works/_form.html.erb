@@ -59,11 +59,7 @@
     </div>
 
     <div class="col-12">
-      <%= f.label :seguridad, "Seguridad y medio ambiente" %>
-      <%= f.text_area :seguridad, class: "form-control", rows: 3 %>
-    </div>
-    <div class="col-12">
-      <%= f.label :descripcion, "Trabajo realizado" %>
+      <%= f.label :descripcion, "Observaciones" %>
       <div class="col-12">
   
 
@@ -95,6 +91,13 @@ Inspector
     <%= f.text_area :descripcion, class: "form-control", rows: 12, id: "work_descripcion" %>
   </div>
   
+    <fieldset class="col-12" data-free-report <%= "hidden disabled" if work.inspection_type.present? %>>
+      <legend class="h5">Informe técnico libre</legend>
+      <div class="row g-3">
+    <div class="col-12">
+      <%= f.label :seguridad, "Seguridad y medio ambiente" %>
+      <%= f.text_area :seguridad, class: "form-control", rows: 3 %>
+    </div>
     <div class="col-12">
       <%= f.label :personal %>
       <%= f.text_area :personal, class: "form-control", rows: 2 %>
@@ -121,6 +124,8 @@ Inspector
         <% end %>
       </div>
     <% end %>
+      </div>
+    </fieldset>
   </div>
 
   <p class="small text-muted mt-3" role="status" aria-live="polite" data-work-form-target="status"></p>

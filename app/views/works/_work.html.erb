@@ -18,7 +18,7 @@
           <div class="fw-semibold"><%= %i[hora_inicio hora_termino].include?(field) ? value.strftime("%H:%M") : value %></div>
         </div>
       <% end %>
-      <% { seguridad: "Seguridad y medio ambiente", descripcion: "Trabajo realizado", personal: "Personal", repuestos: "Repuestos", epp: "EPP", hallazgos: "Hallazgos", observaciones: "Observaciones" }.each do |field, label| %>
+      <% { seguridad: "Seguridad y medio ambiente", descripcion: "Observaciones", personal: "Personal", repuestos: "Repuestos", epp: "EPP", hallazgos: "Hallazgos", observaciones: "Observaciones y recomendaciones" }.each do |field, label| %>
         <% next if work.public_send(field).blank? %>
         <div class="col-12">
           <div class="small text-muted"><%= label %></div>

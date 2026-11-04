@@ -12,6 +12,9 @@ export default class extends Controller {
 
   selectInspection() {
     const selected = this.element.querySelector("[data-inspection-select]").value
+    const freeReport = this.element.querySelector("[data-free-report]")
+    freeReport.hidden = selected !== ""
+    freeReport.disabled = selected !== ""
     this.element.querySelectorAll("[data-inspection]").forEach(section => {
       const enabled = section.dataset.inspection === selected
       section.hidden = !enabled
