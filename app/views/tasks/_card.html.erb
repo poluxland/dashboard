@@ -11,6 +11,6 @@
       <%= f.select :status, Task::STATUSES.map { |value, label| [label, value] }, {}, class: "form-select form-select-sm", aria: { label: "Estado de #{task.title}" } %>
       <%= f.submit "Actualizar", class: "btn btn-sm btn-outline-primary" %>
     <% end %>
-    <% if task_admin? %><%= link_to "Editar tarea", edit_task_path(task), class: "small d-inline-block mt-2" %><% end %>
+    <% if task_admin? %><%= link_to "Editar tarea", edit_task_path(task), class: "btn btn-sm btn-outline-primary mt-2" %><% end %>
   </div>
 </article>
