@@ -1,0 +1,18 @@
+<%= @heading %>
+
+Estimado/a <%= @recipient %>:
+<% if @reminder %>Hoy vence el compromiso asignado por <%= @creator %>.<% else %><%= @creator %> te ha asignado la siguiente actividad:<% end %>
+
+<%= @task.title %>
+<%= @task.description %>
+
+Fecha límite: <%= @task.due_on&.strftime('%d/%m/%Y') || 'Sin fecha límite' %>
+Clase: <%= Task::CATEGORIES[@task.category] %>
+Planta: <%= @task.plant %>
+Prioridad: <%= Task::PRIORITIES[@task.priority] %>
+Estado: <%= Task::STATUSES[@task.status] %>
+<% @task.items.each do |item| %>
+<%= item.completed? ? '[✓]' : '[ ]' %> <%= item.title %> — <%= item.due_on.strftime('%d/%m/%Y') %>
+<% end %>
+
+Abrir actividad: <%= task_url(@task) %>

@@ -1,0 +1,9 @@
+<div data-item-row class="border rounded p-3 mb-2">
+  <%= f.hidden_field :id if f.object.persisted? %>
+  <%= f.hidden_field :_destroy, value: '0' %>
+  <%= f.label :title, 'Subactividad', class: 'form-label' %>
+  <%= f.text_field :title, class: 'form-control mb-2', maxlength: 200, required: true %>
+  <%= f.label :due_on, 'Fecha de compromiso', class: 'form-label' %>
+  <%= f.date_field :due_on, class: 'form-control mb-2', required: true %>
+  <button type="button" class="btn btn-sm btn-outline-danger" data-action="task-items#remove">Quitar paso</button>
+</div>

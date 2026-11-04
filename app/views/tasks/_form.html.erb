@@ -4,7 +4,16 @@
   <%= f.label :description, "Descripción", class: "form-label" %><%= f.text_area :description, rows: 5, class: "form-control mb-3" %>
   <%= f.label :assignee_email, "Responsable", class: "form-label" %><%= f.select :assignee_email, DashboardUser.responsible_options, { include_blank: "Selecciona un usuario" }, required: true, class: "form-select mb-3" %>
   <%= f.label :due_on, "Fecha límite (opcional)", class: "form-label" %><%= f.date_field :due_on, class: "form-control mb-3" %>
+  <%= f.label :category, "Clase", class: "form-label" %><%= f.select :category, Task::CATEGORIES.map { |value, label| [label, value] }, {}, class: "form-select mb-3" %>
+  <%= f.label :plant, "Planta", class: "form-label" %><%= f.select :plant, Task::PLANTS, {}, class: "form-select mb-3" %>
   <%= f.label :priority, "Prioridad", class: "form-label" %><%= f.select :priority, Task::PRIORITIES.map { |value, label| [label, value] }, {}, class: "form-select mb-3" %>
   <%= f.label :status, "Estado", class: "form-label" %><%= f.select :status, Task::STATUSES.map { |value, label| [label, value] }, {}, class: "form-select mb-3" %>
+  <section class="mb-4" data-controller="task-items">
+    <h2 class="h5">Checklist de subactividades</h2>
+    <p class="small text-muted">Agrega los pasos y las fechas para completar esta actividad.</p>
+    <div data-task-items-target="list"><%= f.fields_for :items do |item_form| %><%= render 'item_fields', f: item_form %><% end %></div>
+    <template data-task-items-target="template"><%= f.fields_for :items, TaskItem.new, child_index: 'NEW_ITEM' do |item_form| %><%= render 'item_fields', f: item_form %><% end %></template>
+    <button type="button" class="btn btn-outline-primary btn-sm" data-action="task-items#add">Agregar paso</button>
+  </section>
   <div class="d-flex gap-2"><%= f.submit "Guardar tarea", class: "btn btn-primary" %><%= link_to "Cancelar", tasks_path, class: "btn btn-outline-secondary" %></div>
 <% end %>

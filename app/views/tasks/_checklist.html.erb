@@ -1,0 +1,13 @@
+<% if task.items.any? %>
+  <div class="my-3" data-controller="task-checklist" data-url="<%= task_path(task) %>" data-action="change->task-checklist#change">
+    <div class="small fw-semibold" data-progress-label><%= task.completion_percentage %>% completado</div>
+    <progress value="<%= task.completion_percentage %>" max="100" class="w-100" aria-label="Avance del checklist"></progress>
+    <% task.items.sort_by(&:id).each do |item| %>
+      <label class="d-flex align-items-start gap-2 small my-2">
+        <input type="checkbox" class="form-check-input flex-shrink-0" data-item-id="<%= item.id %>" <%= 'checked' if item.completed? %>>
+        <span data-item-text class="<%= 'text-decoration-line-through' if item.completed? %>"><%= item.title %> <span class="text-muted">· <%= item.due_on.strftime('%d/%m/%Y') %></span></span>
+      </label>
+    <% end %>
+    <span role="status" aria-live="polite" class="small text-muted"></span>
+  </div>
+<% end %>

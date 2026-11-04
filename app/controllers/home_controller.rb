@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   def index
     today = Time.current.in_time_zone("America/Santiago").to_date
-    tasks = Task.where(assignee_email: current_user[:email].to_s.downcase).ordered.to_a
+    tasks = Task.includes(:items).where(assignee_email: current_user[:email].to_s.downcase).ordered.to_a
     pending = tasks.reject { |task| task.status == "done" }
     @task_groups = {
       "Hoy · incluye vencidas" => pending.select { |task| task.due_on && task.due_on <= today },

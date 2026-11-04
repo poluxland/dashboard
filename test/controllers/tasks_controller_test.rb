@@ -82,6 +82,36 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "in_progress", @task.reload.status
   end
 
+  test "checklist updates are scoped and progress is computed" do
+    item = @task.items.create!(title: "Paso", due_on: Date.current)
+    other = Task.create!(title: "Otra", assignee_email: "otro@msindustrial.cl", creator_email: @task.creator_email)
+    foreign_item = other.items.create!(title: "Privado", due_on: Date.current)
+    sign_in_with_google
+    patch task_path(@task), params: { task: { items_attributes: [ { id: item.id, completed: true, title: "Alterado" } ] } }, as: :json
+    assert_response :success
+    assert_equal 100, response.parsed_body["completion_percentage"]
+    assert_equal "Paso", item.reload.title
+    assert item.completed?
+    patch task_path(@task), params: { task: { items_attributes: [ { id: foreign_item.id, completed: true } ] } }, as: :json
+    assert_response :not_found
+    assert_not foreign_item.reload.completed?
+    get task_path(other)
+    assert_response :not_found
+    get task_path(@task)
+    assert_response :success
+    assert_select "input[type=checkbox][checked]", count: 1
+  end
+
+  test "board groups by plant and category without enabling status dragging" do
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+    %w[plant category].each do |group|
+      get tasks_path, params: { group_by: group }
+      assert_response :success
+      assert_select "section", count: 4
+      assert_select "article[draggable]", count: 0
+    end
+  end
+
   test "invalid tasks render errors" do
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     assert_no_difference("Task.count") do

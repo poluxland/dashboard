@@ -76,3 +76,20 @@ incluyen las respuestas y las fotos de cada ítem seleccionado.
 Las fotos nuevas se optimizan en el navegador antes del envío: lado mayor de
 1600 píxeles como máximo y JPEG al 72%, conservando el original si ya pesa menos.
 La carga espera a que termine la optimización. Las fotos existentes se conservan.
+
+## Tareas y avisos
+
+Admin permite asignar tareas por correo, con clase, planta y checklist con fechas.
+Los responsables pueden marcar sus pasos; cada paso pesa igual en el porcentaje.
+El cierre de la tarea sigue siendo una acción explícita.
+
+Los correos pendientes se guardan en `task_notifications`, dentro de la transacción
+que guarda la tarea. El proceso `task_notifications` del Procfile los revisa cada
+minuto y reintenta fallos de entrega. Debe mantenerse con una instancia activa en
+Heroku. También se puede ejecutar `bin/rails tasks:notify` manualmente.
+Los recordatorios se generan desde las 08:00 de America/Santiago, para tareas abiertas
+que vencen ese día, una vez por tarea, fecha y destinatario. Cambiar el responsable
+genera un aviso nuevo y cancela los avisos pendientes del responsable anterior.
+Como SMTP no ofrece una transacción conjunta con la base de datos, una interrupción
+justo después de enviar y antes de registrar el envío podría producir un duplicado.
+Las tareas anteriores conservan clase Otro y planta N/A hasta que se editen.

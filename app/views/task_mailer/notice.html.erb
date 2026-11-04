@@ -1,0 +1,15 @@
+<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#233047">
+  <div style="background:#183b65;color:white;padding:24px;border-radius:12px 12px 0 0"><p style="margin:0;font-size:12px">IMPROMAQ · ACTIVIDADES</p><h1 style="font-size:24px"><%= @heading %></h1></div>
+  <div style="padding:24px;background:#f5f7fb">
+    <p>Estimado/a <%= @recipient %>:</p>
+    <p><% if @reminder %>Te recordamos que hoy vence el compromiso asignado por <strong><%= @creator %></strong>. Revisa tus avances y actualiza el estado de la actividad.<% else %><strong><%= @creator %></strong> te ha asignado la siguiente actividad:<% end %></p>
+    <h2 style="font-size:20px"><%= @task.title %></h2>
+    <div style="white-space:pre-wrap"><%= @task.description %></div>
+    <table cellpadding="8" style="margin:16px 0;background:white;width:100%;text-align:left">
+      <% { "Fecha límite" => @task.due_on&.strftime('%d/%m/%Y') || 'Sin fecha límite', "Clase" => Task::CATEGORIES[@task.category], "Planta" => @task.plant, "Prioridad" => Task::PRIORITIES[@task.priority], "Estado" => Task::STATUSES[@task.status], "Asignada por" => @creator }.each do |label, value| %><tr><th><%= label %></th><td><%= value %></td></tr><% end %>
+    </table>
+    <% if @task.items.any? %><h3>Pasos de la actividad · <%= @task.completion_percentage %>% completado</h3><ul><% @task.items.each do |item| %><li><%= item.completed? ? '✓' : '□' %> <%= item.title %> — <%= item.due_on.strftime('%d/%m/%Y') %></li><% end %></ul><% end %>
+    <p style="margin-top:28px"><%= link_to "Abrir mi actividad", task_url(@task), style: "background:#245dc1;color:white;padding:12px 18px;border-radius:6px;text-decoration:none" %></p>
+    <p style="font-size:12px;color:#637085;margin-top:24px">Ingresa con tu cuenta corporativa para consultar y actualizar la actividad.</p>
+  </div>
+</div>
