@@ -4,7 +4,7 @@
   <%= image_tag attachments["impromaq-logo.png"].url, alt: "Logo Impromaq", width: 56, height: 56, style: "display:block;border:0;" %>
   <p style="color:#bce4ce;font-size:12px;letter-spacing:1px;">IMPROMAQ · INFORME N° <%= @work.id %></p>
   <h1 style="font-size:24px;">Informe técnico de mantenimiento</h1>
-  <h2 style="font-size:20px;"><%= @work.nombre.presence || "Sin título" %></h2>
+  <% if @work.nombre.present? %><h2 style="font-size:20px;"><%= @work.nombre %></h2><% end %>
   <%= link_to "Abrir reporte completo →", @report_url, style: "display:inline-block;background:#fff;color:#12372b;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold;" %>
 </div>
 <div style="padding:24px;">
@@ -21,22 +21,20 @@
     <% summary = inspection.summary %>
     <p><%= summary[:state] %> · <%= summary[:reviewed] %>/<%= summary[:total] %> revisados · <%= summary[:failed] %> no cumplen</p>
     <% inspection.items.each do |item| %>
-      <p><strong><%= item.position + 1 %>. <%= item.question %>: <%= item.answer_label %></strong></p>
-      <%= simple_format(item.observations) %>
+      <% next unless item.reported? %>
+      <p><strong><%= item.position + 1 %>. <%= item.question %><%= ": #{item.answer_label}" if item.answer.present? %></strong></p>
+      <%= simple_format(item.observations) if item.observations.present? %>
     <% end %>
   <% end %>
   <% @photo_groups.each do |label, filenames| %>
     <h2 style="font-size:18px;margin-top:24px;">Imágenes · <%= label %></h2>
-    <% if filenames.empty? %>
-      <p>Sin imágenes registradas.</p>
-    <% else %>
       <table role="presentation" style="width:100%;border-collapse:collapse;">
-      <% filenames.each_slice(2) do |row| %>
+      <% filenames.each_slice(3) do |row| %>
         <tr>
         <% row.each do |filename| %>
-          <td style="width:50%;padding:8px;vertical-align:top;">
+          <td style="width:33.33%;padding:8px;vertical-align:top;">
             <%= link_to @report_url, style: "text-decoration:none;color:#166534;" do %>
-              <%= image_tag attachments[filename].url, alt: "#{label}: #{filename}", width: 240, style: "display:block;width:100%;max-width:240px;height:auto;border-radius:8px;border:1px solid #e2e8f0;" %>
+              <%= image_tag attachments[filename].url, alt: "#{label}: #{filename}", width: 160, style: "display:block;width:100%;max-width:160px;max-height:120px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0;" %>
               <span style="display:block;font-size:12px;padding-top:6px;">Ver foto en el reporte →</span>
             <% end %>
           </td>
@@ -44,7 +42,6 @@
         </tr>
       <% end %>
       </table>
-    <% end %>
   <% end %>
   <p style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;"><%= link_to "Consultar el reporte completo y sus fotografías", @report_url, style: "color:#166534;font-weight:bold;" %></p>
   <p style="color:#64748b;font-size:12px;">Este enlace permite consultar únicamente este reporte, sin iniciar sesión. Compártelo solo con sus destinatarios.</p>

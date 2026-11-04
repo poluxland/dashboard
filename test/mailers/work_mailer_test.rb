@@ -25,10 +25,29 @@ class WorkMailerTest < ActionMailer::TestCase
       assert_includes email.text_part.body.decoded, value
     end
     assert_includes email.html_part.body.decoded, "Imágenes · Después"
+    html = email.html_part.body.decoded
+    assert_operator html.index("Imágenes · Antes"), :>, html.index("Imágenes · Adicionales")
+    assert_operator html.index("Imágenes · Después"), :>, html.index("Imágenes · Antes")
     report_url = "http://example.com/informes/compartidos/#{work.report_token}"
     assert_includes email.text_part.body.decoded, report_url
     document = Nokogiri::HTML(email.html_part.body.decoded)
-    assert_equal 3, document.css("a[href='#{report_url}'] img[width='240']").size
+    assert_equal 3, document.css("a[href='#{report_url}'] img[width='160']").size
     assert document.at_css("a[href='#{report_url}']")
+  end
+  test "email hides empty fields, photo groups and unanswered inspection items" do
+    work = Work.create!(fecha: nil)
+    inspection = work.inspections.create!(template_key: "seguridad")
+    inspection.items.first.update!(observations: "Pendiente revisar documento")
+    email = WorkMailer.technical_report(work, recipient: "destino@example.com")
+    [ email.html_part.body.decoded, email.text_part.body.decoded ].each do |body|
+      assert_not_includes body, "Sin registrar"
+      assert_not_includes body, "Sin título"
+      assert_not_includes body, "Sin responder"
+      assert_not_includes body, "Personal con EPP"
+      assert_not_includes body, "Imágenes · Antes"
+      assert_not_includes body, "FOTOGRAFÍAS INCLUIDAS"
+      assert_includes body, "Pendiente revisar documento"
+      assert_includes body, "0/7 revisados"
+    end
   end
 end

@@ -3,7 +3,7 @@ class WorkMailer < ApplicationMailer
   class PhotosTooLarge < StandardError; end
 
   MAX_PHOTO_BYTES = 15.megabytes
-  PHOTO_GROUPS = { fotos_antes: "Antes", fotos_despues: "Después", fotos: "Adicionales" }.freeze
+  PHOTO_GROUPS = { fotos: "Adicionales", fotos_antes: "Antes", fotos_despues: "Después" }.freeze
 
   def technical_report(work, recipient:)
     @work = work
@@ -11,7 +11,7 @@ class WorkMailer < ApplicationMailer
     inspection_groups = work.selected_inspections.flat_map do |inspection|
       inspection.items.map { |item| [ "#{inspection.title} · #{item.question}", item.fotos.to_a ] }
     end
-    groups = PHOTO_GROUPS.map { |field, label| [ label, work.public_send(field).to_a ] } + inspection_groups.reject { |_, photos| photos.empty? }
+    groups = (inspection_groups + PHOTO_GROUPS.map { |field, label| [ label, work.public_send(field).to_a ] }).reject { |_, photos| photos.empty? }
     photos = groups.flat_map(&:last)
     raise PhotosTooLarge if photos.sum(&:byte_size) > MAX_PHOTO_BYTES
 

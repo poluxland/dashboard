@@ -1,5 +1,5 @@
 IMPROMAQ · INFORME TÉCNICO DE MANTENIMIENTO N° <%= @work.id %>
-<%= @work.nombre.presence || "Sin título" %>
+<%= @work.nombre if @work.nombre.present? %>
 Reporte completo y fotografías: <%= @report_url %>
 El enlace permite consultar únicamente este reporte, sin iniciar sesión. Compártelo solo con sus destinatarios.
 
@@ -7,13 +7,16 @@ El enlace permite consultar únicamente este reporte, sin iniciar sesión. Comp�
 <%= label %>: <%= value.to_s.presence || "Sin registrar" %>
 
 <% end %>
-FOTOGRAFÍAS INCLUIDAS EN EL CORREO
 <% @work.selected_inspections.each do |inspection| %>
 <%= inspection.title %> · <%= inspection.summary[:state] %> · <%= inspection.summary[:reviewed] %>/<%= inspection.summary[:total] %> revisados
 <% inspection.items.each do |item| %>
-<%= item.position + 1 %>. <%= item.question %>: <%= item.answer_label %>
+<% next unless item.reported? %>
+<%= item.position + 1 %>. <%= item.question %><%= ": #{item.answer_label}" if item.answer.present? %>
 <%= item.observations %>
 <% end %>
+<% end %>
+<% if @photo_groups.any? %>
+FOTOGRAFÍAS INCLUIDAS EN EL CORREO
 <% end %>
 <% @photo_groups.each do |label, filenames| %>
 <%= label %>: <%= filenames.size %> imagen(es)

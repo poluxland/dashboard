@@ -271,6 +271,30 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_includes email.text_part.body.decoded, "No cumple"
   end
 
+  test "reports omit empty fields and place before and after thumbnails last" do
+    @work.update!(nombre: "", fecha: nil, planta: "", area: "", tag: "", numero_cotizacion: nil,
+      solicita: "", supervisor: "", hora_inicio: nil, hora_termino: nil, seguridad: "",
+      descripcion: "Trabajo informado", personal: "", epp: "", repuestos: "", hallazgos: "", observaciones: "")
+    inspection = @work.inspections.create!(template_key: "seguridad")
+    inspection.items.first.update!(answer: "yes")
+    @work.fotos_antes.attach(image_blob("antes.png"))
+    @work.fotos_despues.attach(image_blob("despues.png"))
+    [ work_url(@work), public_work_report_url(token: @work.report_token) ].each do |url|
+      get url
+      assert_response :success
+      assert_not_includes response.body, "Sin registrar"
+      assert_not_includes response.body, "Sin fecha"
+      assert_not_includes response.body, "Seguridad y medio ambiente"
+      assert_not_includes response.body, "Personal con EPP"
+      assert_includes response.body, "Trabajo informado"
+      assert_includes response.body, "1/7 revisados"
+      assert_select "[data-photo-group=fotos_antes] img[width='160'][height='120']", count: 1
+      assert_select "[data-photo-group=fotos_despues] img[width='160'][height='120']", count: 1
+      assert_operator response.body.index('data-photo-group="fotos_antes"'), :>, response.body.index("1/7 revisados")
+      assert_operator response.body.index('data-photo-group="fotos_despues"'), :>, response.body.index('data-photo-group="fotos_antes"')
+    end
+  end
+
   private
 
   def image_blob(filename)

@@ -21,6 +21,10 @@ class WorkInspectionItem < ApplicationRecord
     ANSWERS[answer] || "Sin responder"
   end
 
+  def reported?
+    answer.present? || observations.present? || fotos.attached?
+  end
+
   private
 
   def set_question

@@ -11,9 +11,10 @@
       </p>
       <p class="small text-muted">El cumplimiento considera solo respuestas Cumple / No cumple. No aplica y pendientes se excluyen.</p>
       <% inspection.items.each do |item| %>
+        <% next unless item.reported? %>
         <div class="border-top pt-3 mt-3">
           <h3 class="h6"><%= item.position + 1 %>. <%= item.question %></h3>
-          <p><strong><%= item.answer_label %></strong></p>
+          <% if item.answer.present? %><p><strong><%= item.answer_label %></strong></p><% end %>
           <%= simple_format(item.observations) if item.observations.present? %>
           <div class="row g-2">
             <% item.fotos.each do |photo| %>

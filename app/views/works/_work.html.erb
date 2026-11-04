@@ -1,107 +1,37 @@
-<%# app/views/works/_work.html.erb %>
 <div id="<%= dom_id(work) %>" class="card mb-3 shadow-sm">
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-start mb-2">
-      <h5 class="card-title mb-0">
-        <%= work.nombre.presence || "Informe sin título" %>
-      </h5>
-      <span class="badge text-bg-light">
-        <i class="bi bi-calendar-event"></i>
-        <%= work.fecha&.strftime("%d-%m-%Y") || "Sin fecha" %>
-      </span>
+      <% if work.nombre.present? %>
+        <h2 class="h5 card-title mb-0"><%= work.nombre %></h2>
+      <% end %>
+      <% if work.fecha.present? %>
+        <span class="badge text-bg-light"><%= work.fecha.strftime("%d-%m-%Y") %></span>
+      <% end %>
     </div>
-
     <p class="text-muted small">Informe N° <%= work.id %></p>
-    <div class="row gy-2">
-      <% { area: "Área", tag: "Tag del equipo" }.each do |campo, etiqueta| %>
-        <div class="col-md-6">
-          <div class="small text-muted"><%= etiqueta %></div>
-          <div class="fw-semibold"><%= work.public_send(campo).presence || "Sin registrar" %></div>
-        </div>
-      <% end %>
-      <div class="col-md-3">
-        <div class="small text-muted">Planta</div>
-        <div class="fw-semibold"><%= work.planta %></div>
-      </div>
-      <div class="col-md-3">
-        <div class="small text-muted">N° Cotización</div>
-        <div class="fw-semibold"><%= work.numero_cotizacion %></div>
-      </div>
-      <div class="col-md-3">
-        <div class="small text-muted">Solicita</div>
-        <div class="fw-semibold"><%= work.solicita %></div>
-      </div>
-      <div class="col-md-3">
-        <div class="small text-muted">Supervisor</div>
-        <div class="fw-semibold"><%= work.supervisor %></div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="small text-muted">Hora inicio</div>
-        <div class="fw-semibold">
-          <%= work.hora_inicio&.strftime("%H:%M") %>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="small text-muted">Hora término</div>
-        <div class="fw-semibold">
-          <%= work.hora_termino&.strftime("%H:%M") %>
-        </div>
-      </div>
-    </div>
-
-    <hr class="my-3">
-
     <div class="row gy-3">
-      <% { repuestos: "Repuestos", epp: "EPP", hallazgos: "Hallazgos", observaciones: "Observaciones" }.each do |campo, etiqueta| %>
+      <% { area: "Área", tag: "Tag del equipo", planta: "Planta", numero_cotizacion: "N° Cotización", solicita: "Solicita", supervisor: "Supervisor", hora_inicio: "Hora inicio", hora_termino: "Hora término" }.each do |field, label| %>
+        <% value = work.public_send(field) %>
+        <% next if value.blank? %>
         <div class="col-md-6">
-          <div class="small text-muted"><%= etiqueta %></div>
-          <div><%= simple_format(work.public_send(campo).presence || "Sin registrar") %></div>
+          <div class="small text-muted"><%= label %></div>
+          <div class="fw-semibold"><%= %i[hora_inicio hora_termino].include?(field) ? value.strftime("%H:%M") : value %></div>
         </div>
       <% end %>
-      <div class="col-12">
-        <div class="small text-muted">Seguridad y medio ambiente</div>
-        <div><%= simple_format(work.seguridad) %></div>
-      </div>
-      <div class="col-12">
-        <div class="small text-muted">Trabajo realizado</div>
-        <div><%= simple_format(work.descripcion) %></div>
-      </div>
-      <div class="col-12">
-        <div class="small text-muted">Personal</div>
-        <div><%= simple_format(work.personal) %></div>
-      </div>
-    </div>
-
-    <hr class="my-3">
-
-    <div class="row g-3">
-      <% { fotos_antes: "Imágenes antes", fotos_despues: "Imágenes después", fotos: "Registro fotográfico adicional / histórico" }.each do |campo, etiqueta| %>
-        <section class="col-md-6">
-          <h2 class="h6"><%= etiqueta %></h2>
-          <% if work.public_send(campo).attached? %>
-            <% work.public_send(campo).each do |foto| %>
-              <%= image_tag foto, alt: "#{etiqueta}: #{foto.filename}", class: "img-fluid rounded border mb-2", loading: "lazy" %>
-            <% end %>
-          <% else %>
-            <p class="text-muted">Sin imágenes registradas</p>
-          <% end %>
-        </section>
+      <% { seguridad: "Seguridad y medio ambiente", descripcion: "Trabajo realizado", personal: "Personal", repuestos: "Repuestos", epp: "EPP", hallazgos: "Hallazgos", observaciones: "Observaciones" }.each do |field, label| %>
+        <% next if work.public_send(field).blank? %>
+        <div class="col-12">
+          <div class="small text-muted"><%= label %></div>
+          <%= simple_format(work.public_send(field)) %>
+        </div>
       <% end %>
     </div>
-
     <% unless local_assigns[:read_only] %>
-    <div class="mt-3 d-flex gap-2">
-      <%= link_to "Ver", work, class: "btn btn-sm btn-outline-primary" %>
-      <%= link_to "Editar", edit_work_path(work), class: "btn btn-sm btn-outline-secondary" %>
-      <%= link_to email_work_path(work), class: "btn btn-sm btn-outline-primary", title: "Enviar informe por correo" do %>
-        <i class="bi bi-envelope" aria-hidden="true"></i> Correo
-      <% end %>
-      <%= link_to "Eliminar",
-                  work,
-                  data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este informe técnico?" },
-                  class: "btn btn-sm btn-outline-danger" %>
-    </div>
+      <div class="mt-3 d-flex gap-2">
+        <%= link_to "Editar", edit_work_path(work), class: "btn btn-sm btn-outline-secondary" %>
+        <%= link_to "Correo", email_work_path(work), class: "btn btn-sm btn-outline-primary" %>
+        <%= link_to "Eliminar", work, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar este informe técnico?" }, class: "btn btn-sm btn-outline-danger" %>
+      </div>
     <% end %>
   </div>
 </div>

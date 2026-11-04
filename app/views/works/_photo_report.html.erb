@@ -1,0 +1,15 @@
+<% { fotos: "Registro fotográfico adicional / histórico", fotos_antes: "Imágenes antes", fotos_despues: "Imágenes después" }.each do |field, label| %>
+  <% next unless work.public_send(field).attached? %>
+  <section class="card mb-3" data-photo-group="<%= field %>">
+    <div class="card-body">
+      <h2 class="h6"><%= label %></h2>
+      <div class="d-flex flex-wrap gap-3">
+        <% work.public_send(field).each do |photo| %>
+          <%= link_to rails_blob_path(photo, disposition: "inline"), target: "_blank", rel: "noopener", title: "Abrir foto completa" do %>
+            <%= image_tag photo, width: 160, height: 120, style: "max-width:100%;object-fit:contain;", class: "rounded border bg-light", loading: "lazy", alt: "#{label}: #{photo.filename}" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
