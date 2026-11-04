@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
 
-  helper_method :current_user, :signed_in?, :demo_user?
+  helper_method :current_user, :signed_in?, :demo_user?, :task_admin?
 
   private
 
@@ -29,6 +29,10 @@ class ApplicationController < ActionController::Base
 
   def demo_user?
     signed_in? && DEMO_USER_EMAILS.any? { |email| current_user[:email].to_s.casecmp?(email) }
+  end
+
+  def task_admin?
+    demo_user?
   end
 
   def authenticate_user!

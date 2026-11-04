@@ -1,0 +1,10 @@
+<%= form_with model: @task, class: "card card-body shadow-sm mx-auto", style: "max-width: 720px" do |f| %>
+  <% if @task.errors.any? %><div class="alert alert-danger"><%= @task.errors.full_messages.to_sentence %></div><% end %>
+  <%= f.label :title, "Título", class: "form-label" %><%= f.text_field :title, required: true, maxlength: 200, class: "form-control mb-3" %>
+  <%= f.label :description, "Descripción", class: "form-label" %><%= f.text_area :description, rows: 5, class: "form-control mb-3" %>
+  <%= f.label :assignee_email, "Correo del responsable", class: "form-label" %><%= f.email_field :assignee_email, required: true, placeholder: "persona@msindustrial.cl", class: "form-control mb-3" %>
+  <%= f.label :due_on, "Fecha límite (opcional)", class: "form-label" %><%= f.date_field :due_on, class: "form-control mb-3" %>
+  <%= f.label :priority, "Prioridad", class: "form-label" %><%= f.select :priority, Task::PRIORITIES.map { |value, label| [label, value] }, {}, class: "form-select mb-3" %>
+  <%= f.label :status, "Estado", class: "form-label" %><%= f.select :status, Task::STATUSES.map { |value, label| [label, value] }, {}, class: "form-select mb-3" %>
+  <div class="d-flex gap-2"><%= f.submit "Guardar tarea", class: "btn btn-primary" %><%= link_to "Cancelar", tasks_path, class: "btn btn-outline-secondary" %></div>
+<% end %>

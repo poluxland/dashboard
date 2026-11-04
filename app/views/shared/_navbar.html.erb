@@ -263,20 +263,21 @@
             </ul>
           </li>
         <% if demo_user? %>
-          <!-- Menú Demo -->
+          <!-- Menú Admin -->
           <li class="nav-item dropdown">
             <a
-              class="nav-link dropdown-toggle <%= 'active' if %w[estado_equipos mantencion_imports].include?(controller_name) %>"
+              class="nav-link dropdown-toggle <%= 'active' if %w[estado_equipos mantencion_imports tasks].include?(controller_name) %>"
               href="#"
               id="demoDropdown"
               role="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Demo
+              Admin
             </a>
 
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoDropdown">
+              <li><%= link_to "Tablero de tareas", tasks_path, class: "dropdown-item" %></li>
               <li>
                 <%= link_to "Metodo", estado_equipos_path, class: "dropdown-item", data: { turbo: false } %>
               </li>

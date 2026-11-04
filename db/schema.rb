@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_02_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -327,6 +327,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_120000) do
     t.string "signer_name", null: false
     t.text "statement", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.string "assignee_email", null: false
+    t.string "creator_email", null: false
+    t.date "due_on"
+    t.string "status", default: "pending", null: false
+    t.string "priority", default: "normal", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assignee_email", "status", "due_on"], name: "index_tasks_on_assignee_email_and_status_and_due_on"
   end
 
   create_table "tpt_events", force: :cascade do |t|
