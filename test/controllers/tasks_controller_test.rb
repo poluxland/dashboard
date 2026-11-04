@@ -17,6 +17,8 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       get new_task_path
       assert_response :success
+      assert_select "select[name=?] option[value=?]", "task[assignee_email]", email
+      assert_select "input[type=email]", count: 0
       assert_difference("Task.count") do
         post tasks_path, params: { task: { title: "Revisar", assignee_email: " Otro@msindustrial.cl ", creator_email: "fake", priority: "high" } }
       end

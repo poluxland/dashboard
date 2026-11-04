@@ -36,7 +36,10 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-    return if signed_in?
+    if signed_in?
+      DashboardUser.record_login(current_user) unless DashboardUser.exists?(email: current_user[:email].to_s.strip.downcase)
+      return
+    end
 
     return_to = request.fullpath if request.get? && request.format.html?
     reset_session

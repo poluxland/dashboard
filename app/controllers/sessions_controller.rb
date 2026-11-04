@@ -25,6 +25,8 @@ class SessionsController < ApplicationController
       authenticated_at: Time.current.to_i
     }
 
+    DashboardUser.record_login(session[:user])
+
     redirect_to(return_to, notice: "Sesión iniciada correctamente.")
   end
 
