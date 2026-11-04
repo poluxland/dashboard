@@ -30,13 +30,14 @@ class WorksController < ApplicationController
 
   def send_email
     @recipient = params[:recipient].to_s.strip
-    unless @recipient.match?(URI::MailTo::EMAIL_REGEXP) && !@recipient.match?(/[\r\n]/)
-      flash.now[:alert] = "Ingresa un correo válido para el destinatario."
+    recipients = params[:delivery] == "team" ? WorkMailer::TEAM_RECIPIENTS : @recipient.split(/[;,]/).map(&:strip).reject(&:blank?).uniq { |email| email.downcase }
+    unless recipients.any? && recipients.size <= 20 && recipients.all? { |email| email.match?(URI::MailTo::EMAIL_REGEXP) && !email.match?(/[\r\n]/) }
+      flash.now[:alert] = "Ingresa entre 1 y 20 correos válidos, separados por coma o punto y coma."
       return render :email, status: :unprocessable_entity
     end
 
-    WorkMailer.technical_report(@work, recipient: @recipient).deliver_now
-    redirect_to @work, notice: "Informe enviado a #{@recipient}.", status: :see_other
+    WorkMailer.technical_report(@work, recipient: recipients).deliver_now
+    redirect_to @work, notice: "Informe enviado a #{recipients.join(', ')}.", status: :see_other
   rescue WorkMailer::PhotosTooLarge
     flash.now[:alert] = "Las fotos superan los 15 MB permitidos por envío. Reduce su tamaño antes de enviar el informe."
     render :email, status: :unprocessable_entity

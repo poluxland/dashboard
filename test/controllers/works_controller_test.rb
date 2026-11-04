@@ -103,7 +103,7 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
       get email_work_url(@work)
     end
     assert_response :success
-    assert_select "input[type=email][name=recipient]"
+    assert_select "input[name=recipient]"
     assert_difference("ActionMailer::Base.deliveries.size", 1) do
       post send_email_work_url(@work), params: { recipient: " destino@example.com " }
     end
@@ -111,13 +111,34 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "destino@example.com" ], ActionMailer::Base.deliveries.last.to
   end
 
-  test "does not send to invalid or multiple recipients" do
-    [ "", "invalid", "one@example.com,two@example.com", "one@example.com\r\nBcc: other@example.com" ].each do |recipient|
+  test "does not send to invalid recipients" do
+    [ "", "invalid", "one@example.com,invalid", "one@example.com\r\nBcc: other@example.com" ].each do |recipient|
       assert_no_difference("ActionMailer::Base.deliveries.size") do
         post send_email_work_url(@work), params: { recipient: recipient }
       end
       assert_response :unprocessable_entity
     end
+  end
+
+  test "team button sends only to the three predefined recipients" do
+    assert_difference("ActionMailer::Base.deliveries.size", 1) do
+      post send_email_work_url(@work), params: { delivery: "team", recipient: "ignored@example.com" }
+    end
+    assert_redirected_to work_url(@work)
+    assert_equal WorkMailer::TEAM_RECIPIENTS, ActionMailer::Base.deliveries.last.to
+  end
+
+  test "custom button accepts multiple addresses and removes duplicates" do
+    post send_email_work_url(@work), params: { recipient: "one@example.com; two@example.com, ONE@example.com" }
+    assert_redirected_to work_url(@work)
+    assert_equal [ "one@example.com", "two@example.com" ], ActionMailer::Base.deliveries.last.to
+  end
+
+  test "rejects too many recipients" do
+    assert_no_difference("ActionMailer::Base.deliveries.size") do
+      post send_email_work_url(@work), params: { recipient: 21.times.map { |i| "user#{i}@example.com" }.join(",") }
+    end
+    assert_response :unprocessable_entity
   end
 
   test "email requires authentication" do

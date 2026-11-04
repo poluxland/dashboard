@@ -1,4 +1,5 @@
 class WorkMailer < ApplicationMailer
+  TEAM_RECIPIENTS = %w[jose.jerez@msindustrial.cl julio.alvear@msindustrial.cl fernando.gonzalez@msindustrial.cl].freeze
   class PhotosTooLarge < StandardError; end
 
   MAX_PHOTO_BYTES = 15.megabytes
@@ -6,6 +7,7 @@ class WorkMailer < ApplicationMailer
 
   def technical_report(work, recipient:)
     @work = work
+    @report_url = work_url(work)
     inspection_groups = work.selected_inspections.flat_map do |inspection|
       inspection.items.map { |item| [ "#{inspection.title} · #{item.question}", item.fotos.to_a ] }
     end
@@ -36,7 +38,7 @@ class WorkMailer < ApplicationMailer
       "EPP" => work.epp, "Hallazgos" => work.hallazgos,
       "Observaciones" => work.observaciones, "Seguridad y medio ambiente" => work.seguridad,
       "Personal" => work.personal
-    }
+    }.compact_blank
 
     mail(to: recipient, subject: "Informe técnico de mantenimiento ##{work.id} · #{work.nombre.presence || 'Impromaq'}")
   end

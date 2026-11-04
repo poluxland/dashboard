@@ -1,8 +1,13 @@
-<div style="font-family:Arial,sans-serif;max-width:760px;margin:auto;color:#1e293b;">
+<div style="background:#f1f5f9;padding:24px 12px;font-family:Arial,sans-serif;color:#1e293b;">
+<div style="max-width:720px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+<div style="background:#12372b;color:#fff;padding:28px;">
   <%= image_tag attachments["impromaq-logo.png"].url, alt: "Logo Impromaq", width: 56, height: 56, style: "display:block;border:0;" %>
-  <p style="color:#64748b;">IMPROMAQ · INFORME N° <%= @work.id %></p>
+  <p style="color:#bce4ce;font-size:12px;letter-spacing:1px;">IMPROMAQ · INFORME N° <%= @work.id %></p>
   <h1 style="font-size:24px;">Informe técnico de mantenimiento</h1>
   <h2 style="font-size:20px;"><%= @work.nombre.presence || "Sin título" %></h2>
+  <%= link_to "Abrir reporte completo →", @report_url, style: "display:inline-block;background:#fff;color:#12372b;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold;" %>
+</div>
+<div style="padding:24px;">
   <table role="presentation" style="width:100%;border-collapse:collapse;">
     <% @details.each do |label, value| %>
       <tr>
@@ -25,9 +30,24 @@
     <% if filenames.empty? %>
       <p>Sin imágenes registradas.</p>
     <% else %>
-      <% filenames.each do |filename| %>
-        <p><%= image_tag attachments[filename].url, alt: "#{label}: #{filename}", style: "width:100%;max-width:700px;height:auto;" %></p>
+      <table role="presentation" style="width:100%;border-collapse:collapse;">
+      <% filenames.each_slice(2) do |row| %>
+        <tr>
+        <% row.each do |filename| %>
+          <td style="width:50%;padding:8px;vertical-align:top;">
+            <%= link_to @report_url, style: "text-decoration:none;color:#166534;" do %>
+              <%= image_tag attachments[filename].url, alt: "#{label}: #{filename}", width: 240, style: "display:block;width:100%;max-width:240px;height:auto;border-radius:8px;border:1px solid #e2e8f0;" %>
+              <span style="display:block;font-size:12px;padding-top:6px;">Ver foto en el reporte →</span>
+            <% end %>
+          </td>
+        <% end %>
+        </tr>
       <% end %>
+      </table>
     <% end %>
   <% end %>
+  <p style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;"><%= link_to "Consultar el reporte completo y sus fotografías", @report_url, style: "color:#166534;font-weight:bold;" %></p>
+  <p style="color:#64748b;font-size:12px;">Para abrir el reporte, inicia sesión con tu cuenta corporativa autorizada.</p>
+</div>
+</div>
 </div>
