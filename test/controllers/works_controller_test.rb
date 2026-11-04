@@ -14,6 +14,11 @@ class WorksControllerTest < ActionDispatch::IntegrationTest
   test "should get new" do
     get new_work_url
     assert_response :success
+    assert_select "select[name='work[planta]'] option", text: "Puerto Montt"
+    assert_select "select[name='work[planta]'] option", text: "La Calera"
+    assert_select "select[name='work[planta]'] option", text: "Ventanas"
+    assert_select "select[name='work[planta]'] option", text: "Otro"
+    assert_select "input[name='work[fecha]'][value='#{Time.current.in_time_zone('America/Santiago').to_date}']"
   end
 
   test "should create work" do

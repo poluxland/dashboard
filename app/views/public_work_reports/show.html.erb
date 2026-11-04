@@ -1,0 +1,9 @@
+<header class="d-flex align-items-center gap-3 mb-4">
+  <%= image_tag "impromaq-logo.png", alt: "Impromaq", width: 56, height: 56 %>
+  <div>
+    <h1 class="h3 mb-1">Informe técnico de mantenimiento</h1>
+    <p class="text-muted mb-0">Informe N° <%= @work.id %> · Consulta de solo lectura</p>
+  </div>
+</header>
+<%= render "works/work", work: @work, read_only: true %>
+<%= render "works/inspection_report", work: @work %>

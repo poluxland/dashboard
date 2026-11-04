@@ -1,5 +1,12 @@
 # app/models/work.rb
 class Work < ApplicationRecord
+  PLANTAS = [ "Puerto Montt", "La Calera", "Ventanas", "Otro" ].freeze
+  attribute :fecha, :date, default: -> { Time.current.in_time_zone("America/Santiago").to_date }
+
+  def report_token
+    signed_id(purpose: :shared_work_report)
+  end
+
   has_many :inspections, class_name: "WorkInspection", dependent: :destroy, inverse_of: :work
   accepts_nested_attributes_for :inspections, reject_if: ->(attributes) { attributes["id"].blank? && !ActiveModel::Type::Boolean.new.cast(attributes["enabled"]) }
   before_validation :select_inspection_type

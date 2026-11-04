@@ -53,6 +53,14 @@ No publiques ni guardes `GOOGLE_CLIENT_SECRET` en el repositorio.
 
 ## Inspecciones en Works
 
+Los trabajos nuevos usan la fecha actual de Chile, editable, y ofrecen Puerto Montt,
+La Calera, Ventanas u Otro como planta. Al editar se conserva cualquier planta histórica.
+Los correos nuevos incluyen un enlace firmado de solo lectura para consultar ese
+reporte sin sesión. Quien recibe el enlace puede abrirlo y reenviarlo; no habilita
+edición ni acceso al resto del sistema. Los enlaces dejan de servir si se elimina
+el reporte. Los correos anteriores conservan sus enlaces originales y deben reenviarse
+desde la aplicación para incluir el nuevo enlace compartido.
+
 Ejecuta `bin/rails db:migrate` antes de iniciar la aplicación con esta versión.
 Un trabajo admite una sola inspección, elegida en un desplegable, o un informe libre, sin inspección.
 Las siete plantillas y sus preguntas están en `config/work_inspections.json`;

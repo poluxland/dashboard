@@ -1,7 +1,7 @@
 IMPROMAQ · INFORME TÉCNICO DE MANTENIMIENTO N° <%= @work.id %>
 <%= @work.nombre.presence || "Sin título" %>
 Reporte completo y fotografías: <%= @report_url %>
-Inicia sesión con tu cuenta corporativa autorizada para abrir el reporte.
+El enlace permite consultar únicamente este reporte, sin iniciar sesión. Compártelo solo con sus destinatarios.
 
 <% @details.each do |label, value| %>
 <%= label %>: <%= value.to_s.presence || "Sin registrar" %>

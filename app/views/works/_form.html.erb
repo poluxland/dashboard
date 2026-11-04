@@ -24,7 +24,9 @@
     </div>
     <div class="col-md-3">
       <%= f.label :planta %>
-      <%= f.text_field :planta, class: "form-control" %>
+      <% plantas = Work::PLANTAS.dup %>
+      <% plantas << work.planta if work.planta.present? && !plantas.include?(work.planta) %>
+      <%= f.select :planta, plantas, { include_blank: "Selecciona una planta" }, class: "form-select" %>
     </div>
     <div class="col-md-3">
       <%= f.label :numero_cotizacion, "Número cotización" %>

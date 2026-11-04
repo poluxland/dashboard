@@ -25,7 +25,7 @@ class WorkMailerTest < ActionMailer::TestCase
       assert_includes email.text_part.body.decoded, value
     end
     assert_includes email.html_part.body.decoded, "Imágenes · Después"
-    report_url = "http://example.com/works/#{work.id}"
+    report_url = "http://example.com/informes/compartidos/#{work.report_token}"
     assert_includes email.text_part.body.decoded, report_url
     document = Nokogiri::HTML(email.html_part.body.decoded)
     assert_equal 3, document.css("a[href='#{report_url}'] img[width='240']").size

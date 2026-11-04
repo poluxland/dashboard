@@ -7,7 +7,7 @@ class WorkMailer < ApplicationMailer
 
   def technical_report(work, recipient:)
     @work = work
-    @report_url = work_url(work)
+    @report_url = public_work_report_url(token: work.report_token)
     inspection_groups = work.selected_inspections.flat_map do |inspection|
       inspection.items.map { |item| [ "#{inspection.title} · #{item.question}", item.fotos.to_a ] }
     end
