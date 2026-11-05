@@ -1,4 +1,4 @@
-<article <% if local_assigns[:draggable] %>draggable="true" data-task-card data-task-url="<%= task_path(task) %>" data-task-status="<%= task.status %>" data-action="dragstart->task-board#start dragend->task-board#end"<% end %> class="card border-0 shadow-sm mb-3" style="border-radius: 12px; border-top: 4px solid <%= task.priority == 'normal' ? '#537ae9' : '#dc3545' %> !important">
+<article <% if task_admin? && local_assigns[:draggable] %>draggable="true" data-task-card data-task-url="<%= task_path(task) %>" data-task-status="<%= task.status %>" data-action="dragstart->task-board#start dragend->task-board#end"<% end %> class="card border-0 shadow-sm mb-3" style="border-radius: 12px; border-top: 4px solid <%= task.priority == 'normal' ? '#537ae9' : '#dc3545' %> !important">
   <div class="card-body">
     <div class="d-flex justify-content-between gap-2 mb-2"><span class="badge <%= task.priority == 'normal' ? 'text-bg-light' : 'text-bg-danger' %>"><%= Task::PRIORITIES[task.priority] %></span></div>
     <h3 class="h6"><%= link_to task.title, task_path(task), class: "text-decoration-none text-reset #{'stretched-link' if local_assigns[:compact]}" %></h3>
@@ -7,6 +7,6 @@
     <p class="small mb-2 text-break"><i class="bi bi-person"></i> <%= task.assignee_email %></p>
     <p class="small <%= task.due_on && task.due_on < Time.current.in_time_zone('America/Santiago').to_date && task.status != 'done' ? 'text-danger' : 'text-muted' %>"><%= task.due_on ? "Fecha límite: #{task.due_on.strftime('%d/%m/%Y')}" : 'Sin fecha límite' %></p>
     <div class="<%= 'position-relative z-2' if local_assigns[:compact] %>"><%= render "tasks/checklist", task: task %></div>
-    <% unless local_assigns[:compact] %><%= link_to "Editar tarea", edit_task_path(task), class: "btn btn-sm btn-outline-primary mt-2" %><% end %>
+    <% if task_admin? && !local_assigns[:compact] %><%= link_to "Editar tarea", edit_task_path(task), class: "btn btn-sm btn-outline-primary mt-2" %><% end %>
   </div>
 </article>

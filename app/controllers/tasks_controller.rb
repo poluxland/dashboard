@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :require_task_admin!, except: [ :show, :edit, :update ]
+  before_action :require_task_admin!, except: :show
 
   def index
     @group_by = %w[status plant category].include?(params[:group_by]) ? params[:group_by] : "status"
@@ -34,19 +34,17 @@ class TasksController < ApplicationController
   def update
     scope = accessible_tasks
     @task = scope.find(params[:id])
-    attributes = task_admin? ? task_params : task_input.permit(:status, items_attributes: [ :id, :completed ])
+    attributes = task_params
     saved = @task.with_lock { @task.update(attributes) }
     if saved
       respond_to do |format|
-        format.html { redirect_to(task_admin? ? tasks_path : root_path, notice: "Tarea actualizada.") }
+        format.html { redirect_to(tasks_path, notice: "Tarea actualizada.") }
         format.json { render json: { status: @task.status, completion_percentage: @task.completion_percentage } }
       end
     elsif request.format.json?
       render json: { errors: @task.errors.full_messages }, status: :unprocessable_entity
-    elsif task_admin?
-      render :edit, status: :unprocessable_entity
     else
-      redirect_to root_path, alert: @task.errors.full_messages.to_sentence
+      render :edit, status: :unprocessable_entity
     end
   end
 

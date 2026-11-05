@@ -80,7 +80,7 @@ La carga espera a que termine la optimización. Las fotos existentes se conserva
 ## Tareas y avisos
 
 Admin permite asignar tareas por correo, con clase, planta y checklist con fechas.
-Los responsables pueden marcar sus pasos; cada paso pesa igual en el porcentaje.
+Solo José y Fernando pueden editar las tareas y marcar sus pasos; los responsables pueden consultarlos y comentar; cada paso pesa igual en el porcentaje.
 Completar todos los pasos cierra la tarea automáticamente. Desmarcar un paso o agregar uno pendiente vuelve a dejarla En curso.
 
 Los correos pendientes se guardan en `task_notifications`, dentro de la transacción

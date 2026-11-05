@@ -36,17 +36,16 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     get new_task_path
     assert_response :forbidden
     get edit_task_path(@task)
-    assert_response :success
-    assert_select "input[name=?]", "task[title]", count: 0
+    assert_response :forbidden
     assert_no_difference("Task.count") { post tasks_path, params: { task: { title: "Forbidden" } } }
     assert_response :forbidden
     other = Task.create!(title: "Privada", assignee_email: "otro@msindustrial.cl", creator_email: "jose.jerez@msindustrial.cl")
     patch task_path(other), params: { task: { status: "done" } }
-    assert_response :not_found
+    assert_response :forbidden
     assert_equal "pending", other.reload.status
     patch task_path(@task), params: { task: { status: "done", title: "Changed", assignee_email: "otro@msindustrial.cl" } }
-    assert_redirected_to root_path
-    assert_equal "done", @task.reload.status
+    assert_response :forbidden
+    assert_equal "pending", @task.reload.status
     assert_equal "Inspeccionar equipo", @task.title
     assert_equal "usuario@msindustrial.cl", @task.assignee_email
   end
@@ -87,8 +86,8 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     item = @task.items.create!(title: "Paso", due_on: Date.current)
     other = Task.create!(title: "Otra", assignee_email: "otro@msindustrial.cl", creator_email: @task.creator_email)
     foreign_item = other.items.create!(title: "Privado", due_on: Date.current)
-    sign_in_with_google
-    patch task_path(@task), params: { task: { items_attributes: [ { id: item.id, completed: true, title: "Alterado" } ] } }, as: :json
+    sign_in_with_google(email: "fernando.gonzalez@msindustrial.cl")
+    patch task_path(@task), params: { task: { items_attributes: [ { id: item.id, completed: true } ] } }, as: :json
     assert_response :success
     assert_equal 100, response.parsed_body["completion_percentage"]
     assert_equal "done", @task.reload.status
@@ -97,6 +96,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     patch task_path(@task), params: { task: { items_attributes: [ { id: foreign_item.id, completed: true } ] } }, as: :json
     assert_response :not_found
     assert_not foreign_item.reload.completed?
+    sign_in_with_google
     get task_path(other)
     assert_response :not_found
     get task_path(@task)
@@ -143,7 +143,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   test "checklist closes only when every step is checked and reopens when unchecked" do
     first = @task.items.create!(title: "Uno", due_on: Date.current)
     second = @task.items.create!(title: "Dos", due_on: Date.current)
-    sign_in_with_google
+    sign_in_with_google(email: "fernando.gonzalez@msindustrial.cl")
     patch task_path(@task), params: { task: { items_attributes: [ { id: first.id, completed: true } ] } }, as: :json
     assert_equal "pending", @task.reload.status
     assert_equal 50, response.parsed_body["completion_percentage"]
@@ -168,6 +168,33 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
       assert_select "select[name=group_by] option[selected][value=?]", group
       assert_select "article", count: 1
       assert_select "article", text: /Invisible/, count: 0
+    end
+  end
+
+  test "assignee sees disabled checklist and cannot mutate even using direct requests" do
+    item = @task.items.create!(title: "Solo lectura", due_on: Date.current)
+    sign_in_with_google
+    [ root_path, task_path(@task) ].each do |path|
+      get path
+      assert_response :success
+      assert_select "input[type=checkbox][disabled]", count: 1
+      assert_select "a[href=?]", edit_task_path(@task), count: 0
+      assert_select "[draggable=true]", count: 0
+      assert_select "[data-controller=task-checklist]", count: 0
+    end
+    patch task_path(@task), params: { task: { status: "done", items_attributes: [ { id: item.id, completed: true } ] } }, as: :json
+    assert_response :forbidden
+    assert_not item.reload.completed?
+    assert_equal "pending", @task.reload.status
+    %w[jose.jerez@msindustrial.cl fernando.gonzalez@msindustrial.cl].each do |email|
+      sign_in_with_google(email: email)
+      get task_path(@task)
+      assert_select "input[type=checkbox]:not([disabled])", count: 1
+      assert_select "a[href=?]", edit_task_path(@task), count: 1
+      patch task_path(@task), params: { task: { items_attributes: [ { id: item.id, completed: true } ] } }, as: :json
+      assert_response :success
+      assert item.reload.completed?
+      item.update!(completed: false)
     end
   end
 
