@@ -1,6 +1,8 @@
 # config/routes.rb
 Rails.application.routes.draw do
-  resources :tasks, only: [ :index, :show, :new, :create, :edit, :update ]
+  resources :tasks, only: [ :index, :show, :new, :create, :edit, :update ] do
+    resources :comments, only: :create, controller: "task_comments"
+  end
   get "informes/compartidos/:token", to: "public_work_reports#show", as: :public_work_report
   get "reporte-envasadora/productividad", to: "envasadora_dashboard#index", as: :envasadora_dashboard
   resources :tpt_imports, path: "ventohaver-tpt", only: [ :index, :create, :show ]

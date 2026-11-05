@@ -1,1 +1,34 @@
-<div class="mx-auto" style="max-width:720px"><%= link_to 'Volver a mis tareas', root_path, class: 'btn btn-outline-secondary mb-3' %><%= render 'tasks/card', task: @task %></div>
+<%= link_to 'Volver a mis tareas', root_path, class: 'btn btn-outline-secondary mb-3' %>
+<div class="row g-4 align-items-start">
+  <div class="col-12 col-lg-7"><%= render 'tasks/card', task: @task %></div>
+  <section class="col-12 col-lg-5" aria-labelledby="task-activity-title">
+    <div class="p-4 rounded-4 bg-body-tertiary">
+      <h2 id="task-activity-title" class="h5 mb-4"><i class="bi bi-chat-left-text me-2" aria-hidden="true"></i>Comentarios y actividad</h2>
+      <%= form_with model: [@task, @comment], url: task_comments_path(@task), class: "mb-4" do |f| %>
+        <% if @comment.errors.any? %><div class="alert alert-danger" role="alert"><%= @comment.errors.full_messages.to_sentence %></div><% end %>
+        <%= f.label :body, 'Escribe un comentario', class: 'form-label small' %>
+        <%= f.text_area :body, rows: 3, maxlength: 5000, required: true, placeholder: 'Comparte avances, consultas o información de la tarea…', class: 'form-control mb-2' %>
+        <%= f.submit 'Comentar', class: 'btn btn-primary btn-sm', data: { turbo_submits_with: 'Publicando…' } %>
+      <% end %>
+      <ol class="list-unstyled mb-0" aria-label="Historial de la tarea">
+        <li class="border-start border-3 ps-3 mb-4">
+          <p class="small mb-1"><strong class="text-break"><%= @task.creator_email %></strong> creó la tarea.</p>
+          <time class="small text-body-secondary" datetime="<%= @task.created_at.iso8601 %>"><%= @task.created_at.in_time_zone('America/Santiago').strftime('%d/%m/%Y, %H:%M') %> · Chile</time>
+        </li>
+        <% @task.comments.chronological.each do |comment| %>
+          <li id="comment-<%= comment.id %>" class="mb-4">
+            <div class="d-flex gap-2 align-items-start mb-2">
+              <span class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center flex-shrink-0" style="width:36px;height:36px" aria-hidden="true"><%= (comment.author_name.presence || comment.author_email).first.upcase %></span>
+              <div style="min-width:0">
+                <% if comment.author_name.present? %><strong class="d-block small"><%= comment.author_name %></strong><% end %>
+                <span class="small text-break"><%= comment.author_email %></span><br>
+                <time class="small text-body-secondary" datetime="<%= comment.created_at.iso8601 %>"><%= comment.created_at.in_time_zone('America/Santiago').strftime('%d/%m/%Y, %H:%M') %> · Chile</time>
+              </div>
+            </div>
+            <div class="bg-body border rounded-3 p-3 small" style="white-space:pre-wrap;overflow-wrap:anywhere"><%= comment.body %></div>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </section>
+</div>

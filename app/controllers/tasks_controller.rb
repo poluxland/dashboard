@@ -11,6 +11,7 @@ class TasksController < ApplicationController
 
   def show
     @task = accessible_tasks.includes(:items).find(params[:id])
+    @comment = TaskComment.new
   end
 
   def new
