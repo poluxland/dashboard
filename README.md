@@ -81,7 +81,7 @@ La carga espera a que termine la optimización. Las fotos existentes se conserva
 
 Admin permite asignar tareas por correo, con clase, planta y checklist con fechas.
 Los responsables pueden marcar sus pasos; cada paso pesa igual en el porcentaje.
-El cierre de la tarea sigue siendo una acción explícita.
+Completar todos los pasos cierra la tarea automáticamente. Desmarcar un paso o agregar uno pendiente vuelve a dejarla En curso.
 
 Los correos pendientes se guardan en `task_notifications`, dentro de la transacción
 que guarda la tarea. El proceso `task_notifications` del Procfile los revisa cada

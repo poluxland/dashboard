@@ -5,7 +5,10 @@ export default class extends Controller {
     const input = event.target
     if (input.type !== "checkbox") return
     const message = this.element.querySelector("[role=status]")
-    input.disabled = true
+    if (this.saving) return
+    this.saving = true
+    const inputs = this.element.querySelectorAll('input[type="checkbox"]')
+    inputs.forEach(checkbox => checkbox.disabled = true)
     try {
       const response = await fetch(this.element.dataset.url, {
         method: "PATCH",
@@ -18,11 +21,13 @@ export default class extends Controller {
       this.element.querySelector("progress").value = result.completion_percentage
       this.element.querySelector("[data-progress-label]").textContent = `${result.completion_percentage}% completado`
       message.textContent = "Avance guardado."
+      if (result.status !== this.element.dataset.status) window.location.reload()
     } catch {
       input.checked = !input.checked
       message.textContent = "No se pudo guardar el avance. Inténtalo nuevamente."
     } finally {
-      input.disabled = false
+      inputs.forEach(checkbox => checkbox.disabled = false)
+      this.saving = false
     }
   }
 }

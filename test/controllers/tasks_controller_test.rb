@@ -59,7 +59,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
       end
       Task.create!(title: "Invisible", assignee_email: "otro@msindustrial.cl", creator_email: @task.creator_email)
       sign_in_with_google
-      get root_path
+      get root_path, params: { group_by: "date" }
       assert_response :success
       assert_select "section", count: 3
       assert_select "section:nth-child(1)", text: /Inspeccionar equipo/
@@ -91,6 +91,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     patch task_path(@task), params: { task: { items_attributes: [ { id: item.id, completed: true, title: "Alterado" } ] } }, as: :json
     assert_response :success
     assert_equal 100, response.parsed_body["completion_percentage"]
+    assert_equal "done", @task.reload.status
     assert_equal "Paso", item.reload.title
     assert item.completed?
     patch task_path(@task), params: { task: { items_attributes: [ { id: foreign_item.id, completed: true } ] } }, as: :json
@@ -137,6 +138,37 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     patch task_path(task), params: { task: { items_attributes: { "1730000000002" => { title: "Paso 3", due_on: "2026-11-11" } } } }
     assert_redirected_to tasks_path
     assert_equal 3, task.items.reload.size
+  end
+
+  test "checklist closes only when every step is checked and reopens when unchecked" do
+    first = @task.items.create!(title: "Uno", due_on: Date.current)
+    second = @task.items.create!(title: "Dos", due_on: Date.current)
+    sign_in_with_google
+    patch task_path(@task), params: { task: { items_attributes: [ { id: first.id, completed: true } ] } }, as: :json
+    assert_equal "pending", @task.reload.status
+    assert_equal 50, response.parsed_body["completion_percentage"]
+    patch task_path(@task), params: { task: { items_attributes: [ { id: second.id, completed: true } ] } }, as: :json
+    assert_equal "done", @task.reload.status
+    patch task_path(@task), params: { task: { items_attributes: [ { id: first.id, completed: false } ] } }, as: :json
+    assert_equal "in_progress", @task.reload.status
+    assert_equal 50, response.parsed_body["completion_percentage"]
+  end
+
+  test "personal board defaults to class and offers other groupings without exposing other users" do
+    @task.update!(category: "safety", plant: "LCA")
+    Task.create!(title: "Invisible", assignee_email: "otro@msindustrial.cl", creator_email: @task.creator_email)
+    sign_in_with_google
+    get root_path
+    assert_select "select[name=group_by] option[selected][value=category]"
+    assert_select "section", count: 4
+    assert_select "section:first-child", text: /Seguridad.*Inspeccionar equipo/m
+    %w[plant status date].each do |group|
+      get root_path, params: { group_by: group }
+      assert_response :success
+      assert_select "select[name=group_by] option[selected][value=?]", group
+      assert_select "article", count: 1
+      assert_select "article", text: /Invisible/, count: 0
+    end
   end
 
   test "invalid tasks render errors" do

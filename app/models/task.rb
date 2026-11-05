@@ -6,6 +6,7 @@ class Task < ApplicationRecord
   accepts_nested_attributes_for :items, allow_destroy: true, reject_if: :all_blank
   validates :category, inclusion: { in: CATEGORIES.keys }
   validates :plant, inclusion: { in: PLANTS }
+  before_save :sync_checklist_status
   after_create :queue_assignment
   after_update :queue_assignment, if: :saved_change_to_assignee_email?
 
@@ -15,6 +16,18 @@ class Task < ApplicationRecord
   end
 
   private
+
+  def sync_checklist_status
+    checklist = items.to_a
+    return unless checklist.any? { |item| item.new_record? || item.marked_for_destruction? || item.will_save_change_to_completed? }
+
+    remaining = checklist.reject(&:marked_for_destruction?)
+    if remaining.any? && remaining.all?(&:completed?)
+      self.status = "done"
+    elsif status == "done" && remaining.any? { |item| !item.completed? }
+      self.status = "in_progress"
+    end
+  end
 
   def queue_assignment
     notifications.create!(kind: "assigned", recipient: assignee_email, deduplication_key: "assigned:#{id}:#{SecureRandom.uuid}")

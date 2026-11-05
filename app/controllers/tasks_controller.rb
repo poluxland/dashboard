@@ -34,7 +34,8 @@ class TasksController < ApplicationController
     scope = accessible_tasks
     @task = scope.find(params[:id])
     attributes = task_admin? ? task_params : task_input.permit(:status, items_attributes: [ :id, :completed ])
-    if @task.update(attributes)
+    saved = @task.with_lock { @task.update(attributes) }
+    if saved
       respond_to do |format|
         format.html { redirect_to(task_admin? ? tasks_path : root_path, notice: "Tarea actualizada.") }
         format.json { render json: { status: @task.status, completion_percentage: @task.completion_percentage } }
