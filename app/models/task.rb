@@ -1,5 +1,5 @@
 class Task < ApplicationRecord
-  CATEGORIES = { "safety" => "Seguridad", "people" => "Personas", "operations" => "Operaciones", "other" => "Otro" }.freeze
+  CATEGORIES = { "safety" => "Seguridad", "people" => "Personas", "operations" => "Operaciones" }.freeze
   PLANTS = %w[LCA PTM VTS N/A].freeze
   has_many :comments, class_name: "TaskComment", dependent: :destroy
   has_many :items, class_name: "TaskItem", dependent: :destroy

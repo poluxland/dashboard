@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -371,7 +371,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
   end
 
   create_table "tasks", force: :cascade do |t|
-    t.string "category", default: "other", null: false
+    t.string "category", default: "operations", null: false
     t.string "plant", default: "N/A", null: false
     t.string "title", null: false
     t.text "description"
@@ -383,6 +383,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["assignee_email", "status", "due_on"], name: "index_tasks_on_assignee_email_and_status_and_due_on"
+    t.check_constraint "category::text = ANY (ARRAY['safety'::character varying, 'people'::character varying, 'operations'::character varying]::text[])", name: "tasks_category_allowed"
   end
 
   create_table "tpt_events", force: :cascade do |t|

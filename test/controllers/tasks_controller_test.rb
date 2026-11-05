@@ -109,7 +109,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     %w[plant category].each do |group|
       get tasks_path, params: { group_by: group }
       assert_response :success
-      assert_select "section", count: 4
+      assert_select "section", count: group == "plant" ? 4 : 3
       assert_select "article[draggable]", count: 0
     end
   end
@@ -160,7 +160,7 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     sign_in_with_google
     get root_path
     assert_select "select[name=group_by] option[selected][value=category]"
-    assert_select "section", count: 4
+    assert_select "section", count: 3
     assert_select "section:first-child", text: /Seguridad.*Inspeccionar equipo/m
     %w[plant status date].each do |group|
       get root_path, params: { group_by: group }
