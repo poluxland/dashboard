@@ -23,7 +23,7 @@
         <!-- Menú Reportes -->
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[works envasadora_reports envasadora_dashboard shift_reports].include?(controller_name) %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[works envasadora_reports shift_reports].include?(controller_name) %>"
             type="button"
             id="worksDropdown"
             data-bs-toggle="dropdown"
@@ -39,6 +39,24 @@
             <li>
               <%= link_to "Técnico", works_path, class: "dropdown-item", data: { turbo: false } %>
             </li>
+          </ul>
+        </li>
+
+        <!-- Menú Informes -->
+        <li class="nav-item dropdown">
+          <button
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if controller_name == 'envasadora_dashboard' || (%w[mantenciones ots].include?(controller_name) && action_name == 'graficos') %>"
+            type="button"
+            id="informesDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Informes
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="informesDropdown">
+            <li><%= link_to "Producción envasadora", envasadora_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "Mantenciones PTM", graficos_mantenciones_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "OTs", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %></li>
           </ul>
         </li>
 
@@ -119,7 +137,7 @@
         <!-- Menú Mantenimiento -->
         <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones tpt_imports].include?(controller_name) %>"
+            class="nav-link dropdown-toggle <%= 'active' if %w[ots mantenciones tpt_imports].include?(controller_name) && action_name != 'graficos' %>"
             href="#"
             id="mantenimientoDropdown"
             role="button"
