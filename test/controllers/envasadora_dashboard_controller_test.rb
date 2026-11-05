@@ -12,6 +12,9 @@ class EnvasadoraDashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Productividad y detenciones"
     assert_select "canvas", count: 3
+    assert_select "section[aria-labelledby=production-summary-title] h3", count: 3
+    assert_select "section[aria-labelledby=stock-summary-title] h3", count: EnvasadoraReport::CEMENTS.size
+    assert_select "section[aria-labelledby=vorne-summary-title]", text: /Vorne.*MTBF.*MTTR/m
     assert_select "input[type=file]", count: 0
     assert_select "a[href=?]", envasadora_reports_path
     assert_select "a[href=?]", tpt_imports_path

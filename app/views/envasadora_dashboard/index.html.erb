@@ -3,7 +3,7 @@
   <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
     <div>
       <h1 class="h3 fw-bold mb-1">Productividad y detenciones</h1>
-      <p class="text-body-secondary mb-0">Envasadora PTM · Producción Haver y eventos de VentoHaver TPT</p>
+      <p class="text-body-secondary mb-0">Envasadora PTM · Producción, stocks y desempeño Vorne</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
       <%= link_to "Reportes de turno", envasadora_reports_path, class: "btn btn-outline-primary" %>
@@ -68,18 +68,59 @@
     <p class="small text-body-secondary"><%= pluralize(@dashboard.production_only_count, "turno tiene", "turnos tienen") %> reporte de producción sin datos TPT para los filtros seleccionados. Un guion indica que falta el dato.</p>
   <% end %>
 
-  <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
-    <% dashboard_kpis(@dashboard).each do |label, value, description| %>
-      <div class="col"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
-        <div class="small text-body-secondary mb-2"><%= label %></div>
-        <div class="h3 fw-bold mb-1"><%= value %></div>
-        <div class="small text-body-secondary"><%= description %></div>
-      </div></div></div>
-    <% end %>
-  </div>
+  <section class="mb-4" aria-labelledby="production-summary-title">
+    <h2 id="production-summary-title" class="h4 fw-bold">Producción · Reporte de envasadora</h2>
+    <p class="small text-body-secondary">Último reporte por fecha y turno. Incluye ceros declarados. Ton/h = toneladas totales / horas de producción declaradas.</p>
+    <div class="row g-3">
+      <% @dashboard.machine_summaries.each do |machine| %>
+        <div class="col-md-4"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4">
+          <h3 class="h5 fw-bold"><%= machine[:label] %></h3>
+          <div class="small text-body-secondary mt-3">Producción total <%= machine[:label] %></div>
+          <div class="h3 fw-bold"><%= dashboard_number(machine[:total], precision: 0) %> <span class="fs-6 fw-normal"><%= machine[:unit] %></span></div>
+          <dl class="mb-0">
+            <dt class="small text-body-secondary fw-normal mt-3">Toneladas por hora</dt><dd class="h4"><%= dashboard_number(machine[:tons_per_hour], suffix: " Ton/h") %></dd>
+            <dt class="small text-body-secondary fw-normal mt-3">Horas promedio de producción por turno</dt><dd class="h4"><%= dashboard_number(machine[:average_hours], suffix: " h") %></dd>
+            <dt class="small text-body-secondary fw-normal mt-3">Tiempo produciendo / tiempo total del turno</dt><dd class="fs-5 fw-semibold"><%= dashboard_number(machine[:average_hours], suffix: " h") %> / <%= dashboard_number(machine[:average_shift_hours], suffix: " h") %></dd>
+          </dl>
+          <p class="small text-body-secondary mb-0">Promedios sobre <%= machine[:timed_shifts] %> turnos con horas válidas · <%= machine[:reported_shifts] %> turnos con producción declarada.</p>
+          <% if machine[:incomplete_shifts].positive? %><p class="small text-warning-emphasis mt-2 mb-0">Ton/h no disponible: <%= machine[:incomplete_shifts] %> turnos con producción u horas incompletas.</p><% end %>
+        </div></div></div>
+      <% end %>
+    </div>
+    <p class="small text-body-secondary mt-2">La relación de tiempos muestra ambos valores promedio, sin calcular un porcentaje. El detalle inferior muestra los tiempos de cada turno. Haver y Ventomatic: sacos de 25 kg. Bigbag: 1,5 t por unidad, según el reporte de envasadora.</p>
+  </section>
+
+  <section class="mb-4" aria-labelledby="stock-summary-title">
+    <h2 id="stock-summary-title" class="h4 fw-bold">Stocks promedio por producto</h2>
+    <p class="small text-body-secondary">Fuente: Reporte de envasadora · promedio de inventarios de silo y piso en los turnos seleccionados, en toneladas. Se excluyen reportes con inventario incompleto; los stocks no se suman entre turnos.</p>
+    <div class="row row-cols-2 row-cols-md-3 g-3">
+      <% @dashboard.stock_summaries.each do |stock| %>
+        <div class="col"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
+          <h3 class="h6"><%= stock[:product] %></h3>
+          <div class="h3 fw-bold"><%= dashboard_number(stock[:total], suffix: " t") %></div>
+          <p class="small text-body-secondary mb-1">Silo: <%= dashboard_number(stock[:silo], suffix: " t") %> · Piso: <%= dashboard_number(stock[:floor], suffix: " t") %></p>
+          <p class="small text-body-secondary mb-0"><%= stock[:count] %> turnos con inventario válido</p>
+        </div></div></div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="mb-4" aria-labelledby="vorne-summary-title">
+    <h2 id="vorne-summary-title" class="h4 fw-bold">Disponibilidad y confiabilidad</h2>
+    <p class="text-body-secondary">Vorne · resultados del Excel VentoHaver TPT para los turnos con reporte seleccionados.</p>
+    <div class="row row-cols-2 row-cols-md-3 g-3">
+      <% dashboard_vorne_kpis(@dashboard).each do |label, value, description| %>
+        <div class="col"><div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
+          <div class="small text-body-secondary mb-2"><%= label %></div>
+          <div class="h3 fw-bold mb-1"><%= value %></div>
+          <div class="small text-body-secondary"><%= description %></div>
+        </div></div></div>
+      <% end %>
+    </div>
+  </section>
 
   <details class="card border-0 bg-body-tertiary rounded-4 mb-4"><summary class="p-3 fw-semibold">Horarios, fuentes y cálculo de indicadores</summary><div class="px-3 pb-3 small">
-    <p>Producción: sacos Haver del último Reporte envasadora guardado por fecha y turno, incluidos reportes pendientes de envío. Producción por hora se expresa en Ton/h: sacos Haver × 0,025 ÷ horas Haver declaradas; si no hay horas, se muestra un guion. Los inventarios no se suman como producción.</p>
+    <p>Producción: último Reporte envasadora guardado por fecha y turno, incluidos reportes pendientes de envío. Ton/h usa 0,025 t por saco Haver o Ventomatic y 1,5 t por Bigbag, dividido por las horas de su equipo. Los promedios de horas incluyen ceros declarados y excluyen datos ausentes o inválidos. El tiempo total del turno corresponde al horario programado. Los stocks son promedios de inventarios, no producción.</p>
     <p>Lunes: TM 06:00–14:00, TT 14:00–22:00, TN 22:00–06:00. Martes y miércoles: TM 06:00–13:00, TT 13:00–22:00, TN 22:00–06:00. Jueves y viernes: TM 06:00–13:00, TT 13:00–21:00, TN 21:00–06:00. Sábado: solo TM 06:00–12:00. Domingo: sin programación. TN termina al día siguiente y pertenece a la fecha en que empieza. Los filtros por día usan la fecha del turno.</p>
     <p>Disponibilidad observada = tiempo registrado en marcha ÷ tiempo de operación registrado. Se consideran los eventos Correr, Parada planificada y Parada no planificada dentro del horario programado; No programada queda fuera de esa base. Las horas sin registros no se suponen operativas. La cobertura compara el tiempo observado con las horas programadas del turno.</p>
     <p>MTBF = horas operativas observadas ÷ paradas no planificadas. MTTR = minutos de parada no planificada ÷ número de paradas. Una parada que cruza turnos se cuenta una sola vez en el total consultado y su duración se reparte entre los turnos. La confiabilidad estima e^(−8/MTBF), suponiendo una tasa constante de fallas; no es una garantía de operación.</p>
@@ -118,8 +159,8 @@
   </div></div>
   <div class="card border-0 shadow-sm rounded-4"><div class="card-body p-4">
     <h2 class="h5 fw-bold">Detalle por turno</h2>
-    <p class="small text-body-secondary">Fuente: Reporte de envasadora · producción Haver, Vento y Bigbag, y horas Haver declaradas. Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
-    <div class="table-responsive"><table class="table table-striped align-middle small" id="envasadora-shift-detail"><thead><tr><th>Fecha</th><th>Día</th><th>Turno</th><th class="text-end">Prod. Haver (sacos)</th><th class="text-end">Prod. Vento (sacos)</th><th class="text-end">Prod. Bigbag (unid.)</th><th class="text-end">Horas Haver</th><th>Reporte</th></tr></thead><tbody>
+    <p class="small text-body-secondary">Fuente: Reporte de envasadora · producción Haver, Vento y Bigbag, y tiempos declarados por equipo. Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
+    <div class="table-responsive"><table class="table table-striped align-middle small" id="envasadora-shift-detail"><thead><tr><th>Fecha</th><th>Día</th><th>Turno</th><th class="text-end">Prod. Haver (sacos)</th><th class="text-end">Prod. Vento (sacos)</th><th class="text-end">Prod. Bigbag (unid.)</th><th class="text-end">Haver: producción / turno (h)</th><th class="text-end">Ventomatic: producción / turno (h)</th><th class="text-end">Bigbag: producción / turno (h)</th><th>Reporte</th></tr></thead><tbody>
       <% @detail_rows.each do |row| %>
         <tr>
           <td class="text-nowrap"><%= l row[:date] %></td>
@@ -128,11 +169,11 @@
           <% %w[prodhaver prodvento prodbb].each do |field| %>
             <td class="text-end"><%= dashboard_number(row[:report].value_for_analytics(field), precision: 0) %></td>
           <% end %>
-          <td class="text-end"><%= dashboard_number(row[:report].value_for_analytics("horas_haver")) %></td>
+          <% EnvasadoraReport::HOUR_FIELDS.each do |field| %><td class="text-end text-nowrap"><%= dashboard_number(row[:report].value_for_analytics(field)) %> / <%= dashboard_number(row[:planned_hours]) %></td><% end %>
           <td><%= link_to "Ver reporte", envasadora_report_path(row[:report]) %></td>
         </tr>
       <% end %>
-      <% if @detail_rows.empty? %><tr><td colspan="8">Sin turnos para mostrar.</td></tr><% end %>
+      <% if @detail_rows.empty? %><tr><td colspan="10">Sin turnos para mostrar.</td></tr><% end %>
     </tbody></table></div>
     <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
   </div></div>

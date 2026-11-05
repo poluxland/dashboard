@@ -173,6 +173,46 @@ class EnvasadoraDashboardTest < ActiveSupport::TestCase
     end
   end
 
+  test "machine summaries use each machines production hours and mass" do
+    report(production: 900)
+    latest = report(production: 100, hours: 2)
+    latest.update!(prodbb: 10, horas_bigbag: 2)
+    report(shift: "TT", production: 200, hours: 4).update!(prodbb: 20, horas_bigbag: 4)
+    machines = dashboard.machine_summaries.index_by { |machine| machine[:label] }
+    assert_equal 300, machines["Haver"][:total]
+    assert_in_delta 1.25, machines["Haver"][:tons_per_hour]
+    assert_equal 100, machines["Ventomatic"][:total]
+    assert_in_delta 1.25, machines["Ventomatic"][:tons_per_hour]
+    assert_equal 30, machines["Bigbag"][:total]
+    assert_in_delta 7.5, machines["Bigbag"][:tons_per_hour]
+    assert_in_delta 3, machines["Bigbag"][:average_hours]
+    assert_in_delta 7.5, machines["Bigbag"][:average_shift_hours]
+    assert_equal 2, machines["Haver"][:reported_shifts]
+    assert_equal 100, dashboard(shifts: [ "TM" ]).machine_summaries.first[:total]
+  end
+
+  test "stock averages use snapshots not summed stock and ignore duplicate reports" do
+    report.update!(extrsacos: 900)
+    first = report
+    first.update!(extrsacos: 10)
+    second = report(shift: "TT")
+    second.update!(extrsacos: 30)
+    stock = dashboard.stock_summaries.find { |value| value[:product] == "Extra" }
+    assert_equal 2, stock[:count]
+    assert_in_delta 20, stock[:floor]
+    assert_in_delta (first.inventory["Extra"][:total] + second.inventory["Extra"][:total]) / 2.0, stock[:total]
+  end
+
+  test "incomplete historic hours and stock stay missing rather than zero" do
+    record = report
+    record.update_columns(source_fingerprint: "dashboard-partial", source_data: { "present_fields" => [ "prodhaver", "horas_haver" ], "invalid_fields" => [ "horas_haver" ] })
+    result = dashboard
+    assert_nil result.machine_summaries.first[:tons_per_hour]
+    assert_nil result.machine_summaries.first[:average_hours]
+    assert_nil result.machine_summaries.last[:total]
+    assert result.stock_summaries.all? { |stock| stock[:total].nil? && stock[:count].zero? }
+  end
+
   test "rejects invalid dates and reversed periods" do
     assert_raises(EnvasadoraDashboard::InvalidFilter) { dashboard(from: "2026-02-30") }
     assert_raises(EnvasadoraDashboard::InvalidFilter) { dashboard(from: "2026-10-16", to: "2026-10-15") }

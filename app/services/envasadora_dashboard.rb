@@ -68,6 +68,41 @@ class EnvasadoraDashboard
   def production_only_count = @rows.count { |row| !row[:production].nil? && row[:observed_seconds].zero? }
   def tpt_only_count = @rows.count { |row| row[:production].nil? && row[:observed_seconds].positive? }
 
+  def machine_summaries
+    @machine_summaries ||= EnvasadoraReportPresenter::PRODUCTION.map do |label, quantity_field, hours_field, factor, *_rest|
+      values = @rows.map do |row|
+        { production: row[:report].value_for_analytics(quantity_field), hours: row[:report].value_for_analytics(hours_field), planned: row[:planned_hours] }
+      end
+      quantities = values.filter_map { |value| value[:production] }
+      timed = values.select { |value| !value[:hours].nil? }
+      total = quantities.any? ? quantities.sum : nil
+      hours = timed.sum { |value| value[:hours] }
+      incomplete = values.count { |value| value[:production].nil? || value[:hours].nil? || (value[:production].positive? && !value[:hours].positive?) }
+      {
+        label: label, unit: label == "Bigbag" ? "unidades" : "sacos", total: total,
+        tons_per_hour: incomplete.zero? ? divide(total && total * factor.to_d, hours) : nil,
+        average_hours: divide(hours, timed.size),
+        average_shift_hours: divide(timed.sum { |value| value[:planned] }, timed.size),
+        reported_shifts: quantities.size, timed_shifts: timed.size, incomplete_shifts: incomplete
+      }
+    end
+  end
+
+  def stock_summaries
+    @stock_summaries ||= begin
+      inventories = @rows.filter_map do |row|
+        report = row[:report]
+        report.inventory unless report.inventory_for_display.nil?
+      end
+      EnvasadoraReport::CEMENTS.map do |cement|
+        { product: cement, count: inventories.size,
+          total: divide(inventories.sum { |inventory| inventory.fetch(cement)[:total] }, inventories.size),
+          silo: divide(inventories.sum { |inventory| inventory.fetch(cement)[:silo] }, inventories.size),
+          floor: divide(inventories.sum { |inventory| inventory.fetch(cement)[:floor] }, inventories.size) }
+      end
+    end
+  end
+
   private
 
   def selected(input, allowed)
