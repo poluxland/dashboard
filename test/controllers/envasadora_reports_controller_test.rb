@@ -61,12 +61,14 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     get new_envasadora_report_path
     assert_response :success
     assert_select 'select[name="envasadora_report[silo19_cement]"] option[selected]', text: "Extra"
+    assert_select 'select[name="envasadora_report[silo20_cement]"] option[selected]', text: "Ultra"
     assert_difference "EnvasadoraReport.count" do
       assert_no_difference "ActionMailer::Base.deliveries.size" do
         post envasadora_reports_path, params: { envasadora_report: @attributes.merge(author_email: "forged@example.com", sent_at: Time.current) }
       end
     end
     report = EnvasadoraReport.last
+    assert_equal "Ultra", report.silo20_cement
     assert_equal "usuario@msindustrial.cl", report.author_email
     assert_nil report.sent_at
     follow_redirect!

@@ -17,11 +17,11 @@ class EnvasadoraReportsController < ApplicationController
   end
 
   def new
-    @report = EnvasadoraReport.new(blank_numeric_attributes.merge(date: Time.current.in_time_zone("America/Santiago").to_date))
+    @report = EnvasadoraReport.new(new_report_attributes.merge(date: Time.current.in_time_zone("America/Santiago").to_date))
   end
 
   def create
-    @report = EnvasadoraReport.new(blank_numeric_attributes.merge(params.require(:envasadora_report).permit(*EnvasadoraReport::INPUT_FIELDS).to_h))
+    @report = EnvasadoraReport.new(new_report_attributes.merge(params.require(:envasadora_report).permit(*EnvasadoraReport::INPUT_FIELDS).to_h))
     @report.author_email = current_user[:email]
     if @report.save
       redirect_to @report, notice: "Reporte guardado. Revisa los totales y envía el correo."
@@ -70,8 +70,8 @@ class EnvasadoraReportsController < ApplicationController
 
   private
 
-  def blank_numeric_attributes
-    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.index_with(nil)
+  def new_report_attributes
+    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.index_with(nil).merge("silo20_cement" => "Ultra")
   end
 
   def protect_historical_report

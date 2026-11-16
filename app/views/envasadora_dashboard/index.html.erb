@@ -3,7 +3,7 @@
   <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
     <div>
       <h1 class="h3 fw-bold mb-1">Productividad y detenciones</h1>
-      <p class="text-body-secondary mb-0">Envasadora PTM · Producción, stocks y desempeño Vorne</p>
+      <p class="text-body-secondary mb-0">Envasadora LCA · Producción, stocks y desempeño Vorne</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
       <%= link_to "Reportes de turno", envasadora_reports_path, class: "btn btn-outline-primary" %>
@@ -14,8 +14,9 @@
   <div class="card border-0 shadow-sm rounded-4 mb-4"><div class="card-body p-4">
     <%= form_with url: envasadora_dashboard_path, method: :get, data: { turbo: false } do |form| %>
       <div class="d-flex gap-2 flex-wrap mb-3" aria-label="Períodos rápidos">
-        <% { "7" => "Últimos 7 días", "30" => "Últimos 30 días", "month" => "Mes actual", "previous" => "Mes anterior", "all" => "Todo" }.each do |period, label| %>
-          <%= button_tag label, name: :period, value: period, class: "btn btn-sm btn-outline-primary" %>
+        <% EnvasadoraDashboard::PERIODS.each do |period, label| %>
+          <% selected = @dashboard.period == period %>
+          <%= button_tag label, name: :period, value: period, class: class_names("btn btn-sm", selected ? "btn-primary" : "btn-outline-primary"), aria: { current: selected } %>
         <% end %>
       </div>
       <details class="card border-0 bg-body-tertiary rounded-4 mb-3" id="envasadora-filters">
@@ -159,18 +160,37 @@
   </div></div>
   <div class="card border-0 shadow-sm rounded-4"><div class="card-body p-4">
     <h2 class="h5 fw-bold">Detalle por turno</h2>
-    <p class="small text-body-secondary">Fuente: Reporte de envasadora · producción Haver, Vento y Bigbag, y tiempos declarados por equipo. Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
-    <div class="table-responsive"><table class="table table-striped align-middle small" id="envasadora-shift-detail"><thead><tr><th>Fecha</th><th>Día</th><th>Turno</th><th class="text-end">Prod. Haver (sacos)</th><th class="text-end">Prod. Vento (sacos)</th><th class="text-end">Prod. Bigbag (unid.)</th><th class="text-end">Haver: producción / turno (h)</th><th class="text-end">Ventomatic: producción / turno (h)</th><th class="text-end">Bigbag: producción / turno (h)</th><th>Reporte</th></tr></thead><tbody>
+    <p class="small text-body-secondary">Entre paréntesis se indican las horas de producción / horas programadas del turno. Se muestran 60 turnos por página. Los gráficos y totales consideran todo el período seleccionado.</p>
+    <% machines = EnvasadoraReportPresenter::PRODUCTION %>
+    <div class="table-responsive"><table class="table table-striped table-sm align-middle small" id="envasadora-shift-detail">
+      <thead><tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Día</th>
+        <th scope="col">Turno</th>
+        <th scope="col" class="text-end">Prod. Haver (sacos)</th>
+        <th scope="col" class="text-end">Prod. Vento (sacos)</th>
+        <th scope="col" class="text-end">Prod. Bigbag (unid.)</th>
+        <% machines.each do |label, *_fields| %><th scope="col">Comentarios <%= label %></th><% end %>
+        <th scope="col">Reporte</th>
+      </tr></thead>
+      <tbody>
       <% @detail_rows.each do |row| %>
+        <% report = row[:report] %>
+        <% shift_hours = dashboard_number(row[:planned_hours], suffix: " h") %>
         <tr>
           <td class="text-nowrap"><%= l row[:date] %></td>
           <td><%= EnvasadoraDashboard::DAYS[row[:date].cwday - 1] %></td>
           <td><%= row[:shift] %></td>
-          <% %w[prodhaver prodvento prodbb].each do |field| %>
-            <td class="text-end"><%= dashboard_number(row[:report].value_for_analytics(field), precision: 0) %></td>
+          <% machines.each do |_label, quantity, hours_field| %>
+            <td class="text-end">
+              <%= dashboard_number(report.value_for_analytics(quantity), precision: 0) %>
+              <span class="text-body-secondary text-nowrap">(<%= dashboard_number(report.value_for_analytics(hours_field), suffix: " h") %> / <%= shift_hours %>)</span>
+            </td>
           <% end %>
-          <% EnvasadoraReport::HOUR_FIELDS.each do |field| %><td class="text-end text-nowrap"><%= dashboard_number(row[:report].value_for_analytics(field)) %> / <%= dashboard_number(row[:planned_hours]) %></td><% end %>
-          <td><%= link_to "Ver reporte", envasadora_report_path(row[:report]) %></td>
+          <% machines.each do |_label, *_fields, comment| %>
+            <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= report.value_for_analytics(comment).presence || "—" %></td>
+          <% end %>
+          <td><%= link_to "Ver reporte", envasadora_report_path(report) %></td>
         </tr>
       <% end %>
       <% if @detail_rows.empty? %><tr><td colspan="10">Sin turnos para mostrar.</td></tr><% end %>

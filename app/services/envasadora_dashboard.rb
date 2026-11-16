@@ -9,8 +9,9 @@ class EnvasadoraDashboard
   SHIFTS = %w[TN TM TT].freeze
   DAYS = %w[Lun Mar Mié Jue Vie Sáb Dom].freeze
   PARETO_MODES = { "reason" => "Razón TPT", "production_state" => "Estado de producción", "impact" => "Impacto" }.freeze
+  PERIODS = { "7" => "Últimos 7 días", "30" => "Últimos 30 días", "month" => "Mes actual", "previous" => "Mes anterior", "all" => "Todo" }.freeze
 
-  attr_reader :from, :to, :shifts, :weekdays, :source, :pareto_mode, :limit, :exclude_unscheduled, :include_missing_reason,
+  attr_reader :from, :to, :period, :shifts, :weekdays, :source, :pareto_mode, :limit, :exclude_unscheduled, :include_missing_reason,
               :rows, :pareto, :charts, :production_title, :negative_count, :duplicate_report_count,
               :available_from, :available_to
 
@@ -31,7 +32,9 @@ class EnvasadoraDashboard
     last = @available_to || Time.current.in_time_zone("America/Santiago").to_date
     @from = parse_date(@params["from"], last - 29)
     @to = parse_date(@params["to"], last)
-    apply_period(@params["period"], last)
+    @period = @params["period"] if PERIODS.key?(@params["period"])
+    @period ||= "30" if @params["from"].blank? && @params["to"].blank?
+    apply_period(@period, last)
     raise InvalidFilter, "La fecha Desde debe ser anterior o igual a Hasta." if @from > @to
     raise InvalidFilter, "Selecciona un período de hasta 10 años." if (@to - @from) > 3660
   end

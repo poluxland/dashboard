@@ -25,7 +25,7 @@ ingresados se conservan al corregir errores; editar un reporte mantiene sus dato
 - Silos 19–22: `(30 - promedio(medida1, medida2)) × 100` toneladas.
 - Silo 27: `(30 - medida) × 460` toneladas.
 - Silo 28: `(20 - medida) × 100` toneladas.
-- Cementos iniciales: 19 Extra, 20 S4200, 21 Extra, 22 Ultra, 27 Especial, 28 Ultra.
+- Cementos iniciales: 19 Extra, 20 Ultra, 21 Extra, 22 Ultra, 27 Especial, 28 Ultra.
 - El inventario agrupa por el cemento guardado en cada silo. Cambiarlo transfiere
   las toneladas al producto seleccionado, sin cambiar el total físico.
 - Stock de piso: se mantienen los componentes de ERP; Bigbag Plus también figura
