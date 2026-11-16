@@ -59,6 +59,7 @@ class EnvasadoraDashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "#envasadora-shift-detail tbody td:nth-child(4)", text: /1\.234\s+\(4,7 h \/ 9 h\)/
     assert_select "#envasadora-shift-detail tbody td:nth-child(5)", text: /9\.999\s+\(2 h \/ 9 h\)/
     assert_select "#envasadora-shift-detail tbody td:nth-child(6)", text: /77\s+\(1 h \/ 9 h\)/
+    assert_select "#envasadora-shift-detail tbody td > span.d-block", count: 3
     assert_select "#envasadora-shift-detail tbody td:nth-child(7)", text: "Ajuste de <sensor>"
     assert_select "#envasadora-shift-detail tbody td:nth-child(8)", text: "Cambio de formato"
     assert_select "#envasadora-shift-detail tbody td:nth-child(9)", text: "Limpieza de tolva"

@@ -184,7 +184,7 @@
           <% machines.each do |_label, quantity, hours_field| %>
             <td class="text-end">
               <%= dashboard_number(report.value_for_analytics(quantity), precision: 0) %>
-              <span class="text-body-secondary text-nowrap">(<%= dashboard_number(report.value_for_analytics(hours_field), suffix: " h") %> / <%= shift_hours %>)</span>
+              <span class="d-block text-body-secondary text-nowrap">(<%= dashboard_number(report.value_for_analytics(hours_field), suffix: " h") %> / <%= shift_hours %>)</span>
             </td>
           <% end %>
           <% machines.each do |_label, *_fields, comment| %>
