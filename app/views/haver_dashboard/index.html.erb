@@ -14,7 +14,7 @@
   <p class="alert alert-warning" hidden data-haver-dashboard-target="error">No se pudieron cargar los gráficos. Puedes consultar los valores en la tabla.</p>
   <% [
     ["Producción y rendimiento", "production", [["Producción", :tons, " t"], ["Rendimiento real", :rate, " ton/h"], ["Rendimiento / ideal", :performance, "%"]]],
-    ["Disponibilidad, confiabilidad y OEE", "indicators", [["Disponibilidad · fallas sumadas", :availability_plus, "%"], ["Disponibilidad · fallas restadas", :availability_minus, "%"], ["Confiabilidad", :reliability, "%"], ["OEE · fallas sumadas", :oee, "%"]]],
+    ["Disponibilidad, confiabilidad y OEE", "indicators", [["Disponibilidad", :availability, "%"], ["Confiabilidad", :reliability, "%"], ["OEE", :oee, "%"]]],
     ["Sacos rotos Haver", "broken", [["Sacos rotos", :broken, "%"], ["Calidad · sacos buenos", :quality, "%"]]]
   ].each do |title, target, metrics| %>
     <section class="row g-3 mb-4">
@@ -27,8 +27,8 @@
   <div class="card card-body mb-4">
     <h2 class="h5">Detalle diario</h2>
     <div class="table-responsive"><table class="table table-sm">
-      <thead><tr><th>Fecha</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad + fallas %</th><th>Disponibilidad − fallas %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th></tr></thead>
-      <tbody><% @report.days.each do |day| %><tr><td class="text-nowrap"><%= l day[:date] %></td><% %i[tons rate performance availability_plus availability_minus reliability quality oee broken].each do |key| %><td><%= dashboard_number(day[key]) %></td><% end %></tr><% end %></tbody>
+      <thead><tr><th>Fecha</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th></tr></thead>
+      <tbody><% @report.days.each do |day| %><tr><td class="text-nowrap"><%= l day[:date] %></td><% %i[tons rate performance availability reliability quality oee broken].each do |key| %><td><%= dashboard_number(day[key]) %></td><% end %></tr><% end %></tbody>
     </table></div>
   </div>
   <details class="card card-body">
@@ -37,8 +37,8 @@
       <li>Producción en toneladas = sacos Haver × 0,025. Rendimiento real = toneladas / horas Haver declaradas. Rendimiento % = rendimiento real / ideal × 100. Ideal Haver por defecto, 50 ton/h.</li>
       <li>Sacos rotos % = rotos / producción total × 100. Calidad % = 100 − sacos rotos %. Un campo vacío significa sin informar.</li>
       <li>Horas disponibles = tiempo registrado en Vorne dentro del horario del turno, excluyendo No programada y Missing Reason. Mantenimiento = parada planificada (Intervención o Revisión en el archivo actual). Fallas = parada no planificada con causa informada.</li>
-      <li>Disponibilidad con fallas sumadas = (disponibles − mantenimiento + fallas) / disponibles × 100. Disponibilidad con fallas restadas = (disponibles − mantenimiento − fallas) / disponibles × 100.</li>
-      <li>Confiabilidad = horas de operación / (horas de operación + horas de falla) × 100. OEE = disponibilidad con fallas sumadas × rendimiento × calidad, usando proporciones. La fórmula con fallas sumadas puede superar el 100%.</li>
+      <li>Disponibilidad = (disponibles − mantenimiento − fallas) / disponibles × 100.</li>
+      <li>Confiabilidad = horas de operación / (horas de operación + horas de falla) × 100. OEE = disponibilidad × rendimiento × calidad, usando proporciones.</li>
       <li>Se usa el último reporte por fecha y turno. Los días sin reporte y los indicadores con datos incompletos aparecen con un guion. Los tiempos de eventos superpuestos se cuentan una sola vez. Los períodos con cobertura parcial de Vorne representan únicamente el tiempo registrado.</li>
     </ul>
     <p>Mes consultado, <%= @report.monthly[:reports] %> reportes. Roturas pendientes en <%= @report.monthly[:missing_broken] %> reportes. Turnos programados sin tiempos disponibles de Vorne, <%= @report.monthly[:missing_vorne] %>.</p>

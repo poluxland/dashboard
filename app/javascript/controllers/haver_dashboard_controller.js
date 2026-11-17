@@ -22,8 +22,7 @@ export default class extends EnvasadoraDashboardController {
       rate: { position: "right", beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: "Rendimiento %" } }
     })
     this.addChart(this.indicatorsTarget, labels, [
-      series("Disponibilidad + fallas", "availability_plus", "#2563eb"),
-      series("Disponibilidad − fallas", "availability_minus", "#64748b", { borderDash: [5, 4] }),
+      series("Disponibilidad", "availability", "#2563eb"),
       series("Confiabilidad", "reliability", "#16a34a"),
       series("OEE", "oee", "#d97706")
     ], { y: { beginAtZero: true, title: { display: true, text: "%" } } })

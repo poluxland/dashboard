@@ -46,12 +46,11 @@ class HaverDashboard
     failures = rows.sum { |row| row[:failure_seconds] }
     operating = rows.sum { |row| row[:operating_seconds] }
     complete_vorne = rows.any? && rows.all? { |row| row[:available_seconds].positive? || row[:planned_hours].zero? }
-    availability_plus = ratio(available - maintenance + failures, complete_vorne ? available : nil)&.*(100)
-    availability_minus = ratio(available - maintenance - failures, complete_vorne ? available : nil)&.*(100)
+    availability = ratio(available - maintenance - failures, complete_vorne ? available : nil)&.*(100)
     reliability = ratio(operating, complete_vorne ? operating + failures : nil)&.*(100)
-    oee = availability_plus && performance && quality ? availability_plus * performance * quality / 10_000 : nil
+    oee = availability && performance && quality ? availability * performance * quality / 10_000 : nil
     { tons: tons, rate: rate, performance: performance, broken: broken_rate, quality: quality,
-      availability_plus: availability_plus, availability_minus: availability_minus, reliability: reliability, oee: oee,
+      availability: availability, reliability: reliability, oee: oee,
       available_hours: available / 3600, maintenance_hours: maintenance / 3600, failure_hours: failures / 3600,
       reports: rows.size, missing_broken: broken.count(nil), missing_vorne: rows.count { |row| row[:planned_hours].positive? && row[:available_seconds].zero? } }
   end

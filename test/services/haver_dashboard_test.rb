@@ -15,23 +15,22 @@ class HaverDashboardTest < ActiveSupport::TestCase
     HaverDashboard.new(week: @date.iso8601, month: "2026-11", ideal: ideal)
   end
 
-  test "calculates both availability formulas and OEE using added failures" do
+  test "subtracts maintenance and failures for availability and OEE" do
     summary = dashboard.monthly
     assert_in_delta 200, summary[:tons]
     assert_in_delta 50, summary[:rate]
     assert_in_delta 100, summary[:performance]
-    assert_in_delta 100, summary[:availability_plus]
-    assert_in_delta 100 * 4.0 / 6, summary[:availability_minus]
+    assert_in_delta 100 * 4.0 / 6, summary[:availability]
     assert_in_delta 80, summary[:reliability]
     assert_in_delta 1, summary[:broken]
     assert_in_delta 99, summary[:quality]
-    assert_in_delta 99, summary[:oee]
+    assert_in_delta 66, summary[:oee]
     assert_equal 7, dashboard.days.size
     assert_nil dashboard.days.first[:tons]
   end
 
   test "uses confirmed ideal by default and preserves unknown broken bags" do
-    assert_in_delta 99, dashboard(ideal: nil).monthly[:oee]
+    assert_in_delta 66, dashboard(ideal: nil).monthly[:oee]
     assert_in_delta 100, dashboard(ideal: nil).monthly[:performance]
     @report.update!(sacos_rotos_haver: nil)
     assert_nil dashboard.monthly[:quality]
@@ -46,7 +45,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
     copy.save!
     assert_in_delta 2, dashboard.monthly[:broken]
     assert_in_delta 50, dashboard.monthly[:rate]
-    assert_nil dashboard.monthly[:availability_plus]
+    assert_nil dashboard.monthly[:availability]
   end
 
   test "rejects invalid filters and negative or fractional bag counts" do
