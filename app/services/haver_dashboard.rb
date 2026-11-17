@@ -16,8 +16,8 @@ class HaverDashboard
     @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver").call
     producing_rows = @dashboard.rows.select { |row| row[:production]&.positive? }
     rows_by_date = producing_rows.group_by { |row| row[:date] }
-    @days = (@dashboard.from..@dashboard.to).map do |date|
-      summarize(rows_by_date.fetch(date, [])).merge(date: date)
+    @days = rows_by_date.keys.sort.map do |date|
+      summarize(rows_by_date.fetch(date)).merge(date: date)
     end
     @shifts = producing_rows.map do |row|
       summarize([ row ]).merge(date: row[:date], shift: row[:shift],

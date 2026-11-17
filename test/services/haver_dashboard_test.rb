@@ -25,8 +25,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_in_delta 1, summary[:broken]
     assert_in_delta 99, summary[:quality]
     assert_in_delta 66, summary[:oee]
-    assert_equal 7, dashboard.days.size
-    assert_nil dashboard.days.first[:tons]
+    assert_equal [ @date ], dashboard.days.map { |day| day[:date] }
   end
 
   test "uses confirmed ideal by default and preserves unknown broken bags" do
@@ -48,7 +47,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
     result = dashboard
     assert_equal 1, result.shifts.size
     assert_equal @date, result.shifts.sole[:date]
-    assert_nil result.days.find { |day| day[:date] == idle.date }[:tons]
+    assert_equal [ @date ], result.days.map { |day| day[:date] }
     assert_equal 1, result.totals[:reports]
     assert_in_delta 50, result.totals[:rate]
     assert_in_delta 1, result.totals[:broken]
