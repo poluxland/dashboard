@@ -62,6 +62,7 @@ class EnvasadoraReportPresenter
       combined_table,
       dispatch_table,
       production_table,
+      table("Sacos y bigbags rotos", [ "Equipo", "Unidades rotas" ], EnvasadoraReport::BROKEN_BAG_FIELDS.map { |field, label| [ label, @report.public_send(field).nil? ? "Sin informar" : number(@report.public_send(field)) ] }),
       hoppers_table,
       operative_streets_table,
       streets_table,

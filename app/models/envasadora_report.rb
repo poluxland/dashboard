@@ -2,6 +2,7 @@ class EnvasadoraReport < ApplicationRecord
   CEMENTS = [ "Especial", "Extra", "Ultra", "S3300", "S4200", "Plus", "S3300 (AR)", "HPM", "Extramix" ].freeze
   SHIFTS = { "TM" => "Turno Mañana", "TT" => "Turno Tarde", "TN" => "Turno Noche" }.freeze
   HOUR_FIELDS = %w[horas_haver horas_vento horas_bigbag].freeze
+  BROKEN_BAG_FIELDS = { "sacos_rotos_haver" => "Sacos rotos Haver", "sacos_rotos_vento" => "Sacos rotos Ventomatic", "bigbags_rotos" => "Bigbags rotos" }.freeze
   GROUPS = JSON.parse(Rails.root.join("config/envasadora_fields.json").read).freeze
   FIELDS = GROUPS.values.flatten.freeze
   SILOS = {
@@ -32,7 +33,7 @@ class EnvasadoraReport < ApplicationRecord
   RECIPIENTS = JSON.parse(Rails.root.join("config/envasadora_recipients.json").read).freeze
   REQUIRED_NUMERIC_FIELDS = (FIELDS.select { |field| field["kind"] == "number" }.map { |field| field["name"] } +
                              SILOS.values.flat_map { |silo| silo[:readings] }).freeze
-  INPUT_FIELDS = (FIELDS.map { |f| f.fetch("name") } + SILOS.flat_map { |id, s| s[:readings] + [ "silo#{id}_cement" ] } + %w[date turno observations]).freeze
+  INPUT_FIELDS = (FIELDS.map { |f| f.fetch("name") } + SILOS.flat_map { |id, s| s[:readings] + [ "silo#{id}_cement" ] } + BROKEN_BAG_FIELDS.keys + %w[date turno observations]).freeze
 
   DECIMAL_FIELDS = (SILOS.values.flat_map { |silo| silo[:readings] } +
     GROUPS.values_at("Stock", "Despacho").flatten.map { |field| field["name"] } +
@@ -51,6 +52,7 @@ class EnvasadoraReport < ApplicationRecord
 
   # Unit counts remain whole; measurements, hours and tonnages may have decimals.
   validate :whole_number_inputs
+  validates(*BROKEN_BAG_FIELDS.keys, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true)
 
   validates :date, :author_email, presence: true
   validates :turno, inclusion: { in: SHIFTS.keys }

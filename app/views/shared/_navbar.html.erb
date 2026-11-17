@@ -45,7 +45,7 @@
         <!-- Menú Informes -->
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if controller_name == 'envasadora_dashboard' || (%w[mantenciones ots].include?(controller_name) && action_name == 'graficos') %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[envasadora_dashboard haver_dashboard].include?(controller_name) || (%w[mantenciones ots].include?(controller_name) && action_name == 'graficos') %>"
             type="button"
             id="informesDropdown"
             data-bs-toggle="dropdown"
@@ -54,6 +54,7 @@
             Informes
           </button>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="informesDropdown">
+            <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Producción envasadora", envasadora_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Mantenciones PTM", graficos_mantenciones_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "OTs", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %></li>

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   end
   get "informes/compartidos/:token", to: "public_work_reports#show", as: :public_work_report
   get "reporte-envasadora/productividad", to: "envasadora_dashboard#index", as: :envasadora_dashboard
+  get "informes/haver", to: "haver_dashboard#index", as: :haver_dashboard
   resources :tpt_imports, path: "ventohaver-tpt", only: [ :index, :create, :show ]
   get "/login", to: "sessions#new", as: :login
   get "/auth/google_oauth2/callback", to: "sessions#create"

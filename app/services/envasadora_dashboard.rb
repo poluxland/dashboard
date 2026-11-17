@@ -246,6 +246,10 @@ class EnvasadoraDashboard
       row[:observed_seconds] = union_seconds(row[:observed])
       scheduled = union_seconds(within_program(row[:scheduled], row))
       stopped = union_seconds(within_program(row[:stopped], row))
+      row[:available_seconds] = scheduled
+      row[:operating_seconds] = [ scheduled - stopped, 0 ].max
+      row[:failure_seconds] = union_seconds(row[:failures])
+      row[:maintenance_seconds] = [ stopped - row[:failure_seconds], 0 ].max
       @scheduled_seconds += scheduled
       @operating_seconds += [ scheduled - stopped, 0 ].max
       @failure_seconds += union_seconds(row[:failures])

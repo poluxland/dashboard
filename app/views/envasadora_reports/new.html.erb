@@ -24,6 +24,18 @@
       </div><% end %></div>
     </div></section>
   <% end %>
+  <section class="card mb-4"><div class="card-body">
+    <h2 class="h4">Sacos y bigbags rotos</h2>
+    <p class="text-muted">Ingresa 0 si no hubo roturas. Deja en blanco si el dato aún no está disponible.</p>
+    <div class="row">
+      <% EnvasadoraReport::BROKEN_BAG_FIELDS.each do |field, label| %>
+        <div class="col-md-4 mb-3">
+          <%= f.label field, label, class: "form-label" %>
+          <%= f.number_field field, min: 0, step: 1, class: "form-control" %>
+        </div>
+      <% end %>
+    </div>
+  </div></section>
   <div class="mb-3"><%= f.label :observations, "Observaciones", class: "form-label" %><%= f.text_area :observations, rows: 3, maxlength: 10000, class: "form-control" %></div>
   <%= f.submit "Guardar y revisar reporte", class: "btn btn-primary mb-4" %>
 <% end %>
