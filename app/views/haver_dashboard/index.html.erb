@@ -1,5 +1,5 @@
 <% content_for :title, "Informe Haver · LCA" %>
-<div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-pareto-value="<%= @report.dashboard.charts[:pareto].to_json %>" data-haver-dashboard-days-value="<%= @report.days.map { |day| day.slice(:date, :tons, :performance, :availability, :reliability, :oee, :broken) }.to_json %>">
+<div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-pareto-value="<%= @report.dashboard.charts[:pareto].to_json %>" data-haver-dashboard-days-value="<%= @report.days.map { |day| day.slice(:date, :tons, :rate, :availability, :reliability, :oee, :broken) }.to_json %>">
   <h1 class="h3 fw-bold">Informe Haver · LCA</h1>
   <p class="text-body-secondary">Datos del reporte de envasadora y de Vorne. Se consideran únicamente turnos con producción Haver mayor que cero.</p>
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>
@@ -16,7 +16,7 @@
   <p class="small text-body-secondary">Consulta del <%= l @report.dashboard.from %> al <%= l @report.dashboard.to %>. Los gráficos y resúmenes consideran el mismo período. Los períodos rápidos se basan en la última fecha con datos.</p>
   <p class="alert alert-warning" hidden data-haver-dashboard-target="error">No se pudieron cargar los gráficos. Puedes consultar los valores en la tabla.</p>
   <% [
-    ["Producción y rendimiento", "production", [["Producción", :tons, " t"], ["Rendimiento real", :rate, " ton/h"], ["Rendimiento / ideal", :performance, "%"]]],
+    ["Producción y rendimiento", "production", [["Producción", :tons, " t"], ["Rendimiento real", :rate, " ton/h"], ["Efectividad", :performance, "%"]]],
     ["Disponibilidad, confiabilidad y OEE", "indicators", [["Disponibilidad", :availability, "%"], ["Confiabilidad", :reliability, "%"], ["OEE", :oee, "%"]]],
     ["Sacos rotos Haver", "broken", [["Sacos rotos", :broken, "%"], ["Calidad · sacos buenos", :quality, "%"]]]
   ].each do |title, target, metrics| %>
@@ -48,9 +48,9 @@
       </table></div>
     </details>
   </section>
-  <div class="card card-body mb-4">
-    <h2 class="h5">Detalle por turno</h2>
-    <div class="table-responsive"><table class="table table-sm">
+  <details class="card card-body mb-4" id="haver-shift-detail">
+    <summary class="h5 mb-0">Detalle por turno</summary>
+    <div class="table-responsive mt-3"><table class="table table-sm">
       <thead><tr><th>Fecha</th><th>Turno</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th><th>Comentarios Haver</th></tr></thead>
       <tbody>
         <% @report.shifts.each do |row| %>
@@ -66,7 +66,7 @@
         <% if @report.shifts.empty? %><tr><td colspan="11">Sin turnos con producción Haver en este período.</td></tr><% end %>
       </tbody>
     </table></div>
-  </div>
+  </details>
   <details class="card card-body">
     <summary class="fw-semibold">Fuentes, fórmulas y datos pendientes</summary>
     <ul class="mt-3">

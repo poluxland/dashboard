@@ -16,10 +16,10 @@ export default class extends EnvasadoraDashboardController {
     })
     this.addChart(this.productionTarget, labels, [
       series("Producción (t)", "tons", "#93c5fd", { type: "bar", yAxisID: "tons" }),
-      series("Rendimiento (%)", "performance", "#2563eb", { type: "line", yAxisID: "rate" })
+      series("Rendimiento (ton/h)", "rate", "#2563eb", { type: "line", yAxisID: "rate" })
     ], {
       tons: { beginAtZero: true, title: { display: true, text: "Toneladas" } },
-      rate: { position: "right", beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: "Rendimiento %" } }
+      rate: { position: "right", beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: "Rendimiento (ton/h)" } }
     })
     this.addChart(this.indicatorsTarget, labels, [
       series("Disponibilidad", "availability", "#2563eb"),
