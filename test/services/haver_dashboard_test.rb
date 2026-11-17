@@ -37,6 +37,18 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_nil dashboard.totals[:oee]
   end
 
+  test "uses scheduled shift hours for availability and supervisor hours for reliability" do
+    TptEvent.where(impact: "Parada planificada").delete_all
+    TptEvent.find_by!(impact: "Correr").update!(duration_seconds: 3600)
+    summary = dashboard.totals
+    assert_in_delta 6, summary[:available_hours]
+    assert_in_delta 100 * 5.0 / 6, summary[:availability]
+    assert_in_delta 80, summary[:reliability]
+    @report.update!(horas_haver: 3)
+    assert_in_delta 75, dashboard.totals[:reliability]
+    assert_in_delta 100 * 5.0 / 6, dashboard.totals[:availability]
+  end
+
   test "excludes shifts without Haver production from table charts and totals" do
     idle = @report.dup
     idle.assign_attributes(date: @date - 1, prodhaver: 0, horas_haver: 2, sacos_rotos_haver: nil)

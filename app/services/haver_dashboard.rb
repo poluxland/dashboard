@@ -45,20 +45,19 @@ class HaverDashboard
     performance = ratio(rate, @ideal)&.*(100)
     broken_rate = ratio(broken.any? && broken.none?(&:nil?) ? broken.sum : nil, productions.none?(&:nil?) ? productions.sum : nil)&.*(100)
     quality = broken_rate && 100 - broken_rate
-    available = rows.sum { |row| row[:available_seconds] }
+    available = rows.sum { |row| row[:planned_hours] } * 3600
     maintenance = rows.sum { |row| row[:maintenance_seconds] }
     failures = rows.sum { |row| row[:failure_seconds] }
-    operating = rows.sum { |row| row[:operating_seconds] }
-    complete_vorne = rows.any? && rows.all? { |row| row[:available_seconds].positive? || row[:planned_hours].zero? }
-    availability = ratio(available - maintenance - failures, complete_vorne ? available : nil)&.*(100)
+    complete_vorne = rows.any? && rows.all? { |row| row[:available_seconds].positive? && row[:planned_hours].positive? }
     missing_vorne = rows.select { |row| row[:available_seconds].zero? }
     estimated_rows = missing_vorne.select { |row| row[:hours]&.positive? }
     estimated_operation = estimated_rows.sum { |row| row[:hours] } * 3600
     estimated_failures = estimated_operation * ESTIMATED_FAILURE_RATE
-    reliability_operation = operating + estimated_operation
+    reliability_operation = valid_hours ? hours.sum * 3600 : nil
     reliability_failures = failures + estimated_failures
-    complete_reliability = rows.any? && missing_vorne.size == estimated_rows.size
+    complete_reliability = valid_hours && missing_vorne.size == estimated_rows.size
     reliability = ratio(reliability_operation, complete_reliability ? reliability_operation + reliability_failures : nil)&.*(100)
+    availability = ratio(available - maintenance - reliability_failures, complete_vorne ? available : nil)&.*(100)
     oee = availability && performance && quality ? availability * performance * quality / 10_000 : nil
     { tons: tons, rate: rate, performance: performance, broken: broken_rate, quality: quality,
       availability: availability, reliability: reliability, oee: oee,
