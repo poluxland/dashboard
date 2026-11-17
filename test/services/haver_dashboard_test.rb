@@ -6,7 +6,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
     measurements = EnvasadoraReport::SILOS.values.flat_map { |silo| silo[:readings] }.index_with(10)
     @report = EnvasadoraReport.create!(measurements.merge(date: @date, turno: "TM", author_email: "test@msindustrial.cl", prodhaver: 8000, horas_haver: 4, sacos_rotos_haver: 80))
     imported = TptImport.create!(filename: "haver.xlsx", author_email: "test@msindustrial.cl")
-    [[6, 4, "Correr", "Running Normally"], [10, 1, "Parada planificada", "Intervención o Revisión"], [11, 1, "Parada no planificada", "Cintas Haver"]].each do |hour, duration, impact, reason|
+    [ [ 6, 4, "Correr", "Running Normally" ], [ 10, 1, "Parada planificada", "Intervención o Revisión" ], [ 11, 1, "Parada no planificada", "Cintas Haver" ] ].each do |hour, duration, impact, reason|
       imported.tpt_events.create!(started_at: Time.utc(2026, 11, 14, hour), duration_seconds: duration * 3600, impact: impact, reason: reason, production_state: "Estado", source_row: hour, source_fingerprint: SecureRandom.hex)
     end
   end

@@ -2,7 +2,7 @@ source "https://rubygems.org"
 ruby "3.4.12"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.0", ">= 8.1.4"
+gem "rails", "~> 8.1.0", ">= 8.1.4.1"
 gem "rails-i18n"
 
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
@@ -10,7 +10,7 @@ gem "propshaft"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.6", ">= 1.6.2"
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", "~> 7.2", ">= 7.2.1"
+gem "puma", "~> 7.2", ">= 7.2.2"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
