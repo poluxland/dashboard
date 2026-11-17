@@ -1,7 +1,7 @@
 <% content_for :title, "Informe Haver · LCA" %>
-<div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-days-value="<%= @report.days.to_json %>">
+<div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-days-value="<%= @report.days.map { |day| day.slice(:date, :tons, :performance, :availability, :reliability, :oee, :broken) }.to_json %>">
   <h1 class="h3 fw-bold">Informe Haver · LCA</h1>
-  <p class="text-body-secondary">Producción del reporte de envasadora y tiempos registrados en Vorne. Se consideran únicamente turnos con producción Haver mayor que cero.</p>
+  <p class="text-body-secondary">Datos del reporte de envasadora y de Vorne. Se consideran únicamente turnos con producción Haver mayor que cero.</p>
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>
     <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Períodos rápidos">
       <% EnvasadoraDashboard::PERIODS.each do |period, label| %>
@@ -14,9 +14,6 @@
     </div>
   <% end %>
   <p class="small text-body-secondary">Consulta del <%= l @report.dashboard.from %> al <%= l @report.dashboard.to %>. Los gráficos y resúmenes consideran el mismo período. Los períodos rápidos se basan en la última fecha con datos.</p>
-  <% if @report.totals[:estimated_reliability_count].positive? %>
-    <p class="alert alert-info">La confiabilidad incluye estimaciones en <%= @report.totals[:estimated_reliability_count] %> turnos sin tiempos utilizables de Vorne. Se estiman las fallas como el 15% de las horas Haver declaradas por el supervisor, equivalentes a <%= dashboard_number(@report.totals[:estimated_failure_hours]) %> h de fallas estimadas en este período.</p>
-  <% end %>
   <p class="alert alert-warning" hidden data-haver-dashboard-target="error">No se pudieron cargar los gráficos. Puedes consultar los valores en la tabla.</p>
   <% [
     ["Producción y rendimiento", "production", [["Producción", :tons, " t"], ["Rendimiento real", :rate, " ton/h"], ["Rendimiento / ideal", :performance, "%"]]],
@@ -29,7 +26,6 @@
         <% metrics.each do |label, key, unit| %>
           <dt class="small fw-normal mt-3"><%= label %></dt>
           <dd class="h4"><%= dashboard_number(@report.totals[key], suffix: unit) %>
-            <% if key == :reliability && @report.totals[:estimated_reliability_count].positive? %><span class="d-block small fw-normal">Incluye estimaciones</span><% end %>
           </dd>
         <% end %>
       </dl></div></div>
@@ -45,7 +41,7 @@
             <td class="text-nowrap"><%= l row[:date] %></td>
             <td><%= row[:shift] %></td>
             <% %i[tons rate performance availability reliability quality oee broken].each do |key| %>
-              <td><%= dashboard_number(row[key]) %><% if key == :reliability && row[:estimated_reliability_count].positive? %><span class="d-block small text-body-secondary">Estimado</span><% end %></td>
+              <td><%= dashboard_number(row[key]) %></td>
             <% end %>
             <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= row[:comment].presence || "—" %></td>
           </tr>
@@ -62,7 +58,6 @@
       <li>Horas disponibles = tiempo registrado en Vorne dentro del horario del turno, excluyendo No programada y Missing Reason. Mantenimiento = parada planificada (Intervención o Revisión en el archivo actual). Fallas = parada no planificada con causa informada.</li>
       <li>Disponibilidad = (disponibles − mantenimiento − fallas) / disponibles × 100.</li>
       <li>Confiabilidad = horas de operación / (horas de operación + horas de falla) × 100. OEE = disponibilidad × rendimiento × calidad, usando proporciones.</li>
-      <li>Cuando un turno con producción carece de tiempos utilizables de Vorne, la confiabilidad usa las horas Haver declaradas como operación y estima fallas = operación × 0,15. La estimación equivale a una confiabilidad del 86,96% por turno. Vorne tiene prioridad al incorporar datos utilizables. Disponibilidad y OEE requieren sus datos de tiempos y calidad.</li>
       <li>Se usa el último reporte por fecha y turno. Los días sin reporte y los indicadores con datos incompletos aparecen con un guion. Los tiempos de eventos superpuestos se cuentan una sola vez. Los períodos con cobertura parcial de Vorne representan únicamente el tiempo registrado.</li>
     </ul>
     <p>Período consultado, <%= @report.totals[:reports] %> reportes. Roturas pendientes en <%= @report.totals[:missing_broken] %> reportes. Turnos programados sin tiempos disponibles de Vorne, <%= @report.totals[:missing_vorne] %>.</p>

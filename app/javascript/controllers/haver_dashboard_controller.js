@@ -23,11 +23,7 @@ export default class extends EnvasadoraDashboardController {
     })
     this.addChart(this.indicatorsTarget, labels, [
       series("Disponibilidad", "availability", "#2563eb"),
-      series("Confiabilidad", "reliability", "#16a34a", {
-        estimatedCounts: days.map(day => day.estimated_reliability_count),
-        pointStyle: days.map(day => day.estimated_reliability_count > 0 ? "triangle" : "circle"),
-        pointRadius: days.map(day => day.estimated_reliability_count > 0 ? 5 : 3)
-      }),
+      series("Confiabilidad", "reliability", "#16a34a"),
       series("OEE", "oee", "#d97706")
     ], { y: { beginAtZero: true, title: { display: true, text: "%" } } })
     this.addChart(this.brokenTarget, labels, [series("Sacos rotos", "broken", "#dc3545")], {
@@ -40,10 +36,7 @@ export default class extends EnvasadoraDashboardController {
       type: "line", data: { labels, datasets },
       options: { responsive: true, maintainAspectRatio: false, scales,
         interaction: { mode: "index", intersect: false },
-        plugins: { tooltip: { callbacks: { label: context => {
-          const estimated = context.dataset.estimatedCounts?.[context.dataIndex] > 0
-          return `${context.dataset.label}: ${this.number(context.parsed.y)}${estimated ? " (incluye estimación)" : ""}`
-        } } } }
+        plugins: { tooltip: { callbacks: { label: context => `${context.dataset.label}: ${this.number(context.parsed.y)}` } } }
       }
     }))
   }
