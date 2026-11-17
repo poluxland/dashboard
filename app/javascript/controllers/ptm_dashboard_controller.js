@@ -20,7 +20,10 @@ export default class extends HaverDashboardController {
       this.addChart(canvas, top.map(row => row.label), [
         series("Minutos", top, "minutes", "#93c5fd", { type: "bar", yAxisID: "minutes" }),
         series("% acumulado", top, "cumulative", "#dc3545", { yAxisID: "percent" })
-      ], { minutes: { beginAtZero: true }, percent: { beginAtZero: true, max: 100, position: "right", grid: { drawOnChartArea: false } } })
+      ], { x: { ticks: { maxRotation: 35, callback: function(value) {
+        const label = this.getLabelForValue(value)
+        return label.length > 24 ? `${label.slice(0, 24)}…` : label
+      } } }, minutes: { beginAtZero: true }, percent: { beginAtZero: true, max: 100, position: "right", grid: { drawOnChartArea: false } } })
     }
     this.element.dataset.chartsReady = "true"
   }
