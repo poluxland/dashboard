@@ -13,11 +13,11 @@ class HaverDashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Informe Haver · LCA"
     assert_select "canvas", count: 3
     assert_select "input[name=ideal][value='50.0']"
-    assert_select "tbody tr", count: 7
+    assert_select "td[colspan='11']", text: "Sin reportes de turno en este período."
     get haver_dashboard_path, params: { ideal: "50", period: "30" }
     assert_response :success
     assert_select 'button[name="period"][value="30"][aria-current="true"]'
-    assert_select "tbody tr", count: 30
+    assert_select "th", text: "Turno"
     get haver_dashboard_path, params: { ideal: "-5" }
     assert_response :unprocessable_entity
   end

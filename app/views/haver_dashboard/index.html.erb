@@ -28,17 +28,19 @@
     </section>
   <% end %>
   <div class="card card-body mb-4">
-    <h2 class="h5">Detalle diario</h2>
+    <h2 class="h5">Detalle por turno</h2>
     <div class="table-responsive"><table class="table table-sm">
-      <thead><tr><th>Fecha</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th><th>Comentarios Haver</th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Turno</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th><th>Comentarios Haver</th></tr></thead>
       <tbody>
-        <% @report.days.each do |day| %>
+        <% @report.shifts.each do |row| %>
           <tr>
-            <td class="text-nowrap"><%= l day[:date] %></td>
-            <% %i[tons rate performance availability reliability quality oee broken].each do |key| %><td><%= dashboard_number(day[key]) %></td><% end %>
-            <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= day[:comments].join("\n").presence || "—" %></td>
+            <td class="text-nowrap"><%= l row[:date] %></td>
+            <td><%= row[:shift] %></td>
+            <% %i[tons rate performance availability reliability quality oee broken].each do |key| %><td><%= dashboard_number(row[key]) %></td><% end %>
+            <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= row[:comment].presence || "—" %></td>
           </tr>
         <% end %>
+        <% if @report.shifts.empty? %><tr><td colspan="11">Sin reportes de turno en este período.</td></tr><% end %>
       </tbody>
     </table></div>
   </div>

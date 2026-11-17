@@ -38,6 +38,24 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_nil dashboard.totals[:oee]
   end
 
+  test "keeps separate shift values and comments while aggregating chart days" do
+    @report.update!(date: @date - 1, comentarios_haver: "Turno mañana")
+    afternoon = @report.dup
+    afternoon.assign_attributes(turno: "TT", prodhaver: 2000, horas_haver: 1, comentarios_haver: "Turno tarde")
+    afternoon.save!
+    result = dashboard
+    assert_equal 2, result.shifts.size
+    morning = result.shifts.find { |row| row[:shift] == "TM" }
+    evening = result.shifts.find { |row| row[:shift] == "TT" }
+    assert_equal @date - 1, morning[:date]
+    assert_in_delta 200, morning[:tons]
+    assert_in_delta 50, evening[:tons]
+    assert_equal "Turno mañana", morning[:comment]
+    assert_equal "Turno tarde", evening[:comment]
+    assert_in_delta 250, result.days.find { |day| day[:date] == @date - 1 }[:tons]
+    assert_in_delta 250, result.totals[:tons]
+  end
+
   test "period ratios use totals instead of daily averages" do
     @report.update!(sacos_rotos_haver: 0)
     copy = @report.dup

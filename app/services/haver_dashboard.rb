@@ -3,7 +3,7 @@ class HaverDashboard
 
   DEFAULT_IDEAL = 50.0
 
-  attr_reader :ideal, :days, :totals, :dashboard
+  attr_reader :ideal, :days, :shifts, :totals, :dashboard
 
   def initialize(params = {})
     values = params.to_h.stringify_keys
@@ -16,12 +16,11 @@ class HaverDashboard
     @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver").call
     rows_by_date = @dashboard.rows.group_by { |row| row[:date] }
     @days = (@dashboard.from..@dashboard.to).map do |date|
-      rows = rows_by_date.fetch(date, [])
-      comments = rows.sort_by { |row| EnvasadoraReport::SHIFTS.keys.index(row[:shift]) }.filter_map do |row|
-        comment = row[:report].value_for_analytics("comentarios_haver").presence
-        "#{row[:shift]}: #{comment}" if comment
-      end
-      summarize(rows).merge(date: date, comments: comments)
+      summarize(rows_by_date.fetch(date, [])).merge(date: date)
+    end
+    @shifts = @dashboard.rows.map do |row|
+      summarize([ row ]).merge(date: row[:date], shift: row[:shift],
+        comment: row[:report].value_for_analytics("comentarios_haver"))
     end
     @totals = summarize(@dashboard.rows)
   rescue ArgumentError
