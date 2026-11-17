@@ -8,7 +8,7 @@ class PtmReport < ApplicationRecord
   validate :event_minutes_fit_shift, unless: -> { source_key.present? }
 
   def stopped_minutes
-    ptm_events.reject(&:marked_for_destruction?).sum { |event| event.minutes.to_f }
+    ptm_events.reject(&:marked_for_destruction?).sum { |event| event.minutes.to_d }
   end
 
   def usable_times?

@@ -23,3 +23,11 @@ Validación inicial: 7.839 filas, 1.768 turnos, 58 turnos con observaciones. Nor
 - No se calcula OEE, calidad ni confiabilidad sin los datos y la clasificación necesarios. No se reutiliza el ideal de Haver/LCA para PTM.
 
 Los seis gráficos y la tabla usan el mismo período. Por defecto se muestra el mes anterior a la última fecha con registros hasta hoy. El rango Todo excluye fechas futuras; estas permanecen guardadas para revisión.
+
+## Corrección del histórico autorizada el 17/11/2026
+
+`bin/rails ptm:correct_history` aplica una corrección transaccional e idempotente sobre registros importados. Los valores originales siguen en `source_rows`; `history_adjustments` registra los minutos anteriores y el origen/destino de cada producción trasladada.
+
+- Los minutos vacíos pasan a 1. Si el total supera 480, esos minutos se conservan en 1 y los demás se reducen proporcionalmente. Se distribuyen las centésimas restantes para que el total sea exactamente 480.
+- La primera producción permanece en el turno original; cada producción adicional se propone al turno siguiente, en orden TN → TM → TT → TN del día siguiente. Si el destino no tiene producción, se traslada. Si ya tiene producción o es un registro manual, queda pendiente de una regla explícita: nunca se sobrescribe. Un turno creado solo para recibir producción no recibe tiempos de detención inventados.
+- Los paretos muestran las diez categorías principales sin barra Otros. El porcentaje acumulado mantiene el denominador de todas las causas, por lo que puede terminar por debajo de 100%.
