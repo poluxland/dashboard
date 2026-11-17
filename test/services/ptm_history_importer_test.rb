@@ -49,6 +49,13 @@ class PtmHistoryImporterTest < ActiveSupport::TestCase
     end
   end
 
+  test "future records are retained for review but excluded from charts" do
+    PtmReport.create!(date: Date.current + 2, shift: "TM", production: 1000, author_email: "import",
+      source_key: "future", review_notes: "Fecha por revisar")
+    assert_empty PtmDashboard.new("month").reports
+    assert_equal 1, PtmDashboard.new("month").review_reports.size
+  end
+
   test "manual records validate durations and use eight hour shifts" do
     report = PtmReport.new(date: Date.current, shift: "TM", production: 1000, author_email: "test@example.com")
     report.ptm_events.build(equipment: "Radimat", minutes: 481)

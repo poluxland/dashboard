@@ -11,7 +11,7 @@ class PtmDashboard
     when "all" then [ PtmReport.minimum(:date) || latest, latest ]
     else [ latest.prev_month.beginning_of_month, latest.prev_month.end_of_month ]
     end
-    @reports = PtmReport.includes(:ptm_events).where(date: @from..@to).order(date: :desc, shift: :asc).to_a
+    @reports = PtmReport.includes(:ptm_events).where(date: @from..@to).where("date <= ?", Date.current).order(date: :desc, shift: :asc).to_a
   end
 
   def totals(rows = reports)
