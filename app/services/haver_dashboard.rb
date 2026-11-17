@@ -12,7 +12,7 @@ class HaverDashboard
       @ideal = Float(values["ideal"].to_s.tr(",", "."))
       raise InvalidFilter, "El rendimiento ideal debe ser mayor que cero." unless @ideal.finite? && @ideal.positive?
     end
-    period = EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "7"
+    period = EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "previous"
     @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver").call
     producing_rows = @dashboard.rows.select { |row| row[:production]&.positive? }
     rows_by_date = producing_rows.group_by { |row| row[:date] }
