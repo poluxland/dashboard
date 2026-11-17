@@ -29,7 +29,7 @@ class PtmReportsTest < ApplicationSystemTestCase
     assert_selector "canvas", count: 6
     assert_selector "[data-ptm-dashboard-target='error']", visible: false
     assert_equal 1, PtmReport.last.ptm_events.count
-    11.times do |index|
+    14.times do |index|
       PtmReport.last.ptm_events.create!(equipment: "Equipo #{index}", reason: "Causa #{index}", minutes: index + 1)
     end
     visit ptm_reports_path(period: "month")
@@ -38,7 +38,7 @@ class PtmReportsTest < ApplicationSystemTestCase
       data = page.evaluate_script("window.Chart.getChart(document.querySelector('[data-ptm-dashboard-target=\"#{target}\"]')).data")
       assert_equal 12, data.fetch("labels").size
       assert_not_includes data.fetch("labels"), "Otros"
-      assert_in_delta 100, data.fetch("datasets").last.fetch("data").last, 0.001
+      assert_in_delta 96, data.fetch("datasets").last.fetch("data").last, 0.001
     end
     page.save_screenshot(Rails.root.join("tmp/ptm-dashboard.png"))
   end
