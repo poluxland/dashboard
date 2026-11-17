@@ -5,12 +5,12 @@
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>
     <div class="row g-3 align-items-end">
       <div class="col-md-3"><%= f.label :week, "Semana que contiene", class: "form-label" %><%= f.date_field :week, value: @report.week, required: true, class: "form-control" %></div>
-      <div class="col-md-3"><%= f.label :month, "Mes de comparación", class: "form-label" %><%= f.month_field :month, value: @report.month.strftime("%Y-%m"), required: true, class: "form-control" %></div>
+      <div class="col-md-3"><%= f.label :month, "Mes del resumen", class: "form-label" %><%= f.month_field :month, value: @report.month.strftime("%Y-%m"), required: true, class: "form-control" %></div>
       <div class="col-md-4"><%= f.label :ideal, "Rendimiento ideal del supervisor (ton/h)", class: "form-label" %><%= f.number_field :ideal, value: @report.ideal, min: "0.01", step: "any", class: "form-control" %></div>
       <div class="col-md-2"><%= f.submit "Consultar", class: "btn btn-primary" %></div>
     </div>
   <% end %>
-  <p class="small text-body-secondary">Semana del <%= l @report.week %> al <%= l(@report.week + 6) %>. Comparación mensual con <%= @report.month.strftime("%m/%Y") %>. Los valores mensuales se calculan sobre los totales disponibles del mes.</p>
+  <p class="small text-body-secondary">Semana del <%= l @report.week %> al <%= l(@report.week + 6) %>. Resumen mensual de <%= @report.month.strftime("%m/%Y") %>. Los valores mensuales se calculan sobre los totales disponibles del mes.</p>
   <p class="alert alert-warning" hidden data-haver-dashboard-target="error">No se pudieron cargar los gráficos. Puedes consultar los valores en la tabla.</p>
   <% [
     ["Producción y rendimiento", "production", [["Producción", :tons, " t"], ["Rendimiento real", :rate, " ton/h"], ["Rendimiento / ideal", :performance, "%"]]],
