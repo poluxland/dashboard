@@ -1,6 +1,6 @@
 class PtmHistoryCorrector
   def call
-    summary = { capped_shifts: 0, filled_minutes: 0, moved_productions: 0, production_conflicts: [] }
+    summary = { capped_shifts: 0, filled_minutes: 0, moved_productions: 0, discarded_productions: 0 }
     PtmReport.transaction do
       PtmReport.where.not(source_key: nil).order(:id).lock.each do |report|
         next if report.history_adjustments["times_v1"]
@@ -57,13 +57,14 @@ class PtmHistoryCorrector
       audit = report.history_adjustments["productions_v1"]
       next unless audit
       date, shift = report.date, report.shift
-      conflicts = []
+      audit["discarded"] ||= {}
       audit.fetch("original_values").drop(1).each do |entry|
         date, shift = next_shift(date, shift)
-        next if audit.fetch("moved").key?(entry.fetch("row").to_s)
+        next if audit.fetch("moved").key?(entry.fetch("row").to_s) || audit.fetch("discarded").key?(entry.fetch("row").to_s)
         target = PtmReport.find_by(date: date, shift: shift)
         if target && (target.production.present? || target.source_key.blank?)
-          conflicts << { source_id: report.id, source_row: entry.fetch("row"), date: date, shift: shift, production: entry.fetch("value"), existing: target.production }
+          audit.fetch("discarded")[entry.fetch("row").to_s] = { "production" => entry.fetch("value"), "occupied_report_id" => target.id, "existing" => target.production }
+          summary[:discarded_productions] += 1
           next
         end
         target ||= PtmReport.new(date: date, shift: shift, source_key: "ptm-transfer:#{date}:#{shift}", author_email: "importacion-ptm",
@@ -76,9 +77,7 @@ class PtmHistoryCorrector
         summary[:moved_productions] += 1
       end
       report.review_notes = report.review_notes.to_s.gsub(/Varias producciones: .*?Revisar filas originales\./, "").gsub(/Producciones pendientes de traslado: [^.]*\./, "").strip
-      report.review_notes += " Producciones pendientes de traslado: #{conflicts.map { |item| item[:source_row] }.join(', ')}." if conflicts.any?
       report.save!
-      summary[:production_conflicts].concat(conflicts)
     end
   end
 end

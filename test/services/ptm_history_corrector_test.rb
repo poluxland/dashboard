@@ -14,7 +14,7 @@ class PtmHistoryCorrectorTest < ActiveSupport::TestCase
     assert_equal [ BigDecimal("319.33"), BigDecimal("159.67"), BigDecimal("1") ], report.ptm_events.order(:id).map(&:minutes)
     assert report.usable_times?
     assert_nil report.history_adjustments["times_v1"]["original_minutes"].values.last
-    assert_equal({ capped_shifts: 0, filled_minutes: 0, moved_productions: 0, production_conflicts: [] }, PtmHistoryCorrector.new.call)
+    assert_equal({ capped_shifts: 0, filled_minutes: 0, moved_productions: 0, discarded_productions: 0 }, PtmHistoryCorrector.new.call)
   end
 
   test "moves excess production to the next shift and never overwrites an occupied shift" do
@@ -28,13 +28,18 @@ class PtmHistoryCorrectorTest < ActiveSupport::TestCase
     PtmHistoryImporter.new(rows).call
     result = PtmHistoryCorrector.new.call
     assert_equal 1, result[:moved_productions]
-    assert_equal 1, result[:production_conflicts].size
+    assert_equal 1, result[:discarded_productions]
     assert_equal 100, PtmReport.find_by!(date: "2026-10-01", shift: "TN").production
     target = PtmReport.find_by!(date: "2026-10-01", shift: "TM")
     assert_equal 200, target.production
     assert_not target.usable_times?
     assert_equal 500, PtmReport.find_by!(date: "2026-10-02", shift: "TN").production
-    assert_equal 0, PtmHistoryCorrector.new.call[:moved_productions]
+    rerun = PtmHistoryCorrector.new.call
+    assert_equal 0, rerun[:moved_productions]
+    assert_equal 0, rerun[:discarded_productions]
+    source = PtmReport.find_by!(date: "2026-10-01", shift: "TT")
+    assert_equal 400, source.history_adjustments["productions_v1"]["discarded"]["5"]["production"]
+    assert_empty source.review_notes
     assert_equal 200, target.reload.production
     assert_equal rows.first(2), PtmReport.find_by!(date: "2026-10-01", shift: "TN").source_rows
   end
