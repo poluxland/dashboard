@@ -1,0 +1,17 @@
+<h1 class="h3">Registro de turno · Envasadora PTM</h1>
+<p>Turnos de 8 horas. Producción en sacos de 25 kg. Deja la producción vacía si aún no se conoce; escribe 0 si no hubo producción.</p>
+<%= form_with model: @report, data: { controller: "ptm-form" } do |f| %>
+  <% if @report.errors.any? %><div class="alert alert-danger"><%= @report.errors.full_messages.to_sentence %></div><% end %>
+  <div class="row g-3 mb-4">
+    <div class="col-md-4"><%= f.label :date, "Fecha", class: "form-label" %><%= f.date_field :date, required: true, class: "form-control" %></div>
+    <div class="col-md-4"><%= f.label :shift, "Turno", class: "form-label" %><%= f.select :shift, PtmReport::SHIFTS.map { |key, label| ["#{key} · #{label}", key] }, { include_blank: "Selecciona un turno" }, required: true, class: "form-select" %></div>
+    <div class="col-md-4"><%= f.label :production, "Producción (sacos)", class: "form-label" %><%= f.number_field :production, min: 0, step: 1, class: "form-control" %></div>
+  </div>
+  <h2 class="h5">Fallas y detenciones</h2>
+  <p class="small text-body-secondary">Registra también detenciones operacionales (colación, inicio, cierre, cambios). No dupliques minutos de eventos simultáneos. Si no hubo detenciones, puedes dejar la lista vacía.</p>
+  <datalist id="ptm-equipment"><% PtmEquipment.options.each do |name| %><option value="<%= name %>"></option><% end %></datalist>
+  <div data-ptm-form-target="rows"><%= f.fields_for :ptm_events do |event| %><%= render "event", f: event %><% end %></div>
+  <template data-ptm-form-target="template"><%= f.fields_for :ptm_events, PtmEvent.new, child_index: "NEW_EVENT" do |event| %><%= render "event", f: event %><% end %></template>
+  <button type="button" class="btn btn-outline-primary mb-4" data-action="ptm-form#add">Agregar detención</button>
+  <div><%= f.submit "Guardar turno", class: "btn btn-primary" %> <%= link_to "Volver al informe", ptm_reports_path, class: "btn btn-outline-secondary" %></div>
+<% end %>

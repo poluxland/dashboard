@@ -1,0 +1,11 @@
+<fieldset class="card card-body mb-3" data-event-row>
+  <legend class="h6">Detención</legend>
+  <%= f.hidden_field :_destroy, data: { destroy: true } %>
+  <div class="row g-2">
+    <div class="col-md-3"><%= f.label :equipment, "Equipo / fase", class: "form-label" %><%= f.text_field :equipment, list: "ptm-equipment", class: "form-control" %></div>
+    <div class="col-md-5"><%= f.label :reason, "Falla / detención", class: "form-label" %><%= f.text_area :reason, rows: 2, class: "form-control" %></div>
+    <div class="col-md-2"><%= f.label :minutes, "Minutos", class: "form-label" %><%= f.number_field :minutes, min: 0, max: 480, step: "0.01", class: "form-control" %></div>
+    <div class="col-md-2"><%= f.label :equipment_state, "Estado del equipo", class: "form-label" %><%= f.select :equipment_state, ["Equipo operativo", "Equipo en monitoreo", "Equipo fuera de servicio"], { include_blank: "Sin informar" }, class: "form-select" %></div>
+  </div>
+  <button type="button" class="btn btn-sm btn-outline-danger align-self-start mt-2" data-action="ptm-form#remove">Quitar detención</button>
+</fieldset>

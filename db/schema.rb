@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -461,10 +461,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_160000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "ptm_events", force: :cascade do |t|
+    t.bigint "ptm_report_id", null: false
+    t.string "equipment", null: false
+    t.string "original_equipment"
+    t.text "reason"
+    t.decimal "minutes", precision: 10, scale: 2
+    t.string "equipment_state"
+    t.integer "source_row"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ptm_report_id"], name: "index_ptm_events_on_ptm_report_id"
+  end
+
+  create_table "ptm_reports", force: :cascade do |t|
+    t.date "date", null: false
+    t.string "shift", null: false
+    t.integer "production"
+    t.string "author_email", null: false
+    t.string "source_key"
+    t.jsonb "source_rows", default: [], null: false
+    t.text "review_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date", "shift"], name: "index_ptm_reports_on_date_and_shift", unique: true
+    t.index ["source_key"], name: "index_ptm_reports_on_source_key", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "indicator_readings", "people"
   add_foreign_key "tpt_events", "tpt_imports"
+  add_foreign_key "ptm_events", "ptm_reports"
   add_foreign_key "task_comments", "tasks"
   add_foreign_key "task_items", "tasks"
   add_foreign_key "task_notifications", "tasks"
