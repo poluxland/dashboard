@@ -2,6 +2,7 @@ class HaverDashboard
   class InvalidFilter < StandardError; end
 
   DEFAULT_IDEAL = 50.0
+  ESTIMATED_FAILURE_RATE = 0.15
 
   attr_reader :ideal, :days, :shifts, :totals, :dashboard
 
@@ -50,10 +51,18 @@ class HaverDashboard
     operating = rows.sum { |row| row[:operating_seconds] }
     complete_vorne = rows.any? && rows.all? { |row| row[:available_seconds].positive? || row[:planned_hours].zero? }
     availability = ratio(available - maintenance - failures, complete_vorne ? available : nil)&.*(100)
-    reliability = ratio(operating, complete_vorne ? operating + failures : nil)&.*(100)
+    missing_vorne = rows.select { |row| row[:available_seconds].zero? }
+    estimated_rows = missing_vorne.select { |row| row[:hours]&.positive? }
+    estimated_operation = estimated_rows.sum { |row| row[:hours] } * 3600
+    estimated_failures = estimated_operation * ESTIMATED_FAILURE_RATE
+    reliability_operation = operating + estimated_operation
+    reliability_failures = failures + estimated_failures
+    complete_reliability = rows.any? && missing_vorne.size == estimated_rows.size
+    reliability = ratio(reliability_operation, complete_reliability ? reliability_operation + reliability_failures : nil)&.*(100)
     oee = availability && performance && quality ? availability * performance * quality / 10_000 : nil
     { tons: tons, rate: rate, performance: performance, broken: broken_rate, quality: quality,
       availability: availability, reliability: reliability, oee: oee,
+      estimated_reliability_count: estimated_rows.size, estimated_failure_hours: estimated_failures / 3600,
       available_hours: available / 3600, maintenance_hours: maintenance / 3600, failure_hours: failures / 3600,
       reports: rows.size, missing_broken: broken.count(nil), missing_vorne: rows.count { |row| row[:planned_hours].positive? && row[:available_seconds].zero? } }
   end

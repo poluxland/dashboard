@@ -89,4 +89,37 @@ class HaverDashboardTest < ActiveSupport::TestCase
     @report.sacos_rotos_haver = "1.5"
     assert_not @report.valid?
   end
+
+  test "estimates missing Vorne failures from declared operation and weights period totals" do
+    copy = @report.dup
+    copy.assign_attributes(date: @date - 1, horas_haver: 2)
+    copy.save!
+    result = dashboard
+    estimated = result.shifts.find { |row| row[:date] == copy.date }
+    assert_in_delta 100 / 1.15, estimated[:reliability]
+    assert_in_delta 0.3, estimated[:estimated_failure_hours]
+    assert_equal 1, estimated[:estimated_reliability_count]
+    assert_in_delta 6.0 / 7.3 * 100, result.totals[:reliability]
+    assert_equal 1, result.totals[:estimated_reliability_count]
+    assert_nil result.totals[:availability]
+    assert_nil result.totals[:oee]
+  end
+
+  test "keeps recorded zero failures and replaces estimates when Vorne arrives" do
+    TptEvent.delete_all
+    assert_equal 1, dashboard.totals[:estimated_reliability_count]
+    imported = TptImport.first
+    imported.tpt_events.create!(started_at: Time.utc(2026, 11, 14, 6), duration_seconds: 4 * 3600,
+      impact: "Correr", reason: "Running Normally", production_state: "Estado", source_row: 1, source_fingerprint: SecureRandom.hex)
+    assert_in_delta 100, dashboard.totals[:reliability]
+    assert_equal 0, dashboard.totals[:estimated_reliability_count]
+    assert_equal 0, dashboard.totals[:estimated_failure_hours]
+  end
+
+  test "cannot estimate without valid declared operation" do
+    TptEvent.delete_all
+    @report.update!(horas_haver: 0)
+    assert_nil dashboard.totals[:reliability]
+    assert_equal 0, dashboard.totals[:estimated_reliability_count]
+  end
 end
