@@ -15,10 +15,9 @@ export default class extends HaverDashboardController {
     this.addChart(this.shiftsTarget, shifts.map(row => row.shift), [series("Producción (t)", shifts, "tons", "#2563eb", { type: "bar" })], { y: { beginAtZero: true } })
     this.addChart(this.availabilityTarget, labels, [series("Tiempo sin detenciones (%)", days, "available", "#16a34a")], { y: { beginAtZero: true, max: 100 } })
     for (const [canvas, rows] of [[this.equipmentTarget, equipment], [this.causesTarget, causes]]) {
-      const top = rows.slice(0, 10)
-      this.addChart(canvas, top.map(row => row.label), [
-        series("Minutos", top, "minutes", "#93c5fd", { type: "bar", yAxisID: "minutes" }),
-        series("% acumulado", top, "cumulative", "#dc3545", { yAxisID: "percent" })
+      this.addChart(canvas, rows.map(row => row.label), [
+        series("Minutos", rows, "minutes", "#93c5fd", { type: "bar", yAxisID: "minutes" }),
+        series("% acumulado", rows, "cumulative", "#dc3545", { yAxisID: "percent" })
       ], { x: { ticks: { maxRotation: 35, callback: function(value) {
         const label = this.getLabelForValue(value)
         return label.length > 24 ? `${label.slice(0, 24)}…` : label

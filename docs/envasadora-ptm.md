@@ -19,7 +19,7 @@ Validación inicial: 7.839 filas, 1.768 turnos, 58 turnos con observaciones. Nor
 - Toneladas: sacos × 0,025, solo producción informada.
 - Rendimiento por hora de turno: toneladas / (8 × turnos con producción informada). No representa toneladas por hora efectiva de operación.
 - Tiempo sin detenciones registradas: (480 − minutos de detención) / 480 por turno. El consolidado usa sumas de los turnos con tiempos utilizables. Se excluyen los grupos señalados y tiempos desconocidos. Incluye paradas operacionales, no equivale a confiabilidad mecánica.
-- Paretos: minutos declarados por equipo/fase y por causa; diez principales + Otros. Los tiempos no tienen inicio/fin, por lo que no es posible descontar superposiciones históricas.
+- Paretos: minutos declarados por equipo/fase y por causa; todas las categorías, sin Otros. Los tiempos no tienen inicio/fin, por lo que no es posible descontar superposiciones históricas.
 - No se calcula OEE, calidad ni confiabilidad sin los datos y la clasificación necesarios. No se reutiliza el ideal de Haver/LCA para PTM.
 
 Los seis gráficos y la tabla usan el mismo período. Por defecto se muestra el mes anterior a la última fecha con registros hasta hoy. El rango Todo excluye fechas futuras; estas permanecen guardadas para revisión.
@@ -30,4 +30,4 @@ Los seis gráficos y la tabla usan el mismo período. Por defecto se muestra el 
 
 - Los minutos vacíos pasan a 1. Si el total supera 480, esos minutos se conservan en 1 y los demás se reducen proporcionalmente. Se distribuyen las centésimas restantes para que el total sea exactamente 480.
 - La primera producción permanece en el turno original; cada producción adicional se propone al turno siguiente, en orden TN → TM → TT → TN del día siguiente. Si el destino no tiene producción, se traslada. Si ya tiene producción o es un registro manual, se descarta el valor adicional de los cálculos, según la indicación posterior del usuario (ejemplo: 7.108 sacos). Se conserva internamente en la auditoría y nunca se sobrescribe el destino. Un turno creado solo para recibir producción no recibe tiempos de detención inventados.
-- Los paretos muestran las diez categorías principales sin barra Otros. El porcentaje acumulado mantiene el denominador de todas las causas, por lo que puede terminar por debajo de 100%.
+- Los paretos muestran todas las categorías del período sin barra Otros ni límite de diez. El porcentaje acumulado llega a 100% cuando hay minutos registrados.
