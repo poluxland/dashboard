@@ -34,6 +34,7 @@
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
             <li><%= link_to "Nueva envasadora", new_envasadora_report_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Registrar traslado de clínker PTM", new_clinker_transfer_path, class: "dropdown-item" %></li>
             <li><%= link_to "Registrar turno PTM", new_ptm_report_path, class: "dropdown-item" %></li>
             <li><%= link_to "Historial envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
             <li><%= link_to "Cierre de turno", new_shift_report_path, class: "dropdown-item" %></li>
@@ -55,6 +56,7 @@
             Informes
           </button>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="informesDropdown">
+            <li><%= link_to "Traslado de clínker PTM", clinker_transfers_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Envasadora PTM", ptm_reports_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Producción envasadora", envasadora_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>

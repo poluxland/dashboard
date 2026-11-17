@@ -1,0 +1,17 @@
+<% content_for :title, "Traslado de clínker · PTM" %>
+<div class="py-4" data-controller="clinker-dashboard" data-clinker-dashboard-charts-value="<%= @dashboard.charts.to_json %>">
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3"><h1 class="h3">Traslado de clínker · PTM</h1><%= link_to "Registrar traslado diario", new_clinker_transfer_path, class: "btn btn-primary" %></div>
+  <nav class="d-flex flex-wrap gap-2 mb-3" aria-label="Período"><% ClinkerDashboard::PERIODS.each do |key, label| %><%= link_to label, clinker_transfers_path(period: key), class: class_names("btn btn-sm", @dashboard.period == key ? "btn-primary" : "btn-outline-primary"), aria: { current: @dashboard.period == key } %><% end %></nav>
+  <p class="small text-body-secondary"><%= l @dashboard.from %> al <%= l @dashboard.to %>. Períodos calculados respecto de hoy.</p>
+  <div class="row g-3 mb-4"><% [["Total trasladado", @dashboard.records.any? ? @dashboard.total : nil, " t"], ["Promedio por día registrado", @dashboard.average, " t/día"], ["Mayor traslado diario", @dashboard.peak&.tons, " t"], ["Días registrados", @dashboard.records.size, ""]].each do |label, value, unit| %><div class="col-md-3"><div class="card card-body h-100"><div class="small"><%= label %></div><div class="h4"><%= dashboard_number(value, suffix: unit) %></div></div></div><% end %></div>
+  <p class="small text-body-secondary"><%= @dashboard.missing_days %> días sin registro en el período. No se consideran como cero. La tendencia es el promedio de los días informados dentro de los últimos 7 días naturales.</p>
+  <% if @dashboard.records.empty? %><p class="alert alert-info">Aún no hay traslados registrados en este período.</p><% end %>
+  <p class="alert alert-warning" hidden data-clinker-dashboard-target="error">No se pudieron cargar los gráficos. Puedes consultar los datos en el historial.</p>
+  <section class="card card-body mb-3"><h2 class="h5">Traslado diario y tendencia de 7 días</h2><div style="height: 340px"><canvas data-clinker-dashboard-target="daily" role="img" aria-label="Toneladas diarias y promedio móvil de siete días"></canvas></div></section>
+  <div class="row g-3"><% [["Totales por semana", "weekly"], ["Totales por mes", "monthly"]].each do |title, target| %><section class="col-lg-6"><div class="card card-body"><h2 class="h5"><%= title %></h2><div style="height: 300px"><canvas data-clinker-dashboard-target="<%= target %>" role="img" aria-label="<%= title %>"></canvas></div></div></section><% end %></div>
+  <p class="small text-body-secondary mt-2">Las semanas comienzan el lunes. Los totales semanales y mensuales incluyen solo las fechas informadas dentro del período seleccionado; pueden ser parciales.</p>
+  <section class="card card-body mt-4"><h2 class="h5">Historial diario</h2><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Fecha</th><th>Día</th><th>Toneladas</th><th>Observaciones</th><th>Acciones</th></tr></thead><tbody>
+    <% @dashboard.records.reverse_each do |record| %><tr><td><%= l record.date %></td><td><%= l record.date, format: "%A" %></td><td><%= dashboard_number(record.tons) %></td><td style="white-space: pre-wrap"><%= record.observations.presence || "—" %></td><td><% if task_admin? || record.author_email == current_user[:email] %><%= link_to "Editar", edit_clinker_transfer_path(record) %><% end %></td></tr><% end %>
+    <% if @dashboard.records.empty? %><tr><td colspan="5">Sin registros.</td></tr><% end %>
+  </tbody></table></div></section>
+</div>

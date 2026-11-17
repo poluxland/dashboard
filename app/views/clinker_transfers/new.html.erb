@@ -1,0 +1,15 @@
+<% content_for :title, "Registrar traslado de clínker · PTM" %>
+<div class="card card-body mx-auto" style="max-width: 760px">
+  <h1 class="h3"><%= @transfer.persisted? ? "Editar traslado" : "Registrar traslado diario" %> de clínker · PTM</h1>
+  <%= form_with model: @transfer do |f| %>
+    <% if @transfer.errors.any? %><div class="alert alert-danger"><%= @transfer.errors.full_messages.to_sentence %></div><% end %>
+    <div class="row g-3 mt-1">
+      <div class="col-md-6"><%= f.label :date, "Fecha", class: "form-label" %><%= f.date_field :date, required: true, max: Date.current.iso8601, class: "form-control" %></div>
+      <div class="col-md-6"><%= f.label :tons, "Toneladas trasladadas", class: "form-label" %><%= f.number_field :tons, required: true, min: 0, step: "0.001", class: "form-control", aria: { describedby: "tons-help" } %><div class="form-text" id="tons-help">Sin separador de miles: escribe 1291 para 1.291 toneladas. Usa 0 si no hubo traslado.</div></div>
+      <div class="col-12"><%= f.label :observations, "Observaciones (opcional)", class: "form-label" %><%= f.text_area :observations, rows: 3, maxlength: 5000, class: "form-control" %></div>
+    </div>
+    <p class="small text-body-secondary mt-3">Un registro por día. Si ya existe, edítalo desde el historial.</p>
+    <%= f.submit "Guardar traslado", class: "btn btn-primary" %>
+    <%= link_to "Ver informe", clinker_transfers_path, class: "btn btn-outline-secondary" %>
+  <% end %>
+</div>

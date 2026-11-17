@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "clinker_transfers", force: :cascade do |t|
+    t.date "date", null: false
+    t.decimal "tons", precision: 14, scale: 3, null: false
+    t.text "observations"
+    t.string "author_email", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_clinker_transfers_on_date", unique: true
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
