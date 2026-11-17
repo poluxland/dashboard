@@ -1,8 +1,8 @@
 import EnvasadoraDashboardController from "controllers/envasadora_dashboard_controller"
 
 export default class extends EnvasadoraDashboardController {
-  static targets = ["production", "indicators", "broken", "error"]
-  static values = { days: Array }
+  static targets = ["production", "indicators", "broken", "pareto", "error"]
+  static values = { days: Array, pareto: Object }
 
   drawCharts() {
     const days = this.daysValue
@@ -29,6 +29,7 @@ export default class extends EnvasadoraDashboardController {
     this.addChart(this.brokenTarget, labels, [series("Sacos rotos", "broken", "#dc3545")], {
       y: { beginAtZero: true, title: { display: true, text: "% de sacos producidos" } }
     })
+    this.drawPareto(this.paretoValue)
   }
 
   addChart(canvas, labels, datasets, scales) {

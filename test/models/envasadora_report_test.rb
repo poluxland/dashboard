@@ -79,7 +79,7 @@ class EnvasadoraReportTest < ActiveSupport::TestCase
   end
 
   test "hour limits follow each weekday shift including nine hour shifts and unprogrammed weekends" do
-    expected = [ [ 8, 8, 8 ], [ 7, 9, 8 ], [ 7, 9, 8 ], [ 7, 8, 9 ], [ 7, 8, 9 ], [ 6, 0, 0 ], [ 0, 0, 0 ] ]
+    expected = [ [ 8, 8, 8 ], [ 7, 9, 8 ], [ 7, 9, 8 ], [ 7, 8, 9 ], [ 7, 8, 9 ], [ 6, 6, 6 ], [ 6, 6, 6 ] ]
     expected.each_with_index do |limits, index|
       date = Date.new(2026, 10, 12) + index
       %w[TM TT TN].zip(limits).each do |shift, limit|

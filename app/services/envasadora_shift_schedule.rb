@@ -10,11 +10,12 @@ class EnvasadoraShiftSchedule
     7 => {}
   }.transform_values { |shifts| shifts.transform_values(&:freeze).freeze }.freeze
   MAX_HOURS = 9
+  EXTRA_SHIFT_HOURS = 6
 
   def self.offsets(date, shift)
     WEEK.fetch(date.cwday).fetch(shift) do
       start = { "TM" => 6, "TT" => 13, "TN" => 21 }.fetch(shift)
-      [ start, start ]
+      [ start, start + EXTRA_SHIFT_HOURS ]
     end
   end
 

@@ -15,7 +15,8 @@ class EnvasadoraDashboard
               :rows, :pareto, :charts, :production_title, :negative_count, :duplicate_report_count,
               :available_from, :available_to
 
-  def initialize(params = {}, default_source:)
+  def initialize(params = {}, default_source:, only_producing: false)
+    @only_producing = only_producing
     @params = params.to_h.stringify_keys
     @source = SOURCES.key?(@params["source"]) ? @params["source"] : default_source
     @source_config = SOURCES.fetch(@source)
@@ -43,6 +44,7 @@ class EnvasadoraDashboard
     build_rows
     add_production
     @row_map.select! { |_key, row| row[:report].present? }
+    @row_map.select! { |_key, row| row[:production]&.positive? } if @only_producing
     add_events
     finalize_rows
     build_pareto

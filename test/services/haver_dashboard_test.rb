@@ -91,7 +91,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
     copy.save!
     assert_in_delta 2, dashboard.totals[:broken]
     assert_in_delta 50, dashboard.totals[:rate]
-    assert_nil dashboard.totals[:availability]
+    assert_in_delta (13 - 1 - 1.15) / 13 * 100, dashboard.totals[:availability]
   end
 
   test "rejects invalid filters and negative or fractional bag counts" do
@@ -113,8 +113,8 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_equal 1, estimated[:estimated_reliability_count]
     assert_in_delta 6.0 / 7.3 * 100, result.totals[:reliability]
     assert_equal 1, result.totals[:estimated_reliability_count]
-    assert_nil result.totals[:availability]
-    assert_nil result.totals[:oee]
+    assert_in_delta (13 - 1 - 1.3) / 13 * 100, result.totals[:availability]
+    assert result.totals[:oee].positive?
   end
 
   test "keeps recorded zero failures and replaces estimates when Vorne arrives" do
@@ -132,6 +132,33 @@ class HaverDashboardTest < ActiveSupport::TestCase
     TptEvent.delete_all
     @report.update!(horas_haver: 0)
     assert_nil dashboard.totals[:reliability]
+    assert_nil dashboard.totals[:availability]
     assert_equal 0, dashboard.totals[:estimated_reliability_count]
+  end
+
+  test "extra shifts use six hours and provisional downtime until Vorne is available" do
+    @report.update!(turno: "TN", horas_haver: 1.93)
+    summary = dashboard.totals
+    assert_in_delta 6, summary[:available_hours]
+    assert_in_delta (6 - 1.93 * 0.15) / 6 * 100, summary[:availability]
+    assert_in_delta 100 / 1.15, summary[:reliability]
+    imported = TptImport.first
+    imported.tpt_events.create!(started_at: Time.utc(2026, 11, 14, 21), duration_seconds: 3600,
+      impact: "Parada planificada", reason: "Intervención o Revisión", production_state: "Estado", source_row: 99, source_fingerprint: SecureRandom.hex)
+    assert_in_delta 100 * 5.0 / 6, dashboard.totals[:availability]
+    assert_equal 0, dashboard.totals[:estimated_reliability_count]
+  end
+
+  test "reuses envasadora Pareto and excludes events from nonproducing shifts" do
+    expected = EnvasadoraDashboard.new({ period: "7" }, default_source: "haver").call.pareto
+    assert_equal expected, dashboard.dashboard.pareto
+    idle = @report.dup
+    idle.assign_attributes(date: @date - 1, prodhaver: 0)
+    idle.save!
+    TptImport.first.tpt_events.create!(started_at: Time.utc(2026, 11, 13, 6), duration_seconds: 3600,
+      impact: "Parada no planificada", reason: "Turno sin producción", production_state: "Estado", source_row: 99, source_fingerprint: SecureRandom.hex)
+    result = dashboard.dashboard.pareto
+    assert_equal expected, result
+    assert_in_delta 100, result.last[:cumulative]
   end
 end

@@ -63,12 +63,16 @@ export default class extends Controller {
         }
       }))
     }
+    this.drawPareto(charts.pareto)
+  }
+
+  drawPareto(data) {
     this.charts.push(new window.Chart(this.paretoTarget, {
       data: {
-        labels: charts.pareto.labels,
+        labels: data.labels,
         datasets: [
-          { type: "bar", label: "Minutos detenidos", data: charts.pareto.minutes, backgroundColor: "#dc3545", yAxisID: "minutes" },
-          { type: "line", label: "% acumulado", data: charts.pareto.cumulative, borderColor: "#2563eb", backgroundColor: "#2563eb", yAxisID: "percentage", tension: 0.15 }
+          { type: "bar", label: "Minutos detenidos", data: data.minutes, backgroundColor: "#dc3545", yAxisID: "minutes" },
+          { type: "line", label: "% acumulado", data: data.cumulative, borderColor: "#2563eb", backgroundColor: "#2563eb", yAxisID: "percentage", tension: 0.15 }
         ]
       },
       options: {

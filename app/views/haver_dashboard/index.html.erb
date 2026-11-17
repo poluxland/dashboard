@@ -1,5 +1,5 @@
 <% content_for :title, "Informe Haver · LCA" %>
-<div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-days-value="<%= @report.days.map { |day| day.slice(:date, :tons, :performance, :availability, :reliability, :oee, :broken) }.to_json %>">
+<div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-pareto-value="<%= @report.dashboard.charts[:pareto].to_json %>" data-haver-dashboard-days-value="<%= @report.days.map { |day| day.slice(:date, :tons, :performance, :availability, :reliability, :oee, :broken) }.to_json %>">
   <h1 class="h3 fw-bold">Informe Haver · LCA</h1>
   <p class="text-body-secondary">Datos del reporte de envasadora y de Vorne. Se consideran únicamente turnos con producción Haver mayor que cero.</p>
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>
@@ -31,6 +31,23 @@
       </dl></div></div>
     </section>
   <% end %>
+  <section class="card card-body mb-4">
+    <h2 class="h5">Pareto de fallas y detenciones Haver</h2>
+    <p class="small text-body-secondary">Vorne · minutos por causa en turnos con producción Haver. Diez causas principales y el resto agrupado en Otros. Se excluyen No programada y Missing Reason.</p>
+    <div style="height: 350px"><canvas data-haver-dashboard-target="pareto" role="img" aria-label="Pareto de detenciones Haver por causa y porcentaje acumulado"></canvas></div>
+    <details class="mt-3">
+      <summary>Ver detalle de causas</summary>
+      <div class="table-responsive"><table class="table table-sm" id="haver-pareto-detail">
+        <thead><tr><th>Causa</th><th>Minutos</th><th>Eventos</th><th>%</th><th>% acumulado</th></tr></thead>
+        <tbody>
+          <% @report.dashboard.pareto.each do |cause| %>
+            <tr><td><%= cause[:label] %></td><td><%= dashboard_number(cause[:minutes]) %></td><td><%= cause[:events] %></td><td><%= dashboard_number(cause[:percentage]) %></td><td><%= dashboard_number(cause[:cumulative]) %></td></tr>
+          <% end %>
+          <% if @report.dashboard.pareto.empty? %><tr><td colspan="5">Sin detenciones registradas para estos turnos.</td></tr><% end %>
+        </tbody>
+      </table></div>
+    </details>
+  </section>
   <div class="card card-body mb-4">
     <h2 class="h5">Detalle por turno</h2>
     <div class="table-responsive"><table class="table table-sm">
@@ -55,7 +72,7 @@
     <ul class="mt-3">
       <li>Producción en toneladas = sacos Haver × 0,025. Rendimiento real = toneladas / horas Haver declaradas. Rendimiento % = rendimiento real / ideal × 100. Ideal Haver por defecto, 50 ton/h.</li>
       <li>Sacos rotos % = rotos / producción total × 100. Calidad % = 100 − sacos rotos %. Un campo vacío significa sin informar.</li>
-      <li>Horas disponibles = horas programadas según la fecha y el turno. Horas de operación = horas Haver declaradas por el supervisor. Mantenimiento = parada planificada de Vorne (Intervención o Revisión en el archivo actual). Fallas = parada no planificada con causa informada. No programada y Missing Reason se excluyen de las detenciones utilizadas.</li>
+      <li>Horas disponibles = horas programadas según la fecha y el turno. Los turnos extra tienen 6 horas disponibles. Horas de operación = horas Haver declaradas por el supervisor. Mantenimiento = parada planificada de Vorne (Intervención o Revisión en el archivo actual). Fallas = parada no planificada con causa informada. No programada y Missing Reason se excluyen de las detenciones utilizadas.</li>
       <li>Disponibilidad = (disponibles − mantenimiento − fallas) / disponibles × 100.</li>
       <li>Confiabilidad = horas de operación / (horas de operación + horas de falla) × 100. OEE = disponibilidad × rendimiento × calidad, usando proporciones.</li>
       <li>Se usa el último reporte por fecha y turno. Los días sin reporte y los indicadores con datos incompletos aparecen con un guion. Los tiempos de eventos superpuestos se cuentan una sola vez. Los períodos con cobertura parcial de Vorne representan únicamente el tiempo registrado.</li>

@@ -14,8 +14,8 @@ class HaverDashboard
       raise InvalidFilter, "El rendimiento ideal debe ser mayor que cero." unless @ideal.finite? && @ideal.positive?
     end
     period = EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "previous"
-    @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver").call
-    producing_rows = @dashboard.rows.select { |row| row[:production]&.positive? }
+    @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver", only_producing: true).call
+    producing_rows = @dashboard.rows
     rows_by_date = producing_rows.group_by { |row| row[:date] }
     @days = rows_by_date.keys.sort.map do |date|
       summarize(rows_by_date.fetch(date)).merge(date: date)
@@ -48,7 +48,6 @@ class HaverDashboard
     available = rows.sum { |row| row[:planned_hours] } * 3600
     maintenance = rows.sum { |row| row[:maintenance_seconds] }
     failures = rows.sum { |row| row[:failure_seconds] }
-    complete_vorne = rows.any? && rows.all? { |row| row[:available_seconds].positive? && row[:planned_hours].positive? }
     missing_vorne = rows.select { |row| row[:available_seconds].zero? }
     estimated_rows = missing_vorne.select { |row| row[:hours]&.positive? }
     estimated_operation = estimated_rows.sum { |row| row[:hours] } * 3600
@@ -57,7 +56,9 @@ class HaverDashboard
     reliability_failures = failures + estimated_failures
     complete_reliability = valid_hours && missing_vorne.size == estimated_rows.size
     reliability = ratio(reliability_operation, complete_reliability ? reliability_operation + reliability_failures : nil)&.*(100)
-    availability = ratio(available - maintenance - reliability_failures, complete_vorne ? available : nil)&.*(100)
+    # Internally, absent Vorne uses zero maintenance and failures of 15% of declared operation.
+    complete_availability = rows.any? && missing_vorne.size == estimated_rows.size
+    availability = ratio(available - maintenance - reliability_failures, complete_availability ? available : nil)&.*(100)
     oee = availability && performance && quality ? availability * performance * quality / 10_000 : nil
     { tons: tons, rate: rate, performance: performance, broken: broken_rate, quality: quality,
       availability: availability, reliability: reliability, oee: oee,
