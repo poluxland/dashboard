@@ -1,7 +1,7 @@
 <% content_for :title, "Informe Haver · LCA" %>
 <div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-days-value="<%= @report.days.to_json %>">
   <h1 class="h3 fw-bold">Informe Haver · LCA</h1>
-  <p class="text-body-secondary">Producción del reporte de envasadora y tiempos registrados en Vorne.</p>
+  <p class="text-body-secondary">Producción del reporte de envasadora y tiempos registrados en Vorne. Se consideran únicamente turnos con producción Haver mayor que cero.</p>
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>
     <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Períodos rápidos">
       <% EnvasadoraDashboard::PERIODS.each do |period, label| %>
@@ -40,7 +40,7 @@
             <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= row[:comment].presence || "—" %></td>
           </tr>
         <% end %>
-        <% if @report.shifts.empty? %><tr><td colspan="11">Sin reportes de turno en este período.</td></tr><% end %>
+        <% if @report.shifts.empty? %><tr><td colspan="11">Sin turnos con producción Haver en este período.</td></tr><% end %>
       </tbody>
     </table></div>
   </div>

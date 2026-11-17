@@ -13,7 +13,7 @@ class HaverDashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Informe Haver · LCA"
     assert_select "canvas", count: 3
     assert_select "input[name=ideal][value='50.0']"
-    assert_select "td[colspan='11']", text: "Sin reportes de turno en este período."
+    assert_select "td[colspan='11']", text: "Sin turnos con producción Haver en este período."
     get haver_dashboard_path, params: { ideal: "50", period: "30" }
     assert_response :success
     assert_select 'button[name="period"][value="30"][aria-current="true"]'

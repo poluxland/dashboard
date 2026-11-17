@@ -38,6 +38,23 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_nil dashboard.totals[:oee]
   end
 
+  test "excludes shifts without Haver production from table charts and totals" do
+    idle = @report.dup
+    idle.assign_attributes(date: @date - 1, prodhaver: 0, horas_haver: 2, sacos_rotos_haver: nil)
+    idle.save!
+    unknown = idle.dup
+    unknown.assign_attributes(date: @date - 2, source_fingerprint: "missing-production", source_data: { "present_fields" => [] })
+    unknown.save!
+    result = dashboard
+    assert_equal 1, result.shifts.size
+    assert_equal @date, result.shifts.sole[:date]
+    assert_nil result.days.find { |day| day[:date] == idle.date }[:tons]
+    assert_equal 1, result.totals[:reports]
+    assert_in_delta 50, result.totals[:rate]
+    assert_in_delta 1, result.totals[:broken]
+    assert_in_delta 66, result.totals[:oee]
+  end
+
   test "keeps separate shift values and comments while aggregating chart days" do
     @report.update!(date: @date - 1, comentarios_haver: "Turno mañana")
     afternoon = @report.dup

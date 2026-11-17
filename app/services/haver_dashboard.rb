@@ -14,15 +14,16 @@ class HaverDashboard
     end
     period = EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "7"
     @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver").call
-    rows_by_date = @dashboard.rows.group_by { |row| row[:date] }
+    producing_rows = @dashboard.rows.select { |row| row[:production]&.positive? }
+    rows_by_date = producing_rows.group_by { |row| row[:date] }
     @days = (@dashboard.from..@dashboard.to).map do |date|
       summarize(rows_by_date.fetch(date, [])).merge(date: date)
     end
-    @shifts = @dashboard.rows.map do |row|
+    @shifts = producing_rows.map do |row|
       summarize([ row ]).merge(date: row[:date], shift: row[:shift],
         comment: row[:report].value_for_analytics("comentarios_haver"))
     end
-    @totals = summarize(@dashboard.rows)
+    @totals = summarize(producing_rows)
   rescue ArgumentError
     raise InvalidFilter, "Revisa el rendimiento ideal."
   end
