@@ -3,14 +3,17 @@
   <h1 class="h3 fw-bold">Informe Haver · LCA</h1>
   <p class="text-body-secondary">Producción del reporte de envasadora y tiempos registrados en Vorne.</p>
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>
+    <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Períodos rápidos">
+      <% EnvasadoraDashboard::PERIODS.each do |period, label| %>
+        <%= button_tag label, name: :period, value: period, class: class_names("btn btn-sm", @report.dashboard.period == period ? "btn-primary" : "btn-outline-primary"), aria: { current: @report.dashboard.period == period } %>
+      <% end %>
+    </div>
     <div class="row g-3 align-items-end">
-      <div class="col-md-3"><%= f.label :week, "Semana que contiene", class: "form-label" %><%= f.date_field :week, value: @report.week, required: true, class: "form-control" %></div>
-      <div class="col-md-3"><%= f.label :month, "Mes del resumen", class: "form-label" %><%= f.month_field :month, value: @report.month.strftime("%Y-%m"), required: true, class: "form-control" %></div>
       <div class="col-md-4"><%= f.label :ideal, "Rendimiento ideal del supervisor (ton/h)", class: "form-label" %><%= f.number_field :ideal, value: @report.ideal, min: "0.01", step: "any", class: "form-control" %></div>
-      <div class="col-md-2"><%= f.submit "Consultar", class: "btn btn-primary" %></div>
+      <div class="col-md-2"><%= button_tag "Aplicar ideal", name: :period, value: @report.dashboard.period, class: "btn btn-primary" %></div>
     </div>
   <% end %>
-  <p class="small text-body-secondary">Semana del <%= l @report.week %> al <%= l(@report.week + 6) %>. Resumen mensual de <%= @report.month.strftime("%m/%Y") %>. Los valores mensuales se calculan sobre los totales disponibles del mes.</p>
+  <p class="small text-body-secondary">Consulta del <%= l @report.dashboard.from %> al <%= l @report.dashboard.to %>. Los gráficos y resúmenes consideran el mismo período. Los períodos rápidos se basan en la última fecha con datos.</p>
   <p class="alert alert-warning" hidden data-haver-dashboard-target="error">No se pudieron cargar los gráficos. Puedes consultar los valores en la tabla.</p>
   <% [
     ["Producción y rendimiento", "production", [["Producción", :tons, " t"], ["Rendimiento real", :rate, " ton/h"], ["Rendimiento / ideal", :performance, "%"]]],
@@ -18,17 +21,25 @@
     ["Sacos rotos Haver", "broken", [["Sacos rotos", :broken, "%"], ["Calidad · sacos buenos", :quality, "%"]]]
   ].each do |title, target, metrics| %>
     <section class="row g-3 mb-4">
-      <div class="col-lg-9"><div class="card card-body h-100"><h2 class="h5"><%= title %></h2><div style="height: 310px"><canvas data-haver-dashboard-target="<%= target %>" role="img" aria-label="<%= title %> por día de la semana"></canvas></div></div></div>
-      <div class="col-lg-3"><div class="card card-body h-100 bg-body-tertiary"><h3 class="h6">Mes <%= @report.month.strftime("%m/%Y") %></h3><dl class="mb-0">
-        <% metrics.each do |label, key, unit| %><dt class="small fw-normal mt-3"><%= label %></dt><dd class="h4"><%= dashboard_number(@report.monthly[key], suffix: unit) %></dd><% end %>
+      <div class="col-lg-9"><div class="card card-body h-100"><h2 class="h5"><%= title %></h2><div style="height: 310px"><canvas data-haver-dashboard-target="<%= target %>" role="img" aria-label="<%= title %> por día"></canvas></div></div></div>
+      <div class="col-lg-3"><div class="card card-body h-100 bg-body-tertiary"><h3 class="h6">Resumen del período</h3><dl class="mb-0">
+        <% metrics.each do |label, key, unit| %><dt class="small fw-normal mt-3"><%= label %></dt><dd class="h4"><%= dashboard_number(@report.totals[key], suffix: unit) %></dd><% end %>
       </dl></div></div>
     </section>
   <% end %>
   <div class="card card-body mb-4">
     <h2 class="h5">Detalle diario</h2>
     <div class="table-responsive"><table class="table table-sm">
-      <thead><tr><th>Fecha</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th></tr></thead>
-      <tbody><% @report.days.each do |day| %><tr><td class="text-nowrap"><%= l day[:date] %></td><% %i[tons rate performance availability reliability quality oee broken].each do |key| %><td><%= dashboard_number(day[key]) %></td><% end %></tr><% end %></tbody>
+      <thead><tr><th>Fecha</th><th>Toneladas</th><th>Ton/h</th><th>Rendimiento %</th><th>Disponibilidad %</th><th>Confiabilidad %</th><th>Calidad %</th><th>OEE %</th><th>Rotos %</th><th>Comentarios Haver</th></tr></thead>
+      <tbody>
+        <% @report.days.each do |day| %>
+          <tr>
+            <td class="text-nowrap"><%= l day[:date] %></td>
+            <% %i[tons rate performance availability reliability quality oee broken].each do |key| %><td><%= dashboard_number(day[key]) %></td><% end %>
+            <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= day[:comments].join("\n").presence || "—" %></td>
+          </tr>
+        <% end %>
+      </tbody>
     </table></div>
   </div>
   <details class="card card-body">
@@ -41,6 +52,6 @@
       <li>Confiabilidad = horas de operación / (horas de operación + horas de falla) × 100. OEE = disponibilidad × rendimiento × calidad, usando proporciones.</li>
       <li>Se usa el último reporte por fecha y turno. Los días sin reporte y los indicadores con datos incompletos aparecen con un guion. Los tiempos de eventos superpuestos se cuentan una sola vez. Los períodos con cobertura parcial de Vorne representan únicamente el tiempo registrado.</li>
     </ul>
-    <p>Mes consultado, <%= @report.monthly[:reports] %> reportes. Roturas pendientes en <%= @report.monthly[:missing_broken] %> reportes. Turnos programados sin tiempos disponibles de Vorne, <%= @report.monthly[:missing_vorne] %>.</p>
+    <p>Período consultado, <%= @report.totals[:reports] %> reportes. Roturas pendientes en <%= @report.totals[:missing_broken] %> reportes. Turnos programados sin tiempos disponibles de Vorne, <%= @report.totals[:missing_vorne] %>.</p>
   </details>
 </div>

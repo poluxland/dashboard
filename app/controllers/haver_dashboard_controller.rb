@@ -2,7 +2,7 @@ class HaverDashboardController < ApplicationController
   helper EnvasadoraDashboardHelper
 
   def index
-    @report = HaverDashboard.new(params.permit(:week, :month, :ideal))
+    @report = HaverDashboard.new(params.permit(:period, :ideal))
   rescue HaverDashboard::InvalidFilter, EnvasadoraDashboard::InvalidFilter => error
     flash.now[:alert] = error.message
     @report = HaverDashboard.new

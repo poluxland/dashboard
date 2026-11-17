@@ -12,11 +12,11 @@ class HaverDashboardTest < ActiveSupport::TestCase
   end
 
   def dashboard(ideal: "50")
-    HaverDashboard.new(week: @date.iso8601, month: "2026-11", ideal: ideal)
+    HaverDashboard.new(period: "7", ideal: ideal)
   end
 
   test "subtracts maintenance and failures for availability and OEE" do
-    summary = dashboard.monthly
+    summary = dashboard.totals
     assert_in_delta 200, summary[:tons]
     assert_in_delta 50, summary[:rate]
     assert_in_delta 100, summary[:performance]
@@ -30,27 +30,26 @@ class HaverDashboardTest < ActiveSupport::TestCase
   end
 
   test "uses confirmed ideal by default and preserves unknown broken bags" do
-    assert_in_delta 66, dashboard(ideal: nil).monthly[:oee]
-    assert_in_delta 100, dashboard(ideal: nil).monthly[:performance]
+    assert_in_delta 66, dashboard(ideal: nil).totals[:oee]
+    assert_in_delta 100, dashboard(ideal: nil).totals[:performance]
     @report.update!(sacos_rotos_haver: nil)
-    assert_nil dashboard.monthly[:quality]
-    assert_nil dashboard.monthly[:broken]
-    assert_nil dashboard.monthly[:oee]
+    assert_nil dashboard.totals[:quality]
+    assert_nil dashboard.totals[:broken]
+    assert_nil dashboard.totals[:oee]
   end
 
-  test "monthly ratios use totals instead of daily averages" do
+  test "period ratios use totals instead of daily averages" do
     @report.update!(sacos_rotos_haver: 0)
     copy = @report.dup
     copy.assign_attributes(date: @date - 1, prodhaver: 2000, sacos_rotos_haver: 200, horas_haver: 1)
     copy.save!
-    assert_in_delta 2, dashboard.monthly[:broken]
-    assert_in_delta 50, dashboard.monthly[:rate]
-    assert_nil dashboard.monthly[:availability]
+    assert_in_delta 2, dashboard.totals[:broken]
+    assert_in_delta 50, dashboard.totals[:rate]
+    assert_nil dashboard.totals[:availability]
   end
 
   test "rejects invalid filters and negative or fractional bag counts" do
     assert_raises(HaverDashboard::InvalidFilter) { dashboard(ideal: "0") }
-    assert_raises(HaverDashboard::InvalidFilter) { HaverDashboard.new(week: "bad") }
     @report.sacos_rotos_haver = -1
     assert_not @report.valid?
     @report.sacos_rotos_haver = "1.5"

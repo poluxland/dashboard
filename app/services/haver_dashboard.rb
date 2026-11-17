@@ -3,26 +3,29 @@ class HaverDashboard
 
   DEFAULT_IDEAL = 50.0
 
-  attr_reader :week, :month, :ideal, :days, :monthly, :dashboard
+  attr_reader :ideal, :days, :totals, :dashboard
 
   def initialize(params = {})
     values = params.to_h.stringify_keys
-    latest = EnvasadoraReport.maximum(:date) || Date.current
-    @week = values["week"].present? ? Date.iso8601(values["week"]).beginning_of_week : latest.beginning_of_week
-    @month = values["month"].present? ? Date.iso8601("#{values['month']}-01") : latest.beginning_of_month
     @ideal = DEFAULT_IDEAL
     if values["ideal"].present?
       @ideal = Float(values["ideal"].to_s.tr(",", "."))
       raise InvalidFilter, "El rendimiento ideal debe ser mayor que cero." unless @ideal.finite? && @ideal.positive?
     end
-    first = [ @week, @month ].min
-    last = [ @week + 6, @month.end_of_month ].max
-    raise InvalidFilter, "Selecciona una semana y un mes separados por menos de un año." if last - first > 366
-    @dashboard = EnvasadoraDashboard.new({ from: first.iso8601, to: last.iso8601 }, default_source: "haver").call
-    @days = (@week..@week + 6).map { |date| summarize(@dashboard.rows.select { |row| row[:date] == date }).merge(date: date) }
-    @monthly = summarize(@dashboard.rows.select { |row| (@month..@month.end_of_month).cover?(row[:date]) })
-  rescue Date::Error, ArgumentError
-    raise InvalidFilter, "Revisa las fechas y el rendimiento ideal."
+    period = EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "7"
+    @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver").call
+    rows_by_date = @dashboard.rows.group_by { |row| row[:date] }
+    @days = (@dashboard.from..@dashboard.to).map do |date|
+      rows = rows_by_date.fetch(date, [])
+      comments = rows.sort_by { |row| EnvasadoraReport::SHIFTS.keys.index(row[:shift]) }.filter_map do |row|
+        comment = row[:report].value_for_analytics("comentarios_haver").presence
+        "#{row[:shift]}: #{comment}" if comment
+      end
+      summarize(rows).merge(date: date, comments: comments)
+    end
+    @totals = summarize(@dashboard.rows)
+  rescue ArgumentError
+    raise InvalidFilter, "Revisa el rendimiento ideal."
   end
 
   private
