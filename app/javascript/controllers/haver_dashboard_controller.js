@@ -26,8 +26,11 @@ export default class extends EnvasadoraDashboardController {
       series("Confiabilidad", "reliability", "#16a34a"),
       series("OEE", "oee", "#d97706")
     ], { y: { beginAtZero: true, title: { display: true, text: "%" } } })
-    this.addChart(this.brokenTarget, labels, [series("Sacos rotos", "broken", "#dc3545")], {
-      y: { beginAtZero: true, title: { display: true, text: "% de sacos producidos" } }
+    this.addChart(this.brokenTarget, labels, [
+      series("Calidad de sacos", "quality", "#16a34a"),
+      series("Sacos rotos", "broken", "#dc3545")
+    ], {
+      y: { beginAtZero: true, title: { display: true, text: "% de sacos buenos informados" } }
     })
     this.drawPareto(this.paretoValue)
   }

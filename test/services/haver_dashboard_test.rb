@@ -4,7 +4,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
   setup do
     @date = Date.new(2026, 11, 14)
     measurements = EnvasadoraReport::SILOS.values.flat_map { |silo| silo[:readings] }.index_with(10)
-    @report = EnvasadoraReport.create!(measurements.merge(date: @date, turno: "TM", author_email: "test@msindustrial.cl", prodhaver: 8000, horas_haver: 4, sacos_rotos_haver: 80))
+    @report = EnvasadoraReport.create!(measurements.merge(date: @date, turno: "TM", author_email: "test@msindustrial.cl", prodhaver: 8000, horas_haver: 4, sacos_rotos_haver: 80, sacos_descartados_haver: 0))
     imported = TptImport.create!(filename: "haver.xlsx", author_email: "test@msindustrial.cl")
     [ [ 6, 4, "Correr", "Running Normally" ], [ 10, 1, "Parada planificada", "Intervención o Revisión" ], [ 11, 1, "Parada no planificada", "Cintas Haver" ] ].each do |hour, duration, impact, reason|
       imported.tpt_events.create!(started_at: Time.utc(2026, 11, 14, hour), duration_seconds: duration * 3600, impact: impact, reason: reason, production_state: "Estado", source_row: hour, source_fingerprint: SecureRandom.hex)
@@ -13,6 +13,38 @@ class HaverDashboardTest < ActiveSupport::TestCase
 
   def dashboard(ideal: "50")
     HaverDashboard.new(period: "7", ideal: ideal)
+  end
+
+  test "quality subtracts broken and discarded bags from reported good production" do
+    @report.update!(sacos_descartados_haver: 120, sacos_no_reconocidos_haver: 52)
+    summary = dashboard.totals
+    assert_equal 8000, summary[:good_bags]
+    assert_equal 80, summary[:broken_bags]
+    assert_equal 120, summary[:discarded_bags]
+    assert_equal 52, summary[:unrecognized_bags]
+    assert_equal 200, summary[:total_haver]
+    assert_in_delta 97.5, summary[:quality]
+    assert_in_delta 65, summary[:oee]
+    @report.update!(sacos_descartados_haver: nil)
+    assert_nil dashboard.totals[:quality]
+    assert_nil dashboard.totals[:total_haver]
+    assert_equal 1, dashboard.totals[:missing_quality]
+  end
+
+  test "retains losses without good production without changing operating indicators" do
+    idle = @report.dup
+    idle.assign_attributes(date: @date - 1, prodhaver: 0, horas_haver: 0, sacos_rotos_haver: 4)
+    idle.save!
+    result = dashboard
+    assert_equal 84, result.totals[:total_haver]
+    assert_equal 8000, result.totals[:good_bags]
+    assert_in_delta 98.95, result.totals[:quality]
+    assert_in_delta 100 * 4.0 / 6, result.totals[:availability]
+    assert_equal 1, result.totals[:reports]
+    day = result.days.find { |row| row[:date] == idle.date }
+    assert_equal 4, day[:total_haver]
+    assert_nil day[:quality]
+    assert_nil day[:availability]
   end
 
   test "subtracts maintenance and failures for availability and OEE" do

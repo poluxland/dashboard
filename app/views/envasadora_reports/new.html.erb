@@ -25,10 +25,10 @@
     </div></section>
   <% end %>
   <section class="card mb-4"><div class="card-body">
-    <h2 class="h4">Sacos y bigbags rotos</h2>
-    <p class="text-muted">Ingresa 0 si no hubo roturas. Deja en blanco si el dato aún no está disponible.</p>
+    <h2 class="h4">Calidad de sacos y bigbags</h2>
+    <p class="text-muted">Ingresa las cantidades del turno. Usa 0 cuando no haya casos y deja en blanco los datos pendientes. Los sacos buenos Haver corresponden a la producción Haver.</p>
     <div class="row">
-      <% EnvasadoraReport::BROKEN_BAG_FIELDS.each do |field, label| %>
+      <% EnvasadoraReport::BAG_FIELDS.each do |field, label| %>
         <div class="col-md-4 mb-3">
           <%= f.label field, label, class: "form-label" %>
           <%= f.number_field field, min: 0, step: 1, class: "form-control" %>

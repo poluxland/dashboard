@@ -19,7 +19,7 @@ class EnvasadoraReportPresenterTest < ActiveSupport::TestCase
     assert_equal [ "Haver", "7.408", "61", "3,5", "53", "Dureza en regueras" ], tables["Producciones"][:rows].first
     assert_equal [ "Silos 3000", "Tolva 1", "Extra", "25", "37" ], tables["Nivel tolvas"][:rows].first
     assert_includes tables["Inventario de Sacos"][:rows], [ "Especial plastificado soluble completo", "7", "—", "—" ]
-    assert_equal [ "Inventario por Tipo", "Inventario de Sacos", "Inventario de Big Bags", "Inventario de Silos", "Inventario Total combinado", "Despachos", "Producciones", "Sacos y bigbags rotos", "Nivel tolvas", "Calles operativas", "Estado de calles", "Enjuagues" ], tables.keys
+    assert_equal [ "Inventario por Tipo", "Inventario de Sacos", "Inventario de Big Bags", "Inventario de Silos", "Inventario Total combinado", "Despachos", "Producciones", "Calidad de sacos y bigbags", "Nivel tolvas", "Calles operativas", "Estado de calles", "Enjuagues" ], tables.keys
   end
 
   test "sack and bigbag comparisons retain separate shift values and dynamic cement labels" do

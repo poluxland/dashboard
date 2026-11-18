@@ -56,6 +56,25 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
   end
 
+  test "quality fields are optional whole counts and survive form submission and preview" do
+    sign_in_with_google
+    get new_envasadora_report_path
+    %w[sacos_no_reconocidos_haver sacos_descartados_haver].each do |field|
+      assert_select "input[name='envasadora_report[#{field}]'][min='0'][step='1']"
+      assert_no_difference("EnvasadoraReport.count") do
+        post envasadora_reports_path, params: { envasadora_report: @attributes.merge(field => "1.5") }
+      end
+      assert_response :unprocessable_entity
+    end
+    post envasadora_reports_path, params: { envasadora_report: @attributes.merge(sacos_no_reconocidos_haver: 52, sacos_descartados_haver: 113) }
+    report = EnvasadoraReport.last
+    assert_equal 52, report.sacos_no_reconocidos_haver
+    assert_equal 113, report.sacos_descartados_haver
+    follow_redirect!
+    assert_select "th", text: "Sacos no reconocidos Haver"
+    assert_select "th", text: "Sacos descartados Haver"
+  end
+
   test "form defaults save preview and email use selected cement and exact record" do
     sign_in_with_google
     get new_envasadora_report_path

@@ -6,6 +6,18 @@
   <% if corrections.any? %><details class="mb-3"><summary>Correcciones registradas (<%= corrections.size %>)</summary><ul class="mt-2"><% corrections.each do |correction| %><li><%= correction["field"].humanize %>: <%= correction["previous"] %> → <%= correction["value"] %>. <%= correction["reason"] %></li><% end %></ul></details><% end %>
   <% issues = report.source_data.fetch("issues", []) %>
   <% if issues.any? %><details class="alert alert-warning"><summary>Datos de origen para revisar (<%= issues.size %>)</summary><ul class="mb-0 mt-2"><% issues.each do |issue| %><li><%= issue %></li><% end %></ul></details><% end %>
+  <section class="card card-body mb-3">
+    <h2 class="h5">Calidad de sacos Haver</h2>
+    <dl class="row mb-0">
+      <% EnvasadoraReport::HAVER_QUALITY_FIELDS.each do |field, label| %>
+        <dt class="col-sm-8 fw-normal"><%= label %></dt>
+        <dd class="col-sm-4"><%= report.value_for_analytics(field).nil? ? "Sin informar" : envasadora_number(report.value_for_analytics(field)) %></dd>
+      <% end %>
+    </dl>
+    <% if (quality_source = report.source_data["haver_quality_import"]) %>
+      <p class="small text-body-secondary mb-0">Origen de calidad, <%= quality_source["filename"] %>. Cantidades diarias distribuidas entre los turnos con producción del <%= l report.date %>.</p>
+    <% end %>
+  </section>
   <div class="row g-3">
     <% EnvasadoraHistoryImporter::COLUMNS.reject { |column| column["group"].nil? }.group_by { |column| column["group"] }.each do |group, columns| %>
       <div class="col-lg-6"><section class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body">
