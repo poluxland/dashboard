@@ -27,7 +27,7 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_in_delta 65, summary[:oee]
     @report.update!(sacos_descartados_haver: nil)
     assert_nil dashboard.totals[:quality]
-    assert_nil dashboard.totals[:total_haver]
+    assert_equal 80, dashboard.totals[:total_haver]
     assert_equal 1, dashboard.totals[:missing_quality]
   end
 

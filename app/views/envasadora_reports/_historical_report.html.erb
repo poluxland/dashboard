@@ -15,7 +15,7 @@
       <% end %>
     </dl>
     <% if (quality_source = report.source_data["haver_quality_import"]) %>
-      <p class="small text-body-secondary mb-0">Origen de calidad, <%= quality_source["filename"] %>. Cantidades diarias distribuidas entre los turnos con producción del <%= l report.date %>.</p>
+      <p class="small text-body-secondary mb-0">Origen de calidad, <%= quality_source["filename"] %>. Cantidades diarias asignadas a los turnos del <%= l report.date %>.</p>
     <% end %>
   </section>
   <div class="row g-3">

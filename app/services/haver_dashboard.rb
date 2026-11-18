@@ -86,7 +86,8 @@ class HaverDashboard
     }
     counts = quantities.transform_values { |values| values.compact.sum if values.any? { |value| !value.nil? } }
     missing_quality = rows.count { |row| %w[sacos_rotos_haver sacos_descartados_haver].any? { |field| row[:report].value_for_analytics(field).nil? } }
-    total = counts[:broken_bags] + counts[:discarded_bags] if counts[:broken_bags] && counts[:discarded_bags]
+    losses = counts.values_at(:broken_bags, :discarded_bags).compact
+    total = losses.sum if losses.any?
     loss_rate = ratio(total, counts[:good_bags])&.*(100) if missing_quality.zero? && quantities[:good_bags].none?(&:nil?)
     broken_rate = ratio(counts[:broken_bags], counts[:good_bags])&.*(100) if quantities[:broken_bags].none?(&:nil?) && quantities[:good_bags].none?(&:nil?)
     counts.merge(total_haver: total, quality: loss_rate && 100 - loss_rate,

@@ -25,7 +25,7 @@
       <div class="col-lg-3"><div class="card card-body h-100 bg-body-tertiary"><h3 class="h6">Resumen del período</h3><dl class="mb-0">
         <% metrics.each do |label, key, unit| %>
           <dt class="small fw-normal mt-3"><%= label %></dt>
-          <dd class="h4"><%= dashboard_number(@report.totals[key], suffix: unit) %>
+          <dd class="h4"><%= dashboard_number(@report.totals[key], precision: key == :quality ? 2 : 1, suffix: unit) %>
           </dd>
         <% end %>
       </dl></div></div>
@@ -40,7 +40,7 @@
         <% @report.days.each do |day| %>
           <tr><th scope="row" class="text-nowrap"><%= l day[:date] %></th>
             <% %i[good_bags unrecognized_bags broken_bags discarded_bags total_haver quality].each do |key| %>
-              <td><%= dashboard_number(day[key]) %></td>
+              <td><%= dashboard_number(day[key], precision: key == :quality ? 2 : 1) %></td>
             <% end %>
           </tr>
         <% end %>
@@ -48,7 +48,7 @@
       </tbody>
       <tfoot><tr class="fw-semibold"><th scope="row">Total del período</th>
         <% %i[good_bags unrecognized_bags broken_bags discarded_bags total_haver quality].each do |key| %>
-          <td><%= dashboard_number(@report.totals[key]) %></td>
+          <td><%= dashboard_number(@report.totals[key], precision: key == :quality ? 2 : 1) %></td>
         <% end %>
       </tr></tfoot>
     </table></div>
@@ -82,7 +82,7 @@
             <td class="text-nowrap"><%= l row[:date] %></td>
             <td><%= row[:shift] %></td>
             <% %i[good_bags unrecognized_bags broken_bags discarded_bags total_haver tons rate performance availability reliability quality oee broken].each do |key| %>
-              <td><%= dashboard_number(row[key]) %></td>
+              <td><%= dashboard_number(row[key], precision: key == :quality ? 2 : 1) %></td>
             <% end %>
             <td style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= row[:comment].presence || "—" %></td>
           </tr>
