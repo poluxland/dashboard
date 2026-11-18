@@ -6,6 +6,75 @@ class MantencionesControllerTest < ActionDispatch::IntegrationTest
     @mantencion = mantenciones(:one)
   end
 
+  test "download menu offers every specialty and defaults to the full date range" do
+    get mantenciones_url
+    assert_response :success
+    assert_select "button#mantenciones-download-menu", text: "Descargar Excel"
+    assert_select "form[action=?][method=get]", descargar_mantenciones_path(format: :xlsx) do
+      assert_select "select[name=especialidad] option", count: 3
+      assert_select "option[value=todas][selected]", text: "Todas"
+      assert_select "option[value=mecanica]", text: "Mecánico"
+      assert_select "option[value=electrica]", text: "Eléctrico"
+      assert_select "input[name=desde][type=date][required][value='2026-09-02']"
+      assert_select "input[name=hasta][type=date][required][value='2026-09-03']"
+    end
+    get mantenciones_url(especialidad: "mecanica")
+    assert_select "#mantenciones_download_specialty option[value=mecanica][selected]"
+  end
+
+  test "download exports the complete inclusive date range for all or one specialty" do
+    records = 30.times.map do |index|
+      Mantencion.create!(fecha: Date.new(2026, 9, 2), especialidad: "Mecánico", actividad: "Actividad descargable #{index}", numero_ot: "000123", comentarios: "=Texto original")
+    end
+    Mantencion.create!(fecha: Date.new(2026, 9, 1), especialidad: "Mecánico", actividad: "Anterior al rango")
+    Mantencion.create!(fecha: Date.new(2026, 9, 4), especialidad: "Eléctrico", actividad: "Posterior al rango")
+    { "todas" => 32, "mecanica" => 31, "electrica" => 1 }.each do |specialty, count|
+      get descargar_mantenciones_url(format: :xlsx, especialidad: specialty, desde: "2026-09-02", hasta: "2026-09-03", page: 2, q: "sin coincidencias")
+      assert_response :success
+      assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response.media_type
+      assert_includes response.headers["Content-Disposition"], "mantenciones_#{specialty}_2026-09-02_al_2026-09-03.xlsx"
+      Tempfile.create([ "mantenciones-download", ".xlsx" ]) do |file|
+        file.binmode
+        file.write(response.body)
+        file.flush
+        sheet = Roo::Excelx.new(file.path).sheet(0)
+        assert_equal count + 1, sheet.last_row
+        assert_equal "Comentarios", sheet.cell(1, 12)
+        dates = (2..sheet.last_row).map { |row| sheet.cell(row, 2) }
+        assert dates.all? { |date| (Date.new(2026, 9, 2)..Date.new(2026, 9, 3)).cover?(date) }
+        if specialty == "mecanica"
+          assert_equal [ "Mecánico" ], (2..sheet.last_row).map { |row| sheet.cell(row, 3) }.uniq
+          row = (2..sheet.last_row).find { |index| sheet.cell(index, 7) == records.last.actividad }
+          assert_equal "000123", sheet.cell(row, 10)
+          assert_equal "=Texto original", sheet.cell(row, 12)
+          assert_nil sheet.formula(row, 12)
+        end
+      end
+    end
+  end
+
+  test "download rejects missing invalid and inverted dates and unknown specialties" do
+    [
+      { desde: "", hasta: "2026-09-03" },
+      { desde: "2026-09-02", hasta: "" },
+      { desde: "2026-02-30", hasta: "2026-09-03" },
+      { desde: "2026-09-04", hasta: "2026-09-03" },
+      { desde: "2026-09-02", hasta: "2026-09-03", especialidad: "no-existe" }
+    ].each do |filters|
+      get descargar_mantenciones_url(**filters, format: :xlsx)
+      assert_response :unprocessable_entity
+      assert_equal "text/html", response.media_type
+      assert_select ".alert-danger[role=alert]"
+      assert_nil response.headers["Content-Disposition"]
+    end
+  end
+
+  test "download requires the corporate session" do
+    delete logout_path
+    get descargar_mantenciones_url(format: :xlsx, desde: "2026-09-02", hasta: "2026-09-03")
+    assert_redirected_to login_path
+  end
+
   test "detalle por área requiere elegir un área y maneja selecciones vacías" do
     get area_mantenciones_url
     assert_response :success

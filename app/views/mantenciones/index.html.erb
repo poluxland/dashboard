@@ -8,6 +8,28 @@
     </div>
 
     <div class="d-flex flex-wrap gap-2">
+      <div class="dropdown">
+        <button class="btn btn-outline-light fw-semibold dropdown-toggle" type="button" id="mantenciones-download-menu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Descargar Excel</button>
+        <div class="dropdown-menu dropdown-menu-end p-3" style="width: min(24rem, calc(100vw - 2rem));" aria-labelledby="mantenciones-download-menu">
+          <%= form_with url: descargar_mantenciones_path(format: :xlsx), method: :get, data: { turbo: false } do %>
+            <div class="mb-3">
+              <%= label_tag :mantenciones_download_specialty, "Especialidad", class: "form-label" %>
+              <%= select_tag :especialidad, options_for_select([["Todas", "todas"], ["Mecánico", "mecanica"], ["Eléctrico", "electrica"]], @especialidad_filter || "todas"), id: "mantenciones_download_specialty", class: "form-select" %>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <%= label_tag :mantenciones_download_from, "Desde", class: "form-label" %>
+                <%= date_field_tag :desde, @download_from, id: "mantenciones_download_from", required: true, class: "form-control" %>
+              </div>
+              <div class="col-6">
+                <%= label_tag :mantenciones_download_to, "Hasta", class: "form-label" %>
+                <%= date_field_tag :hasta, @download_to, id: "mantenciones_download_to", required: true, class: "form-control" %>
+              </div>
+            </div>
+            <%= submit_tag "Descargar mantenciones", class: "btn btn-primary w-100" %>
+          <% end %>
+        </div>
+      </div>
       <%= link_to "Detalle por área", area_mantenciones_path, class: "btn btn-outline-light fw-semibold", data: { turbo: false } %>
       <%= link_to "Ver gráficos",
                   graficos_mantenciones_path(especialidad: @especialidad_filter),
@@ -18,6 +40,8 @@
                   class: "btn btn-light fw-semibold" %>
     </div>
   </div>
+
+  <% if @download_error.present? %><div class="alert alert-danger" role="alert"><%= @download_error %></div><% end %>
 
   <%= form_with url: mantenciones_path, method: :get, class: "card border-0 shadow-sm rounded-4 mb-3", data: { turbo: false } do %>
     <% if @especialidad_filter.present? %>

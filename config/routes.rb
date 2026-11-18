@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       get :graficos
       get :desglose
       get :area
+      get :descargar, defaults: { format: :xlsx }
     end
   end
   resources :enfundados do

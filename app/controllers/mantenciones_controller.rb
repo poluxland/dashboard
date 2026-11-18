@@ -46,6 +46,38 @@ class MantencionesController < ApplicationController
     end
 
     @pagy, @mantenciones = pagy(scope)
+    first_date, last_date = Mantencion.pick(Arel.sql("MIN(fecha)"), Arel.sql("MAX(fecha)"))
+    today = Time.find_zone!("America/Santiago").today
+    @download_from = params[:desde].presence || first_date || today
+    @download_to = params[:hasta].presence || last_date || today
+  end
+
+  def descargar
+    specialty = params[:especialidad].presence || "todas"
+    unless specialty == "todas" || SPECIALTY_FILTERS.key?(specialty)
+      @download_error = "Selecciona Todas, Mecánico o Eléctrico para descargar."
+      return render_download_error
+    end
+
+    dates = %i[desde hasta].map { |field| params[field].to_s }
+    unless dates.all? { |date| date.match?(/\A\d{4}-\d{2}-\d{2}\z/) }
+      @download_error = "Selecciona una fecha Desde y una fecha Hasta válidas."
+      return render_download_error
+    end
+    from, to = dates.map { |date| Date.iso8601(date) }
+    if from > to
+      @download_error = "La fecha Desde debe ser anterior o igual a la fecha Hasta."
+      return render_download_error
+    end
+
+    scope = Mantencion.where(fecha: from..to)
+    scope = scope.where("LOWER(especialidad) IN (?)", SPECIALTY_FILTERS.fetch(specialty)[:values]) unless specialty == "todas"
+    @mantenciones_xlsx = scope.order(fecha: :desc, id: :desc)
+    response.headers["Content-Disposition"] = "attachment; filename=mantenciones_#{specialty}_#{from.iso8601}_al_#{to.iso8601}.xlsx"
+    render :area, formats: [ :xlsx ]
+  rescue Date::Error
+    @download_error = "Selecciona una fecha Desde y una fecha Hasta válidas."
+    render_download_error
   end
 
   def graficos
@@ -147,6 +179,11 @@ class MantencionesController < ApplicationController
   end
 
   private
+
+  def render_download_error
+    index
+    render :index, formats: [ :html ], content_type: "text/html", status: :unprocessable_entity
+  end
 
   def report_scope(scope = Mantencion.all)
     @available_years = scope.where.not(fecha: nil).pluck(:fecha).map(&:year).uniq.sort.reverse
