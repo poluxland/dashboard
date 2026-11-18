@@ -1,0 +1,35 @@
+<section class="row g-3 mb-4" id="haver-pareto">
+  <div class="col-lg-9">
+    <div class="card card-body h-100">
+      <h2 class="h5">Pareto de fallas y detenciones Haver</h2>
+      <p class="small text-body-secondary">Vorne · minutos por causa en turnos con producción Haver. Diez causas principales y el resto agrupado en Otros. Se excluyen No programada y Missing Reason.</p>
+      <div style="height: 350px"><canvas data-haver-dashboard-target="pareto" role="img" aria-label="Pareto de detenciones Haver por causa y porcentaje acumulado"></canvas></div>
+      <details class="mt-3">
+        <summary>Ver detalle de causas</summary>
+        <div class="table-responsive"><table class="table table-sm" id="haver-pareto-detail">
+          <thead><tr><th>Causa</th><th>Minutos</th><th>Eventos</th><th>%</th><th>% acumulado</th></tr></thead>
+          <tbody>
+            <% causes.each do |cause| %>
+              <tr><td><%= cause[:label] %></td><td><%= dashboard_number(cause[:minutes]) %></td><td><%= cause[:events] %></td><td><%= dashboard_number(cause[:percentage]) %></td><td><%= dashboard_number(cause[:cumulative]) %></td></tr>
+            <% end %>
+            <% if causes.empty? %><tr><td colspan="5">Sin detenciones registradas para estos turnos.</td></tr><% end %>
+          </tbody>
+        </table></div>
+      </details>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card card-body h-100 bg-body-tertiary">
+      <h3 class="h6">Resumen del período</h3>
+      <dl class="mb-0">
+        <dt class="small fw-normal mt-3">Tiempo total de detenciones</dt>
+        <dd class="h4"><%= dashboard_number(causes.sum { |cause| cause[:minutes] }, suffix: " min") %></dd>
+        <dt class="small fw-normal mt-3">Eventos de detención</dt>
+        <dd class="h4"><%= dashboard_number(causes.sum { |cause| cause[:events] }, precision: 0) %></dd>
+        <dt class="small fw-normal mt-3">Principal causa por tiempo</dt>
+        <dd class="h5"><%= causes.first&.fetch(:label) || "—" %></dd>
+        <% if causes.any? %><dd class="small text-body-secondary"><%= dashboard_number(causes.first[:percentage], suffix: "% del tiempo de detenciones") %></dd><% end %>
+      </dl>
+    </div>
+  </div>
+</section>

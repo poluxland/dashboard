@@ -31,6 +31,7 @@
         <% end %>
       </dl></div></div>
     </section>
+    <% if target == "indicators" %><%= render "pareto", causes: @report.dashboard.pareto %><% end %>
   <% end %>
   <section class="card card-body mb-4" id="haver-bag-quality">
     <h2 class="h5">Registro diario de sacos Haver</h2>
@@ -55,23 +56,6 @@
     </table></div>
     <% if @report.totals[:missing_quality].positive? %><p class="small text-body-secondary mb-0">Faltan rotos o descartados en <%= @report.totals[:missing_quality] %> turnos. Las cantidades acumuladas tienen cobertura parcial y la calidad que requiere esos datos se muestra con un guion.</p><% end %>
     <% if @report.totals[:missing_unrecognized].positive? %><p class="small text-body-secondary mb-0">No reconocidos pendientes en <%= @report.totals[:missing_unrecognized] %> turnos.</p><% end %>
-  </section>
-  <section class="card card-body mb-4">
-    <h2 class="h5">Pareto de fallas y detenciones Haver</h2>
-    <p class="small text-body-secondary">Vorne · minutos por causa en turnos con producción Haver. Diez causas principales y el resto agrupado en Otros. Se excluyen No programada y Missing Reason.</p>
-    <div style="height: 350px"><canvas data-haver-dashboard-target="pareto" role="img" aria-label="Pareto de detenciones Haver por causa y porcentaje acumulado"></canvas></div>
-    <details class="mt-3">
-      <summary>Ver detalle de causas</summary>
-      <div class="table-responsive"><table class="table table-sm" id="haver-pareto-detail">
-        <thead><tr><th>Causa</th><th>Minutos</th><th>Eventos</th><th>%</th><th>% acumulado</th></tr></thead>
-        <tbody>
-          <% @report.dashboard.pareto.each do |cause| %>
-            <tr><td><%= cause[:label] %></td><td><%= dashboard_number(cause[:minutes]) %></td><td><%= cause[:events] %></td><td><%= dashboard_number(cause[:percentage]) %></td><td><%= dashboard_number(cause[:cumulative]) %></td></tr>
-          <% end %>
-          <% if @report.dashboard.pareto.empty? %><tr><td colspan="5">Sin detenciones registradas para estos turnos.</td></tr><% end %>
-        </tbody>
-      </table></div>
-    </details>
   </section>
   <details class="card card-body mb-4" id="haver-shift-detail">
     <summary class="h5 mb-0">Detalle por turno</summary>
