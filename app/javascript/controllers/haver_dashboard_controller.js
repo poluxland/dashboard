@@ -33,9 +33,9 @@ export default class extends EnvasadoraDashboardController {
       y: { beginAtZero: true, title: { display: true, text: "% de sacos buenos informados" } }
     })
     this.addChart(this.bagCountsTarget, labels, [
-      series("No reconocidos", "unrecognized_bags", "#2563eb", { type: "bar" }),
-      series("Rotos", "broken_bags", "#dc3545", { type: "bar" }),
-      series("Descartados", "discarded_bags", "#d97706", { type: "bar" })
+      series("No reconocidos", "unrecognized_bags", "#2563eb"),
+      series("Rotos", "broken_bags", "#dc3545"),
+      series("Descartados", "discarded_bags", "#d97706")
     ], {
       y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: "Cantidad de sacos" } }
     })
