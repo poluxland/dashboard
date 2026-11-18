@@ -47,6 +47,21 @@ class HaverDashboardTest < ActiveSupport::TestCase
     assert_nil day[:availability]
   end
 
+  test "shows reported counts with partial coverage while leaving period quality unknown" do
+    copy = @report.dup
+    copy.assign_attributes(date: @date - 1, sacos_rotos_haver: nil, sacos_no_reconocidos_haver: 52, sacos_descartados_haver: nil)
+    copy.save!
+    summary = dashboard.totals
+    assert_equal 16000, summary[:good_bags]
+    assert_equal 80, summary[:broken_bags]
+    assert_equal 52, summary[:unrecognized_bags]
+    assert_equal 80, summary[:total_haver]
+    assert_equal 1, summary[:missing_quality]
+    assert_nil summary[:quality]
+    assert_nil summary[:broken]
+    assert_nil summary[:oee]
+  end
+
   test "subtracts maintenance and failures for availability and OEE" do
     summary = dashboard.totals
     assert_in_delta 200, summary[:tons]

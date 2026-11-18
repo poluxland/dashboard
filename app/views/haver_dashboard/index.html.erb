@@ -33,7 +33,7 @@
   <% end %>
   <section class="card card-body mb-4" id="haver-bag-quality">
     <h2 class="h5">Registro diario de sacos Haver</h2>
-    <p class="small text-body-secondary">Buenos = producción Haver del reporte de envasadora. Total Haver = rotos + descartados. Calidad = (buenos − Total Haver) / buenos × 100.</p>
+    <p class="small text-body-secondary">Buenos = producción Haver del reporte de envasadora. Total Haver = rotos + descartados. Calidad = (buenos − Total Haver) / buenos × 100. Las cantidades suman los datos informados.</p>
     <div class="table-responsive"><table class="table table-sm align-middle">
       <thead><tr><th>Fecha</th><th>Buenos</th><th>No reconocidos</th><th>Rotos</th><th>Descartados</th><th>Total Haver</th><th>Calidad %</th></tr></thead>
       <tbody>
@@ -52,7 +52,8 @@
         <% end %>
       </tr></tfoot>
     </table></div>
-    <% if @report.totals[:missing_quality].positive? %><p class="small text-body-secondary mb-0">Faltan rotos o descartados en <%= @report.totals[:missing_quality] %> turnos. Los totales y la calidad que requieren esos datos se muestran con un guion.</p><% end %>
+    <% if @report.totals[:missing_quality].positive? %><p class="small text-body-secondary mb-0">Faltan rotos o descartados en <%= @report.totals[:missing_quality] %> turnos. Las cantidades acumuladas tienen cobertura parcial y la calidad que requiere esos datos se muestra con un guion.</p><% end %>
+    <% if @report.totals[:missing_unrecognized].positive? %><p class="small text-body-secondary mb-0">No reconocidos pendientes en <%= @report.totals[:missing_unrecognized] %> turnos.</p><% end %>
   </section>
   <section class="card card-body mb-4">
     <h2 class="h5">Pareto de fallas y detenciones Haver</h2>
