@@ -11,7 +11,8 @@ class HaverDashboardControllerTest < ActionDispatch::IntegrationTest
     get haver_dashboard_path
     assert_response :success
     assert_select "h1", "Informe Haver · LCA"
-    assert_select "canvas", count: 4
+    assert_select "canvas", count: 5
+    assert_select 'canvas[data-haver-dashboard-target="bagCounts"]', count: 1
     assert_select "#haver-pareto-detail"
     assert_select 'button[name="period"][value="previous"][aria-current="true"]'
     assert_select "input[name=ideal][value='50.0']"
