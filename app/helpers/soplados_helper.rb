@@ -1,7 +1,11 @@
 module SopladosHelper
-  def soplado_value(soplado, field)
+  def soplado_export_values(soplado)
+    [ soplado.id, soplado.erp_id, *Soplado::LABELS.keys.map { |field| soplado_value(soplado, field, missing: nil) } ]
+  end
+
+  def soplado_value(soplado, field, missing: "—")
     value = soplado.public_send(field)
-    return "—" if value.nil? || value == ""
+    return missing if value.nil? || value == ""
 
     case field
     when :fecha then soplado.local_fecha.strftime("%d/%m/%Y %H:%M")

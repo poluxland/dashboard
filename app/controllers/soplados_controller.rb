@@ -1,3 +1,5 @@
+require "csv"
+
 class SopladosController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[new create]
   around_action :use_chilean_time
@@ -15,7 +17,23 @@ class SopladosController < ApplicationController
       pattern = "%#{Soplado.sanitize_sql_like(@filters[:supervisor].strip)}%"
       scope = scope.where("supervisor ILIKE ?", pattern)
     end
-    @pagy, @soplados = pagy(scope, limit: 30)
+    respond_to do |format|
+      format.html do
+        if params[:vista] == "impresion"
+          @soplados = scope
+          render :imprimir
+        else
+          @pagy, @soplados = pagy(scope, limit: 30)
+        end
+      end
+      format.csv do
+        send_data soplados_csv(scope), filename: "soplado-tc.csv", type: "text/csv; charset=utf-8"
+      end
+      format.xlsx do
+        @soplados = scope
+        response.headers["Content-Disposition"] = 'attachment; filename="soplado-tc.xlsx"'
+      end
+    end
   rescue Date::Error
     redirect_to soplados_path, alert: "Indica fechas válidas para consultar el historial."
   end
@@ -65,6 +83,18 @@ class SopladosController < ApplicationController
   end
 
   private
+
+  def soplados_csv(scope)
+    CSV.generate(+"\uFEFF", col_sep: ";") do |csv|
+      csv << [ "N.º Dashboard", "N.º ERP", *Soplado::LABELS.values ]
+      scope.each do |record|
+        cells = helpers.soplado_export_values(record).map do |value|
+          value.is_a?(String) && value.match?(/\A(?:[\t\r\n]|[[:space:]]*[=+\-@])/) ? "'#{value}" : value
+        end
+        csv << cells
+      end
+    end
+  end
 
   def use_chilean_time(&action)
     Time.use_zone(Soplado::ZONE, &action)

@@ -99,6 +99,34 @@ class SopladosTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "history exports keep the filters and protect spreadsheet cells from formulas" do
+    Soplado.create!(fecha: Time.utc(2026, 11, 16, 15), supervisor: "Turno A", observaciones: "=1+1", horno: 120)
+    Soplado.create!(fecha: Time.utc(2026, 11, 17, 15), supervisor: "Turno B", horno: 130)
+    sign_in_with_google
+
+    filters = { desde: "2026-11-16", hasta: "2026-11-16" }
+    get soplados_path(format: :csv), params: filters
+    assert_response :success
+    csv = CSV.parse(response.body.delete_prefix("\uFEFF"), col_sep: ";", headers: true)
+    assert_equal [ "Turno A" ], csv.map { |row| row["Supervisor"] }
+    assert_equal "'=1+1", csv.first["Observaciones"]
+    assert_equal "120.0", csv.first["Alimentación horno (t/h)"]
+
+    get soplados_path(format: :xlsx), params: filters
+    assert_response :success
+    Zip::File.open_buffer(response.body) do |zip|
+      worksheet = zip.read("xl/worksheets/sheet1.xml")
+      assert_includes worksheet, "Turno A"
+      assert_not_includes worksheet, "Turno B"
+      refute_match(/<f[ >]/, worksheet)
+    end
+
+    get soplados_path, params: filters.merge(vista: "impresion")
+    assert_response :success
+    assert_select ".soplados-print table tbody tr", count: 1
+    assert_select ".soplados-print table th", text: "Acciones", count: 0
+  end
+
   test "mail includes previous readings and preserves the ERP morning recipient" do
     at = Time.utc(2026, 11, 17, 11)
     Soplado.create!(fecha: at - 1.day, created_at: at - 1.day, supervisor: "Anterior")

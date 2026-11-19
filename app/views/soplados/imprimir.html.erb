@@ -1,0 +1,23 @@
+<% content_for :title, "Soplado TC · Historial para imprimir" %>
+
+<style>
+  @media print {
+    @page { size: landscape; margin: 8mm; }
+    .navbar, .app-flash-stack { display: none !important; }
+    .soplados-print .table-responsive { overflow: visible; border: 0 !important; }
+    .soplados-print table { font-size: 8pt; }
+    .soplados-print .text-nowrap { white-space: normal !important; }
+    .soplados-print tr { break-inside: avoid; }
+  }
+</style>
+
+<section class="soplados-print">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3" data-controller="trabajo-print">
+    <h1 class="h3 mb-0">Historial de soplado TC</h1>
+    <div class="d-flex flex-wrap gap-2 d-print-none">
+      <%= link_to "Volver al historial", soplados_path(@filters), class: "btn btn-outline-secondary" %>
+      <%= button_tag "Imprimir / Guardar como PDF", type: "button", class: "btn btn-primary", data: { action: "trabajo-print#print" } %>
+    </div>
+  </div>
+  <%= render "table", soplados: @soplados, actions: false %>
+</section>
