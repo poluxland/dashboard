@@ -8,6 +8,11 @@ namespace :tasks do
   task notification_worker: :environment do
     loop do
       begin
+        HaverDailyDelivery.dispatch_due
+      rescue StandardError => error
+        Rails.logger.error("Daily Haver report delivery failed: #{error.class}")
+      end
+      begin
         TaskNotification.dispatch_pending
       rescue StandardError => error
         Rails.logger.error("Task notification worker failed: #{error.class}")

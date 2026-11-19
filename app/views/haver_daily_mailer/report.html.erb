@@ -1,0 +1,75 @@
+<div style="max-width: 760px; margin: 0 auto; color: #20342d; font: 15px/1.5 Arial, sans-serif">
+  <div style="padding: 18px 20px; background: #eaf3ee; border-left: 4px solid #245a46">
+    <h1 style="font-size: 22px; margin: 0 0 3px"><%= @title %></h1>
+    <p style="margin: 0">Corte <%= @cutoff_label %> · hora de Chile</p>
+  </div>
+  <% if @test %><p><strong>Correo de prueba.</strong></p><% end %>
+
+  <h2 style="font-size: 17px; margin-bottom: 6px">Tres turnos anteriores</h2>
+  <p style="margin: 0 0 8px"><%= @report.shifts.count { |shift| shift[:received] } %> de 3 reportes disponibles al corte.</p>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px">
+    <thead>
+      <tr style="background: #f2f6f4">
+        <th scope="col" style="padding: 7px; text-align: left">Indicador</th>
+        <% @report.shifts.each do |shift| %>
+          <th scope="col" style="padding: 7px; text-align: right">
+            <%= EnvasadoraReport::SHIFTS.fetch(shift[:shift]) %><br>
+            <%= shift[:date].strftime("%d/%m") %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" style="padding: 7px; text-align: left; border-bottom: 1px solid #dee8e1">Estado al corte</th>
+        <% @report.shifts.each do |shift| %>
+          <td style="padding: 7px; text-align: right; border-bottom: 1px solid #dee8e1"><%= shift[:status] %></td>
+        <% end %>
+      </tr>
+      <% HaverDailyReport::SHIFT_METRICS.each do |label, key, unit, precision| %>
+        <tr>
+          <th scope="row" style="padding: 6px; text-align: left; border-bottom: 1px solid #dee8e1"><%= label %></th>
+          <% @report.shifts.each do |shift| %>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(shift[key], suffix: unit, precision: precision) %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% @report.shifts.select { |shift| shift[:comment].present? }.each do |shift| %>
+    <p style="margin: 6px 0; font-size: 13px"><strong><%= shift[:shift] %> <%= shift[:date].strftime("%d/%m") %></strong> · <%= shift[:comment] %></p>
+  <% end %>
+
+  <h2 style="font-size: 17px; margin-bottom: 6px">KPI acumulados</h2>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px">
+    <thead>
+      <tr style="background: #f2f6f4">
+        <th scope="col" style="padding: 7px; text-align: left">Indicador</th>
+        <% @report.periods.each do |period| %>
+          <th scope="col" style="padding: 7px; text-align: right">
+            <%= period[:label] %><br>
+            <%= period[:range].begin.strftime("%d/%m") %>–<%= period[:range].end.strftime("%d/%m") %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% HaverDailyReport::TOTAL_METRICS.each do |label, key, unit, precision| %>
+        <tr>
+          <th scope="row" style="padding: 6px; text-align: left; border-bottom: 1px solid #dee8e1"><%= label %></th>
+          <% @report.periods.each do |period| %>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(period[:totals][key], suffix: unit, precision: precision) %></td>
+          <% end %>
+        </tr>
+      <% end %>
+      <tr>
+        <th scope="row" style="padding: 6px; text-align: left">Turnos con estimación Vorne</th>
+        <% @report.periods.each do |period| %>
+          <td style="padding: 6px; text-align: right"><%= period[:totals][:estimated_reliability_count] %></td>
+        <% end %>
+      </tr>
+    </tbody>
+  </table>
+  <p style="color: #51615b; font-size: 13px">Ideal Haver <%= dashboard_number(@report.ideal, suffix: " t/h") %>. El guion indica un dato ausente o un indicador que no se puede calcular. Los acumulados usan los reportes disponibles al corte.</p>
+  <p><%= link_to "Abrir Informe Haver en el Dashboard", haver_dashboard_url, style: "color: #245a46" %></p>
+</div>

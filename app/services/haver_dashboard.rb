@@ -13,11 +13,18 @@ class HaverDashboard
       @ideal = Float(values["ideal"].to_s.tr(",", "."))
       raise InvalidFilter, "El rendimiento ideal debe ser mayor que cero." unless @ideal.finite? && @ideal.positive?
     end
-    period = EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "previous"
-    @dashboard = EnvasadoraDashboard.new({ period: period }, default_source: "haver", only_producing: true).call
+    filters = if values["from"].present? || values["to"].present?
+      values.slice("from", "to")
+    else
+      { "period" => EnvasadoraDashboard::PERIODS.key?(values["period"]) ? values["period"] : "previous" }
+    end
+    cutoff = values["reported_before"]
+    @dashboard = EnvasadoraDashboard.new(filters.merge("reported_before" => cutoff), default_source: "haver", only_producing: true).call
     producing_rows = @dashboard.rows
     # Keep recorded losses on days with no good production in the bag totals.
-    reports = EnvasadoraReport.where(date: @dashboard.from..@dashboard.to).order(:created_at, :id).index_by { |report| [ report.date, report.turno ] }.values
+    reports = EnvasadoraReport.where(date: @dashboard.from..@dashboard.to)
+    reports = reports.where(created_at: ..cutoff) if cutoff
+    reports = reports.order(:created_at, :id).index_by { |report| [ report.date, report.turno ] }.values
     losses_without_production = reports.filter_map do |report|
       production = report.value_for_analytics("prodhaver")
       next if production&.positive?
@@ -25,18 +32,22 @@ class HaverDashboard
 
       { date: report.date, shift: report.turno, production: production, report: report }
     end
-    rows = producing_rows + losses_without_production
-    rows_by_date = rows.group_by { |row| row[:date] }
+    @rows = producing_rows + losses_without_production
+    rows_by_date = @rows.group_by { |row| row[:date] }
     @days = rows_by_date.keys.sort.map do |date|
       summarize(rows_by_date.fetch(date)).merge(date: date)
     end
-    @shifts = rows.sort_by { |row| [ row[:date], EnvasadoraShiftSchedule.offsets(row[:date], row[:shift]).first ] }.reverse.map do |row|
+    @shifts = @rows.sort_by { |row| [ row[:date], EnvasadoraShiftSchedule.offsets(row[:date], row[:shift]).first ] }.reverse.map do |row|
       summarize([ row ]).merge(date: row[:date], shift: row[:shift],
         comment: row[:report].value_for_analytics("comentarios_haver"))
     end
-    @totals = summarize(rows)
+    @totals = summarize(@rows)
   rescue ArgumentError
     raise InvalidFilter, "Revisa el rendimiento ideal."
+  end
+
+  def totals_for(&filter)
+    summarize(@rows.select(&filter))
   end
 
   private

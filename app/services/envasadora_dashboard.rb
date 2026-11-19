@@ -18,6 +18,7 @@ class EnvasadoraDashboard
   def initialize(params = {}, default_source:, only_producing: false)
     @only_producing = only_producing
     @params = params.to_h.stringify_keys
+    @reported_before = @params["reported_before"]
     @source = SOURCES.key?(@params["source"]) ? @params["source"] : default_source
     @source_config = SOURCES.fetch(@source)
     @pareto_mode = PARETO_MODES.key?(@params["pareto"]) ? @params["pareto"] : "reason"
@@ -161,7 +162,9 @@ class EnvasadoraDashboard
   end
 
   def add_production
-    reports = EnvasadoraReport.where(date: @from..@to, turno: @shifts).order(:created_at, :id).to_a
+    reports = EnvasadoraReport.where(date: @from..@to, turno: @shifts)
+    reports = reports.where(created_at: ..@reported_before) if @reported_before
+    reports = reports.order(:created_at, :id).to_a
     chosen = reports.index_by { |report| [ report.date, report.turno ] }
     @duplicate_report_count = 0
     reports.group_by { |report| [ report.date, report.turno ] }.each do |key, list|
@@ -187,6 +190,7 @@ class EnvasadoraDashboard
     lower = windows.first[:start]
     upper = windows.last[:finish]
     scope = TptEvent.all
+    scope = scope.where(created_at: ..@reported_before) if @reported_before
     scope = scope.where("LOWER(BTRIM(reason)) <> ?", "missing reason") unless @include_missing_reason
     scope.where(started_at: lower...upper).where("duration_seconds < 0").pluck(:started_at).each do |time|
       index = windows.bsearch_index { |row| row[:finish] > time }

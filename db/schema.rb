@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -303,6 +303,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_010000) do
     t.integer "estado_ruedas"
     t.integer "estado_sistema_aire"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "haver_daily_deliveries", force: :cascade do |t|
+    t.date "scheduled_on", null: false
+    t.datetime "sent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scheduled_on"], name: "index_haver_daily_deliveries_on_scheduled_on", unique: true
   end
 
   create_table "indicator_readings", force: :cascade do |t|

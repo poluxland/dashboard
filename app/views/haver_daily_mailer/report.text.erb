@@ -1,0 +1,27 @@
+<%= @title %>
+Corte <%= @cutoff_label %> · hora de Chile
+<% if @test %>Correo de prueba.<% end %>
+
+TRES TURNOS ANTERIORES
+<%= @report.shifts.count { |shift| shift[:received] } %> de 3 reportes disponibles al corte.
+<% @report.shifts.each do |shift| -%>
+<%= EnvasadoraReport::SHIFTS.fetch(shift[:shift]) %> <%= shift[:date].strftime("%d/%m") %> · <%= shift[:status] %>
+<% HaverDailyReport::SHIFT_METRICS.each do |label, key, unit, precision| -%>
+- <%= label %> · <%= dashboard_number(shift[key], suffix: unit, precision: precision) %>
+<% end -%>
+<% if shift[:comment].present? -%>Comentario · <%= shift[:comment] %>
+<% end -%>
+
+<% end -%>
+
+KPI ACUMULADOS
+<% @report.periods.each do |period| -%>
+<%= period[:label] %> · <%= period[:range].begin.strftime("%d/%m") %>–<%= period[:range].end.strftime("%d/%m") %>
+<% HaverDailyReport::TOTAL_METRICS.each do |label, key, unit, precision| -%>
+- <%= label %> · <%= dashboard_number(period[:totals][key], suffix: unit, precision: precision) %>
+<% end -%>
+- Turnos con estimación Vorne · <%= period[:totals][:estimated_reliability_count] %>
+
+<% end -%>
+Ideal Haver <%= dashboard_number(@report.ideal, suffix: " t/h") %>. El guion indica un dato ausente o un indicador que no se puede calcular.
+<%= haver_dashboard_url %>
