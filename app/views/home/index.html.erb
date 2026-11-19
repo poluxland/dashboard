@@ -1,3 +1,5 @@
+<%= render "trabajos/resumen", report: @trabajos_report if @trabajos_report %>
+
 <div class="mb-4"><h1 class="h3">Mis tareas</h1><p class="text-muted">Hola, <%= current_user[:name] %>. Este es tu trabajo pendiente.</p></div>
 <%= form_with url: root_path, method: :get, class: "mb-4", data: { controller: "task-filters", action: "change->task-filters#apply" } do |f| %>
   <%= f.label :group_by, "Ver mis tareas", class: "form-label" %>

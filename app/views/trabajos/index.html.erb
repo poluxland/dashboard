@@ -1,0 +1,80 @@
+<% content_for :title, "Trabajos · Impromaq" %>
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <h1 class="h3 mb-0"><%= task_admin? ? "Trabajos" : "Mis cotizaciones" %></h1>
+  <%= link_to "Crear cotización", new_trabajo_path, class: "btn btn-primary" %>
+</div>
+
+<%= form_with url: trabajos_path, method: :get, class: "card card-body mb-3" do %>
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4 col-xl-3">
+      <%= label_tag :q, "Buscar", class: "form-label" %>
+      <%= search_field_tag :q, @filters[:q], class: "form-control", placeholder: "Referencia, descripción, OP o factura" %>
+    </div>
+    <div class="col-md-4 col-xl-2">
+      <%= label_tag :planta, "Planta", class: "form-label" %>
+      <%= select_tag :planta, options_for_select(Trabajo::PLANTAS_NOMBRES.invert, @filters[:planta]), include_blank: "Todas", class: "form-select" %>
+    </div>
+    <div class="col-md-4 col-xl-2">
+      <%= label_tag :avance, "Estado", class: "form-label" %>
+      <% estados = Trabajo::ESTADOS.map { |value| [estado_trabajo(value), value] } + [["Terminados o facturados", "finalizados"], ["Sin estado", "sin_estado"]] %>
+      <%= select_tag :avance, options_for_select(estados, @filters[:avance]), include_blank: "Todos", class: "form-select" %>
+    </div>
+    <div class="col-md-4 col-xl-2">
+      <%= label_tag :mes, "Mes de término", class: "form-label" %>
+      <%= month_field_tag :mes, @filters[:mes], class: "form-control" %>
+    </div>
+    <div class="col-md-4 col-xl-1">
+      <%= label_tag :op, "OP", class: "form-label" %>
+      <%= select_tag :op, options_for_select([["Con OP", "con"], ["Sin OP", "sin"]], @filters[:op]), include_blank: "Todas", class: "form-select" %>
+    </div>
+    <div class="col-md-auto">
+      <%= submit_tag "Filtrar", class: "btn btn-outline-primary" %>
+      <%= link_to "Limpiar", trabajos_path, class: "btn btn-link" if @filters.values.any?(&:present?) %>
+    </div>
+  </div>
+<% end %>
+
+<p class="text-body-secondary">
+  <%= number_with_delimiter(@pagy.count, delimiter: ".") %> trabajos · Total <strong><%= monto_trabajo(@total) %></strong>
+</p>
+
+<% if @trabajos.any? %>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Referencia</th>
+          <th scope="col">Planta</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Solicitante</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Término</th>
+          <th scope="col">OP</th>
+          <th scope="col">Factura</th>
+          <th scope="col">Centro de costo</th>
+          <th scope="col" class="text-end">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @trabajos.each do |trabajo| %>
+          <tr>
+            <td><%= link_to trabajo.referencia, trabajo, class: "d-inline-block" %></td>
+            <td><%= nombre_planta_trabajo(trabajo.planta) %></td>
+            <td><%= trabajo.descripcion %></td>
+            <td><%= trabajo.ito %></td>
+            <td><%= estado_trabajo(trabajo.avance) %></td>
+            <td class="text-nowrap"><%= trabajo.fecha_termino&.strftime("%d/%m/%Y") %></td>
+            <td><%= trabajo.op %></td>
+            <td><%= trabajo.factura %></td>
+            <td><%= trabajo.centro_costo %></td>
+            <td class="text-end text-nowrap"><%= monto_trabajo(trabajo.total) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+<% else %>
+  <p>Sin trabajos para los filtros seleccionados.</p>
+<% end %>

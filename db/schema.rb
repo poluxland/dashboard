@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -574,6 +574,65 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_230000) do
     t.jsonb "issues", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "trabajos", force: :cascade do |t|
+    t.bigint "erp_id"
+    t.string "author_email"
+    t.string "planta"
+    t.string "ito"
+    t.string "descripcion"
+    t.bigint "total", default: 0
+    t.date "fecha_termino"
+    t.string "avance"
+    t.integer "op"
+    t.integer "factura"
+    t.text "observaciones"
+    t.string "centro_costo"
+    t.string "supervisor"
+    t.text "otros"
+    t.text "detalle"
+    t.string "i1"
+    t.integer "q1"
+    t.integer "v1"
+    t.string "i2"
+    t.integer "q2"
+    t.integer "v2"
+    t.string "i3"
+    t.integer "q3"
+    t.integer "v3"
+    t.string "i4"
+    t.integer "q4"
+    t.integer "v4"
+    t.string "i5"
+    t.integer "q5"
+    t.integer "v5"
+    t.string "i6"
+    t.integer "q6"
+    t.integer "v6"
+    t.string "i7"
+    t.integer "q7"
+    t.integer "v7"
+    t.string "i8"
+    t.integer "q8"
+    t.integer "v8"
+    t.string "i9"
+    t.integer "q9"
+    t.integer "v9"
+    t.string "i10"
+    t.integer "q10"
+    t.integer "v10"
+    t.string "i11"
+    t.integer "q11"
+    t.integer "v11"
+    t.string "i12"
+    t.integer "q12"
+    t.integer "v12"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_email"], name: "index_trabajos_on_author_email"
+    t.index ["avance", "planta", "fecha_termino"], name: "index_trabajos_on_avance_and_planta_and_fecha_termino"
+    t.index ["erp_id"], name: "index_trabajos_on_erp_id", unique: true
   end
 
   create_table "work_inspection_items", force: :cascade do |t|

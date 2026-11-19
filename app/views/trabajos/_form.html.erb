@@ -1,0 +1,95 @@
+<%= form_with model: trabajo, class: "mb-4", data: { controller: "trabajo-form", action: "input->trabajo-form#update" } do |form| %>
+  <% if trabajo.errors.any? %>
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0">
+        <% trabajo.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card card-body mb-3">
+    <div class="row g-3">
+      <div class="col-md-8">
+        <%= form.label :descripcion, "Nombre de la cotización", class: "form-label" %>
+        <%= form.text_field :descripcion, class: "form-control" %>
+      </div>
+      <div class="col-md-4">
+        <%= form.label :planta, "Planta", class: "form-label" %>
+        <% plantas = (Trabajo::PLANTAS.keys + [trabajo.planta].compact).uniq %>
+        <%= form.select :planta, plantas.map { |value| [nombre_planta_trabajo(value), value] }, { include_blank: true }, class: "form-select" %>
+      </div>
+      <div class="col-md-4">
+        <%= form.label :ito, "Solicitante", class: "form-label" %>
+        <%= form.text_field :ito, class: "form-control" %>
+      </div>
+      <div class="col-md-4">
+        <%= form.label :centro_costo, "Centro de costo", class: "form-label" %>
+        <%= form.select :centro_costo, (Trabajo::CENTROS + [trabajo.centro_costo].compact).uniq, { include_blank: true }, class: "form-select" %>
+      </div>
+      <div class="col-md-4">
+        <%= form.label :supervisor, "Clasificación", class: "form-label" %>
+        <%= form.select :supervisor, (Trabajo::CLASIFICACIONES + [trabajo.supervisor].compact).uniq, { include_blank: true }, class: "form-select" %>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <%= form.label :avance, "Estado", class: "form-label" %>
+        <% estados = (Trabajo::ESTADOS + [trabajo.avance].compact).uniq %>
+        <%= form.select :avance, estados.map { |value| [estado_trabajo(value), value] }, { include_blank: true }, class: "form-select" %>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <%= form.label :fecha_termino, "Fecha de término", class: "form-label" %>
+        <%= form.date_field :fecha_termino, class: "form-control" %>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <%= form.label :op, "OP", class: "form-label" %>
+        <%= form.number_field :op, class: "form-control" %>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <%= form.label :factura, "Factura", class: "form-label" %>
+        <%= form.number_field :factura, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-body mb-3">
+    <h2 class="h5">Ítems de la cotización</h2>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 48%">Descripción</th>
+            <th scope="col" style="min-width: 7rem">Cantidad</th>
+            <th scope="col" style="min-width: 8rem">Precio unitario</th>
+            <th scope="col" class="text-end">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Trabajo::ITEMS.each do |number| %>
+            <tr data-trabajo-form-target="row">
+              <td><%= form.text_field "i#{number}", class: "form-control form-control-sm", aria: { label: "Descripción del ítem #{number}" } %></td>
+              <td><%= form.number_field "q#{number}", class: "form-control form-control-sm", aria: { label: "Cantidad del ítem #{number}" }, data: { item_quantity: true } %></td>
+              <td><%= form.number_field "v#{number}", class: "form-control form-control-sm", aria: { label: "Precio unitario del ítem #{number}" }, data: { item_price: true } %></td>
+              <td class="text-end text-nowrap" data-item-subtotal><%= monto_trabajo(trabajo.subtotal(number)) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colspan="3" class="text-end">Total</th>
+            <td class="text-end text-nowrap fw-semibold" data-trabajo-form-target="total"><%= monto_trabajo(trabajo.total) %></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="row g-3">
+      <% { observaciones: "Observaciones", detalle: "Detalle", otros: "Otros antecedentes" }.each do |field, label| %>
+        <div class="col-md-4">
+          <%= form.label field, label, class: "form-label" %>
+          <%= form.text_area field, rows: 3, class: "form-control" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form.submit trabajo.persisted? ? "Guardar cambios" : "Crear cotización", class: "btn btn-primary" %>
+  <%= link_to "Cancelar", trabajo.persisted? ? trabajo_path(trabajo) : trabajos_path, class: "btn btn-link" %>
+<% end %>

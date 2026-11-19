@@ -33,6 +33,10 @@
           </ul>
         </li>
 
+        <li class="nav-item">
+          <%= link_to "Trabajos", trabajos_path, class: "nav-link #{'active' if controller_name == 'trabajos'}" %>
+        </li>
+
         <li class="nav-item dropdown">
           <button
             class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[estado_canchas envasadora_reports envasadora_dashboard haver_dashboard].include?(controller_name) || (controller_name == 'ots' && action_name == 'graficos') %>"

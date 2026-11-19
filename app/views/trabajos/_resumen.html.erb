@@ -1,0 +1,56 @@
+<section class="mb-5" id="resumen-trabajos" aria-labelledby="titulo-resumen-trabajos">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="h3 mb-0" id="titulo-resumen-trabajos">Resumen de trabajos</h2>
+    <%= link_to "Ver todos los trabajos", trabajos_path, class: "btn btn-outline-primary btn-sm" %>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <% Trabajo::PLANTAS.each do |planta, sigla| %>
+      <div class="col-12 col-sm-6 col-xl-3">
+        <section class="card card-body h-100">
+          <h3 class="h5 mb-3"><%= nombre_planta_trabajo(planta) %> <span class="text-body-secondary small">· <%= sigla %></span></h3>
+          <dl class="mb-0">
+            <div class="d-flex justify-content-between gap-2">
+              <dt>Pendiente</dt>
+              <dd class="mb-1 fw-semibold"><%= link_to monto_trabajo(report.pendientes[planta]), trabajos_path(planta: planta, avance: "Terminado") %></dd>
+            </div>
+            <div class="d-flex justify-content-between gap-2 ps-2 small">
+              <dt class="fw-normal">Sin OP</dt>
+              <dd class="mb-1"><%= link_to monto_trabajo(report.sin_op[planta]), trabajos_path(planta: planta, avance: "Terminado", op: "sin") %></dd>
+            </div>
+            <div class="d-flex justify-content-between gap-2 ps-2 small">
+              <dt class="fw-normal">Con OP</dt>
+              <dd class="mb-1"><%= link_to monto_trabajo(report.con_op[planta]), trabajos_path(planta: planta, avance: "Terminado", op: "con") %></dd>
+            </div>
+            <div class="d-flex justify-content-between gap-2 border-top mt-2 pt-2">
+              <dt>En ejecución</dt>
+              <dd class="mb-1 fw-semibold"><%= link_to monto_trabajo(report.en_ejecucion[planta]), trabajos_path(planta: planta, avance: Trabajo::EN_EJECUCION) %></dd>
+            </div>
+          </dl>
+          <h4 class="h6 border-top mt-2 pt-2">Ventas por mes de término</h4>
+          <dl class="mb-0">
+            <% report.meses.each do |mes| %>
+              <div class="d-flex justify-content-between gap-2">
+                <dt class="fw-normal"><%= mes_trabajo(mes) %></dt>
+                <dd class="mb-1"><%= link_to monto_trabajo(report.ventas[[planta, mes]]), trabajos_path(planta: planta, avance: "finalizados", mes: mes.strftime("%Y-%m")) %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </section>
+      </div>
+    <% end %>
+  </div>
+
+  <section class="card card-body" data-controller="trabajos-chart" data-trabajos-chart-series-value="<%= report.grafico.to_json %>">
+    <h3 class="h5">Ventas adicionales por planta</h3>
+    <p class="small text-body-secondary mb-2">Trabajos terminados o facturados por fecha de término durante los últimos 12 meses.</p>
+    <% if report.grafico.all? { |series| series[:data].empty? } %>
+      <p class="text-body-secondary mb-0">Sin trabajos en este período.</p>
+    <% else %>
+      <div style="height: 280px">
+        <canvas role="img" aria-label="Montos de ventas adicionales por planta y fecha de término" data-trabajos-chart-target="canvas"></canvas>
+      </div>
+      <p hidden class="text-body-secondary mb-0" data-trabajos-chart-target="error">No se pudo cargar el gráfico.</p>
+    <% end %>
+  </section>
+</section>
