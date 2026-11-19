@@ -3,6 +3,7 @@ class HaverDailyMailer < ApplicationMailer
 
   TO = "camila.ramirez@meloncementos.cl"
   CC = %w[
+    guillermo.roco@meloncementos.cl
     gaston.guerrero@meloncementos.cl
     marcelo.lopez@meloncementos.cl
     orlando.vasquez@meloncementos.cl

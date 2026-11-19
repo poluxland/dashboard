@@ -45,7 +45,8 @@ class HaverDailyReportTest < ActiveSupport::TestCase
 
     daily = HaverDailyMailer.report(scheduled_at: cutoff).message
     assert_equal [ "camila.ramirez@meloncementos.cl" ], daily.to
-    assert_equal 12, daily.cc.size
+    assert_equal 13, daily.cc.size
+    assert_includes daily.cc, "guillermo.roco@meloncementos.cl"
     assert_includes daily.cc, "jefesturno.planta@meloncementos.cl"
   end
 
