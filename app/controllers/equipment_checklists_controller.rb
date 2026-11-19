@@ -1,4 +1,5 @@
 class EquipmentChecklistsController < ApplicationController
+  skip_before_action :authenticate_user!, only: %i[new create]
   before_action :set_checklist, only: %i[show edit update destroy]
   before_action :load_assets, only: %i[new create edit update index report]
 
@@ -33,14 +34,16 @@ class EquipmentChecklistsController < ApplicationController
   end
 
   def new
-    asset = MobileAsset.find_by(id: params[:asset_id])
-    @checklist = EquipmentChecklist.new(mobile_asset: asset, c17: EquipmentChecklist.plant_code(asset&.plant))
+    asset = @assets.find { |item| item.id.to_s == params[:asset_id] }
+    @checklist = EquipmentChecklist.new(mobile_asset: asset)
+    @checklist.c17 = EquipmentChecklist.plant_code(asset&.plant) if signed_in?
   end
 
   def create
     @checklist = EquipmentChecklist.new(checklist_params)
     if @checklist.save
-      redirect_to @checklist, notice: "Checklist registrado."
+      destination = signed_in? ? @checklist : new_equipment_checklist_path
+      redirect_to destination, notice: "Checklist registrado.", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
@@ -65,7 +68,9 @@ class EquipmentChecklistsController < ApplicationController
   private
 
   def load_assets
-    @assets = MobileAsset.order(:code, :id).to_a
+    assets = MobileAsset.order(:code, :id)
+    assets = assets.select(:id, :code) unless signed_in?
+    @assets = assets.to_a
   end
 
   def set_checklist

@@ -35,6 +35,42 @@ class EquipmentChecklistsTest < ActionDispatch::IntegrationTest
     assert_select ".badge", text: "Con falla grave"
   end
 
+  test "an operator can submit a checklist from the login page without signing in" do
+    @asset.update!(brand: "Marca interna")
+    get login_path
+    assert_select "a[href=?]", new_equipment_checklist_path, text: "Checklist Operador"
+    assert_select "a[href=?]", new_maintenance_checklist_path, count: 0
+
+    get new_equipment_checklist_path
+    assert_response :success
+    assert_select "a[href=?]", mobile_assets_path, count: 0
+    assert_select "a[href=?]", report_equipment_checklists_path, count: 0
+    assert_select "[data-search=?]", @asset.code
+    refute_includes response.body, "Marca interna"
+
+    assert_no_difference "EquipmentChecklist.count" do
+      post equipment_checklists_path, params: { equipment_checklist: { mobile_asset_id: @asset.id } }
+      assert_response :unprocessable_entity
+    end
+
+    answers = EquipmentChecklist::QUESTIONS.keys.index_with { "Si" }
+    assert_difference "EquipmentChecklist.count" do
+      post equipment_checklists_path, params: { equipment_checklist: answers.merge(
+        mobile_asset_id: @asset.id, operator: "Desde terreno", hour_meter: 125, c17: "LCA"
+      ) }
+      assert_response :see_other
+    end
+    assert_redirected_to new_equipment_checklist_path
+    follow_redirect!
+    assert_select "[role=status]", text: /Checklist registrado/
+
+    record = @asset.equipment_checklists.sole
+    get equipment_checklist_path(record)
+    assert_redirected_to login_path
+    get edit_equipment_checklist_path(record)
+    assert_redirected_to login_path
+  end
+
   test "historical records without a link appear in the equipment history and report" do
     sign_in_with_google
     chile = Time.find_zone!("America/Santiago")

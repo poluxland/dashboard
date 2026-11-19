@@ -1,5 +1,4 @@
 class MaintenanceChecklistsController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[new create]
   before_action :set_checklist, only: %i[show edit update destroy]
   before_action :load_assets, only: %i[new create edit update]
 
@@ -17,8 +16,7 @@ class MaintenanceChecklistsController < ApplicationController
   def create
     @checklist = MaintenanceChecklist.new(checklist_params)
     if @checklist.save
-      destination = signed_in? ? @checklist : new_maintenance_checklist_path
-      redirect_to destination, notice: "Checklist de mantenedor registrado.", status: :see_other
+      redirect_to @checklist, notice: "Checklist de mantenedor registrado.", status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
@@ -44,7 +42,6 @@ class MaintenanceChecklistsController < ApplicationController
 
   def load_assets
     @assets = MobileAsset.order(:code, :id)
-    @assets = @assets.select(:id, :code) unless signed_in?
   end
 
   def set_checklist

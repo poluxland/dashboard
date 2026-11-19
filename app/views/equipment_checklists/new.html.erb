@@ -1,5 +1,5 @@
 <section class="container-md py-4 equipment-form">
-  <h1 class="h2 mb-3">Nuevo checklist de equipo</h1>
-  <%= render "navigation" %>
+  <h1 class="h2 mb-3">Checklist Operador</h1>
+  <%= render "navigation" if signed_in? %>
   <%= render "form" %>
 </section>

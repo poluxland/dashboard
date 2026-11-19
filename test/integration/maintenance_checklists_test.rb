@@ -47,44 +47,16 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
     assert_equal "", record.operating_status
   end
 
-  test "the login page links to a public submission without exposing the equipment catalog or saved record" do
-    @asset.update!(brand: "Marca interna")
-    get login_path
-    assert_select "a[href=?]", new_maintenance_checklist_path, text: /sin iniciar sesión/
-
+  test "creating a maintainer checklist requires Dashboard login" do
     get new_maintenance_checklist_path
-    assert_response :success
-    assert_select "a[href=?]", mobile_assets_path, count: 0
-    assert_select "a[href=?]", report_equipment_checklists_path, count: 0
-    assert_select "[data-search=?]", @asset.code
-    assert_select "form input[type=radio][checked]", count: 0
-    refute_includes response.body, "Marca interna"
+    assert_redirected_to login_path
 
-    post maintenance_checklists_path, params: { maintenance_checklist: { mobile_asset_id: 0 } }
-    assert_response :unprocessable_entity
-    assert_select "a[href=?]", mobile_assets_path, count: 0
-
-    assert_difference "MaintenanceChecklist.count" do
+    assert_no_difference "MaintenanceChecklist.count" do
       post maintenance_checklists_path, params: { maintenance_checklist: {
         mobile_asset_id: @asset.id, technician: "Desde terreno", operating_status: "Operativo"
       } }
-      assert_response :see_other
+      assert_redirected_to login_path
     end
-    assert_redirected_to new_maintenance_checklist_path
-    follow_redirect!
-    assert_select "[role=status]", text: /Checklist de mantenedor registrado/
-
-    record = MaintenanceChecklist.find_by!(technician: "Desde terreno")
-    assert_nil record.c1
-    assert_nil record.c19
-    get maintenance_checklist_path(record)
-    assert_redirected_to login_path
-    get edit_maintenance_checklist_path(record)
-    assert_redirected_to login_path
-    get report_equipment_checklists_path
-    assert_redirected_to login_path
-    get new_equipment_checklist_path
-    assert_redirected_to login_path
   end
 
   test "the common report and CSV include both types, preserve nils and link legacy codes" do
