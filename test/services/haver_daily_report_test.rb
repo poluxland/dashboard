@@ -42,6 +42,8 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_includes message.html_part.decoded, "KPI acumulados"
     assert_includes message.text_part.decoded, "TRES TURNOS ANTERIORES"
     assert_includes message.text_part.decoded, "05:00"
+    assert_not_includes message.html_part.decoded, "Turnos con estimación Vorne"
+    assert_not_includes message.text_part.decoded, "Turnos con estimación Vorne"
 
     daily = HaverDailyMailer.report(scheduled_at: cutoff).message
     assert_equal [ "camila.ramirez@meloncementos.cl" ], daily.to

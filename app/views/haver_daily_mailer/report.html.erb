@@ -62,12 +62,6 @@
           <% end %>
         </tr>
       <% end %>
-      <tr>
-        <th scope="row" style="padding: 6px; text-align: left">Turnos con estimación Vorne</th>
-        <% @report.periods.each do |period| %>
-          <td style="padding: 6px; text-align: right"><%= period[:totals][:estimated_reliability_count] %></td>
-        <% end %>
-      </tr>
     </tbody>
   </table>
   <p style="color: #51615b; font-size: 13px">Ideal Haver <%= dashboard_number(@report.ideal, suffix: " t/h") %>. El guion indica un dato ausente o un indicador que no se puede calcular. Los acumulados usan los reportes disponibles al corte.</p>

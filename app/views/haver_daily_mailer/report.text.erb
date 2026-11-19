@@ -20,7 +20,6 @@ KPI ACUMULADOS
 <% HaverDailyReport::TOTAL_METRICS.each do |label, key, unit, precision| -%>
 - <%= label %> · <%= dashboard_number(period[:totals][key], suffix: unit, precision: precision) %>
 <% end -%>
-- Turnos con estimación Vorne · <%= period[:totals][:estimated_reliability_count] %>
 
 <% end -%>
 Ideal Haver <%= dashboard_number(@report.ideal, suffix: " t/h") %>. El guion indica un dato ausente o un indicador que no se puede calcular.
