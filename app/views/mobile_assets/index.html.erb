@@ -1,0 +1,28 @@
+<section class="container-xl py-4">
+  <h1 class="h2 mb-3">Equipos móviles</h1>
+  <%= render "equipment_checklists/navigation" %>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="mb-0 text-body-secondary"><%= @assets.size %> equipos</p>
+    <%= link_to "Nuevo equipo", new_mobile_asset_path, class: "btn btn-primary" %>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Código</th><th scope="col">Marca</th><th scope="col">Modelo</th>
+          <th scope="col">Planta</th><th scope="col">Año</th><th scope="col">Otros</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @assets.each do |asset| %>
+          <tr>
+            <th scope="row"><%= link_to asset.label, asset %></th>
+            <td><%= asset.brand %></td><td><%= asset.model %></td>
+            <td><%= EquipmentChecklist::PLANTS.fetch(asset.plant, asset.plant) %></td>
+            <td><%= asset.year %></td><td><%= truncate(asset.notes, length: 110) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

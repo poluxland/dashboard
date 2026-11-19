@@ -1,0 +1,28 @@
+<% if checklists.any? %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Fecha</th><th scope="col">Equipo</th><th scope="col">Planta</th>
+          <th scope="col">Operador</th><th scope="col">Horómetro</th><th scope="col">Resultado</th><th scope="col">Comentarios</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% checklists.each do |record| %>
+          <% label, color = EquipmentChecklist::STATUSES.fetch(record.status_key) %>
+          <tr>
+            <td class="text-nowrap"><%= link_to record.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M"), record %></td>
+            <td class="text-nowrap"><%= record.asset_label %></td>
+            <td><%= record.plant_label %></td>
+            <td><%= record.operator %></td>
+            <td><%= record.hour_meter %></td>
+            <td><span class="badge text-bg-<%= color %>"><%= label %></span></td>
+            <td><%= truncate(record.comments, length: 110) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="text-body-secondary py-3">No hay checklists para mostrar.</p>
+<% end %>

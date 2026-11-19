@@ -287,6 +287,18 @@
               
             </ul>
           </li>
+          <li class="nav-item dropdown">
+            <button type="button" class="nav-link dropdown-toggle <%= 'active' if %w[mobile_assets equipment_checklists].include?(controller_name) %>"
+                    id="mobileEquipmentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Equipos
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileEquipmentDropdown">
+              <li><%= link_to "Nuevo checklist", new_equipment_checklist_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Historial de checklists", equipment_checklists_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Equipos móviles", mobile_assets_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Informe de checklists", report_equipment_checklists_path, class: "dropdown-item" %></li>
+            </ul>
+          </li>
         <% if demo_user? %>
           <!-- Menú Admin -->
           <li class="nav-item dropdown">

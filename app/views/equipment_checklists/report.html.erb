@@ -1,0 +1,49 @@
+<section class="container-xl py-4">
+  <h1 class="h2 mb-3">Informe de checklists de equipos</h1>
+  <%= render "navigation" %>
+  <%= render "filters" %>
+  <div class="row g-3 mb-4">
+    <% total = @totals.values.sum %>
+    <% { "Total de checklists" => total }.merge(EquipmentChecklist::STATUSES.to_h { |key, (label, _)| [label, @totals[key]] }).each do |label, count| %>
+      <div class="col-6 col-lg-2">
+        <div class="card card-body h-100">
+          <span class="small text-body-secondary"><%= label %></span>
+          <strong class="fs-3"><%= number_with_delimiter(count, delimiter: ".") %></strong>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <h2 class="h5">Resultados por planta</h2>
+  <div class="table-responsive mb-4">
+    <table class="table table-bordered align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Planta</th>
+          <th scope="col" class="text-end">Total</th>
+          <% EquipmentChecklist::STATUSES.each_value do |label, _| %>
+            <th scope="col" class="text-end"><%= label %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @plants.sort_by { |plant, _| plant.to_s }.each do |plant, counts| %>
+          <tr>
+            <th scope="row"><%= EquipmentChecklist::PLANTS.fetch(plant, plant || "Sin planta registrada") %></th>
+            <td class="text-end"><%= counts.values.sum %></td>
+            <% EquipmentChecklist::STATUSES.each_key do |key| %>
+              <td class="text-end"><%= counts[key] %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <p class="small text-body-secondary">El resultado de cada checklist se determina por la falla de mayor gravedad registrada.</p>
+  <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+    <h2 class="h5 mb-0">Registros del informe</h2>
+    <%= link_to "Descargar Excel", equipment_checklists_path(@filters.merge(format: :xlsx)), class: "btn btn-outline-primary", data: { turbo: false } %>
+  </div>
+  <%= render "table", checklists: @checklists %>
+  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+</section>

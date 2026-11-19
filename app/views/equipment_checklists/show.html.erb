@@ -1,0 +1,46 @@
+<section class="container-lg py-4">
+  <h1 class="h2 mb-3">Checklist de <%= @checklist.asset_label %></h1>
+  <%= render "navigation" %>
+  <% label, color = EquipmentChecklist::STATUSES.fetch(@checklist.status_key) %>
+  <div class="card card-body mb-4">
+    <dl class="row mb-0">
+      <dt class="col-sm-4">Fecha</dt><dd class="col-sm-8"><%= @checklist.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %></dd>
+      <dt class="col-sm-4">Planta</dt><dd class="col-sm-8"><%= @checklist.plant_label %></dd>
+      <dt class="col-sm-4">Operador</dt><dd class="col-sm-8"><%= @checklist.operator.presence || "Sin registro" %></dd>
+      <dt class="col-sm-4">Horómetro</dt><dd class="col-sm-8"><%= @checklist.hour_meter || "Sin registro" %></dd>
+      <dt class="col-sm-4">Resultado</dt><dd class="col-sm-8"><span class="badge text-bg-<%= color %>"><%= label %></span></dd>
+      <% if @checklist.legacy_code.present? %>
+        <dt class="col-sm-4">Código histórico</dt><dd class="col-sm-8"><%= @checklist.legacy_code %></dd>
+      <% end %>
+      <% if @checklist.erp_id.present? %>
+        <dt class="col-sm-4">N.º en el ERP</dt><dd class="col-sm-8"><%= @checklist.erp_id %></dd>
+      <% end %>
+    </dl>
+  </div>
+  <h2 class="h5">Puntos de inspección</h2>
+  <dl class="row">
+    <% EquipmentChecklist::QUESTIONS.each do |field, question| %>
+      <% value = @checklist[field] %>
+      <dt class="col-sm-8 border-bottom py-2"><%= question %></dt>
+      <dd class="col-sm-4 border-bottom py-2 mb-0"><%= EquipmentChecklist::ANSWERS.fetch(value, value).presence || "Sin respuesta" %></dd>
+    <% end %>
+    <% (18..30).each do |number| %>
+      <% value = @checklist["c#{number}"] %>
+      <% if value.present? %>
+        <dt class="col-sm-8 border-bottom py-2">Campo histórico <%= number %></dt>
+        <dd class="col-sm-4 border-bottom py-2 mb-0"><%= value %></dd>
+      <% end %>
+    <% end %>
+  </dl>
+  <h2 class="h5">Comentarios</h2>
+  <%= simple_format(@checklist.comments.presence || "Sin comentarios") %>
+
+  <div class="d-flex gap-2 mt-4 flex-wrap">
+    <%= link_to "Editar checklist", edit_equipment_checklist_path(@checklist), class: "btn btn-outline-primary" %>
+    <% if @checklist.mobile_asset %>
+      <%= link_to "Ficha del equipo", @checklist.mobile_asset, class: "btn btn-outline-secondary" %>
+    <% end %>
+    <%= button_to "Eliminar checklist", @checklist, method: :delete, class: "btn btn-outline-danger",
+                  form: { data: { turbo_confirm: "¿Eliminar este checklist?" } } %>
+  </div>
+</section>

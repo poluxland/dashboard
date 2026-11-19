@@ -1,0 +1,11 @@
+<section class="container-xl py-4">
+  <h1 class="h2 mb-3">Historial de checklists</h1>
+  <%= render "navigation" %>
+  <%= render "filters" %>
+  <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+    <p class="mb-0 text-body-secondary"><%= number_with_delimiter(@pagy.count, delimiter: ".") %> registros</p>
+    <%= link_to "Descargar Excel", equipment_checklists_path(@filters.merge(format: :xlsx)), class: "btn btn-outline-primary", data: { turbo: false } %>
+  </div>
+  <%= render "table", checklists: @checklists %>
+  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+</section>

@@ -1,0 +1,32 @@
+<%= form_with url: request.path, method: :get, class: "card card-body mb-4", data: { turbo: false } do |f| %>
+  <div class="row g-3">
+    <div class="col-md-3">
+      <%= f.label :asset_id, "Equipo", class: "form-label" %>
+      <%= f.select :asset_id, options_for_select(@assets.map { |asset| [asset.label, asset.id] }, @filters[:asset_id]), { include_blank: "Todos" }, class: "form-select" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :plant, "Planta", class: "form-label" %>
+      <%= f.select :plant, options_for_select(@plant_options.map { |plant| [EquipmentChecklist::PLANTS.fetch(plant, plant), plant] }, @filters[:plant]), { include_blank: "Todas" }, class: "form-select" %>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <%= f.label :from, "Desde", class: "form-label" %>
+      <%= f.date_field :from, value: @filters[:from], class: "form-control" %>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <%= f.label :to, "Hasta", class: "form-label" %>
+      <%= f.date_field :to, value: @filters[:to], class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :status, "Resultado", class: "form-label" %>
+      <%= f.select :status, options_for_select(EquipmentChecklist::STATUSES.map { |key, (label, _)| [label, key] }, @filters[:status]), { include_blank: "Todos" }, class: "form-select" %>
+    </div>
+    <div class="col-md-8 d-flex align-items-end gap-3 flex-wrap">
+      <div class="form-check py-2">
+        <%= check_box_tag :observations, "1", @filters[:observations] == "1", class: "form-check-input" %>
+        <%= f.label :observations, "Solo fallas o comentarios", class: "form-check-label" %>
+      </div>
+      <%= f.submit "Filtrar", class: "btn btn-primary" %>
+      <%= link_to "Limpiar", request.path, class: "btn btn-outline-secondary" %>
+    </div>
+  </div>
+<% end %>

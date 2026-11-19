@@ -1,0 +1,9 @@
+<div class="equipment-choices">
+  <% options.each_with_index do |(value, label), index| %>
+    <% id = "#{f.object_name}_#{field}_option_#{index}" %>
+    <label class="equipment-choice" for="<%= id %>">
+      <%= f.radio_button field, value, id: id, required: required, class: "form-check-input" %>
+      <%= label %>
+    </label>
+  <% end %>
+</div>

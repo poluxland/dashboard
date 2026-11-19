@@ -1,0 +1,12 @@
+<% if record.errors.any? %>
+  <div class="alert alert-danger" role="alert">
+    <p class="fw-semibold mb-1">Revisa los siguientes campos.</p>
+    <ul class="mb-0">
+      <% record.errors.each do |error| %>
+        <% labels = { mobile_asset: "Equipo", operator: "Operador", hour_meter: "Horómetro", c17: "Planta", code: "Código" } %>
+        <% label = EquipmentChecklist::QUESTIONS[error.attribute] || labels[error.attribute] || error.attribute.to_s.humanize %>
+        <li><%= label %> <%= { blank: "es obligatorio.", inclusion: "requiere una opción válida.", not_a_number: "debe ser un número.", not_an_integer: "debe ser un entero.", greater_than_or_equal_to: "debe ser mayor o igual a cero." }.fetch(error.type, error.message) %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

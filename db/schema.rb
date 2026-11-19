@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -220,6 +220,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_200000) do
     t.index ["date", "turno"], name: "index_envasadora_reports_on_date_and_turno"
   end
 
+  create_table "equipment_checklists", force: :cascade do |t|
+    t.bigint "erp_id"
+    t.bigint "mobile_asset_id"
+    t.string "legacy_code"
+    t.string "operator"
+    t.integer "hour_meter"
+    t.string "c1"
+    t.string "c2"
+    t.string "c3"
+    t.string "c4"
+    t.string "c5"
+    t.string "c6"
+    t.string "c7"
+    t.string "c8"
+    t.string "c9"
+    t.string "c10"
+    t.string "c11"
+    t.string "c12"
+    t.string "c13"
+    t.string "c14"
+    t.string "c15"
+    t.string "c16"
+    t.string "c17"
+    t.string "c18"
+    t.string "c19"
+    t.string "c20"
+    t.string "c21"
+    t.string "c22"
+    t.string "c23"
+    t.string "c24"
+    t.string "c25"
+    t.string "c26"
+    t.string "c27"
+    t.string "c28"
+    t.string "c29"
+    t.string "c30"
+    t.text "comments"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at", "id"], name: "index_equipment_checklists_on_created_at_and_id"
+    t.index ["erp_id"], name: "index_equipment_checklists_on_erp_id", unique: true
+    t.index ["mobile_asset_id"], name: "index_equipment_checklists_on_mobile_asset_id"
+  end
+
   create_table "estado_equipos", force: :cascade do |t|
     t.text "comentarios"
     t.datetime "created_at", null: false
@@ -273,6 +317,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_200000) do
     t.index ["source_fingerprint"], name: "index_mantenciones_on_source_fingerprint", unique: true
     t.check_constraint "planificacion::text = ANY (ARRAY['Plan'::character varying, 'Adicional'::character varying, 'Reprogramado'::character varying]::text[])", name: "mantenciones_planificacion_allowed"
     t.check_constraint "tipo_mantencion::text = ANY (ARRAY['Preventiva'::character varying, 'Correctivo Programado'::character varying, 'Correctivo No programado'::character varying, 'Reprogramar'::character varying]::text[])", name: "mantenciones_tipo_mantencion_allowed"
+  end
+
+  create_table "mobile_assets", force: :cascade do |t|
+    t.bigint "erp_id"
+    t.string "code"
+    t.string "brand"
+    t.string "model"
+    t.string "plant"
+    t.integer "year"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["erp_id"], name: "index_mobile_assets_on_erp_id", unique: true
   end
 
   create_table "monthly_records", force: :cascade do |t|
@@ -523,6 +580,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_200000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "equipment_checklists", "mobile_assets"
   add_foreign_key "indicator_readings", "people"
   add_foreign_key "tpt_events", "tpt_imports"
   add_foreign_key "ptm_events", "ptm_reports"

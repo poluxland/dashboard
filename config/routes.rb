@@ -1,5 +1,9 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :mobile_assets, path: "equipos-moviles"
+  resources :equipment_checklists, path: "checklists-equipos" do
+    get :report, on: :collection, path: "informe"
+  end
   resources :operation_activities, path: "operaciones-ptm", only: %i[index new create edit update]
   resources :tasks, only: [ :index, :show, :new, :create, :edit, :update ] do
     resources :comments, only: :create, controller: "task_comments"
