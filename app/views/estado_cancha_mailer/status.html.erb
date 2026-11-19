@@ -1,0 +1,18 @@
+<h1>Capacidad ocupada de canchas</h1>
+<p><%= @timestamp %> · Hora de Chile</p>
+<table style="border-collapse: collapse;">
+  <thead><tr><th scope="col">Material</th><th scope="col">Ocupación</th></tr></thead>
+  <tbody>
+    <% EstadoCancha::MATERIALS.each do |field, name| %>
+      <% value = @estado_cancha[field] %>
+      <tr>
+        <th scope="row" style="text-align: left; padding: 4px 12px;"><%= name %></th>
+        <td style="padding: 4px 12px;"><%= value.nil? ? "—" : "#{value} %" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<% if @estado_cancha.observaciones.present? %>
+  <h2>Observaciones</h2>
+  <p style="white-space: pre-wrap;"><%= @estado_cancha.observaciones %></p>
+<% end %>

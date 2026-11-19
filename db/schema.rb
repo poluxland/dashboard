@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -262,6 +262,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_220000) do
     t.index ["created_at", "id"], name: "index_equipment_checklists_on_created_at_and_id"
     t.index ["erp_id"], name: "index_equipment_checklists_on_erp_id", unique: true
     t.index ["mobile_asset_id"], name: "index_equipment_checklists_on_mobile_asset_id"
+  end
+
+  create_table "estado_canchas", force: :cascade do |t|
+    t.bigint "pmm_id"
+    t.integer "quilimari"
+    t.integer "cachinales"
+    t.integer "ñilhue"
+    t.integer "caolin"
+    t.integer "fierro"
+    t.integer "puzolana"
+    t.integer "tunga"
+    t.integer "ceniza"
+    t.integer "yeso"
+    t.integer "conchuela"
+    t.integer "san_pedro"
+    t.integer "clinker_a"
+    t.integer "clinker_b"
+    t.integer "clinker_importado"
+    t.text "observaciones"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at", "id"], name: "index_estado_canchas_on_created_at_and_id"
+    t.index ["pmm_id"], name: "index_estado_canchas_on_pmm_id", unique: true
   end
 
   create_table "estado_equipos", force: :cascade do |t|

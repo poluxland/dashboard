@@ -1,5 +1,8 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :estado_canchas do
+    get :historial, on: :collection
+  end
   resources :maintenance_checklists, path: "checklists-mantenedor"
   resources :mobile_assets, path: "equipos-moviles"
   resources :equipment_checklists, path: "checklists-equipos" do

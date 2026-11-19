@@ -1,0 +1,37 @@
+<%= form_with model: @estado_cancha do |form| %>
+  <% if @estado_cancha.errors.any? %>
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0">
+        <% @estado_cancha.errors.attribute_names.each do |field| %>
+          <li><%= EstadoCancha::MATERIALS.fetch(field, field.to_s.humanize) %> requiere un porcentaje entero.</li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card card-body mb-3">
+    <fieldset>
+      <legend class="h5">Ocupación por material</legend>
+      <div class="row g-3">
+        <% EstadoCancha::MATERIALS.each do |field, name| %>
+          <div class="col-6 col-md-4 col-lg-3">
+            <%= form.label field, name, class: "form-label" %>
+            <div class="input-group">
+              <%= form.number_field field, step: 1, inputmode: "numeric", class: "form-control" %>
+              <span class="input-group-text">%</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :observaciones, "Observaciones", class: "form-label" %>
+    <%= form.text_area :observaciones, rows: 3, class: "form-control" %>
+  </div>
+  <div class="d-flex gap-2">
+    <%= form.submit "Guardar estado", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", @estado_cancha.persisted? ? estado_cancha_path(@estado_cancha) : estado_canchas_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

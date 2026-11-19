@@ -1,0 +1,12 @@
+Capacidad ocupada de canchas
+<%= @timestamp %> · Hora de Chile
+
+<% EstadoCancha::MATERIALS.each do |field, name| %>
+<% value = @estado_cancha[field] %>
+<%= name %>: <%= value.nil? ? "—" : "#{value} %" %>
+<% end %>
+<% if @estado_cancha.observaciones.present? %>
+
+Observaciones
+<%= @estado_cancha.observaciones %>
+<% end %>

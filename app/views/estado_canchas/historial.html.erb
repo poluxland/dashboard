@@ -1,0 +1,31 @@
+<% content_for :title, "Historial de canchas" %>
+<section class="container-xl py-4">
+  <header class="d-flex flex-wrap justify-content-between gap-3 mb-4">
+    <h1 class="h2 mb-0">Historial de canchas</h1>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Volver a Materia Prima", estado_canchas_path, class: "btn btn-outline-secondary" %>
+      <%= link_to "Registrar estado", new_estado_cancha_path, class: "btn btn-primary" %>
+    </div>
+  </header>
+
+  <%= form_with url: historial_estado_canchas_path, method: :get, class: "card card-body mb-3" do |form| %>
+    <div class="row g-2 align-items-end">
+      <div class="col-sm-4 col-lg-3">
+        <%= form.label :desde, "Desde", class: "form-label" %>
+        <%= form.date_field :desde, value: @from, class: "form-control" %>
+      </div>
+      <div class="col-sm-4 col-lg-3">
+        <%= form.label :hasta, "Hasta", class: "form-label" %>
+        <%= form.date_field :hasta, value: @to, class: "form-control" %>
+      </div>
+      <div class="col-sm-4 col-lg-6 d-flex gap-2">
+        <%= form.submit "Filtrar", class: "btn btn-primary" %>
+        <%= link_to "Limpiar", historial_estado_canchas_path, class: "btn btn-outline-secondary" %>
+      </div>
+    </div>
+  <% end %>
+
+  <p class="text-body-secondary"><%= number_with_delimiter(@pagy.count, delimiter: ".") %> registros</p>
+  <%= render "table", records: @estado_canchas %>
+  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+</section>
