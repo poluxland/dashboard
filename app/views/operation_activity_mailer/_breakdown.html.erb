@@ -1,0 +1,25 @@
+<div style="border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:18px;">
+  <h2 style="font-size:17px;margin:0 0 14px;"><%= title %></h2>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;table-layout:fixed;">
+    <% counts.each_with_index do |(label, count), index| %>
+      <% percentage = (100.0 * count / total).round(1) %>
+      <tr>
+        <td width="34%" style="padding:6px 10px 6px 0;font-size:13px;line-height:1.35;overflow-wrap:break-word;"><%= label %></td>
+        <td style="padding:6px 10px 6px 0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-collapse:separate;background:#e5e7eb;border-radius:5px;overflow:hidden;">
+            <tr>
+              <% if percentage.positive? %>
+                <% color = colors[index % colors.size] %>
+                <td width="<%= percentage %>%" height="12" bgcolor="<%= color %>" style="background:<%= color %>;font-size:0;line-height:0;">&nbsp;</td>
+              <% end %>
+              <% if percentage < 100 %>
+                <td height="12" style="font-size:0;line-height:0;">&nbsp;</td>
+              <% end %>
+            </tr>
+          </table>
+        </td>
+        <td width="34" align="right" style="padding:6px 0;font-size:13px;font-weight:700;"><%= number_with_delimiter(count) %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

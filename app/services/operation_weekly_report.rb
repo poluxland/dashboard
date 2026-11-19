@@ -46,6 +46,14 @@ class OperationWeeklyReport
     records.map(&:area).tally.sort_by { |area, count| [ -count, area ] }
   end
 
+  def breakdown_counts
+    {
+      "Estado de ejecución" => state_counts,
+      "Tipo de actividad" => summary_counts.except("Actividades"),
+      "Actividades por área" => area_counts
+    }
+  end
+
   def state_counts
     complete = records.count { |record| record.estado == 100 }
     pending = records.count { |record| record.estado.zero? }

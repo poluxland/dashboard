@@ -1,49 +1,95 @@
+<style>
+  @media only screen and (max-width: 530px) {
+    .operations-email-content { padding: 16px !important; }
+    .operations-email-metrics > tbody > tr { display: flex; flex-wrap: wrap; gap: 8px; }
+    .operations-email-metrics > tbody > tr > td { box-sizing: border-box; width: calc(50% - 4px); }
+    .operations-email-date { width: 48px !important; white-space: normal !important; }
+    .operations-email-advance { width: 56px !important; }
+  }
+</style>
 <div style="margin:0;background:#f3f4f6;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;color:#111827;">
   <div style="max-width:760px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;">
-    <div style="background:#111827;color:#ffffff;padding:24px;">
-      <h1 style="font-size:24px;margin:0 0 8px;"><%= @report.title %></h1>
-      <div style="color:#d1d5db;">Puerto Montt · <%= l(@report.start_date, format: :long) %> al <%= l(@report.end_date, format: :long) %></div>
+    <div class="operations-email-content" style="background:#111827;color:#ffffff;padding:28px;">
+      <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;">Informe semanal</div>
+      <h1 style="font-size:26px;line-height:1.25;margin:6px 0 8px;">Operaciones PTM · Semana <%= @report.week_number %></h1>
+      <div style="font-size:15px;color:#d1d5db;">
+        <%= l(@report.start_date, format: :long) %> al <%= l(@report.end_date, format: :long) %>
+      </div>
     </div>
-    <div style="padding:24px;">
-      <% average = @report.average_state %>
-      <% metrics = @report.summary_counts.merge("Avance promedio" => average ? number_to_percentage(average, precision: 1, strip_insignificant_zeros: true) : "—") %>
-      <table width="100%" style="border-collapse:collapse;">
+
+    <div class="operations-email-content" style="padding:24px 28px;">
+      <%
+        average = @report.average_state
+        metrics = @report.summary_counts.merge("Avance promedio" => average ? number_to_percentage(average, precision: 1, strip_insignificant_zeros: true) : "—")
+        card_colors = {
+          "Actividades" => %w[#eff6ff #1e3a8a],
+          "Programadas" => %w[#f0fdf4 #166534],
+          "Por reprogramar" => %w[#fffbeb #92400e],
+          "Contingencias" => %w[#ecfeff #155e75],
+          "Sin clasificar" => %w[#f1f5f9 #334155],
+          "Avance promedio" => %w[#faf5ff #6b21a8]
+        }
+      %>
+      <table class="operations-email-metrics" role="presentation" width="100%" cellpadding="0" cellspacing="8" style="border-collapse:separate;table-layout:fixed;margin:0 0 12px;">
         <tbody>
-          <% metrics.each do |label, value| %>
-            <tr>
-              <th scope="row" style="text-align:left;padding:6px 12px;background:#f3f4f6;font-weight:normal;"><%= label %></th>
-              <td style="text-align:right;padding:6px 12px;background:#f3f4f6;font-weight:bold;"><%= value %></td>
-            </tr>
-          <% end %>
+          <tr>
+            <% metrics.each do |label, value| %>
+              <% background, foreground = card_colors.fetch(label) %>
+              <td bgcolor="<%= background %>" style="background:<%= background %>;border-radius:10px;padding:12px;vertical-align:top;">
+                <div style="font-size:12px;color:#475569;overflow-wrap:break-word;"><%= label %></div>
+                <div style="font-size:23px;font-weight:700;color:<%= foreground %>;margin-top:4px;"><%= value.is_a?(Integer) ? number_with_delimiter(value) : value %></div>
+              </td>
+            <% end %>
+          </tr>
         </tbody>
       </table>
 
       <% if @report.records.empty? %>
-        <p>No se registraron actividades durante esta semana.</p>
+        <div style="padding:18px;background:#eff6ff;color:#1e40af;border-radius:10px;">No se registraron actividades durante esta semana.</div>
       <% else %>
-        <% { "Estado de ejecución" => @report.state_counts, "Actividades por área" => @report.area_counts }.each do |title, counts| %>
-          <h2 style="font-size:17px;margin:24px 0 8px;"><%= title %></h2>
-          <table width="100%" style="border-collapse:collapse;">
-            <tbody>
-              <% counts.each do |label, count| %>
-                <tr>
-                  <th scope="row" style="text-align:left;padding:5px 0;font-weight:normal;"><%= label %></th>
-                  <td style="text-align:right;font-weight:bold;"><%= count %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
+        <%
+          palettes = [
+            %w[#166534 #b45309 #991b1b],
+            %w[#166534 #b45309 #0891b2 #64748b],
+            %w[#2563eb #16a34a #7c3aed #0891b2 #c2410c #be185d]
+          ]
+        %>
+        <% @report.breakdown_counts.each_with_index do |(title, counts), index| %>
+          <%= render "breakdown", title: title, counts: counts, total: @report.records.size, colors: palettes.fetch(index) %>
         <% end %>
 
-        <h2 style="font-size:17px;margin:24px 0 8px;">Actividades de la semana</h2>
-        <% @report.records.each do |record| %>
-          <div style="border-top:1px solid #e5e7eb;padding:10px 0;">
-            <div style="font-weight:bold;"><%= record.actividad %></div>
-            <div style="color:#475569;font-size:13px;margin-top:4px;">
-              <%= l(record.fecha, format: :short) %> · <%= record.area %> · <%= record.tipo %> · <%= number_to_percentage(record.estado, precision: 2, strip_insignificant_zeros: true) %>
-            </div>
-          </div>
-        <% end %>
+        <div style="border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:18px;">
+          <h2 style="font-size:17px;margin:0 0 4px;">Actividades de la semana</h2>
+          <p style="font-size:13px;color:#64748b;margin:0 0 14px;">Detalle de las <%= number_with_delimiter(@report.records.size) %> actividades y su porcentaje de avance.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;table-layout:fixed;">
+            <% @report.records.each_with_index do |record, index| %>
+              <%
+                lines = record.actividad.lines.map(&:strip).reject(&:blank?)
+                border = index.zero? ? "0" : "1px solid #e5e7eb"
+                color = if record.estado >= 100
+                  "#166534"
+                elsif record.estado.positive?
+                  "#92400e"
+                else
+                  "#991b1b"
+                end
+              %>
+              <tr>
+                <td class="operations-email-date" width="72" style="padding:12px 8px 12px 0;border-top:<%= border %>;vertical-align:top;font-size:12px;color:#475569;white-space:nowrap;"><%= l(record.fecha, format: :short) %></td>
+                <td style="padding:12px 8px;border-top:<%= border %>;vertical-align:top;overflow-wrap:break-word;">
+                  <div style="font-size:14px;font-weight:700;line-height:1.35;"><%= lines.first %></div>
+                  <div style="font-size:12px;color:#475569;margin-top:4px;line-height:1.4;"><%= record.area %> · <%= record.tipo %></div>
+                  <% if lines.size > 1 %>
+                    <div style="font-size:12px;color:#475569;margin-top:4px;line-height:1.4;"><%= safe_join(lines.drop(1), tag.br) %></div>
+                  <% end %>
+                </td>
+                <td class="operations-email-advance" width="70" align="right" style="padding:12px 0 12px 4px;border-top:<%= border %>;vertical-align:top;white-space:nowrap;">
+                  <span style="display:inline-block;background:<%= color %>;color:#ffffff;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:700;"><%= number_to_percentage(record.estado, precision: 2, strip_insignificant_zeros: true, format: "%n%") %></span>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
       <% end %>
 
       <p style="text-align:center;margin:24px 0 0;">

@@ -10,7 +10,7 @@ Avance promedio: <%= average ? number_to_percentage(average, precision: 1, strip
 <% if @report.records.empty? %>
 No se registraron actividades durante esta semana.
 <% else %>
-<% { "Estado de ejecución" => @report.state_counts, "Actividades por área" => @report.area_counts }.each do |title, counts| %>
+<% @report.breakdown_counts.each do |title, counts| %>
 <%= title %>
 <% counts.each do |label, count| %>
 - <%= label %>: <%= count %>
