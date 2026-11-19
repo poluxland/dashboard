@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -498,6 +498,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000000) do
     t.string "signer_name", null: false
     t.text "statement", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "soplados", force: :cascade do |t|
+    t.bigint "erp_id"
+    t.string "supervisor"
+    t.datetime "fecha"
+    t.float "presion1"
+    t.float "presion2"
+    t.float "presion3"
+    t.float "presion4"
+    t.float "presion5"
+    t.float "presion6"
+    t.float "horno"
+    t.float "carbon_horno"
+    t.float "carbon_precalcinador"
+    t.boolean "jetin"
+    t.string "mirillas"
+    t.float "so3"
+    t.integer "tiempo"
+    t.integer "operadores"
+    t.text "observaciones"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["erp_id"], name: "index_soplados_on_erp_id", unique: true
+    t.index ["fecha", "id"], name: "index_soplados_on_fecha_and_id"
   end
 
   create_table "task_comments", force: :cascade do |t|

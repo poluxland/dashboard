@@ -1,0 +1,19 @@
+<h1>Reporte Soplado TC</h1>
+<table style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px">
+  <thead>
+    <tr>
+      <% Soplado::LABELS.each_value do |label| %>
+        <th scope="col" style="padding: 6px; border: 1px solid #d6e1dc; background: #edf5f0"><%= label %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @soplados.each do |soplado| %>
+      <tr>
+        <% Soplado::LABELS.each_key do |field| %>
+          <td style="padding: 6px; border: 1px solid #d6e1dc"><%= soplado_value(soplado, field) %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

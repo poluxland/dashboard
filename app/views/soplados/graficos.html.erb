@@ -1,0 +1,47 @@
+<% content_for :title, "Gráficos de soplado TC" %>
+
+<section class="py-2">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+    <h1 class="h3 mb-0">Gráficos de soplado TC</h1>
+    <%= link_to "Ver historial", soplados_path, class: "btn btn-outline-secondary" %>
+  </div>
+  <p class="text-body-secondary">Registros del <%= @desde.strftime("%d/%m/%Y") %> al <%= @hasta.strftime("%d/%m/%Y") %></p>
+
+  <% if @series.values.any?(&:present?) %>
+    <div class="row g-3" data-controller="soplados-charts"
+          data-soplados-charts-series-value="<%= @series.to_json %>"
+          data-soplados-charts-from-value="<%= @desde.to_i * 1000 %>"
+          data-soplados-charts-to-value="<%= @hasta.to_i * 1000 %>">
+      <div class="col-md-6">
+        <section class="card card-body">
+          <h2 class="h5">Producción del horno</h2>
+          <div style="height: 265px">
+            <canvas role="img" aria-label="Alimentación del horno en toneladas por hora"
+                    data-soplados-charts-target="horno"></canvas>
+          </div>
+        </section>
+      </div>
+      <div class="col-md-6">
+        <section class="card card-body">
+          <h2 class="h5">Temperatura CC54</h2>
+          <div style="height: 265px">
+            <canvas role="img" aria-label="Temperatura CC54 por fecha"
+                    data-soplados-charts-target="temperature"></canvas>
+          </div>
+        </section>
+      </div>
+      <div class="col-12">
+        <section class="card card-body">
+          <h2 class="h5">Presiones</h2>
+          <div style="height: 315px">
+            <canvas role="img" aria-label="Presiones del ducto ascendente, CC54 y Quench"
+                    data-soplados-charts-target="pressure"></canvas>
+          </div>
+        </section>
+      </div>
+      <p hidden class="text-body-secondary" data-soplados-charts-target="error">No se pudieron cargar los gráficos.</p>
+    </div>
+  <% else %>
+    <p>Sin mediciones para este período.</p>
+  <% end %>
+</section>

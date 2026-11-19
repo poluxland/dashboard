@@ -1,6 +1,9 @@
 # config/routes.rb
 Rails.application.routes.draw do
   resources :trabajos, only: %i[index show new create edit update]
+  resources :soplados do
+    get :graficos, on: :collection
+  end
   resources :estado_canchas do
     get :historial, on: :collection
   end

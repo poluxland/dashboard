@@ -1,0 +1,27 @@
+<% content_for :title, "Registro de soplado TC" %>
+
+<section class="py-2">
+  <%= link_to "Volver al historial", soplados_path, class: "d-inline-block mb-2" %>
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="h3 mb-0">Registro de soplado TC</h1>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Editar", edit_soplado_path(@soplado), class: "btn btn-outline-primary" %>
+      <% if task_admin? %>
+        <%= button_to "Eliminar", @soplado, method: :delete, class: "btn btn-outline-danger",
+                      form: { data: { turbo_confirm: "¿Eliminar este registro de soplado?" } } %>
+      <% end %>
+    </div>
+  </div>
+
+  <section class="card card-body">
+    <% if @soplado.erp_id %><p class="small text-body-secondary">Registro ERP <%= @soplado.erp_id %></p><% end %>
+    <dl class="row mb-0">
+      <% Soplado::LABELS.each do |field, label| %>
+        <div class="<%= field == :observaciones ? "col-12" : "col-6 col-md-4 col-lg-3" %>">
+          <dt><%= label %></dt>
+          <dd class="text-break" style="white-space: pre-wrap"><%= soplado_value(@soplado, field) %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </section>
+</section>

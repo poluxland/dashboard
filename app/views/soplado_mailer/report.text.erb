@@ -1,0 +1,8 @@
+Reporte Soplado TC
+
+<% @soplados.each do |soplado| -%>
+<% Soplado::LABELS.each do |field, label| -%>
+<%= label %>: <%= soplado_value(soplado, field) %>
+<% end -%>
+
+<% end -%>

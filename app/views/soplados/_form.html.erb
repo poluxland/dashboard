@@ -1,0 +1,70 @@
+<%= form_with model: soplado do |form| %>
+  <% if soplado.errors.any? %>
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0">
+        <% soplado.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card card-body shadow-sm mb-3">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <%= form.label :supervisor, "Supervisor", class: "form-label" %>
+        <%= form.text_field :supervisor, maxlength: 255, required: soplado.new_record?, class: "form-control", autocomplete: "name" %>
+      </div>
+      <div class="col-md-6">
+        <%= form.label :fecha, "Fecha y hora de Chile", class: "form-label" %>
+        <%= form.datetime_field :fecha, value: soplado.local_fecha&.strftime("%Y-%m-%dT%H:%M"), required: true, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+
+  <section class="card card-body shadow-sm mb-3">
+    <h2 class="h5">Mediciones</h2>
+    <div class="row g-3">
+      <% Soplado::MEASUREMENTS.each do |field, (label, reference)| %>
+        <div class="col-6 col-md-4">
+          <%= form.label field, label, class: "form-label" %>
+          <%= form.text_field field, inputmode: "decimal", class: "form-control",
+                              aria: reference ? { describedby: "soplado_#{field}_referencia" } : {} %>
+          <% if reference %>
+            <div class="form-text" id="soplado_<%= field %>_referencia">Normal <%= reference %></div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="card card-body shadow-sm mb-3">
+    <h2 class="h5">Datos de la tarea</h2>
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <%= form.label :jetin, "Jetin", class: "form-label" %>
+        <%= form.select :jetin, [["Sí", "true"], ["No", "false"]], { include_blank: "Sin informar" }, class: "form-select" %>
+      </div>
+      <div class="col-6 col-md-3">
+        <%= form.label :tiempo, "Tiempo de la tarea (min)", class: "form-label" %>
+        <%= form.number_field :tiempo, min: 0, step: 1, class: "form-control" %>
+      </div>
+      <div class="col-6 col-md-3">
+        <%= form.label :operadores, "Número de operadores", class: "form-label" %>
+        <%= form.number_field :operadores, min: 0, step: 1, class: "form-control" %>
+      </div>
+      <div class="col-md-3">
+        <%= form.label :mirillas, "Estado de mirillas", class: "form-label" %>
+        <%= form.text_field :mirillas, maxlength: 255, class: "form-control" %>
+      </div>
+      <div class="col-12">
+        <%= form.label :observaciones, "Observaciones", class: "form-label" %>
+        <%= form.text_area :observaciones, rows: 3, maxlength: 5000, class: "form-control" %>
+      </div>
+    </div>
+  </section>
+
+  <div class="d-flex flex-wrap gap-2">
+    <%= form.submit "Guardar registro", class: "btn btn-primary", data: { turbo_submits_with: "Guardando…" } %>
+    <%= link_to signed_in? ? "Ver historial" : "Volver al inicio de sesión",
+                signed_in? ? soplados_path : login_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>
