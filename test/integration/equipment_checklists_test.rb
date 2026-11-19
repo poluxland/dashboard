@@ -2,13 +2,11 @@ require "test_helper"
 
 class EquipmentChecklistsTest < ActionDispatch::IntegrationTest
   setup do
-    OmniAuth.config.test_mode = true
     @asset = MobileAsset.create!(code: "HQ01", plant: "LCA")
   end
 
   teardown do
     OmniAuth.config.mock_auth[:google_oauth2] = nil
-    OmniAuth.config.test_mode = false
   end
 
   test "the checklist form uses radio choices and saves a complete inspection" do
