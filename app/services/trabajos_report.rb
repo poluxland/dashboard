@@ -1,5 +1,5 @@
 class TrabajosReport
-  attr_reader :meses, :pendientes, :sin_op, :con_op, :en_ejecucion, :ventas, :grafico, :periodo_grafico
+  attr_reader :meses, :pendientes, :sin_op, :con_op, :en_ejecucion, :ventas
 
   def initialize(today:)
     @meses = (0..3).map { |offset| today.beginning_of_month << offset }
@@ -15,16 +15,5 @@ class TrabajosReport
       .group(:planta, :fecha_termino).sum(:total).each do |(planta, fecha), total|
         @ventas[[ planta, fecha.beginning_of_month ]] += total
       end
-
-    @periodo_grafico = (today << 12)..today
-    por_planta = trabajos.finalizados.where(fecha_termino: periodo_grafico)
-      .group(:planta, :fecha_termino).order(:fecha_termino).sum(:total)
-      .group_by { |(planta, _fecha), _total| planta }
-    @grafico = Trabajo::PLANTAS.map do |planta, sigla|
-      {
-        label: sigla,
-        data: por_planta.fetch(planta, []).map { |(_planta, fecha), total| [ fecha.iso8601, total ] }
-      }
-    end
   end
 end

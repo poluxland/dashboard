@@ -13,7 +13,8 @@ class TrabajosTest < ActionDispatch::IntegrationTest
 
       get root_path
       assert_response :success
-      assert_select "#resumen-trabajos h3", count: 5
+      assert_select "#resumen-trabajos h3", count: 4
+      assert_select "#resumen-trabajos canvas", count: 0
       {
         trabajos_path(planta: "La Calera", avance: "Terminado") => "$620",
         trabajos_path(planta: "La Calera", avance: "Terminado", op: "sin") => "$500",
@@ -22,13 +23,6 @@ class TrabajosTest < ActionDispatch::IntegrationTest
         trabajos_path(planta: "La Calera", avance: "finalizados", mes: "2026-10") => "$720"
       }.each do |url, amount|
         assert_select "a[href=?]", url, text: amount
-      end
-
-      assert_select "[data-trabajos-chart-series-value]" do |chart|
-        assert_equal "2025-11-19", chart.first["data-trabajos-chart-from-value"]
-        assert_equal "2026-11-19", chart.first["data-trabajos-chart-to-value"]
-        data = JSON.parse(chart.first["data-trabajos-chart-series-value"]).first.fetch("data")
-        assert_equal [ [ "2026-10-01", 200 ], [ "2026-10-31", 520 ] ], data
       end
 
       get trabajos_path, params: { planta: "La Calera", avance: "finalizados", mes: "2026-10" }
@@ -43,7 +37,7 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "admins can look up a historical reference and preserve the imported total until its quantities or prices change" do
+  test "authorized users can look up a reference and preserve the imported total until its quantities or prices change" do
     id = Trabajo.insert!({ erp_id: 900, descripcion: "Reparación", q1: 2, v1: 300, total: 500 }).rows.first.first
     trabajo = Trabajo.find(id)
     sign_in_with_google(email: "fernando.gonzalez@msindustrial.cl")
@@ -71,20 +65,27 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     assert_equal 900, trabajo.erp_id
   end
 
-  test "corporate users can manage their own quotes and the imported history requires administrator access" do
-    imported = Trabajo.create!(erp_id: 567, descripcion: "Trabajo histórico")
-    get trabajos_path
-    assert_redirected_to login_path
-    sign_in_with_google
+  test "ERP superadmins can access the cards and the plant menus with their corporate accounts" do
+    emails = %w[
+      administracion@msindustrial.cl elizabeth.zuniga@msindustrial.cl fernando.gonzalez@msindustrial.cl
+      jose.jerez@msindustrial.cl julio.alvear@msindustrial.cl orlando.lobos@msindustrial.cl
+      simon.rojas@msindustrial.cl susana.molina@msindustrial.cl
+    ]
+    emails.each do |email|
+      sign_in_with_google(email: email)
+      get root_path
+      assert_response :success
+      assert_select "#resumen-trabajos", count: 1
+      assert_select ".navbar a.nav-link", text: "Trabajos", count: 0
+      assert_select 'ul[aria-labelledby="lcaDropdown"] a[href=?]', trabajos_path(planta: "La Calera"), text: "Trabajos"
+      assert_select 'ul[aria-labelledby="ptmDropdown"] a[href=?]', trabajos_path(planta: "P.Montt"), text: "Trabajos"
+      get trabajos_path
+      assert_response :success
+    end
+  end
 
-    get root_path
-    assert_select "#resumen-trabajos", count: 0
-    get trabajos_path
-    assert_response :success
-    assert_select "h1", "Mis cotizaciones"
-    assert_select "tbody a", count: 0
-    get trabajo_path(imported)
-    assert_response :not_found
+  test "authorized ERP users can create and print a quotation without a dashboard admin role" do
+    sign_in_with_google(email: "elizabeth.zuniga@msindustrial.cl")
     get new_trabajo_path
     assert_response :success
 
@@ -96,7 +97,32 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     get trabajo_path(Trabajo.last)
     assert_response :success
     assert_select "button", "Imprimir cotización"
+
+    get tasks_path
+    assert_response :forbidden
+  end
+
+  test "unlisted accounts cannot open or submit any jobs or quotations" do
+    imported = Trabajo.create!(erp_id: 567, descripcion: "Trabajo histórico")
+    own = Trabajo.create!(author_email: "usuario@msindustrial.cl", descripcion: "Cotización anterior")
     get trabajos_path
-    assert_select "tbody tr", count: 1
+    assert_redirected_to login_path
+    sign_in_with_google
+
+    get root_path
+    assert_select "#resumen-trabajos", count: 0
+    assert_select ".navbar a", text: "Trabajos", count: 0
+    [ trabajos_path, new_trabajo_path, trabajo_path(imported), trabajo_path(own), edit_trabajo_path(own) ].each do |path|
+      get path
+      assert_response :forbidden
+    end
+
+    assert_no_difference("Trabajo.count") do
+      post trabajos_path, params: { trabajo: { descripcion: "Cotización", q12: 2, v12: 250 } }
+      assert_response :forbidden
+    end
+    patch trabajo_path(own), params: { trabajo: { descripcion: "Cambio" } }
+    assert_response :forbidden
+    assert_equal "Cotización anterior", own.reload.descripcion
   end
 end

@@ -33,10 +33,6 @@
           </ul>
         </li>
 
-        <li class="nav-item">
-          <%= link_to "Trabajos", trabajos_path, class: "nav-link #{'active' if controller_name == 'trabajos'}" %>
-        </li>
-
         <li class="nav-item dropdown">
           <button
             class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[estado_canchas envasadora_reports envasadora_dashboard haver_dashboard].include?(controller_name) || (controller_name == 'ots' && action_name == 'graficos') %>"
@@ -53,6 +49,9 @@
             <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "OTs", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Reporte técnico", works_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <% if trabajos_access? %>
+              <li><%= link_to "Trabajos", trabajos_path(planta: "La Calera"), class: "dropdown-item" %></li>
+            <% end %>
           </ul>
         </li>
 
@@ -73,6 +72,9 @@
             <li><%= link_to "Mantenciones", graficos_mantenciones_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Cierre de turno", shift_reports_path, class: "dropdown-item" %></li>
             <li><%= link_to "Reporte técnico", works_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <% if trabajos_access? %>
+              <li><%= link_to "Trabajos", trabajos_path(planta: "P.Montt"), class: "dropdown-item" %></li>
+            <% end %>
           </ul>
         </li>
 

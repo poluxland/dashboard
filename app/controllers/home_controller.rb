@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   def index
     today = Time.current.in_time_zone("America/Santiago").to_date
-    @trabajos_report = TrabajosReport.new(today: today) if task_admin?
+    @trabajos_report = TrabajosReport.new(today: today) if trabajos_access?
     tasks = Task.includes(:items).where(assignee_email: current_user[:email].to_s.downcase).ordered.to_a
     pending = tasks.reject { |task| task.status == "done" }
     @group_by = %w[category plant status date].include?(params[:group_by]) ? params[:group_by] : "category"

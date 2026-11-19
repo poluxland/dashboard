@@ -1,10 +1,7 @@
 <section class="mb-5" id="resumen-trabajos" aria-labelledby="titulo-resumen-trabajos">
-  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h2 class="h3 mb-0" id="titulo-resumen-trabajos">Resumen de trabajos</h2>
-    <%= link_to "Ver todos los trabajos", trabajos_path, class: "btn btn-outline-primary btn-sm" %>
-  </div>
+  <h2 class="h3 mb-3" id="titulo-resumen-trabajos">Resumen de trabajos</h2>
 
-  <div class="row g-3 mb-3">
+  <div class="row g-3">
     <% Trabajo::PLANTAS.each do |planta, sigla| %>
       <div class="col-12 col-sm-6 col-xl-3">
         <section class="card card-body h-100">
@@ -40,21 +37,4 @@
       </div>
     <% end %>
   </div>
-
-  <section class="card card-body"
-           data-controller="trabajos-chart"
-           data-trabajos-chart-series-value="<%= report.grafico.to_json %>"
-           data-trabajos-chart-from-value="<%= report.periodo_grafico.begin.iso8601 %>"
-           data-trabajos-chart-to-value="<%= report.periodo_grafico.end.iso8601 %>">
-    <h3 class="h5">Ventas adicionales por planta</h3>
-    <p class="small text-body-secondary mb-2">Trabajos terminados o facturados por fecha de término durante los últimos 12 meses.</p>
-    <% if report.grafico.all? { |series| series[:data].empty? } %>
-      <p class="text-body-secondary mb-0">Sin trabajos en este período.</p>
-    <% else %>
-      <div style="height: 280px">
-        <canvas role="img" aria-label="Montos de ventas adicionales por planta y fecha de término" data-trabajos-chart-target="canvas"></canvas>
-      </div>
-      <p hidden class="text-body-secondary mb-0" data-trabajos-chart-target="error">No se pudo cargar el gráfico.</p>
-    <% end %>
-  </section>
 </section>

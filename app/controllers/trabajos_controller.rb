@@ -1,4 +1,5 @@
 class TrabajosController < ApplicationController
+  before_action :require_trabajos_access!
   before_action :set_trabajo, only: %i[show edit update]
 
   def index
@@ -37,14 +38,12 @@ class TrabajosController < ApplicationController
 
   private
 
-  def visible_trabajos
-    return Trabajo.all if task_admin?
-
-    Trabajo.where(author_email: current_user[:email].to_s.strip.downcase)
+  def require_trabajos_access!
+    head :forbidden unless trabajos_access?
   end
 
   def filtered_trabajos
-    scope = visible_trabajos
+    scope = Trabajo.all
     scope = scope.where(planta: @filters[:planta]) if @filters[:planta].present?
     scope = case @filters[:avance]
     when "finalizados" then scope.finalizados
@@ -72,7 +71,7 @@ class TrabajosController < ApplicationController
   end
 
   def set_trabajo
-    @trabajo = visible_trabajos.find(params[:id])
+    @trabajo = Trabajo.find(params[:id])
   end
 
   def trabajo_params

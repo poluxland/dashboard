@@ -4,6 +4,16 @@ class ApplicationController < ActionController::Base
     jose.jerez@msindustrial.cl
     fernando.gonzalez@msindustrial.cl
   ].freeze
+  TRABAJOS_USER_EMAILS = %w[
+    administracion@msindustrial.cl
+    elizabeth.zuniga@msindustrial.cl
+    fernando.gonzalez@msindustrial.cl
+    jose.jerez@msindustrial.cl
+    julio.alvear@msindustrial.cl
+    orlando.lobos@msindustrial.cl
+    simon.rojas@msindustrial.cl
+    susana.molina@msindustrial.cl
+  ].freeze
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -11,7 +21,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
 
-  helper_method :current_user, :signed_in?, :demo_user?, :task_admin?
+  helper_method :current_user, :signed_in?, :demo_user?, :task_admin?, :trabajos_access?
 
   private
 
@@ -33,6 +43,10 @@ class ApplicationController < ActionController::Base
 
   def task_admin?
     demo_user?
+  end
+
+  def trabajos_access?
+    signed_in? && TRABAJOS_USER_EMAILS.include?(current_user[:email].to_s.strip.downcase)
   end
 
   def authenticate_user!
