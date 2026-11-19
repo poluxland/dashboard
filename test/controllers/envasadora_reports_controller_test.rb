@@ -59,15 +59,24 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
   test "quality fields are optional whole counts and survive form submission and preview" do
     sign_in_with_google
     get new_envasadora_report_path
-    %w[sacos_no_reconocidos_haver sacos_descartados_haver].each do |field|
-      assert_select "input[name='envasadora_report[#{field}]'][min='0'][step='1']"
+    assert_response :success
+    EnvasadoraReport::HAVER_QUALITY_FIELDS.each_key do |field|
+      assert_select "input[name='envasadora_report[#{field}]'][min='0'][step='1'][value='0']"
+    end
+    %w[sacos_rotos_vento bigbags_rotos].each do |field|
+      assert_select "input[name='envasadora_report[#{field}]']" do |inputs|
+        assert inputs.first["value"].blank?, field
+      end
+    end
+    EnvasadoraReport::HAVER_QUALITY_FIELDS.each_key do |field|
       assert_no_difference("EnvasadoraReport.count") do
         post envasadora_reports_path, params: { envasadora_report: @attributes.merge(field => "1.5") }
       end
       assert_response :unprocessable_entity
     end
-    post envasadora_reports_path, params: { envasadora_report: @attributes.merge(sacos_no_reconocidos_haver: 52, sacos_descartados_haver: 113) }
+    post envasadora_reports_path, params: { envasadora_report: @attributes.merge(sacos_rotos_haver: 7, sacos_no_reconocidos_haver: 52, sacos_descartados_haver: 113) }
     report = EnvasadoraReport.last
+    assert_equal 7, report.sacos_rotos_haver
     assert_equal 52, report.sacos_no_reconocidos_haver
     assert_equal 113, report.sacos_descartados_haver
     follow_redirect!
@@ -87,6 +96,7 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
       end
     end
     report = EnvasadoraReport.last
+    assert_equal [ 0, 0, 0 ], report.values_at(*EnvasadoraReport::HAVER_QUALITY_FIELDS.keys)
     assert_equal "Ultra", report.silo20_cement
     assert_equal "usuario@msindustrial.cl", report.author_email
     assert_nil report.sent_at

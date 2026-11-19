@@ -71,7 +71,8 @@ class EnvasadoraReportsController < ApplicationController
   private
 
   def new_report_attributes
-    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.index_with(nil).merge("silo20_cement" => "Ultra")
+    EnvasadoraReport::REQUIRED_NUMERIC_FIELDS.index_with(nil)
+      .merge(EnvasadoraReport::HAVER_QUALITY_FIELDS.keys.index_with(0), "silo20_cement" => "Ultra")
   end
 
   def protect_historical_report
