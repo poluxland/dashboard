@@ -1,11 +1,16 @@
 <section class="container-xl py-4">
   <h1 class="h2 mb-3">Informe de checklists de equipos</h1>
   <%= render "navigation" %>
-  <%= render "filters" %>
+  <%= render "filters", unified: true %>
+  <% by_plant = @groups.group_by { |(plant, _, _), _| plant } %>
+  <% by_kind = @groups.group_by { |(_, kind, _), _| kind } %>
+  <% findings = @groups.sum { |(_, _, status), count| EquipmentInspectionReport::FINDINGS.include?(status) ? count : 0 } %>
   <div class="row g-3 mb-4">
-    <% total = @totals.values.sum %>
-    <% { "Total de checklists" => total }.merge(EquipmentChecklist::STATUSES.to_h { |key, (label, _)| [label, @totals[key]] }).each do |label, count| %>
-      <div class="col-6 col-lg-2">
+    <% { "Total de checklists" => @pagy.count,
+         "De operador" => by_kind.fetch("operador", []).sum(&:last),
+         "De mantenedor" => by_kind.fetch("mantenedor", []).sum(&:last),
+         "Con fallas o alertas" => findings }.each do |label, count| %>
+      <div class="col-6 col-lg-3">
         <div class="card card-body h-100">
           <span class="small text-body-secondary"><%= label %></span>
           <strong class="fs-3"><%= number_with_delimiter(count, delimiter: ".") %></strong>
@@ -14,36 +19,44 @@
     <% end %>
   </div>
 
-  <h2 class="h5">Resultados por planta</h2>
-  <div class="table-responsive mb-4">
-    <table class="table table-bordered align-middle">
-      <thead>
-        <tr>
-          <th scope="col">Planta</th>
-          <th scope="col" class="text-end">Total</th>
-          <% EquipmentChecklist::STATUSES.each_value do |label, _| %>
-            <th scope="col" class="text-end"><%= label %></th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <% @plants.sort_by { |plant, _| plant.to_s }.each do |plant, counts| %>
+  <% if by_plant.any? %>
+    <h2 class="h5">Resultados por planta</h2>
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered align-middle">
+        <thead>
           <tr>
-            <th scope="row"><%= EquipmentChecklist::PLANTS.fetch(plant, plant || "Sin planta registrada") %></th>
-            <td class="text-end"><%= counts.values.sum %></td>
-            <% EquipmentChecklist::STATUSES.each_key do |key| %>
-              <td class="text-end"><%= counts[key] %></td>
-            <% end %>
+            <th scope="col">Planta</th><th scope="col" class="text-end">Total</th>
+            <th scope="col" class="text-end">Operador</th><th scope="col" class="text-end">Mantenedor</th>
+            <th scope="col">Resultados</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-  <p class="small text-body-secondary">El resultado de cada checklist se determina por la falla de mayor gravedad registrada.</p>
+        </thead>
+        <tbody>
+          <% by_plant.sort_by { |plant, _| plant.to_s }.each do |plant, rows| %>
+            <% by_status = rows.group_by { |(_, _, status), _| status } %>
+            <tr>
+              <th scope="row"><%= EquipmentChecklist::PLANTS.fetch(plant, plant || "Sin planta registrada") %></th>
+              <td class="text-end"><%= rows.sum(&:last) %></td>
+              <% EquipmentInspectionReport::KINDS.each_key do |kind| %>
+                <td class="text-end"><%= rows.sum { |(_, row_kind, _), count| row_kind == kind ? count : 0 } %></td>
+              <% end %>
+              <td>
+                <div class="d-flex flex-wrap gap-1">
+                  <% EquipmentInspectionReport::STATUSES.each do |status, (label, color)| %>
+                    <% count = by_status.fetch(status, []).sum(&:last) %>
+                    <% if count.positive? %><span class="badge text-bg-<%= color %>"><%= label %> · <%= count %></span><% end %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
   <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
     <h2 class="h5 mb-0">Registros del informe</h2>
-    <%= link_to "Descargar Excel", equipment_checklists_path(@filters.merge(format: :xlsx)), class: "btn btn-outline-primary", data: { turbo: false } %>
+    <%= link_to "Descargar CSV", report_equipment_checklists_path(@filters.merge(format: :csv)), class: "btn btn-outline-primary", data: { turbo: false } %>
   </div>
-  <%= render "table", checklists: @checklists %>
+  <%= render "report_table", checklists: @checklists %>
   <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
 </section>

@@ -1,5 +1,12 @@
 <%= form_with url: request.path, method: :get, class: "card card-body mb-4", data: { turbo: false } do |f| %>
+  <% unified = local_assigns.fetch(:unified, false) %>
   <div class="row g-3">
+    <% if unified %>
+      <div class="col-md-3">
+        <%= f.label :kind, "Tipo de checklist", class: "form-label" %>
+        <%= f.select :kind, options_for_select(EquipmentInspectionReport::KINDS.invert, @filters[:kind]), { include_blank: "Todos" }, class: "form-select" %>
+      </div>
+    <% end %>
     <div class="col-md-3">
       <%= f.label :asset_id, "Equipo", class: "form-label" %>
       <%= f.select :asset_id, options_for_select(@assets.map { |asset| [asset.label, asset.id] }, @filters[:asset_id]), { include_blank: "Todos" }, class: "form-select" %>
@@ -18,12 +25,12 @@
     </div>
     <div class="col-md-4">
       <%= f.label :status, "Resultado", class: "form-label" %>
-      <%= f.select :status, options_for_select(EquipmentChecklist::STATUSES.map { |key, (label, _)| [label, key] }, @filters[:status]), { include_blank: "Todos" }, class: "form-select" %>
+      <%= f.select :status, options_for_select((unified ? EquipmentInspectionReport::STATUSES : EquipmentChecklist::STATUSES).map { |key, (label, _)| [label, key] }, @filters[:status]), { include_blank: "Todos" }, class: "form-select" %>
     </div>
     <div class="col-md-8 d-flex align-items-end gap-3 flex-wrap">
       <div class="form-check py-2">
         <%= check_box_tag :observations, "1", @filters[:observations] == "1", class: "form-check-input" %>
-        <%= f.label :observations, "Solo fallas o comentarios", class: "form-check-label" %>
+        <%= f.label :observations, unified ? "Solo hallazgos o comentarios" : "Solo fallas o comentarios", class: "form-check-label" %>
       </div>
       <%= f.submit "Filtrar", class: "btn btn-primary" %>
       <%= link_to "Limpiar", request.path, class: "btn btn-outline-secondary" %>

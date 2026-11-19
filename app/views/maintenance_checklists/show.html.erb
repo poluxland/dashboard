@@ -1,0 +1,44 @@
+<section class="container-lg py-4">
+  <h1 class="h2 mb-3">Checklist de mantenedor · <%= @checklist.asset_label %></h1>
+  <%= render "equipment_checklists/navigation" %>
+  <div class="card card-body mb-4">
+    <dl class="row mb-0">
+      <% {
+        "Fecha" => @checklist.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M"),
+        "Mantenedor" => @checklist.technician,
+        "Estado operativo" => @checklist.operating_status,
+        "Horómetro" => @checklist.hour_meter
+      }.each do |label, value| %>
+        <dt class="col-sm-4"><%= label %></dt><dd class="col-sm-8"><%= value.presence || "Sin registro" %></dd>
+      <% end %>
+      <% if @checklist.legacy_code.present? %>
+        <dt class="col-sm-4">Código histórico</dt><dd class="col-sm-8"><%= @checklist.legacy_code %></dd>
+      <% end %>
+      <% if @checklist.erp_id.present? %>
+        <dt class="col-sm-4">N.º en el ERP</dt><dd class="col-sm-8"><%= @checklist.erp_id %></dd>
+      <% end %>
+    </dl>
+  </div>
+  <h2 class="h5">Puntos de revisión</h2>
+  <dl class="row mb-4">
+    <% MaintenanceChecklist::QUESTIONS.each do |field, label| %>
+      <dt class="col-sm-8 border-bottom py-2"><%= label %></dt>
+      <dd class="col-sm-4 border-bottom py-2 mb-0"><%= MaintenanceChecklist::ANSWERS.fetch(@checklist[field]) %></dd>
+    <% end %>
+  </dl>
+  <h2 class="h5">Combustible y aceites</h2>
+  <dl class="row">
+    <% MaintenanceChecklist::FLUIDS.each do |field, label| %>
+      <dt class="col-sm-8 border-bottom py-2"><%= label %></dt>
+      <dd class="col-sm-4 border-bottom py-2 mb-0"><%= @checklist[field] || "Sin registro" %></dd>
+    <% end %>
+  </dl>
+  <div class="d-flex gap-2 mt-4 flex-wrap">
+    <%= link_to "Editar checklist", edit_maintenance_checklist_path(@checklist), class: "btn btn-outline-primary" %>
+    <% if @checklist.mobile_asset %>
+      <%= link_to "Ficha del equipo", @checklist.mobile_asset, class: "btn btn-outline-secondary" %>
+    <% end %>
+    <%= button_to "Eliminar checklist", @checklist, method: :delete, class: "btn btn-outline-danger",
+                  form: { data: { turbo_confirm: "¿Eliminar este checklist?" } } %>
+  </div>
+</section>

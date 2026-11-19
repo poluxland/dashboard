@@ -13,16 +13,20 @@ class EquipmentChecklistsController < ApplicationController
   end
 
   def report
-    scope = filtered_checklists
-    counts = scope.reorder(nil).group(:c17, Arel.sql(EquipmentChecklist::STATUS_SQL)).count
-    @totals = Hash.new(0)
-    @plants = counts.each_with_object({}) do |((plant, status), count), plants|
-      @totals[status] += count
-      plant = plant.presence
-      plants[plant] ||= Hash.new(0)
-      plants[plant][status] += count
+    @filters = params.permit(:kind, :asset_id, :plant, :from, :to, :status, :observations).to_h
+    report = EquipmentInspectionReport.new(@filters)
+    scope = report.rows
+
+    respond_to do |format|
+      format.html do
+        @plant_options = report.plant_options
+        @groups = scope.group(:report_plant, :kind, :report_status).count
+        @pagy, @checklists = pagy(scope.order(created_at: :desc, kind: :asc, id: :desc), limit: 30)
+      end
+      format.csv do
+        send_data report.csv(scope), filename: "informe-checklists-equipos.csv", type: "text/csv; charset=utf-8"
+      end
     end
-    @pagy, @checklists = pagy(scope, limit: 30)
   end
 
   def show

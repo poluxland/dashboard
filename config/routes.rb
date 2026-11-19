@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :maintenance_checklists, path: "checklists-mantenedor"
   resources :mobile_assets, path: "equipos-moviles"
   resources :equipment_checklists, path: "checklists-equipos" do
     get :report, on: :collection, path: "informe"

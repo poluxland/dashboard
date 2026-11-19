@@ -1,0 +1,24 @@
+  <fieldset class="card card-body mb-3" data-controller="equipment-picker">
+    <legend class="h5">Equipo</legend>
+    <% if @assets.any? %>
+      <label for="equipment-search" class="form-label">Buscar por código, marca o modelo</label>
+      <input type="search" id="equipment-search" class="form-control mb-2" autocomplete="off"
+             data-equipment-picker-target="search" data-action="input->equipment-picker#filter">
+      <% if f.object.legacy_code.present? && f.object.mobile_asset_id.nil? %>
+        <p class="small text-body-secondary">Código del registro histórico: <%= f.object.legacy_code %></p>
+      <% end %>
+      <div class="equipment-choices equipment-picker-options">
+        <% @assets.each do |asset| %>
+          <% id = "#{f.object_name}_mobile_asset_id_#{asset.id}" %>
+          <label class="equipment-choice" for="<%= id %>" data-equipment-picker-target="option" data-search="<%= [asset.label, asset.brand, asset.model, asset.plant].compact.join(" ") %>">
+            <%= f.radio_button :mobile_asset_id, asset.id, id: id, required: f.object.new_record?, class: "form-check-input",
+                               data: { action: "change->equipment-picker#filter" } %>
+            <%= asset.label %>
+          </label>
+        <% end %>
+        <p hidden class="small mb-0" data-equipment-picker-target="empty" role="status">No se encontraron equipos con esa búsqueda.</p>
+      </div>
+    <% else %>
+      <p class="mb-0">Primero registra un equipo en el <%= link_to "catálogo de equipos", mobile_assets_path %>.</p>
+    <% end %>
+  </fieldset>

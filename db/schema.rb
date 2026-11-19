@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -293,6 +293,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_180000) do
     t.datetime "updated_at", null: false
     t.index ["person_id", "period"], name: "idx_unique_person_period", unique: true
     t.index ["person_id"], name: "index_indicator_readings_on_person_id"
+  end
+
+  create_table "maintenance_checklists", force: :cascade do |t|
+    t.bigint "erp_id"
+    t.bigint "mobile_asset_id"
+    t.string "legacy_code"
+    t.string "technician"
+    t.string "operating_status"
+    t.string "hour_meter"
+    t.boolean "c1", default: false
+    t.boolean "c2", default: false
+    t.boolean "c3", default: false
+    t.boolean "c4", default: false
+    t.boolean "c5", default: false
+    t.boolean "c6", default: false
+    t.boolean "c7", default: false
+    t.boolean "c8", default: false
+    t.boolean "c9", default: false
+    t.boolean "c10", default: false
+    t.boolean "c11", default: false
+    t.boolean "c12", default: false
+    t.boolean "c13", default: false
+    t.boolean "c14", default: false
+    t.boolean "c15", default: false
+    t.boolean "c16", default: false
+    t.boolean "c17", default: false
+    t.boolean "c18", default: false
+    t.boolean "c19", default: false
+    t.integer "fuel"
+    t.integer "engine_oil"
+    t.integer "hydraulic_oil"
+    t.integer "transmission_oil"
+    t.integer "atf_oil"
+    t.integer "nuto_oil"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at", "id"], name: "index_maintenance_checklists_on_created_at_and_id"
+    t.index ["erp_id"], name: "index_maintenance_checklists_on_erp_id", unique: true
+    t.index ["mobile_asset_id"], name: "index_maintenance_checklists_on_mobile_asset_id"
   end
 
   create_table "mantenciones", force: :cascade do |t|
@@ -582,6 +621,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_180000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "equipment_checklists", "mobile_assets"
   add_foreign_key "indicator_readings", "people"
+  add_foreign_key "maintenance_checklists", "mobile_assets"
   add_foreign_key "tpt_events", "tpt_imports"
   add_foreign_key "ptm_events", "ptm_reports"
   add_foreign_key "task_comments", "tasks"

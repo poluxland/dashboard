@@ -10,7 +10,8 @@
       <dt class="col-sm-4">Otros</dt><dd class="col-sm-8"><%= simple_format(@asset.notes.presence || "—") %></dd>
     </dl>
     <div class="d-flex gap-2 flex-wrap">
-      <%= link_to "Crear checklist", new_equipment_checklist_path(asset_id: @asset.id), class: "btn btn-primary" %>
+      <%= link_to "Checklist de operador", new_equipment_checklist_path(asset_id: @asset.id), class: "btn btn-primary" %>
+      <%= link_to "Checklist de mantenedor", new_maintenance_checklist_path(asset_id: @asset.id), class: "btn btn-outline-primary" %>
       <%= link_to "Editar equipo", edit_mobile_asset_path(@asset), class: "btn btn-outline-secondary" %>
       <% if @checklists.empty? %>
         <%= button_to "Eliminar equipo", @asset, method: :delete, class: "btn btn-outline-danger",
@@ -20,7 +21,7 @@
   </div>
   <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
     <h2 class="h5 mb-0">Últimos checklists</h2>
-    <%= link_to "Ver historial completo", equipment_checklists_path(asset_id: @asset.id), class: "btn btn-sm btn-outline-primary" %>
+    <%= link_to "Ver historial completo", report_equipment_checklists_path(asset_id: @asset.id), class: "btn btn-sm btn-outline-primary" %>
   </div>
-  <%= render "equipment_checklists/table", checklists: @checklists %>
+  <%= render "equipment_checklists/report_table", checklists: @checklists %>
 </section>

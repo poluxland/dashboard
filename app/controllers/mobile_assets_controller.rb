@@ -6,7 +6,7 @@ class MobileAssetsController < ApplicationController
   end
 
   def show
-    @checklists = @asset.checklist_history.includes(:mobile_asset).order(created_at: :desc, id: :desc).limit(10)
+    @checklists = EquipmentInspectionReport.new(asset_id: @asset.id).rows.order(created_at: :desc, kind: :asc, id: :desc).limit(10)
   end
 
   def new
@@ -34,7 +34,7 @@ class MobileAssetsController < ApplicationController
   end
 
   def destroy
-    if @asset.checklist_history.exists? || !@asset.destroy
+    if @asset.checklist_history.exists? || @asset.checklist_history(MaintenanceChecklist).exists? || !@asset.destroy
       redirect_to @asset, alert: "Este equipo tiene checklists y no se puede eliminar.", status: :see_other
     else
       redirect_to mobile_assets_path, notice: "Equipo eliminado.", status: :see_other

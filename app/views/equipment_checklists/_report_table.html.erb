@@ -1,0 +1,30 @@
+<% if checklists.any? %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Equipo</th><th scope="col">Planta</th>
+          <th scope="col">Responsable</th><th scope="col">Horómetro</th><th scope="col">Resultado</th><th scope="col">Comentarios</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% checklists.each do |row| %>
+          <% status, color = EquipmentInspectionReport::STATUSES.fetch(row.report_status) %>
+          <% path = row.kind == "mantenedor" ? maintenance_checklist_path(row.id) : equipment_checklist_path(row.id) %>
+          <tr>
+            <td class="text-nowrap"><%= link_to row.created_at.in_time_zone(EquipmentInspectionReport::CHILE).strftime("%d/%m/%Y %H:%M"), path %></td>
+            <td><%= EquipmentInspectionReport::KINDS.fetch(row.kind) %></td>
+            <td class="text-nowrap"><%= row.asset_code.presence || "Sin equipo registrado" %></td>
+            <td><%= EquipmentChecklist::PLANTS.fetch(row.report_plant, row.report_plant) || "Sin planta registrada" %></td>
+            <td><%= row.inspector %></td>
+            <td><%= row.meter_reading %></td>
+            <td><span class="badge text-bg-<%= color %>"><%= status %></span></td>
+            <td><%= truncate(row.report_comments, length: 110) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="text-body-secondary py-3">No hay checklists para mostrar.</p>
+<% end %>
