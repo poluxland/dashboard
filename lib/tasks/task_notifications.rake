@@ -12,6 +12,11 @@ namespace :tasks do
       rescue StandardError => error
         Rails.logger.error("Task notification worker failed: #{error.class}")
       end
+      begin
+        OperationWeeklyDelivery.dispatch_due
+      rescue StandardError => error
+        Rails.logger.error("Operations weekly report delivery failed: #{error.class}")
+      end
       sleep 60
     end
   end
