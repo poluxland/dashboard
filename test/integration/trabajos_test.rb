@@ -76,9 +76,9 @@ class TrabajosTest < ActionDispatch::IntegrationTest
       get root_path
       assert_response :success
       assert_select "#resumen-trabajos", count: 1
-      assert_select ".navbar a.nav-link", text: "Trabajos", count: 0
-      assert_select 'ul[aria-labelledby="lcaDropdown"] a[href=?]', trabajos_path(planta: "La Calera"), text: "Trabajos"
-      assert_select 'ul[aria-labelledby="ptmDropdown"] a[href=?]', trabajos_path(planta: "P.Montt"), text: "Trabajos"
+      assert_select ".navbar a.nav-link", text: "Cotizaciones", count: 0
+      assert_select 'ul[aria-labelledby="lcaDropdown"] a[href=?]', trabajos_path(planta: "La Calera"), text: "Cotizaciones"
+      assert_select 'ul[aria-labelledby="ptmDropdown"] a[href=?]', trabajos_path(planta: "P.Montt"), text: "Cotizaciones"
       get trabajos_path
       assert_response :success
     end
@@ -111,7 +111,7 @@ class TrabajosTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select "#resumen-trabajos", count: 0
-    assert_select ".navbar a", text: "Trabajos", count: 0
+    assert_select ".navbar a", text: "Cotizaciones", count: 0
     [ trabajos_path, new_trabajo_path, trabajo_path(imported), trabajo_path(own), edit_trabajo_path(own) ].each do |path|
       get path
       assert_response :forbidden

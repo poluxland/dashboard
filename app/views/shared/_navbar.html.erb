@@ -50,7 +50,7 @@
             <li><%= link_to "OTs", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Reporte técnico", works_path, class: "dropdown-item", data: { turbo: false } %></li>
             <% if trabajos_access? %>
-              <li><%= link_to "Trabajos", trabajos_path(planta: "La Calera"), class: "dropdown-item" %></li>
+              <li><%= link_to "Cotizaciones", trabajos_path(planta: "La Calera"), class: "dropdown-item" %></li>
             <% end %>
           </ul>
         </li>
@@ -73,7 +73,7 @@
             <li><%= link_to "Cierre de turno", shift_reports_path, class: "dropdown-item" %></li>
             <li><%= link_to "Reporte técnico", works_path, class: "dropdown-item", data: { turbo: false } %></li>
             <% if trabajos_access? %>
-              <li><%= link_to "Trabajos", trabajos_path(planta: "P.Montt"), class: "dropdown-item" %></li>
+              <li><%= link_to "Cotizaciones", trabajos_path(planta: "P.Montt"), class: "dropdown-item" %></li>
             <% end %>
           </ul>
         </li>
