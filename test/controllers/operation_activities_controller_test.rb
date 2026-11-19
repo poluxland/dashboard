@@ -47,6 +47,15 @@ class OperationActivitiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "tbody", text: /Registro de la semana siguiente/, count: 0
   end
 
+  test "cuenta las actividades sin tipo del histórico" do
+    OperationActivity.create!(activity_attributes.merge(tipo: OperationActivity::UNCLASSIFIED_TYPE))
+
+    get operation_activities_path, params: { semana: "2026-05-19" }
+    assert_response :success
+    assert_select ".card-body .text-body-secondary", text: "Sin clasificar", count: 1
+    assert_select "tbody td", text: "Sin clasificar", count: 1
+  end
+
   private
 
   def activity_attributes

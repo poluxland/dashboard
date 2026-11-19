@@ -31,12 +31,15 @@ class OperationWeeklyReport
 
   def summary_counts
     counts = records.map(&:tipo).tally
-    {
+    summary = {
       "Actividades" => records.size,
       "Programadas" => counts.fetch("Programada", 0),
       "Por reprogramar" => counts.fetch("Reprogramar", 0),
       "Contingencias" => counts.fetch("Contingencia", 0)
     }
+    unclassified = counts.fetch(OperationActivity::UNCLASSIFIED_TYPE, 0)
+    summary[OperationActivity::UNCLASSIFIED_TYPE] = unclassified if unclassified.positive?
+    summary
   end
 
   def area_counts

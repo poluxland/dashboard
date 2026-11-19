@@ -14,7 +14,8 @@ class OperationActivity < ApplicationRecord
     "Porteo interno"
   ].freeze
 
-  TIPOS = [ "Programada", "Reprogramar", "Contingencia" ].freeze
+  UNCLASSIFIED_TYPE = "Sin clasificar".freeze
+  TIPOS = [ "Programada", "Reprogramar", "Contingencia", UNCLASSIFIED_TYPE ].freeze
 
   validates :fecha, :actividad, presence: true
   validates :area, inclusion: { in: AREA_OPTIONS }

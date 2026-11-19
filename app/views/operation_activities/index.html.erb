@@ -26,7 +26,7 @@
 
   <% average = @report.average_state %>
   <% metrics = @report.summary_counts.merge("Avance promedio" => average ? number_to_percentage(average, precision: 1, strip_insignificant_zeros: true) : "—") %>
-  <div class="row row-cols-2 row-cols-md-5 g-2 mb-3">
+  <div class="row row-cols-2 row-cols-md-3 row-cols-xl-<%= metrics.size %> g-2 mb-3">
     <% metrics.each do |label, value| %>
       <div class="col">
         <div class="card border-0 shadow-sm rounded-4 h-100">
