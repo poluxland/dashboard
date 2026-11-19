@@ -1,0 +1,29 @@
+<h1 style="font-size: 21px; margin: 0 0 8px; color: #183153;"><%= @title %></h1>
+<p style="margin: 0 0 16px; color: #475569;"><%= @period %> · Hora de Chile</p>
+
+<% if @rows.any? %>
+  <table style="border-collapse: collapse; width: 100%; font-size: 13px;">
+    <thead>
+      <tr style="background: #183153; color: white; text-align: left;">
+        <% ["Equipo", "Fecha y hora", "Horómetro", "Puntaje", "Graves", "Leves", "Detalle graves", "Detalle leves", "Comentarios"].each do |heading| %>
+          <th scope="col" style="padding: 8px; border: 1px solid #cbd5e1;"><%= heading %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @rows.each do |row| %>
+        <tr>
+          <% score = row.score && number_to_percentage(row.score, precision: 1, separator: ",", strip_insignificant_zeros: true) %>
+          <% values = [row.equipment, row.checked_at.strftime("%d/%m/%Y %H:%M"), row.hour_meter, score,
+                       row.severe.size, row.minor.size, row.severe.join(", ").presence,
+                       row.minor.join(", ").presence, row.comments.presence] %>
+          <% values.each do |value| %>
+            <td style="padding: 8px; border: 1px solid #cbd5e1; vertical-align: top;"><%= value || "—" %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No se registraron checklists en este período.</p>
+<% end %>

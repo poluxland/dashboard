@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -409,6 +409,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_210000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["week_start"], name: "index_operation_weekly_deliveries_on_week_start", unique: true
+  end
+
+  create_table "operator_checklist_report_deliveries", force: :cascade do |t|
+    t.string "plant", null: false
+    t.datetime "scheduled_at", null: false
+    t.datetime "sent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["plant", "scheduled_at"], name: "idx_on_plant_scheduled_at_19d6013067", unique: true
   end
 
   create_table "ots", force: :cascade do |t|
