@@ -14,9 +14,10 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
     sign_in_with_google
     get new_maintenance_checklist_path(asset_id: @asset.id)
     assert_response :success
+    assert_select "form[autocomplete=off]"
     assert_select "form select", count: 0
     assert_select "input[name='maintenance_checklist[c19]'][type=radio]", count: 2
-    assert_select "input[name='maintenance_checklist[c19]'][value=false][checked]"
+    assert_select "form input[type=radio][checked]", count: 0
     assert_select "input[name='maintenance_checklist[nuto_oil]'][type=number]"
 
     answers = MaintenanceChecklist::QUESTIONS.keys.index_with { "true" }.merge(c2: "false")
@@ -33,7 +34,10 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
     assert_equal false, record.c2
     assert_equal true, record.c19
     assert_equal 12, record.nuto_oil
-    follow_redirect!
+    get edit_maintenance_checklist_path(record)
+    assert_select "input[name='maintenance_checklist[c2]'][value=false][checked]"
+    assert_select "input[name='maintenance_checklist[c19]'][value=true][checked]"
+    get maintenance_checklist_path(record)
     assert_response :success
     assert_select "dt", text: "Aceite NUTOH46"
 
@@ -53,6 +57,7 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", mobile_assets_path, count: 0
     assert_select "a[href=?]", report_equipment_checklists_path, count: 0
     assert_select "[data-search=?]", @asset.code
+    assert_select "form input[type=radio][checked]", count: 0
     refute_includes response.body, "Marca interna"
 
     post maintenance_checklists_path, params: { maintenance_checklist: { mobile_asset_id: 0 } }
@@ -70,6 +75,8 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
     assert_select "[role=status]", text: /Checklist de mantenedor registrado/
 
     record = MaintenanceChecklist.find_by!(technician: "Desde terreno")
+    assert_nil record.c1
+    assert_nil record.c19
     get maintenance_checklist_path(record)
     assert_redirected_to login_path
     get edit_maintenance_checklist_path(record)

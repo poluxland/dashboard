@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -302,25 +302,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_200000) do
     t.string "technician"
     t.string "operating_status"
     t.string "hour_meter"
-    t.boolean "c1", default: false
-    t.boolean "c2", default: false
-    t.boolean "c3", default: false
-    t.boolean "c4", default: false
-    t.boolean "c5", default: false
-    t.boolean "c6", default: false
-    t.boolean "c7", default: false
-    t.boolean "c8", default: false
-    t.boolean "c9", default: false
-    t.boolean "c10", default: false
-    t.boolean "c11", default: false
-    t.boolean "c12", default: false
-    t.boolean "c13", default: false
-    t.boolean "c14", default: false
-    t.boolean "c15", default: false
-    t.boolean "c16", default: false
-    t.boolean "c17", default: false
-    t.boolean "c18", default: false
-    t.boolean "c19", default: false
+    t.boolean "c1"
+    t.boolean "c2"
+    t.boolean "c3"
+    t.boolean "c4"
+    t.boolean "c5"
+    t.boolean "c6"
+    t.boolean "c7"
+    t.boolean "c8"
+    t.boolean "c9"
+    t.boolean "c10"
+    t.boolean "c11"
+    t.boolean "c12"
+    t.boolean "c13"
+    t.boolean "c14"
+    t.boolean "c15"
+    t.boolean "c16"
+    t.boolean "c17"
+    t.boolean "c18"
+    t.boolean "c19"
     t.integer "fuel"
     t.integer "engine_oil"
     t.integer "hydraulic_oil"

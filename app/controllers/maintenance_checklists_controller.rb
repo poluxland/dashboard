@@ -11,7 +11,7 @@ class MaintenanceChecklistsController < ApplicationController
   end
 
   def new
-    @checklist = MaintenanceChecklist.new(mobile_asset: MobileAsset.find_by(id: params[:asset_id]))
+    @checklist = MaintenanceChecklist.new
   end
 
   def create

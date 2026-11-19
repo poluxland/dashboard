@@ -11,7 +11,7 @@
     </dl>
     <div class="d-flex gap-2 flex-wrap">
       <%= link_to "Checklist de operador", new_equipment_checklist_path(asset_id: @asset.id), class: "btn btn-primary" %>
-      <%= link_to "Checklist de mantenedor", new_maintenance_checklist_path(asset_id: @asset.id), class: "btn btn-outline-primary" %>
+      <%= link_to "Checklist de mantenedor", new_maintenance_checklist_path, class: "btn btn-outline-primary" %>
       <%= link_to "Editar equipo", edit_mobile_asset_path(@asset), class: "btn btn-outline-secondary" %>
       <% if @checklists.empty? %>
         <%= button_to "Eliminar equipo", @asset, method: :delete, class: "btn btn-outline-danger",
