@@ -21,6 +21,19 @@
       <ul class="navbar-nav ms-auto">
 
         <li class="nav-item dropdown">
+          <button type="button" class="nav-link dropdown-toggle <%= 'active' if %w[mobile_assets equipment_checklists maintenance_checklists].include?(controller_name) %>"
+                  id="mobileEquipmentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Equipos
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileEquipmentDropdown">
+            <li><%= link_to "Checklist de operador", new_equipment_checklist_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Checklist de mantenedor", new_maintenance_checklist_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Equipos móviles", mobile_assets_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Informe de checklists", report_equipment_checklists_path, class: "dropdown-item" %></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
           <button
             class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[estado_canchas envasadora_reports envasadora_dashboard haver_dashboard].include?(controller_name) || (controller_name == 'ots' && action_name == 'graficos') %>"
             type="button"
@@ -277,18 +290,6 @@
                 <%= link_to "Inventario", inventario_films_enfundados_path, class: "dropdown-item", data: { turbo: false } %>
               </li>
               
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <button type="button" class="nav-link dropdown-toggle <%= 'active' if %w[mobile_assets equipment_checklists maintenance_checklists].include?(controller_name) %>"
-                    id="mobileEquipmentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Equipos
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileEquipmentDropdown">
-              <li><%= link_to "Checklist de operador", new_equipment_checklist_path, class: "dropdown-item" %></li>
-              <li><%= link_to "Checklist de mantenedor", new_maintenance_checklist_path, class: "dropdown-item" %></li>
-              <li><%= link_to "Equipos móviles", mobile_assets_path, class: "dropdown-item" %></li>
-              <li><%= link_to "Informe de checklists", report_equipment_checklists_path, class: "dropdown-item" %></li>
             </ul>
           </li>
         <% if demo_user? %>
