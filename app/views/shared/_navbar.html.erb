@@ -20,52 +20,42 @@
     <div class="collapse navbar-collapse" id="mainNavbar">
       <ul class="navbar-nav ms-auto">
 
-        <!-- Menú Reportes -->
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[works envasadora_reports shift_reports estado_canchas].include?(controller_name) || (controller_name == 'operation_activities' && action_name != 'index') %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[estado_canchas envasadora_reports envasadora_dashboard haver_dashboard].include?(controller_name) || (controller_name == 'ots' && action_name == 'graficos') %>"
             type="button"
-            id="worksDropdown"
+            id="lcaDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Reportes
+            LCA
           </button>
-
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
-            <li><%= link_to "Registrar actividad de operaciones PTM", new_operation_activity_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Registrar estado de canchas", new_estado_cancha_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Nueva envasadora", new_envasadora_report_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Registrar traslado de clínker PTM", new_clinker_transfer_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Registrar turno PTM", new_ptm_report_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Historial envasadora", envasadora_reports_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Cierre de turno", new_shift_report_path, class: "dropdown-item" %></li>
-            <li>
-              <%= link_to "Técnico", works_path, class: "dropdown-item", data: { turbo: false } %>
-            </li>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="lcaDropdown">
+            <li><%= link_to "Materia Prima", estado_canchas_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Envasadora", envasadora_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "OTs", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "Reporte técnico", works_path, class: "dropdown-item", data: { turbo: false } %></li>
           </ul>
         </li>
 
-        <!-- Menú Informes -->
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[envasadora_dashboard haver_dashboard estado_canchas].include?(controller_name) || (controller_name == 'operation_activities' && action_name == 'index') || (%w[mantenciones ots].include?(controller_name) && action_name == 'graficos') %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[operation_activities clinker_transfers ptm_reports shift_reports].include?(controller_name) || (controller_name == 'mantenciones' && action_name == 'graficos') %>"
             type="button"
-            id="informesDropdown"
+            id="ptmDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Informes
+            PTM
           </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="informesDropdown">
-            <li><%= link_to "Materia Prima", estado_canchas_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Informe semanal de operaciones PTM", operation_activities_path, class: "dropdown-item" %></li>
-            <li><%= link_to "Traslado de clínker PTM", clinker_transfers_path, class: "dropdown-item", data: { turbo: false } %></li>
-            <li><%= link_to "Envasadora PTM", ptm_reports_path, class: "dropdown-item", data: { turbo: false } %></li>
-            <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
-            <li><%= link_to "Producción envasadora", envasadora_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
-            <li><%= link_to "Mantenciones PTM", graficos_mantenciones_path, class: "dropdown-item", data: { turbo: false } %></li>
-            <li><%= link_to "OTs", graficos_ots_path, class: "dropdown-item", data: { turbo: false } %></li>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="ptmDropdown">
+            <li><%= link_to "Envasadora", ptm_reports_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "Informe semanal de operaciones", operation_activities_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Traslado de clínker", clinker_transfers_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "Mantenciones", graficos_mantenciones_path, class: "dropdown-item", data: { turbo: false } %></li>
+            <li><%= link_to "Cierre de turno", shift_reports_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Reporte técnico", works_path, class: "dropdown-item", data: { turbo: false } %></li>
           </ul>
         </li>
 
