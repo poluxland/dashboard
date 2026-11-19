@@ -2,7 +2,7 @@ import EnvasadoraDashboardController from "controllers/envasadora_dashboard_cont
 
 export default class extends EnvasadoraDashboardController {
   static targets = ["canvas", "error"]
-  static values = { series: Array }
+  static values = { series: Array, from: String, to: String }
 
   drawCharts() {
     if (!this.hasCanvasTarget) return
@@ -31,8 +31,13 @@ export default class extends EnvasadoraDashboardController {
       options: {
         maintainAspectRatio: false,
         scales: {
-          x: { type: "linear", ticks: { maxTicksLimit: 6, maxRotation: 0, callback: value => date.format(value) } },
-          y: { ticks: { callback: value => money.format(value) } }
+          x: {
+            type: "linear",
+            min: Date.parse(this.fromValue),
+            max: Date.parse(this.toValue),
+            ticks: { maxTicksLimit: 6, maxRotation: 0, callback: value => date.format(value) }
+          },
+          y: { beginAtZero: true, ticks: { callback: value => money.format(value) } }
         },
         plugins: {
           tooltip: {

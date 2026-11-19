@@ -25,6 +25,8 @@ class TrabajosTest < ActionDispatch::IntegrationTest
       end
 
       assert_select "[data-trabajos-chart-series-value]" do |chart|
+        assert_equal "2025-11-19", chart.first["data-trabajos-chart-from-value"]
+        assert_equal "2026-11-19", chart.first["data-trabajos-chart-to-value"]
         data = JSON.parse(chart.first["data-trabajos-chart-series-value"]).first.fetch("data")
         assert_equal [ [ "2026-10-01", 200 ], [ "2026-10-31", 520 ] ], data
       end
