@@ -2,7 +2,7 @@
   <h1 class="h2 mb-3">Informe de checklists de equipos</h1>
   <%= render "navigation" %>
   <%= render "filters", unified: true %>
-  <% by_plant = @groups.group_by { |(plant, _, _), _| plant } %>
+  <% by_plant = @groups.reject { |(plant, _, _), _| plant.nil? }.group_by { |(plant, _, _), _| plant } %>
   <% by_kind = @groups.group_by { |(_, kind, _), _| kind } %>
   <% findings = @groups.sum { |(_, _, status), count| EquipmentInspectionReport::FINDINGS.include?(status) ? count : 0 } %>
   <div class="row g-3 mb-4">
@@ -34,7 +34,7 @@
           <% by_plant.sort_by { |plant, _| plant.to_s }.each do |plant, rows| %>
             <% by_status = rows.group_by { |(_, _, status), _| status } %>
             <tr>
-              <th scope="row"><%= EquipmentChecklist::PLANTS.fetch(plant, plant || "Sin planta registrada") %></th>
+              <th scope="row"><%= EquipmentChecklist::PLANTS.fetch(plant) %></th>
               <td class="text-end"><%= rows.sum(&:last) %></td>
               <% EquipmentInspectionReport::KINDS.each_key do |kind| %>
                 <td class="text-end"><%= rows.sum { |(_, row_kind, _), count| row_kind == kind ? count : 0 } %></td>

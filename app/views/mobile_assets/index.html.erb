@@ -18,7 +18,7 @@
           <tr>
             <th scope="row"><%= link_to asset.label, asset %></th>
             <td><%= asset.brand %></td><td><%= asset.model %></td>
-            <td><%= EquipmentChecklist::PLANTS.fetch(asset.plant, asset.plant) %></td>
+            <td><%= EquipmentChecklist::PLANTS[EquipmentChecklist.plant_code(asset.plant)] || "—" %></td>
             <td><%= asset.year %></td><td><%= truncate(asset.notes, length: 110) %></td>
           </tr>
         <% end %>

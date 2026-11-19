@@ -19,12 +19,11 @@ class EquipmentChecklist < ApplicationRecord
   }.freeze
   ANSWERS = { "Si" => "Sí", "No(leve)" => "No leve", "No(grave)" => "No grave", "No aplica" => "No aplica" }.freeze
   PLANTS = {
-    "LCA" => "La Calera", "PTM" => "Puerto Montt", "VTS" => "Ventanas", "PAM" => "PAM", "Otros" => "Otros"
+    "LCA" => "La Calera", "PTM" => "Puerto Montt", "VTS" => "Ventanas"
   }.freeze
   STATUSES = {
     "grave" => [ "Con falla grave", "danger" ],
     "leve" => [ "Con falla leve", "warning" ],
-    "sin_clasificar" => [ "Con falla sin clasificación", "warning" ],
     "incompleto" => [ "Incompleto", "secondary" ],
     "sin_fallas" => [ "Sin fallas", "success" ]
   }.freeze
@@ -32,8 +31,7 @@ class EquipmentChecklist < ApplicationRecord
   STATUS_SQL = <<~SQL.squish.freeze
     CASE
       WHEN 'No(grave)' = ANY(#{ANSWER_ARRAY}) THEN 'grave'
-      WHEN 'No(leve)' = ANY(#{ANSWER_ARRAY}) THEN 'leve'
-      WHEN 'No' = ANY(#{ANSWER_ARRAY}) THEN 'sin_clasificar'
+      WHEN 'No(leve)' = ANY(#{ANSWER_ARRAY}) OR 'No' = ANY(#{ANSWER_ARRAY}) THEN 'leve'
       WHEN '' = ANY(#{ANSWER_ARRAY}) OR array_position(#{ANSWER_ARRAY}, NULL) IS NOT NULL THEN 'incompleto'
       ELSE 'sin_fallas'
     END
@@ -55,15 +53,19 @@ class EquipmentChecklist < ApplicationRecord
     mobile_asset&.label || legacy_code.presence || "Sin equipo registrado"
   end
 
+  def self.plant_code(value)
+    normalized = value.to_s.strip.upcase
+    PLANTS.find { |code, label| normalized == code || normalized == label.upcase }&.first
+  end
+
   def plant_label
-    PLANTS.fetch(c17, c17).presence || "Sin planta registrada"
+    PLANTS[self.class.plant_code(c17)] || "—"
   end
 
   def status_key
     answers = QUESTIONS.keys.map { |field| self[field] }
     return "grave" if answers.include?("No(grave)")
-    return "leve" if answers.include?("No(leve)")
-    return "sin_clasificar" if answers.include?("No")
+    return "leve" if answers.include?("No(leve)") || answers.include?("No")
     return "incompleto" if answers.any? { |answer| answer.nil? || answer.empty? }
 
     "sin_fallas"

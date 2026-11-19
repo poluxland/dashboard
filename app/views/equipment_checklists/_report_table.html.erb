@@ -15,7 +15,7 @@
             <td class="text-nowrap"><%= link_to row.created_at.in_time_zone(EquipmentInspectionReport::CHILE).strftime("%d/%m/%Y %H:%M"), path %></td>
             <td><%= EquipmentInspectionReport::KINDS.fetch(row.kind) %></td>
             <td class="text-nowrap"><%= row.asset_code.presence || "Sin equipo registrado" %></td>
-            <td><%= EquipmentChecklist::PLANTS.fetch(row.report_plant, row.report_plant) || "Sin planta registrada" %></td>
+            <td><%= EquipmentChecklist::PLANTS[row.report_plant] || "—" %></td>
             <td><%= row.inspector %></td>
             <td><%= row.meter_reading %></td>
             <td><span class="badge text-bg-<%= color %>"><%= status %></span></td>

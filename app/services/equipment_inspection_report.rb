@@ -4,8 +4,8 @@ class EquipmentInspectionReport
   KINDS = { "operador" => "Operador", "mantenedor" => "Mantenedor" }.freeze
   STATUSES = EquipmentChecklist::STATUSES.merge(
     MaintenanceChecklist::STATUSES.to_h { |label, (key, color)| [ key, [ label, color ] ] }
-  ).freeze
-  FINDINGS = %w[grave leve sin_clasificar fuera_servicio observaciones].freeze
+  ).merge("sin_estado" => [ "Sin estado operativo", "secondary" ]).freeze
+  FINDINGS = %w[grave leve fuera_servicio observaciones].freeze
   CHILE = Time.find_zone!("America/Santiago")
   HISTORICAL_OPERATOR_FIELDS = (18..30).map { |number| :"c#{number}" }.freeze
   UNIQUE_ASSETS = <<~SQL.squish.freeze
@@ -39,7 +39,7 @@ class EquipmentInspectionReport
   end
 
   def plant_options
-    all_rows.distinct.pluck(:report_plant).compact_blank.sort
+    EquipmentChecklist::PLANTS.keys
   end
 
   def csv(scope)
@@ -84,7 +84,7 @@ class EquipmentInspectionReport
       SELECT equipment_checklists.id, equipment_checklists.erp_id, equipment_checklists.created_at,
              'operador' AS kind, asset.id AS resolved_asset_id, equipment_checklists.legacy_code,
              COALESCE(NULLIF(asset.code, ''), NULLIF(equipment_checklists.legacy_code, '')) AS asset_code,
-             NULLIF(BTRIM(equipment_checklists.c17), '') AS report_plant,
+             #{plant_code("equipment_checklists.c17")} AS report_plant,
              equipment_checklists.operator AS inspector, equipment_checklists.hour_meter::text AS meter_reading,
              (#{EquipmentChecklist::STATUS_SQL}) AS report_status, equipment_checklists.comments AS report_comments
       FROM equipment_checklists
@@ -97,16 +97,26 @@ class EquipmentInspectionReport
       SELECT record.id, record.erp_id, record.created_at, 'mantenedor' AS kind,
              asset.id AS resolved_asset_id, record.legacy_code,
              COALESCE(NULLIF(asset.code, ''), NULLIF(record.legacy_code, '')) AS asset_code,
-             NULLIF(BTRIM(asset.plant), '') AS report_plant, record.technician AS inspector,
+             #{plant_code("asset.plant")} AS report_plant, record.technician AS inspector,
              record.hour_meter AS meter_reading,
              CASE record.operating_status
                WHEN 'Operativo' THEN 'operativo'
                WHEN 'Observaciones' THEN 'observaciones'
                WHEN 'Fuera de servicio' THEN 'fuera_servicio'
-               ELSE 'incompleto'
+               ELSE 'sin_estado'
              END AS report_status, NULL::text AS report_comments
       FROM maintenance_checklists AS record
       #{asset_join("record")}
+    SQL
+  end
+
+  def plant_code(column)
+    <<~SQL.squish
+      CASE UPPER(TRIM(#{column}))
+        WHEN 'LCA' THEN 'LCA' WHEN 'LA CALERA' THEN 'LCA'
+        WHEN 'PTM' THEN 'PTM' WHEN 'PUERTO MONTT' THEN 'PTM'
+        WHEN 'VTS' THEN 'VTS' WHEN 'VENTANAS' THEN 'VTS'
+      END
     SQL
   end
 

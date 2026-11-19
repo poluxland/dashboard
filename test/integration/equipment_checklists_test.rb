@@ -59,7 +59,7 @@ class EquipmentChecklistsTest < ActionDispatch::IntegrationTest
     assert_equal "No", legacy.reload.c2
     assert_nil legacy.mobile_asset_id
 
-    filters = { asset_id: @asset.id, plant: "LCA", from: "2026-11-18", to: "2026-11-18", status: "sin_clasificar" }
+    filters = { asset_id: @asset.id, plant: "LCA", from: "2026-11-18", to: "2026-11-18", status: "leve" }
     get report_equipment_checklists_path, params: filters
     assert_response :success
     assert_select "td", text: "Histórico", count: 1

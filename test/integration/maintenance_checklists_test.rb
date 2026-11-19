@@ -4,7 +4,6 @@ require "csv"
 class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
   setup do
     @asset = MobileAsset.create!(code: "HQ01", plant: "LCA")
-    sign_in_with_google
   end
 
   teardown do
@@ -12,6 +11,7 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
   end
 
   test "registers and edits the full maintainer checklist" do
+    sign_in_with_google
     get new_maintenance_checklist_path(asset_id: @asset.id)
     assert_response :success
     assert_select "form select", count: 0
@@ -43,7 +43,45 @@ class MaintenanceChecklistsTest < ActionDispatch::IntegrationTest
     assert_equal "", record.operating_status
   end
 
+  test "the login page links to a public submission without exposing the equipment catalog or saved record" do
+    @asset.update!(brand: "Marca interna")
+    get login_path
+    assert_select "a[href=?]", new_maintenance_checklist_path, text: /sin iniciar sesión/
+
+    get new_maintenance_checklist_path
+    assert_response :success
+    assert_select "a[href=?]", mobile_assets_path, count: 0
+    assert_select "a[href=?]", report_equipment_checklists_path, count: 0
+    assert_select "[data-search=?]", @asset.code
+    refute_includes response.body, "Marca interna"
+
+    post maintenance_checklists_path, params: { maintenance_checklist: { mobile_asset_id: 0 } }
+    assert_response :unprocessable_entity
+    assert_select "a[href=?]", mobile_assets_path, count: 0
+
+    assert_difference "MaintenanceChecklist.count" do
+      post maintenance_checklists_path, params: { maintenance_checklist: {
+        mobile_asset_id: @asset.id, technician: "Desde terreno", operating_status: "Operativo"
+      } }
+      assert_response :see_other
+    end
+    assert_redirected_to new_maintenance_checklist_path
+    follow_redirect!
+    assert_select "[role=status]", text: /Checklist de mantenedor registrado/
+
+    record = MaintenanceChecklist.find_by!(technician: "Desde terreno")
+    get maintenance_checklist_path(record)
+    assert_redirected_to login_path
+    get edit_maintenance_checklist_path(record)
+    assert_redirected_to login_path
+    get report_equipment_checklists_path
+    assert_redirected_to login_path
+    get new_equipment_checklist_path
+    assert_redirected_to login_path
+  end
+
   test "the common report and CSV include both types, preserve nils and link legacy codes" do
+    sign_in_with_google
     timestamp = Time.find_zone!("America/Santiago").local(2026, 11, 19, 22, 30)
     maintainer = MaintenanceChecklist.create!(
       mobile_asset: @asset, technician: "=Mantenedor", operating_status: "Fuera de servicio",

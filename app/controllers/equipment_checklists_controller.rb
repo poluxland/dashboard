@@ -34,8 +34,7 @@ class EquipmentChecklistsController < ApplicationController
 
   def new
     asset = MobileAsset.find_by(id: params[:asset_id])
-    plant = asset&.plant
-    @checklist = EquipmentChecklist.new(mobile_asset: asset, c17: EquipmentChecklist::PLANTS.key?(plant) ? plant : nil)
+    @checklist = EquipmentChecklist.new(mobile_asset: asset, c17: EquipmentChecklist.plant_code(asset&.plant))
   end
 
   def create
@@ -75,7 +74,7 @@ class EquipmentChecklistsController < ApplicationController
 
   def filtered_checklists
     @filters = params.permit(:asset_id, :plant, :from, :to, :status, :observations).to_h
-    @plant_options = EquipmentChecklist.distinct.pluck(:c17).compact_blank.sort
+    @plant_options = EquipmentChecklist::PLANTS.keys
     scope = EquipmentChecklist.all
     if @filters[:asset_id].present?
       asset = @assets.find { |item| item.id.to_s == @filters[:asset_id] }
@@ -86,7 +85,7 @@ class EquipmentChecklistsController < ApplicationController
       scope = scope.where("(#{EquipmentChecklist::STATUS_SQL}) = ?", @filters[:status])
     end
     if @filters[:observations] == "1"
-      scope = scope.where("(#{EquipmentChecklist::STATUS_SQL}) IN ('grave', 'leve', 'sin_clasificar') OR NULLIF(BTRIM(comments), '') IS NOT NULL")
+      scope = scope.where("(#{EquipmentChecklist::STATUS_SQL}) IN ('grave', 'leve') OR NULLIF(BTRIM(comments), '') IS NOT NULL")
     end
 
     from = local_midnight(@filters[:from])
