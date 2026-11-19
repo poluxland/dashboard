@@ -10,8 +10,8 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
   test "La Calera reports the latest checklist per asset in the preceding eight hours" do
     cutoff = @zone.local(2026, 11, 19, 6)
     checklist(@asset, cutoff - 8.hours, comments: "Reemplazado dentro del turno")
-    checklist(@asset, cutoff - 1.minute, hour_meter: 313, comments: "Comentario & foto",
-              c3: "Si", c4: "No(grave)", c8: "No(leve)")
+    checklist(@asset, cutoff - 1.minute, hour_meter: 313, operator: "María Soto", comments: "Comentario & foto",
+              c3: "Si", c4: "No(grave)", c8: "No(leve)", c10: "Si")
     checklist(@asset, cutoff, comments: "Pertenece al turno siguiente")
     checklist(@other_asset, cutoff - 8.hours - 1.second, comments: "Fuera del turno anterior")
     checklist(@other_asset, cutoff - 8.hours, comments: "Inicio del turno", c1: "No(grave)")
@@ -23,11 +23,13 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
     assert_equal 6, email.to.size
     assert_includes email.to, "fernando.gonzalez@msindustrial.cl"
     assert_not_includes email.to, "julio.alvear@msindustrial.cl"
-    assert_equal 9, html.css("th").size
+    assert_equal ["Equipo", "Fecha y hora", "H", "Operador", "%", "Graves", "Leves", "Detalle graves",
+                  "Detalle leves", "Comentarios"], html.css("th").map(&:text)
     assert_equal [
-      [ "HQ01", "19/11/2026 05:59", "313", "50 %", "1", "1", "Frenos", "Neumáticos", "Comentario & foto" ],
-      [ "HQ02", "18/11/2026 22:00", "100", "0 %", "1", "0", "Fugas", "—", "Inicio del turno" ]
+      [ "HQ01", "19/11/2026 05:59", "313", "María Soto", "62,5", "1", "1", "Frenos", "Neumáticos", "Comentario & foto" ],
+      [ "HQ02", "18/11/2026 22:00", "100", "Operador de prueba", "0", "1", "0", "Fugas", "—", "Inicio del turno" ]
     ], html.css("tbody tr").map { |row| row.css("td").map(&:text) }
+    assert_includes email.text_part.decoded, "H 313 · Operador María Soto · % 62,5\n"
     assert_includes email.text_part.decoded, "Graves (1): Frenos"
   end
 
@@ -44,7 +46,7 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
     assert_includes email.to, "julio.alvear@msindustrial.cl"
     assert_equal "Checklist de operador · Puerto Montt · 18/11/2026", email.subject
     assert_equal [ "Último", "Primero" ], html.css("tbody tr").map { |row| row.css("td").last.text }
-    assert_equal "—", html.css("tbody tr").first.css("td")[3].text
+    assert_equal "—", html.css("tbody tr").first.css("td")[4].text
   end
 
   private

@@ -4,8 +4,8 @@
 No se registraron checklists en este período.
 <% end %>
 <% @rows.each do |row| %>
-<% score = row.score && number_to_percentage(row.score, precision: 1, separator: ",", strip_insignificant_zeros: true) %>
-<%= row.equipment %> · <%= row.checked_at.strftime("%d/%m/%Y %H:%M") %> · Horómetro <%= row.hour_meter || "—" %> · Puntaje <%= score || "—" %>
+<% score = row.score && number_with_precision(row.score, precision: 1, separator: ",", strip_insignificant_zeros: true) %>
+<%= row.equipment %> · <%= row.checked_at.strftime("%d/%m/%Y %H:%M") %> · H <%= row.hour_meter || "—" %> · Operador <%= row.operator.presence || "—" %> · % <%= score || "—" %>
 Graves (<%= row.severe.size %>): <%= row.severe.join(", ").presence || "—" %>
 Leves (<%= row.minor.size %>): <%= row.minor.join(", ").presence || "—" %>
 Comentarios: <%= row.comments.presence || "—" %>

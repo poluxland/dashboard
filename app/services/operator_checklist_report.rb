@@ -5,7 +5,7 @@ class OperatorChecklistReport
     c6: "Espejos", c7: "Cinturón", c8: "Neumáticos", c9: "Alarma de retroceso", c10: "Bocina",
     c11: "Luces", c12: "Alarmas", c13: "Engrase", c14: "Parabrisas", c15: "Pértiga", c16: "Extintor"
   }.freeze
-  Row = Data.define(:equipment, :checked_at, :hour_meter, :score, :severe, :minor, :comments)
+  Row = Data.define(:equipment, :checked_at, :hour_meter, :operator, :score, :severe, :minor, :comments)
 
   attr_reader :plant, :window
 
@@ -60,7 +60,7 @@ class OperatorChecklistReport
     applicable = passed + severe.size + minor.size
     score = 100.0 * (passed + 0.5 * minor.size) / applicable if applicable.positive?
 
-    Row.new(checklist.asset_label, checklist.created_at.in_time_zone(CHILE), checklist.hour_meter,
+    Row.new(checklist.asset_label, checklist.created_at.in_time_zone(CHILE), checklist.hour_meter, checklist.operator,
             score, severe, minor, checklist.comments)
   end
 end

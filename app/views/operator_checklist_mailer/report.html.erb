@@ -5,7 +5,7 @@
   <table style="border-collapse: collapse; width: 100%; font-size: 13px;">
     <thead>
       <tr style="background: #183153; color: white; text-align: left;">
-        <% ["Equipo", "Fecha y hora", "Horómetro", "Puntaje", "Graves", "Leves", "Detalle graves", "Detalle leves", "Comentarios"].each do |heading| %>
+        <% ["Equipo", "Fecha y hora", "H", "Operador", "%", "Graves", "Leves", "Detalle graves", "Detalle leves", "Comentarios"].each do |heading| %>
           <th scope="col" style="padding: 8px; border: 1px solid #cbd5e1;"><%= heading %></th>
         <% end %>
       </tr>
@@ -13,8 +13,8 @@
     <tbody>
       <% @rows.each do |row| %>
         <tr>
-          <% score = row.score && number_to_percentage(row.score, precision: 1, separator: ",", strip_insignificant_zeros: true) %>
-          <% values = [row.equipment, row.checked_at.strftime("%d/%m/%Y %H:%M"), row.hour_meter, score,
+          <% score = row.score && number_with_precision(row.score, precision: 1, separator: ",", strip_insignificant_zeros: true) %>
+          <% values = [row.equipment, row.checked_at.strftime("%d/%m/%Y %H:%M"), row.hour_meter, row.operator.presence, score,
                        row.severe.size, row.minor.size, row.severe.join(", ").presence,
                        row.minor.join(", ").presence, row.comments.presence] %>
           <% values.each do |value| %>
