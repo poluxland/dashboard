@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_193000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -293,6 +293,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_190000) do
     t.integer "tiempo"
     t.datetime "updated_at", null: false
     t.integer "uso_jetin"
+  end
+
+  create_table "operation_activities", force: :cascade do |t|
+    t.date "fecha", null: false
+    t.string "area", null: false
+    t.text "actividad", null: false
+    t.string "tipo", null: false
+    t.decimal "estado", precision: 5, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fecha"], name: "index_operation_activities_on_fecha"
+    t.check_constraint "estado >= 0::numeric AND estado <= 100::numeric", name: "operation_activities_estado_range"
   end
 
   create_table "ots", force: :cascade do |t|

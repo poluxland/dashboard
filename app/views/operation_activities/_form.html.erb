@@ -1,0 +1,47 @@
+<% content_for :title, title %>
+
+<div class="mx-auto" style="max-width: 800px;">
+  <h1 class="h4 mb-3"><%= title %></h1>
+  <%= form_with model: @activity, class: "card border-0 shadow-sm rounded-4" do |form| %>
+    <div class="card-body p-4">
+      <% if @activity.errors.any? %>
+        <div class="alert alert-danger" role="alert">
+          <ul class="mb-0">
+            <% @activity.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <%= form.label :fecha, "Fecha", class: "form-label" %>
+          <%= form.date_field :fecha, class: "form-control", required: true %>
+        </div>
+        <div class="col-md-8">
+          <%= form.label :area, "Área", class: "form-label" %>
+          <%= form.select :area, OperationActivity::AREA_OPTIONS, { prompt: "Selecciona un área" }, class: "form-select", required: true %>
+        </div>
+        <div class="col-12">
+          <%= form.label :actividad, "Actividad", class: "form-label" %>
+          <%= form.text_area :actividad, class: "form-control", rows: 4, required: true, aria: { describedby: "operation-area-detail" } %>
+          <div class="form-text" id="operation-area-detail">Si corresponde, indica aquí el código o el sector específico.</div>
+        </div>
+        <div class="col-md-8">
+          <%= form.label :tipo, "Tipo", class: "form-label" %>
+          <%= form.select :tipo, OperationActivity::TIPOS, { prompt: "Selecciona un tipo" }, class: "form-select", required: true %>
+        </div>
+        <div class="col-md-4">
+          <%= form.label :estado, "Estado (% de avance)", class: "form-label" %>
+          <%= form.number_field :estado, min: 0, max: 100, step: 0.01, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <%= form.submit "Guardar actividad", class: "btn btn-primary" %>
+        <%= link_to "Volver al informe", operation_activities_path(semana: @activity.persisted? ? @activity.fecha_in_database : nil), class: "btn btn-outline-secondary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

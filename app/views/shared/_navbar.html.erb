@@ -23,7 +23,7 @@
         <!-- Menú Reportes -->
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[works envasadora_reports shift_reports].include?(controller_name) %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[works envasadora_reports shift_reports].include?(controller_name) || (controller_name == 'operation_activities' && action_name != 'index') %>"
             type="button"
             id="worksDropdown"
             data-bs-toggle="dropdown"
@@ -33,6 +33,7 @@
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="worksDropdown">
+            <li><%= link_to "Registrar actividad de operaciones PTM", new_operation_activity_path, class: "dropdown-item" %></li>
             <li><%= link_to "Nueva envasadora", new_envasadora_report_path, class: "dropdown-item" %></li>
             <li><%= link_to "Registrar traslado de clínker PTM", new_clinker_transfer_path, class: "dropdown-item" %></li>
             <li><%= link_to "Registrar turno PTM", new_ptm_report_path, class: "dropdown-item" %></li>
@@ -47,7 +48,7 @@
         <!-- Menú Informes -->
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[envasadora_dashboard haver_dashboard].include?(controller_name) || (%w[mantenciones ots].include?(controller_name) && action_name == 'graficos') %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[envasadora_dashboard haver_dashboard].include?(controller_name) || (controller_name == 'operation_activities' && action_name == 'index') || (%w[mantenciones ots].include?(controller_name) && action_name == 'graficos') %>"
             type="button"
             id="informesDropdown"
             data-bs-toggle="dropdown"
@@ -56,6 +57,7 @@
             Informes
           </button>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="informesDropdown">
+            <li><%= link_to "Informe semanal de operaciones PTM", operation_activities_path, class: "dropdown-item" %></li>
             <li><%= link_to "Traslado de clínker PTM", clinker_transfers_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Envasadora PTM", ptm_reports_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>

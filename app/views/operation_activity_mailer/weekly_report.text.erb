@@ -1,0 +1,26 @@
+<%= @report.title %>
+Puerto Montt · <%= l(@report.start_date, format: :long) %> al <%= l(@report.end_date, format: :long) %>
+
+<% @report.summary_counts.each do |label, value| %>
+<%= label %>: <%= value %>
+<% end %>
+<% average = @report.average_state %>
+Avance promedio: <%= average ? number_to_percentage(average, precision: 1, strip_insignificant_zeros: true) : "Sin datos" %>
+
+<% if @report.records.empty? %>
+No se registraron actividades durante esta semana.
+<% else %>
+<% { "Estado de ejecución" => @report.state_counts, "Actividades por área" => @report.area_counts }.each do |title, counts| %>
+<%= title %>
+<% counts.each do |label, count| %>
+- <%= label %>: <%= count %>
+<% end %>
+
+<% end %>
+Actividades de la semana
+<% @report.records.each do |record| %>
+- <%= l(record.fecha, format: :short) %> · <%= record.area %> · <%= record.actividad %> · <%= record.tipo %> · <%= number_to_percentage(record.estado, precision: 2, strip_insignificant_zeros: true) %>
+<% end %>
+<% end %>
+
+Ver informe en el dashboard: <%= operation_activities_url(semana: @report.start_date) %>

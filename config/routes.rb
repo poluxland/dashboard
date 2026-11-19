@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :operation_activities, path: "operaciones-ptm", only: %i[index new create edit update]
   resources :tasks, only: [ :index, :show, :new, :create, :edit, :update ] do
     resources :comments, only: :create, controller: "task_comments"
   end

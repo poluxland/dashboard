@@ -1,0 +1,98 @@
+<% content_for :title, @report.title %>
+
+<div class="mx-auto mb-4" style="max-width: 1350px;">
+  <header class="bg-dark text-white rounded-4 p-4 mb-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <h1 class="h4 mb-1"><%= @report.title %></h1>
+      <p class="text-white-50 mb-0">Puerto Montt · <%= l(@report.start_date, format: :long) %> al <%= l(@report.end_date, format: :long) %></p>
+    </div>
+    <%= link_to "Registrar actividad", new_operation_activity_path, class: "btn btn-light" %>
+  </header>
+
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <%= form_with url: operation_activities_path, method: :get, class: "d-flex flex-wrap align-items-end gap-2" do %>
+      <div>
+        <%= label_tag :semana, "Fecha de la semana", class: "form-label mb-1" %>
+        <%= date_field_tag :semana, @report.start_date, required: true, class: "form-control" %>
+      </div>
+      <%= submit_tag "Consultar", class: "btn btn-outline-primary" %>
+    <% end %>
+    <nav class="d-flex flex-wrap gap-2" aria-label="Navegación por semanas">
+      <%= link_to "Semana anterior", operation_activities_path(semana: @report.start_date - 1.week), class: "btn btn-outline-secondary" %>
+      <%= link_to "Semana actual", operation_activities_path(semana: OperationWeeklyReport.local_today), class: "btn btn-outline-secondary" %>
+      <%= link_to "Semana siguiente", operation_activities_path(semana: @report.start_date + 1.week), class: "btn btn-outline-secondary" %>
+    </nav>
+  </div>
+
+  <% average = @report.average_state %>
+  <% metrics = @report.summary_counts.merge("Avance promedio" => average ? number_to_percentage(average, precision: 1, strip_insignificant_zeros: true) : "—") %>
+  <div class="row row-cols-2 row-cols-md-5 g-2 mb-3">
+    <% metrics.each do |label, value| %>
+      <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body">
+            <div class="small text-body-secondary"><%= label %></div>
+            <div class="fs-4 fw-bold"><%= value %></div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @report.records.empty? %>
+    <div class="alert alert-info">No se registraron actividades durante esta semana.</div>
+  <% else %>
+    <div class="row g-3 mb-3">
+      <% { "Estado de ejecución" => @report.state_counts, "Actividades por área" => @report.area_counts }.each do |title, counts| %>
+        <section class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+              <h2 class="h6 fw-bold"><%= title %></h2>
+              <% counts.each do |label, count| %>
+                <div class="d-flex justify-content-between gap-2 small mt-2">
+                  <span><%= label %></span>
+                  <strong><%= count %></strong>
+                </div>
+                <div class="progress" style="height: 6px;" role="presentation">
+                  <div class="progress-bar" style="width: <%= (100.0 * count / @report.records.size).round(1) %>%;"></div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </section>
+      <% end %>
+    </div>
+
+    <section class="card border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <h2 class="h6 fw-bold">Actividades de la semana</h2>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Área</th>
+                <th scope="col">Actividad</th>
+                <th scope="col">Tipo</th>
+                <th scope="col" class="text-end">Estado</th>
+                <th scope="col"><span class="visually-hidden">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @report.records.each do |activity| %>
+                <tr>
+                  <td class="text-nowrap"><%= l(activity.fecha, format: :short) %></td>
+                  <td><%= activity.area %></td>
+                  <td><%= activity.actividad %></td>
+                  <td><%= activity.tipo %></td>
+                  <td class="text-end text-nowrap"><%= number_to_percentage(activity.estado, precision: 2, strip_insignificant_zeros: true) %></td>
+                  <td class="text-end"><%= link_to "Editar", edit_operation_activity_path(activity), class: "btn btn-sm btn-outline-secondary" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  <% end %>
+</div>
