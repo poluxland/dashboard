@@ -3,6 +3,14 @@ module TrabajosHelper
     number_to_currency(value || 0, unit: "$", precision: 0, delimiter: ".", format: "%u%n", negative_format: "-%u%n")
   end
 
+  def enlace_monto_trabajo(value, path, label:, principal: false)
+    monto = monto_trabajo(value)
+    link_to path, class: class_names("trabajos-summary-amount", "is-zero": value.to_i.zero?),
+                  aria: { label: "#{label}, #{monto}" } do
+      safe_join([ monto, (tag.i(class: "bi bi-arrow-up-right", aria: { hidden: true }) if principal) ].compact)
+    end
+  end
+
   def estado_trabajo(value)
     return "En ejecución" if value == Trabajo::EN_EJECUCION
 

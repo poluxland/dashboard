@@ -3,36 +3,54 @@
 
   <div class="row g-3">
     <% Trabajo::PLANTAS.each do |planta, sigla| %>
+      <% nombre_planta = nombre_planta_trabajo(planta) %>
       <div class="col-12 col-sm-6 col-xl-3">
-        <section class="card card-body h-100">
-          <h3 class="h5 mb-3"><%= nombre_planta_trabajo(planta) %> <span class="text-body-secondary small">· <%= sigla %></span></h3>
-          <dl class="mb-0">
-            <div class="d-flex justify-content-between gap-2">
-              <dt>Pendiente</dt>
-              <dd class="mb-1 fw-semibold"><%= link_to monto_trabajo(report.pendientes[planta]), trabajos_path(planta: planta, avance: "Terminado") %></dd>
-            </div>
-            <div class="d-flex justify-content-between gap-2 ps-2 small">
-              <dt class="fw-normal">Sin OP</dt>
-              <dd class="mb-1"><%= link_to monto_trabajo(report.sin_op[planta]), trabajos_path(planta: planta, avance: "Terminado", op: "sin") %></dd>
-            </div>
-            <div class="d-flex justify-content-between gap-2 ps-2 small">
-              <dt class="fw-normal">Con OP</dt>
-              <dd class="mb-1"><%= link_to monto_trabajo(report.con_op[planta]), trabajos_path(planta: planta, avance: "Terminado", op: "con") %></dd>
-            </div>
-            <div class="d-flex justify-content-between gap-2 border-top mt-2 pt-2">
-              <dt>En ejecución</dt>
-              <dd class="mb-1 fw-semibold"><%= link_to monto_trabajo(report.en_ejecucion[planta]), trabajos_path(planta: planta, avance: Trabajo::EN_EJECUCION) %></dd>
-            </div>
-          </dl>
-          <h4 class="h6 border-top mt-2 pt-2">Ventas por mes de término</h4>
-          <dl class="mb-0">
-            <% report.meses.each do |mes| %>
-              <div class="d-flex justify-content-between gap-2">
-                <dt class="fw-normal"><%= mes_trabajo(mes) %></dt>
-                <dd class="mb-1"><%= link_to monto_trabajo(report.ventas[[planta, mes]]), trabajos_path(planta: planta, avance: "finalizados", mes: mes.strftime("%Y-%m")) %></dd>
+        <section class="trabajos-summary-card h-100" aria-labelledby="resumen-planta-<%= sigla %>">
+          <header class="trabajos-summary-header">
+            <span class="trabajos-summary-icon" aria-hidden="true"><i class="bi bi-building"></i></span>
+            <h3 id="resumen-planta-<%= sigla %>"><%= nombre_planta %></h3>
+            <span class="trabajos-summary-code"><%= sigla %></span>
+          </header>
+
+          <div class="trabajos-summary-body">
+            <dl class="trabajos-summary-metrics">
+              <div class="trabajos-summary-pending">
+                <dt>Pendiente</dt>
+                <dd><%= enlace_monto_trabajo(report.pendientes[planta], trabajos_path(planta: planta, avance: "Terminado"),
+                                             label: "Pendiente · #{nombre_planta}", principal: true) %></dd>
               </div>
-            <% end %>
-          </dl>
+              <div class="trabajos-summary-op">
+                <dt>Sin OP</dt>
+                <dd><%= enlace_monto_trabajo(report.sin_op[planta], trabajos_path(planta: planta, avance: "Terminado", op: "sin"),
+                                             label: "Sin OP · #{nombre_planta}") %></dd>
+              </div>
+              <div class="trabajos-summary-op">
+                <dt>Con OP</dt>
+                <dd><%= enlace_monto_trabajo(report.con_op[planta], trabajos_path(planta: planta, avance: "Terminado", op: "con"),
+                                             label: "Con OP · #{nombre_planta}") %></dd>
+              </div>
+              <div class="trabajos-summary-execution">
+                <dt>En ejecución</dt>
+                <dd><%= enlace_monto_trabajo(report.en_ejecucion[planta], trabajos_path(planta: planta, avance: Trabajo::EN_EJECUCION),
+                                             label: "En ejecución · #{nombre_planta}") %></dd>
+              </div>
+            </dl>
+
+            <div class="trabajos-summary-sales">
+              <h4><i class="bi bi-calendar3" aria-hidden="true"></i> Ventas por mes de término</h4>
+              <dl>
+                <% report.meses.each do |mes| %>
+                  <% nombre_mes = mes_trabajo(mes) %>
+                  <div class="trabajos-summary-month">
+                    <dt><%= nombre_mes %></dt>
+                    <dd><%= enlace_monto_trabajo(report.ventas[[planta, mes]],
+                                                trabajos_path(planta: planta, avance: "finalizados", mes: mes.strftime("%Y-%m")),
+                                                label: "Ventas de #{nombre_mes.downcase} · #{nombre_planta}") %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            </div>
+          </div>
         </section>
       </div>
     <% end %>

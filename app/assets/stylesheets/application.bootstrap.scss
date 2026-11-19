@@ -109,3 +109,164 @@
 @media (min-width: 576px) {
   .equipment-choices { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+.trabajos-summary-card {
+  --trabajos-ink: #1c3029;
+  --trabajos-muted: #52635b;
+  --trabajos-line: #e0e8e3;
+  --trabajos-accent: #215a45;
+  --trabajos-highlight: #edf5f0;
+  color: var(--trabajos-ink);
+  background: #fff;
+  border: 1px solid var(--trabajos-line);
+  border-radius: .875rem;
+  box-shadow: 0 4px 14px rgba(28, 48, 41, .055);
+
+  dl, dd { margin: 0; }
+
+  .trabajos-summary-header {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+    padding: .875rem 1rem;
+    border-bottom: 1px solid var(--trabajos-line);
+    border-radius: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background: #f8faf9;
+
+    h3 {
+      flex: 1;
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 650;
+      line-height: 1.25;
+    }
+  }
+
+  .trabajos-summary-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: .5rem;
+    color: var(--trabajos-accent);
+    background: #e5efe9;
+  }
+
+  .trabajos-summary-code {
+    color: var(--trabajos-muted);
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+  }
+
+  .trabajos-summary-body { padding: 1rem; }
+
+  .trabajos-summary-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .625rem .875rem;
+  }
+
+  .trabajos-summary-pending {
+    grid-column: 1 / -1;
+    padding: .55rem .75rem .45rem;
+    border-radius: .5rem;
+    background: var(--trabajos-highlight);
+
+    dt { font-size: .8125rem; }
+
+    .trabajos-summary-amount {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.5625rem;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    i {
+      flex: 0 0 auto;
+      font-size: .875rem;
+    }
+  }
+
+  .trabajos-summary-op dt {
+    color: var(--trabajos-muted);
+    font-size: .75rem;
+    font-weight: 500;
+  }
+
+  .trabajos-summary-execution,
+  .trabajos-summary-month {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: .5rem;
+
+    dd { text-align: end; }
+  }
+
+  .trabajos-summary-execution {
+    grid-column: 1 / -1;
+    padding-top: .625rem;
+    border-top: 1px solid var(--trabajos-line);
+    font-size: .875rem;
+  }
+
+  .trabajos-summary-sales {
+    margin-top: .625rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--trabajos-line);
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin: 0 0 .375rem;
+      font-size: .8125rem;
+      font-weight: 650;
+    }
+
+    i { color: var(--trabajos-accent); }
+  }
+
+  .trabajos-summary-month {
+    line-height: 1.35;
+    font-size: .8125rem;
+
+    dt {
+      color: var(--trabajos-muted);
+      font-weight: 400;
+    }
+  }
+
+  .trabajos-summary-amount {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    max-width: calc(100% + .5rem);
+    margin-inline: -.25rem;
+    padding: .2rem .25rem;
+    border-radius: .25rem;
+    color: var(--trabajos-accent);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+
+    &.is-zero { color: var(--trabajos-muted); }
+
+    &:hover,
+    &:focus-visible {
+      color: var(--trabajos-accent);
+      background: #e0efe6;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--trabajos-accent);
+      outline-offset: 1px;
+    }
+  }
+}
