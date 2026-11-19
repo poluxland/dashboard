@@ -2,7 +2,9 @@
 <div class="py-4" data-controller="haver-dashboard" data-haver-dashboard-pareto-value="<%= @report.dashboard.charts[:pareto].to_json %>" data-haver-dashboard-days-value="<%= @report.days.map { |day| day.slice(:date, :tons, :rate, :availability, :reliability, :oee, :broken, :quality, :unrecognized_bags, :broken_bags, :discarded_bags) }.to_json %>">
   <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
     <h1 class="h3 fw-bold mb-0">Informe Haver · LCA</h1>
-    <%= link_to "Nuevo reporte de envasadora", new_envasadora_report_path, class: "btn btn-primary" %>
+    <% if signed_in? %>
+      <%= link_to "Nuevo reporte de envasadora", new_envasadora_report_path, class: "btn btn-primary" %>
+    <% end %>
   </div>
   <p class="text-body-secondary">Datos del reporte de envasadora y de Vorne. Los indicadores operacionales consideran turnos con producción Haver. El registro de calidad incluye las pérdidas informadas en turnos sin producción.</p>
   <%= form_with url: haver_dashboard_path, method: :get, data: { turbo: false }, class: "card card-body mb-4" do |f| %>

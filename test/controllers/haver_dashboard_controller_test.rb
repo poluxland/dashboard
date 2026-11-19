@@ -1,8 +1,18 @@
 require "test_helper"
 
 class HaverDashboardControllerTest < ActionDispatch::IntegrationTest
-  test "requires login" do
+  test "visitors can consult and filter the report while creating a report requires login" do
     get haver_dashboard_path
+    assert_response :success
+    assert_select "h1", "Informe Haver · LCA"
+    assert_select "a[href=?]", new_envasadora_report_path, count: 0
+
+    get haver_dashboard_path, params: { period: "7", ideal: "55" }
+    assert_response :success
+    assert_select 'button[name="period"][value="7"][aria-current="true"]'
+    assert_select "input[name=ideal][value='55.0']"
+
+    get new_envasadora_report_path
     assert_redirected_to login_path
   end
 
@@ -11,6 +21,7 @@ class HaverDashboardControllerTest < ActionDispatch::IntegrationTest
     get haver_dashboard_path
     assert_response :success
     assert_select "h1", "Informe Haver · LCA"
+    assert_select "a[href=?]", new_envasadora_report_path, text: "Nuevo reporte de envasadora"
     assert_select "canvas", count: 5
     assert_select "canvas[data-haver-dashboard-target]" do |canvases|
       assert_equal %w[production indicators pareto broken bagCounts], canvases.map { |canvas| canvas["data-haver-dashboard-target"] }

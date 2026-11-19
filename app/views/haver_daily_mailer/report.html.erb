@@ -65,5 +65,8 @@
     </tbody>
   </table>
   <p style="color: #51615b; font-size: 13px">Ideal Haver <%= dashboard_number(@report.ideal, suffix: " t/h") %>. El guion indica un dato ausente o un indicador que no se puede calcular. Los acumulados usan los reportes disponibles al corte.</p>
-  <p><%= link_to "Abrir Informe Haver en el Dashboard", haver_dashboard_url, style: "color: #245a46" %></p>
+  <p style="margin: 20px 0">
+    <%= link_to "Ver Informe Haver", haver_dashboard_url,
+                style: "display: inline-block; padding: 11px 18px; background: #245a46; color: #fff; border-radius: 6px; text-decoration: none; font-weight: bold" %>
+  </p>
 </div>

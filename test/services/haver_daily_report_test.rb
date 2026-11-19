@@ -44,6 +44,8 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_includes message.text_part.decoded, "05:00"
     assert_not_includes message.html_part.decoded, "Turnos con estimación Vorne"
     assert_not_includes message.text_part.decoded, "Turnos con estimación Vorne"
+    button = Nokogiri::HTML(message.html_part.decoded).css("a").find { |link| link.text == "Ver Informe Haver" }
+    assert_equal "/informes/haver", URI.parse(button["href"]).path
 
     daily = HaverDailyMailer.report(scheduled_at: cutoff).message
     assert_equal [ "camila.ramirez@meloncementos.cl" ], daily.to

@@ -1,4 +1,6 @@
 class HaverDashboardController < ApplicationController
+  skip_before_action :authenticate_user!, only: :index
+
   helper EnvasadoraDashboardHelper
 
   def index
