@@ -12,12 +12,15 @@ class HaverDailyMailer < ApplicationMailer
     geraldinne.martinez@meloncementos.cl
     jose.jerez@msindustrial.cl
     fernando.gonzalez@msindustrial.cl
+    claudio.villanueva@msindustrial.cl
     supervisor.envasadora@msindustrial.cl
     mauricio.collado@msindustrial.cl
     leandro.estrella@msindustrial.cl
     jefesturno.planta@meloncementos.cl
   ].freeze
-  TEST_RECIPIENTS = %w[jose.jerez@msindustrial.cl fernando.gonzalez@msindustrial.cl].freeze
+  TEST_RECIPIENTS = %w[
+    jose.jerez@msindustrial.cl fernando.gonzalez@msindustrial.cl claudio.villanueva@msindustrial.cl
+  ].freeze
   PRODUCTION_CHART_FILENAME = "haver-produccion-rendimiento.png"
 
   def report(scheduled_at:, test: false)

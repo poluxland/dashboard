@@ -37,10 +37,10 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_equal Date.new(2026, 11, 9)..Date.new(2026, 11, 14), report.periods.second[:range]
   end
 
-  test "test mail uses only its two recipients and includes HTML and text KPIs" do
+  test "test mail uses only its three recipients and includes HTML and text KPIs" do
     cutoff = HaverDailyReport.cutoff_for(Date.new(2026, 11, 19))
     message = HaverDailyMailer.report(scheduled_at: cutoff, test: true).message
-    assert_equal %w[jose.jerez@msindustrial.cl fernando.gonzalez@msindustrial.cl].sort, message.destinations.sort
+    assert_equal %w[claudio.villanueva@msindustrial.cl fernando.gonzalez@msindustrial.cl jose.jerez@msindustrial.cl], message.destinations.sort
     assert_match(/\APRUEBA/, message.subject)
     assert_includes message.html_part.decoded, "KPI acumulados"
     assert_includes message.text_part.decoded, "TRES TURNOS ANTERIORES"
@@ -53,7 +53,8 @@ class HaverDailyReportTest < ActiveSupport::TestCase
 
     daily = HaverDailyMailer.report(scheduled_at: cutoff).message
     assert_equal [ "camila.ramirez@meloncementos.cl" ], daily.to
-    assert_equal 13, daily.cc.size
+    assert_equal 14, daily.cc.size
+    assert_includes daily.cc, "claudio.villanueva@msindustrial.cl"
     assert_includes daily.cc, "guillermo.roco@meloncementos.cl"
     assert_includes daily.cc, "jefesturno.planta@meloncementos.cl"
   end
