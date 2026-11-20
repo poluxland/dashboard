@@ -40,6 +40,37 @@
     <p style="margin: 6px 0; font-size: 13px"><strong><%= shift[:shift] %> <%= shift[:date].strftime("%d/%m") %></strong> · <%= shift[:comment] %></p>
   <% end %>
 
+  <h2 style="font-size: 17px; margin-bottom: 6px">Producción y rendimiento</h2>
+  <p style="font-size: 13px; color: #51615b; margin: 0 0 6px">
+    Del <%= @report.production_by_day.first[:date].strftime("%d/%m") %> al <%= @report.production_by_day.last[:date].strftime("%d/%m") %> · datos al corte
+  </p>
+  <% if @production_chart_url %>
+    <%= image_tag @production_chart_url, width: 720,
+                  alt: "Gráfico de producción diaria en toneladas y rendimiento en toneladas por hora",
+                  style: "display: block; width: 100%; max-width: 720px; height: auto; border: 0; margin-bottom: 16px" %>
+  <% elsif @report.production_data? %>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px">
+      <thead>
+        <tr style="background: #f2f6f4">
+          <th scope="col" style="padding: 6px; text-align: left">Fecha</th>
+          <th scope="col" style="padding: 6px; text-align: right">Producción (t)</th>
+          <th scope="col" style="padding: 6px; text-align: right">Rendimiento (t/h)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @report.production_by_day.each do |day| %>
+          <tr>
+            <th scope="row" style="padding: 6px; text-align: left; border-bottom: 1px solid #dee8e1"><%= day[:date].strftime("%d/%m") %></th>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(day[:tons]) %></td>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(day[:rate]) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p style="font-size: 13px">Sin producción Haver informada en este período.</p>
+  <% end %>
+
   <h2 style="font-size: 17px; margin-bottom: 6px">KPI acumulados</h2>
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px">
     <thead>

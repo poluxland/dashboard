@@ -1,6 +1,7 @@
 class HaverDailyReport
   CHILE = Time.find_zone!("America/Santiago")
   HOUR = 5
+  TREND_DAYS = 7
   SHIFT_METRICS = [
     [ "Producción", :tons, " t", 1 ],
     [ "Rendimiento real", :rate, " t/h", 1 ],
@@ -24,10 +25,14 @@ class HaverDailyReport
     discarded_bags: "sacos_descartados_haver"
   }.freeze
 
-  attr_reader :cutoff, :shifts, :periods, :ideal
+  attr_reader :cutoff, :shifts, :periods, :ideal, :production_by_day
 
   def self.cutoff_for(date)
     CHILE.local(date.year, date.month, date.day, HOUR)
+  end
+
+  def production_data?
+    production_by_day.any? { |day| day[:tons] || day[:rate] }
   end
 
   def initialize(scheduled_at:)
@@ -44,10 +49,16 @@ class HaverDailyReport
     last_report_date = slots.last.first
     week = last_report_date.beginning_of_week(:monday)..last_report_date
     month = last_report_date.beginning_of_month..last_report_date
-    start = [ slots.first.first, week.begin, month.begin ].min
+    trend = (last_report_date - (TREND_DAYS - 1))..last_report_date
+    start = [ slots.first.first, week.begin, month.begin, trend.begin ].min
     dashboard = HaverDashboard.new(from: start.iso8601, to: last_report_date.iso8601, reported_before: cutoff)
     @ideal = dashboard.ideal
     by_shift = dashboard.shifts.index_by { |row| [ row[:date], row[:shift] ] }
+    by_day = dashboard.days.index_by { |row| row[:date] }
+    @production_by_day = trend.map do |date|
+      day = by_day.fetch(date, {})
+      { date: date, tons: day[:tons], rate: day[:rate] }
+    end
 
     @shifts = slots.map do |date, shift|
       recorded = recent_reports[[ date, shift ]]

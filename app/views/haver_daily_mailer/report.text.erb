@@ -14,6 +14,16 @@ TRES TURNOS ANTERIORES
 
 <% end -%>
 
+PRODUCCIÓN Y RENDIMIENTO
+Del <%= @report.production_by_day.first[:date].strftime("%d/%m") %> al <%= @report.production_by_day.last[:date].strftime("%d/%m") %> · datos al corte
+<% if @report.production_data? -%>
+<% @report.production_by_day.each do |day| -%>
+<%= day[:date].strftime("%d/%m") %> · Producción <%= dashboard_number(day[:tons], suffix: " t") %> · Rendimiento <%= dashboard_number(day[:rate], suffix: " t/h") %>
+<% end -%>
+<% else -%>
+Sin producción Haver informada en este período.
+<% end -%>
+
 KPI ACUMULADOS
 <% @report.periods.each do |period| -%>
 <%= period[:label] %> · <%= period[:range].begin.strftime("%d/%m") %>–<%= period[:range].end.strftime("%d/%m") %>

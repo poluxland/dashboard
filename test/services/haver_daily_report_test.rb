@@ -21,6 +21,9 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_nil report.shifts.last[:good_bags]
     assert_equal [ 300, 350, 350 ], report.periods.map { |period| period[:totals][:tons] }
     assert_in_delta 50, report.periods.first[:totals][:rate]
+    assert_equal ((day - 6)..day).to_a, report.production_by_day.pluck(:date)
+    assert_nil report.production_by_day.first[:tons]
+    assert_equal({ date: day, tons: 300.0, rate: 50.0 }, report.production_by_day.last)
   end
 
   test "Monday uses the latest scheduled turns across the weekend" do
@@ -42,6 +45,7 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_includes message.html_part.decoded, "KPI acumulados"
     assert_includes message.text_part.decoded, "TRES TURNOS ANTERIORES"
     assert_includes message.text_part.decoded, "05:00"
+    assert_includes message.html_part.decoded, "Sin producción Haver informada en este período."
     assert_not_includes message.html_part.decoded, "Turnos con estimación Vorne"
     assert_not_includes message.text_part.decoded, "Turnos con estimación Vorne"
     button = Nokogiri::HTML(message.html_part.decoded).css("a").find { |link| link.text == "Ver Informe Haver" }
@@ -52,6 +56,23 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_equal 13, daily.cc.size
     assert_includes daily.cc, "guillermo.roco@meloncementos.cl"
     assert_includes daily.cc, "jefesturno.planta@meloncementos.cl"
+  end
+
+  test "email embeds the daily PNG and includes its data in plain text across a month boundary" do
+    day = Date.new(2026, 11, 3)
+    cutoff = HaverDailyReport.cutoff_for(day.next_day)
+    add_report(Date.new(2026, 10, 29), "TM", at: cutoff - 6.days + 12.hours, sacks: 8000, hours: 4)
+    add_report(day, "TM", at: cutoff - 15.hours, sacks: 4000, hours: 2)
+
+    message = HaverDailyMailer.report(scheduled_at: cutoff, test: true).message
+    image = message.attachments["haver-produccion-rendimiento.png"]
+    assert_equal "image/png", image.mime_type
+    assert image.inline?
+    assert image.body.decoded.start_with?(HaverProductionChart::PNG_SIGNATURE)
+    assert_operator image.body.decoded.bytesize, :>, 1000
+    assert_includes message.html_part.decoded, image.url
+    assert_includes message.text_part.decoded, "29/10 · Producción 200 t · Rendimiento 50 t/h"
+    assert_includes message.text_part.decoded, "30/10 · Producción — · Rendimiento —"
   end
 
   test "worker uses Chilean 05:00 in both seasons and sends a weekday slot once" do
