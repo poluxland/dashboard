@@ -2,6 +2,7 @@ class HaverDailyReport
   CHILE = Time.find_zone!("America/Santiago")
   HOUR = 5
   TREND_DAYS = 7
+  PARETO_DAYS = 30
   SHIFT_METRICS = [
     [ "Producción", :tons, " t", 1 ],
     [ "Rendimiento real", :rate, " t/h", 1 ],
@@ -25,14 +26,15 @@ class HaverDailyReport
     discarded_bags: "sacos_descartados_haver"
   }.freeze
 
-  attr_reader :cutoff, :shifts, :periods, :ideal, :production_by_day
+  attr_reader :cutoff, :shifts, :periods, :ideal, :production_range, :production_by_day,
+              :pareto_range, :pareto_causes, :pareto_last_date
 
   def self.cutoff_for(date)
     CHILE.local(date.year, date.month, date.day, HOUR)
   end
 
   def production_data?
-    production_by_day.any? { |day| day[:tons] || day[:rate] }
+    production_by_day.any?
   end
 
   def initialize(scheduled_at:)
@@ -49,16 +51,15 @@ class HaverDailyReport
     last_report_date = slots.last.first
     week = last_report_date.beginning_of_week(:monday)..last_report_date
     month = last_report_date.beginning_of_month..last_report_date
-    trend = (last_report_date - (TREND_DAYS - 1))..last_report_date
-    start = [ slots.first.first, week.begin, month.begin, trend.begin ].min
+    @production_range = (last_report_date - (TREND_DAYS - 1))..last_report_date
+    start = [ slots.first.first, week.begin, month.begin, production_range.begin ].min
     dashboard = HaverDashboard.new(from: start.iso8601, to: last_report_date.iso8601, reported_before: cutoff)
     @ideal = dashboard.ideal
     by_shift = dashboard.shifts.index_by { |row| [ row[:date], row[:shift] ] }
-    by_day = dashboard.days.index_by { |row| row[:date] }
-    @production_by_day = trend.map do |date|
-      day = by_day.fetch(date, {})
-      { date: date, tons: day[:tons], rate: day[:rate] }
+    @production_by_day = dashboard.days.filter_map do |day|
+      day.slice(:date, :tons, :rate) if production_range.cover?(day[:date]) && day[:tons]&.positive?
     end
+    load_pareto(last_date)
 
     @shifts = slots.map do |date, shift|
       recorded = recent_reports[[ date, shift ]]
@@ -75,6 +76,15 @@ class HaverDailyReport
   end
 
   private
+
+  def load_pareto(last_date)
+    @pareto_range = (last_date - (PARETO_DAYS - 1))..last_date
+    filters = { from: pareto_range.begin.iso8601, to: pareto_range.end.iso8601, reported_before: cutoff,
+                include_missing_reason: "0" }
+    dashboard = EnvasadoraDashboard.new(filters, default_source: "haver", only_producing: true).call
+    @pareto_causes = dashboard.pareto
+    @pareto_last_date = dashboard.rows.filter_map { |row| row[:date] if row[:downtime_seconds].positive? }.max
+  end
 
   def reports_for(dates)
     EnvasadoraReport.where(date: dates, created_at: ..cutoff).order(:created_at, :id)

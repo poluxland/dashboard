@@ -7,6 +7,7 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     day = Date.new(2026, 11, 18)
     cutoff = HaverDailyReport.cutoff_for(day.next_day)
     add_report(day - 1, "TM", at: cutoff - 1.day, sacks: 2000)
+    add_report(day - 2, "TM", at: cutoff - 2.days, sacks: 0, hours: 0)
     add_report(day, "TM", at: cutoff - 15.hours, sacks: 8000, hours: 4)
     add_report(day, "TT", at: cutoff - 7.hours, sacks: 4000, hours: 2)
     add_report(day, "TT", at: cutoff + 30.minutes, sacks: 9000, hours: 4)
@@ -21,8 +22,8 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_nil report.shifts.last[:good_bags]
     assert_equal [ 300, 350, 350 ], report.periods.map { |period| period[:totals][:tons] }
     assert_in_delta 50, report.periods.first[:totals][:rate]
-    assert_equal ((day - 6)..day).to_a, report.production_by_day.pluck(:date)
-    assert_nil report.production_by_day.first[:tons]
+    assert_equal (day - 6)..day, report.production_range
+    assert_equal [ day - 1, day ], report.production_by_day.pluck(:date)
     assert_equal({ date: day, tons: 300.0, rate: 50.0 }, report.production_by_day.last)
   end
 
@@ -69,11 +70,42 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     image = message.attachments["haver-produccion-rendimiento.png"]
     assert_equal "image/png", image.mime_type
     assert image.inline?
-    assert image.body.decoded.start_with?(HaverProductionChart::PNG_SIGNATURE)
+    assert image.body.decoded.start_with?(HaverEmailChart::PNG_SIGNATURE)
     assert_operator image.body.decoded.bytesize, :>, 1000
     assert_includes message.html_part.decoded, image.url
     assert_includes message.text_part.decoded, "29/10 · Producción 200 t · Rendimiento 50 t/h"
-    assert_includes message.text_part.decoded, "30/10 · Producción — · Rendimiento —"
+    assert_not_includes message.text_part.decoded, "30/10 · Producción"
+    assert_includes message.text_part.decoded, "Del 28/10 al 03/11"
+  end
+
+  test "Pareto includes 30 days of reported detentions and omits Missing Reason" do
+    day = Date.new(2026, 11, 18)
+    start = day - 29
+    cutoff = HaverDailyReport.cutoff_for(day.next_day)
+    [ start - 1, start, day ].each { |date| add_report(date, "TM", at: cutoff - 1.day, sacks: 4000) }
+    source = TptImport.create!(filename: "vorne.xlsx", author_email: "test@msindustrial.cl")
+    add_event(source, start - 1, "Fuera del período", 60, at: cutoff - 1.hour)
+    add_event(source, start, "Falla en cinta", 30, at: cutoff - 1.hour)
+    add_event(source, day, "Revisión", 15, at: cutoff - 1.hour)
+    add_event(source, day, "  mIsSiNg ReAsOn  ", 150, at: cutoff - 1.hour)
+    add_event(source, day, "Cargado después", 90, at: cutoff + 1.hour)
+
+    report = HaverDailyReport.new(scheduled_at: cutoff)
+    assert_equal start..day, report.pareto_range
+    assert_equal day, report.pareto_last_date
+    assert_equal [ "Falla en cinta", "Revisión" ], report.pareto_causes.pluck(:label)
+    assert_equal [ 30, 15 ], report.pareto_causes.pluck(:minutes)
+    assert_in_delta 66.6667, report.pareto_causes.first[:cumulative]
+    assert_equal 100, report.pareto_causes.last[:cumulative]
+
+    message = HaverDailyMailer.report(scheduled_at: cutoff, test: true).message
+    image = message.attachments["haver-pareto-detenciones.png"]
+    assert_equal "image/png", image.mime_type
+    assert image.inline?
+    assert image.body.decoded.start_with?(HaverEmailChart::PNG_SIGNATURE)
+    assert_includes message.html_part.decoded, image.url
+    assert_includes message.text_part.decoded, "Falla en cinta · 30 min"
+    assert_no_match(/missing reason/i, message.text_part.decoded)
   end
 
   test "worker uses Chilean 05:00 in both seasons and sends a weekday slot once" do
@@ -94,6 +126,13 @@ class HaverDailyReportTest < ActiveSupport::TestCase
   end
 
   private
+
+  def add_event(source, date, reason, minutes, at:)
+    source.tpt_events.create!(started_at: Time.utc(date.year, date.month, date.day, 7),
+                              duration_seconds: minutes * 60, impact: "Parada no planificada",
+                              reason: reason, production_state: "Estado", created_at: at,
+                              source_row: source.tpt_events.size + 1, source_fingerprint: SecureRandom.hex)
+  end
 
   def add_report(date, turno, at:, sacks:, hours: 1)
     fields = EnvasadoraReport::SILOS.values.flat_map { |silo| silo[:readings] }.index_with(10)

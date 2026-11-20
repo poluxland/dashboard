@@ -42,7 +42,7 @@
 
   <h2 style="font-size: 17px; margin-bottom: 6px">Producción y rendimiento</h2>
   <p style="font-size: 13px; color: #51615b; margin: 0 0 6px">
-    Del <%= @report.production_by_day.first[:date].strftime("%d/%m") %> al <%= @report.production_by_day.last[:date].strftime("%d/%m") %> · datos al corte
+    Del <%= @report.production_range.begin.strftime("%d/%m") %> al <%= @report.production_range.end.strftime("%d/%m") %> · días con producción Haver
   </p>
   <% if @production_chart_url %>
     <%= image_tag @production_chart_url, width: 720,
@@ -69,6 +69,38 @@
     </table>
   <% else %>
     <p style="font-size: 13px">Sin producción Haver informada en este período.</p>
+  <% end %>
+
+  <h2 style="font-size: 17px; margin-bottom: 6px">Pareto de detenciones Haver · últimos 30 días</h2>
+  <p style="font-size: 13px; color: #51615b; margin: 0 0 6px">
+    Del <%= @report.pareto_range.begin.strftime("%d/%m") %> al <%= @report.pareto_range.end.strftime("%d/%m") %> · detenciones con causa informada en turnos con producción Haver
+    <% if @report.pareto_last_date %><br>Último día con detenciones consideradas <%= @report.pareto_last_date.strftime("%d/%m") %>.<% end %>
+  </p>
+  <% if @pareto_chart_url %>
+    <%= image_tag @pareto_chart_url, width: 720,
+                  alt: "Pareto Haver de minutos detenidos por causa y porcentaje acumulado",
+                  style: "display: block; width: 100%; max-width: 720px; height: auto; border: 0; margin-bottom: 16px" %>
+  <% elsif @report.pareto_causes.any? %>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px">
+      <thead>
+        <tr style="background: #f2f6f4">
+          <th scope="col" style="padding: 6px; text-align: left">Causa</th>
+          <th scope="col" style="padding: 6px; text-align: right">Minutos</th>
+          <th scope="col" style="padding: 6px; text-align: right">% acumulado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @report.pareto_causes.each do |cause| %>
+          <tr>
+            <th scope="row" style="padding: 6px; text-align: left; border-bottom: 1px solid #dee8e1"><%= cause[:label] %></th>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(cause[:minutes]) %></td>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(cause[:cumulative], suffix: "%") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p style="font-size: 13px">Sin detenciones con causa informada en este período.</p>
   <% end %>
 
   <h2 style="font-size: 17px; margin-bottom: 6px">KPI acumulados</h2>

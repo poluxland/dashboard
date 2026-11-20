@@ -15,13 +15,24 @@ TRES TURNOS ANTERIORES
 <% end -%>
 
 PRODUCCIÓN Y RENDIMIENTO
-Del <%= @report.production_by_day.first[:date].strftime("%d/%m") %> al <%= @report.production_by_day.last[:date].strftime("%d/%m") %> · datos al corte
+Del <%= @report.production_range.begin.strftime("%d/%m") %> al <%= @report.production_range.end.strftime("%d/%m") %> · días con producción Haver
 <% if @report.production_data? -%>
 <% @report.production_by_day.each do |day| -%>
 <%= day[:date].strftime("%d/%m") %> · Producción <%= dashboard_number(day[:tons], suffix: " t") %> · Rendimiento <%= dashboard_number(day[:rate], suffix: " t/h") %>
 <% end -%>
 <% else -%>
 Sin producción Haver informada en este período.
+<% end -%>
+
+PARETO DE DETENCIONES HAVER · ÚLTIMOS 30 DÍAS
+Del <%= @report.pareto_range.begin.strftime("%d/%m") %> al <%= @report.pareto_range.end.strftime("%d/%m") %> · detenciones con causa informada en turnos con producción Haver
+<% if @report.pareto_last_date -%>
+Último día con detenciones consideradas <%= @report.pareto_last_date.strftime("%d/%m") %>.
+<% @report.pareto_causes.each do |cause| -%>
+<%= cause[:label] %> · <%= dashboard_number(cause[:minutes], suffix: " min") %> · <%= dashboard_number(cause[:cumulative], suffix: "% acumulado") %>
+<% end -%>
+<% else -%>
+Sin detenciones con causa informada en este período.
 <% end -%>
 
 KPI ACUMULADOS
