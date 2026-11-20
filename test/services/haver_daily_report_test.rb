@@ -20,8 +20,11 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_equal 4000, report.shifts.second[:good_bags]
     assert_equal "En curso al corte · cierra 06:00", report.shifts.last[:status]
     assert_nil report.shifts.last[:good_bags]
-    assert_equal [ 300, 350, 350 ], report.periods.map { |period| period[:totals][:tons] }
+    assert_equal [ 300, 350, 350, 300 ], report.periods.map { |period| period[:totals][:tons] }
     assert_in_delta 50, report.periods.first[:totals][:rate]
+    assert_equal "2 de 3 turnos al corte", report.full_day[:coverage]
+    assert_equal day..day, report.full_day[:range]
+    assert_in_delta 50, report.full_day[:totals][:rate]
     assert_equal (day - 6)..day, report.production_range
     assert_equal [ day - 1, day ], report.production_by_day.pluck(:date)
     assert_equal({ date: day, tons: 300.0, rate: 50.0 }, report.production_by_day.last)
@@ -29,13 +32,34 @@ class HaverDailyReportTest < ActiveSupport::TestCase
 
   test "Monday uses the latest scheduled turns across the weekend" do
     calendar = Date.new(2026, 11, 16)
-    report = HaverDailyReport.new(scheduled_at: HaverDailyReport.cutoff_for(calendar))
+    cutoff = HaverDailyReport.cutoff_for(calendar)
+    friday = Date.new(2026, 11, 13)
+    saturday = friday.next_day
+    add_report(friday, "TT", at: cutoff - 2.days, sacks: 4000)
+    add_report(friday, "TN", at: cutoff - 2.days, sacks: 2000)
+    add_report(saturday, "TM", at: cutoff - 1.day, sacks: 8000, hours: 4)
+    report = HaverDailyReport.new(scheduled_at: cutoff)
     assert_equal [
       [ Date.new(2026, 11, 13), "TT" ],
       [ Date.new(2026, 11, 13), "TN" ],
       [ Date.new(2026, 11, 14), "TM" ]
     ], report.shifts.map { |row| row.values_at(:date, :shift) }
     assert_equal Date.new(2026, 11, 9)..Date.new(2026, 11, 14), report.periods.second[:range]
+    assert_equal saturday..saturday, report.full_day[:range]
+    assert_equal "1 de 1 turno al corte", report.full_day[:coverage]
+    assert_equal 350, report.periods.first[:totals][:tons]
+    assert_equal 200, report.full_day[:totals][:tons]
+  end
+
+  test "the full day shows zero production for an explicitly idle shift" do
+    day = Date.new(2026, 11, 18)
+    cutoff = HaverDailyReport.cutoff_for(day.next_day)
+    add_report(day, "TM", at: cutoff - 15.hours, sacks: 0, hours: 0)
+    report = HaverDailyReport.new(scheduled_at: cutoff)
+    assert_equal "1 de 3 turnos al corte", report.full_day[:coverage]
+    assert_equal 0, report.full_day[:totals][:good_bags]
+    assert_equal 0.0, report.full_day[:totals][:tons]
+    assert_nil report.full_day[:totals][:rate]
   end
 
   test "test mail uses only its three recipients and includes HTML and text KPIs" do
@@ -49,7 +73,14 @@ class HaverDailyReportTest < ActiveSupport::TestCase
     assert_includes message.html_part.decoded, "Sin producción Haver informada en este período."
     assert_not_includes message.html_part.decoded, "Turnos con estimación Vorne"
     assert_not_includes message.text_part.decoded, "Turnos con estimación Vorne"
-    button = Nokogiri::HTML(message.html_part.decoded).css("a").find { |link| link.text == "Ver Informe Haver" }
+    html = Nokogiri::HTML(message.html_part.decoded)
+    %w[haver-email-turnos haver-email-acumulados].each do |table|
+      headers = html.css("##{table} thead th")
+      assert_equal 5, headers.size
+      assert_includes headers.last.text, "Día completo"
+    end
+    assert_includes message.text_part.decoded, "Día completo 18/11 · 0 de 3 turnos al corte"
+    button = html.css("a").find { |link| link.text == "Ver Informe Haver" }
     assert_equal "/informes/haver", URI.parse(button["href"]).path
 
     daily = HaverDailyMailer.report(scheduled_at: cutoff).message

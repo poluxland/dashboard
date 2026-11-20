@@ -7,7 +7,7 @@
 
   <h2 style="font-size: 17px; margin-bottom: 6px">Tres turnos anteriores</h2>
   <p style="margin: 0 0 8px"><%= @report.shifts.count { |shift| shift[:received] } %> de 3 reportes disponibles al corte.</p>
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px">
+  <table id="haver-email-turnos" style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px">
     <thead>
       <tr style="background: #f2f6f4">
         <th scope="col" style="padding: 7px; text-align: left">Indicador</th>
@@ -17,6 +17,10 @@
             <%= shift[:date].strftime("%d/%m") %>
           </th>
         <% end %>
+        <th scope="col" style="padding: 7px; text-align: right; background: #eaf3ee">
+          <%= @report.full_day[:label] %><br>
+          <%= @report.full_day[:range].begin.strftime("%d/%m") %>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +29,7 @@
         <% @report.shifts.each do |shift| %>
           <td style="padding: 7px; text-align: right; border-bottom: 1px solid #dee8e1"><%= shift[:status] %></td>
         <% end %>
+        <td style="padding: 7px; text-align: right; border-bottom: 1px solid #dee8e1; background: #f2f7f4"><%= @report.full_day[:coverage] %></td>
       </tr>
       <% HaverDailyReport::SHIFT_METRICS.each do |label, key, unit, precision| %>
         <tr>
@@ -32,6 +37,7 @@
           <% @report.shifts.each do |shift| %>
             <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(shift[key], suffix: unit, precision: precision) %></td>
           <% end %>
+          <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1; background: #f2f7f4; font-weight: 600"><%= dashboard_number(@report.full_day[:totals][key], suffix: unit, precision: precision) %></td>
         </tr>
       <% end %>
     </tbody>
@@ -104,14 +110,19 @@
   <% end %>
 
   <h2 style="font-size: 17px; margin-bottom: 6px">KPI acumulados</h2>
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px">
+  <table id="haver-email-acumulados" style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px">
     <thead>
       <tr style="background: #f2f6f4">
         <th scope="col" style="padding: 7px; text-align: left">Indicador</th>
         <% @report.periods.each do |period| %>
-          <th scope="col" style="padding: 7px; text-align: right">
+          <th scope="col" style="padding: 7px; text-align: right<%= '; background: #eaf3ee' if period[:coverage] %>">
             <%= period[:label] %><br>
-            <%= period[:range].begin.strftime("%d/%m") %>–<%= period[:range].end.strftime("%d/%m") %>
+            <% if period[:coverage] %>
+              <%= period[:range].begin.strftime("%d/%m") %><br>
+              <small><%= period[:coverage] %></small>
+            <% else %>
+              <%= period[:range].begin.strftime("%d/%m") %>–<%= period[:range].end.strftime("%d/%m") %>
+            <% end %>
           </th>
         <% end %>
       </tr>
@@ -121,7 +132,7 @@
         <tr>
           <th scope="row" style="padding: 6px; text-align: left; border-bottom: 1px solid #dee8e1"><%= label %></th>
           <% @report.periods.each do |period| %>
-            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1"><%= dashboard_number(period[:totals][key], suffix: unit, precision: precision) %></td>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px solid #dee8e1<%= '; background: #f2f7f4; font-weight: 600' if period[:coverage] %>"><%= dashboard_number(period[:totals][key], suffix: unit, precision: precision) %></td>
           <% end %>
         </tr>
       <% end %>

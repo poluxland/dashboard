@@ -9,7 +9,6 @@ const font = { family: "DejaVu Sans, Arial, sans-serif", size: 16 }
 function production(days) {
   return {
     height: 330,
-    indexAxis: "x",
     data: {
       labels: days.map(day => day.label),
       datasets: [
@@ -65,10 +64,8 @@ function wrapCause(label) {
 
 function pareto(causes) {
   const labels = causes.map(cause => wrapCause(cause.label))
-  const rowsHeight = labels.reduce((height, lines) => height + (lines.length > 1 ? 45 : 35), 0)
   return {
-    height: Math.max(245, rowsHeight + 100),
-    indexAxis: "y",
+    height: 405,
     data: {
       labels,
       datasets: [
@@ -77,10 +74,10 @@ function pareto(causes) {
           label: "Minutos detenidos",
           data: causes.map(cause => cause.minutes),
           backgroundColor: "#dc3545",
-          maxBarThickness: 19,
+          maxBarThickness: 42,
           borderRadius: 3,
           pointStyle: "rectRounded",
-          xAxisID: "minutes",
+          yAxisID: "minutes",
           order: 1
         },
         {
@@ -91,22 +88,26 @@ function pareto(causes) {
           backgroundColor: "#1d4ed8",
           borderWidth: 3,
           pointRadius: 4,
-          xAxisID: "percentage",
+          yAxisID: "percentage",
           clip: false,
           order: 0
         }
       ]
     },
     scales: {
-      y: { grid: { display: false }, ticks: { autoSkip: false, font } },
-      minutes: {
+      x: {
         position: "bottom",
+        grid: { display: false },
+        ticks: { autoSkip: false, minRotation: 40, maxRotation: 50, font: { ...font, size: 14 } }
+      },
+      minutes: {
+        position: "left",
         beginAtZero: true,
         ticks: { maxTicksLimit: 5, callback: tickLabel, font },
         grid: { color: "#e4ebef" }
       },
       percentage: {
-        position: "top",
+        position: "right",
         min: 0,
         max: 100,
         ticks: { stepSize: 25, callback: value => `${value}%`, font },
@@ -118,17 +119,16 @@ function pareto(causes) {
 
 const { kind, rows } = JSON.parse(readFileSync(0, "utf8"))
 const builders = { production, pareto }
-const { height, indexAxis, data, scales } = builders[kind](rows)
+const { height, data, scales } = builders[kind](rows)
 const canvas = createCanvas(720, height)
 const chart = new Chart(canvas.getContext("2d"), {
   type: "bar",
   data,
   options: {
-    indexAxis,
     responsive: false,
     animation: false,
     devicePixelRatio: 2,
-    layout: { padding: { left: 7, right: 11, bottom: 3 } },
+    layout: { padding: { left: kind === "pareto" ? 23 : 7, right: 11, bottom: 3 } },
     color: "#344957",
     plugins: {
       legend: {

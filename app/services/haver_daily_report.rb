@@ -26,7 +26,7 @@ class HaverDailyReport
     discarded_bags: "sacos_descartados_haver"
   }.freeze
 
-  attr_reader :cutoff, :shifts, :periods, :ideal, :production_range, :production_by_day,
+  attr_reader :cutoff, :shifts, :periods, :full_day, :ideal, :production_range, :production_by_day,
               :pareto_range, :pareto_causes, :pareto_last_date
 
   def self.cutoff_for(date)
@@ -67,15 +67,33 @@ class HaverDailyReport
       metrics.merge(date: date, shift: shift, status: shift_status(date, shift, recorded),
                     received: recorded.present?, comment: recorded&.value_for_analytics("comentarios_haver"))
     end
+    @full_day = summarize_day(last_report_date, candidates, recent_reports, dashboard)
     @periods = [
       { label: "Tres turnos", range: slots.first.first..last_report_date,
         totals: dashboard.totals_for { |row| slots.include?([ row[:date], row[:shift] ]) } },
       { label: "Semana", range: week, totals: dashboard.totals_for { |row| week.cover?(row[:date]) } },
-      { label: "Mes", range: month, totals: dashboard.totals_for { |row| month.cover?(row[:date]) } }
+      { label: "Mes", range: month, totals: dashboard.totals_for { |row| month.cover?(row[:date]) } },
+      full_day
     ]
   end
 
   private
+
+  def summarize_day(date, candidates, recent_reports, dashboard)
+    slots = candidates.select { |slot_date, _shift| slot_date == date }
+    records = recent_reports.values_at(*slots).compact
+    totals = dashboard.totals_for { |row| row[:date] == date }
+    BAG_FIELDS.each do |key, field|
+      next unless totals[key].nil?
+
+      values = records.filter_map { |record| record.value_for_analytics(field) }
+      totals[key] = values.sum if values.any?
+    end
+    totals[:tons] = 0.0 if totals[:good_bags] == 0
+
+    shift_label = slots.one? ? "turno" : "turnos"
+    { label: "Día completo", range: date..date, coverage: "#{records.size} de #{slots.size} #{shift_label} al corte", totals: totals }
+  end
 
   def load_pareto(last_date)
     @pareto_range = (last_date - (PARETO_DAYS - 1))..last_date

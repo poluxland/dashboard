@@ -14,6 +14,11 @@ TRES TURNOS ANTERIORES
 
 <% end -%>
 
+<%= @report.full_day[:label] %> <%= @report.full_day[:range].begin.strftime("%d/%m") %> · <%= @report.full_day[:coverage] %>
+<% HaverDailyReport::SHIFT_METRICS.each do |label, key, unit, precision| -%>
+- <%= label %> · <%= dashboard_number(@report.full_day[:totals][key], suffix: unit, precision: precision) %>
+<% end -%>
+
 PRODUCCIÓN Y RENDIMIENTO
 Del <%= @report.production_range.begin.strftime("%d/%m") %> al <%= @report.production_range.end.strftime("%d/%m") %> · días con producción Haver
 <% if @report.production_data? -%>
@@ -37,7 +42,11 @@ Sin detenciones con causa informada en este período.
 
 KPI ACUMULADOS
 <% @report.periods.each do |period| -%>
+<% if period[:coverage] -%>
+<%= period[:label] %> · <%= period[:range].begin.strftime("%d/%m") %> · <%= period[:coverage] %>
+<% else -%>
 <%= period[:label] %> · <%= period[:range].begin.strftime("%d/%m") %>–<%= period[:range].end.strftime("%d/%m") %>
+<% end -%>
 <% HaverDailyReport::TOTAL_METRICS.each do |label, key, unit, precision| -%>
 - <%= label %> · <%= dashboard_number(period[:totals][key], suffix: unit, precision: precision) %>
 <% end -%>
