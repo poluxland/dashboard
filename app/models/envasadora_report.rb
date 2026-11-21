@@ -8,7 +8,10 @@ class EnvasadoraReport < ApplicationRecord
     "sacos_no_reconocidos_haver" => "Sacos no reconocidos Haver",
     "sacos_descartados_haver" => "Sacos descartados Haver"
   }.freeze
-  BAG_FIELDS = BROKEN_BAG_FIELDS.merge(HAVER_QUALITY_FIELDS).freeze
+  BAG_FIELDS = BROKEN_BAG_FIELDS.merge(HAVER_QUALITY_FIELDS).merge(
+    "sacos_no_reconocidos_vento" => "Sacos no reconocidos Ventomatic",
+    "sacos_descartados_vento" => "Sacos descartados Ventomatic"
+  ).freeze
   GROUPS = JSON.parse(Rails.root.join("config/envasadora_fields.json").read).freeze
   FIELDS = GROUPS.values.flatten.freeze
   SILOS = {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_020000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -216,6 +216,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_020000) do
     t.integer "source_row"
     t.string "source_fingerprint"
     t.jsonb "source_data", default: {}, null: false
+    t.integer "sacos_no_reconocidos_vento"
+    t.integer "sacos_descartados_vento"
     t.index ["source_fingerprint"], name: "index_envasadora_reports_on_source_fingerprint", unique: true
     t.index ["date", "turno"], name: "index_envasadora_reports_on_date_and_turno"
   end

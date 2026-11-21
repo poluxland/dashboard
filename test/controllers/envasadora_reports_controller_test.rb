@@ -63,7 +63,7 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
     EnvasadoraReport::HAVER_QUALITY_FIELDS.each_key do |field|
       assert_select "input[name='envasadora_report[#{field}]'][min='0'][step='1'][value='0']"
     end
-    %w[sacos_rotos_vento bigbags_rotos].each do |field|
+    %w[sacos_rotos_vento sacos_no_reconocidos_vento sacos_descartados_vento bigbags_rotos].each do |field|
       assert_select "input[name='envasadora_report[#{field}]']" do |inputs|
         assert inputs.first["value"].blank?, field
       end
@@ -74,14 +74,21 @@ class EnvasadoraReportsControllerTest < ActionDispatch::IntegrationTest
       end
       assert_response :unprocessable_entity
     end
-    post envasadora_reports_path, params: { envasadora_report: @attributes.merge(sacos_rotos_haver: 7, sacos_no_reconocidos_haver: 52, sacos_descartados_haver: 113) }
+    post envasadora_reports_path, params: { envasadora_report: @attributes.merge(
+      sacos_rotos_haver: 7, sacos_no_reconocidos_haver: 52, sacos_descartados_haver: 113,
+      sacos_no_reconocidos_vento: 15, sacos_descartados_vento: 21
+    ) }
     report = EnvasadoraReport.last
     assert_equal 7, report.sacos_rotos_haver
     assert_equal 52, report.sacos_no_reconocidos_haver
     assert_equal 113, report.sacos_descartados_haver
+    assert_equal 15, report.sacos_no_reconocidos_vento
+    assert_equal 21, report.sacos_descartados_vento
     follow_redirect!
     assert_select "th", text: "Sacos no reconocidos Haver"
     assert_select "th", text: "Sacos descartados Haver"
+    assert_select "th", text: "Sacos no reconocidos Ventomatic"
+    assert_select "th", text: "Sacos descartados Ventomatic"
   end
 
   test "form defaults save preview and email use selected cement and exact record" do
