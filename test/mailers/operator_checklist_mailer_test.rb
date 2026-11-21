@@ -23,8 +23,8 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
     assert_equal 6, email.to.size
     assert_includes email.to, "fernando.gonzalez@msindustrial.cl"
     assert_not_includes email.to, "julio.alvear@msindustrial.cl"
-    assert_equal ["Equipo", "Fecha y hora", "H", "Operador", "%", "Graves", "Leves", "Detalle graves",
-                  "Detalle leves", "Comentarios"], html.css("th").map(&:text)
+    assert_equal [ "Equipo", "Fecha y hora", "H", "Operador", "%", "Graves", "Leves", "Detalle graves",
+                  "Detalle leves", "Comentarios" ], html.css("th").map(&:text)
     assert_equal [
       [ "HQ01", "19/11/2026 05:59", "313", "María Soto", "62,5", "1", "1", "Frenos", "Neumáticos", "Comentario & foto" ],
       [ "HQ02", "18/11/2026 22:00", "100", "Operador de prueba", "0", "1", "0", "Fugas", "—", "Inicio del turno" ]

@@ -30,20 +30,20 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
 
     assert_no_difference "OvertimeReview.count" do
-      patch review_overtime_entries_path, params: { ids: [@first.id, @other.id], decision: "Aprobada" }
+      patch review_overtime_entries_path, params: { ids: [ @first.id, @other.id ], decision: "Aprobada" }
     end
     assert_equal OvertimeEntry::PENDING, @first.reload.estado
     assert_equal OvertimeEntry::PENDING, @other.reload.estado
 
     assert_difference "OvertimeReview.count", 2 do
-      patch review_overtime_entries_path, params: { ids: [@first.id, @second.id], decision: "Aprobada" }
+      patch review_overtime_entries_path, params: { ids: [ @first.id, @second.id ], decision: "Aprobada" }
     end
     assert_redirected_to overtime_entries_path
-    assert_equal ["Aprobada", "Aprobada"], [@first.reload.estado, @second.reload.estado]
+    assert_equal [ "Aprobada", "Aprobada" ], [ @first.reload.estado, @second.reload.estado ]
     assert_equal EMAIL, @first.overtime_reviews.last.reviewer_email
 
     assert_no_difference "OvertimeReview.count" do
-      patch review_overtime_entries_path, params: { ids: [@first.id], decision: "Rechazada", reason: "Corrección" }
+      patch review_overtime_entries_path, params: { ids: [ @first.id ], decision: "Rechazada", reason: "Corrección" }
     end
     assert_equal "Aprobada", @first.reload.estado
     get root_path
@@ -58,9 +58,9 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="ids[]"]', 3
 
     assert_difference "OvertimeReview.count", 2 do
-      patch review_overtime_entries_path, params: { ids: [@first.id, @other.id], decision: "Aprobada" }
+      patch review_overtime_entries_path, params: { ids: [ @first.id, @other.id ], decision: "Aprobada" }
     end
-    assert_equal ["Aprobada", "Aprobada"], [@first.reload.estado, @other.reload.estado]
+    assert_equal [ "Aprobada", "Aprobada" ], [ @first.reload.estado, @other.reload.estado ]
     assert_equal GLOBAL_REVIEW_EMAIL, @other.overtime_reviews.last.reviewer_email
     assert_not_includes OvertimeAccess::RECIPIENTS, GLOBAL_REVIEW_EMAIL
   end
@@ -75,7 +75,7 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, @other.descripcion
     assert_difference "OvertimeReview.count", 2 do
-      patch review_overtime_entries_path, params: { ids: [@first.id, @other.id], decision: "Rechazada", reason: "Falta respaldo" }
+      patch review_overtime_entries_path, params: { ids: [ @first.id, @other.id ], decision: "Rechazada", reason: "Falta respaldo" }
     end
     assert_equal "Falta respaldo", @other.overtime_reviews.last.reason
 
@@ -93,7 +93,7 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
 
   test "a report link keeps the reviewer scope and points to the approval page" do
     email = OvertimeMailer.pending_report(recipient: EMAIL).message
-    assert_equal [EMAIL], email.to
+    assert_equal [ EMAIL ], email.to
     assert_includes email.html_part.decoded, "http://example.com/horas"
     assert_includes email.text_part.decoded, @first.descripcion
     assert_not_includes email.html_part.decoded, @other.descripcion

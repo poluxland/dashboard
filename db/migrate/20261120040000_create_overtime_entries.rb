@@ -19,7 +19,7 @@ class CreateOvertimeEntries < ActiveRecord::Migration[8.1]
       t.string :author_email
       t.timestamps
       t.index :erp_id, unique: true
-      t.index [:estado, :mandante, :fecha]
+      t.index [ :estado, :mandante, :fecha ]
     end
 
     create_table :overtime_reviews do |t|
@@ -44,7 +44,7 @@ class CreateOvertimeEntries < ActiveRecord::Migration[8.1]
       t.datetime :scheduled_at, null: false
       t.string :recipient, null: false
       t.datetime :sent_at
-      t.index [:scheduled_at, :recipient], unique: true
+      t.index [ :scheduled_at, :recipient ], unique: true
     end
   end
 end

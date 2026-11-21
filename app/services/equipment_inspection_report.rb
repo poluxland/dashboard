@@ -76,7 +76,8 @@ class EquipmentInspectionReport
   private
 
   def all_rows
-    EquipmentChecklist.from("(#{operator_sql} UNION ALL #{maintenance_sql}) AS equipment_checklists").readonly
+    combined = Arel::Nodes::UnionAll.new(Arel.sql(operator_sql), Arel.sql(maintenance_sql))
+    EquipmentChecklist.from(Arel::Nodes::TableAlias.new(combined, EquipmentChecklist.table_name)).readonly
   end
 
   def operator_sql

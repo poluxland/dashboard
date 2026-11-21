@@ -14,13 +14,13 @@ class OvertimeLoginCode < ApplicationRecord
     record = find_or_create_by!(email: email) do |row|
       row.assign_attributes(challenge: challenge, digest: sign(email, challenge, code), issued_at: now)
     end
-    return [challenge, code] if record.previously_new_record?
+    return [ challenge, code ] if record.previously_new_record?
 
     record.with_lock do
       return if record.issued_at > now - RESEND_AFTER
 
       record.update!(challenge: challenge, digest: sign(email, challenge, code), issued_at: now, attempts: 0, used_at: nil)
-      [challenge, code]
+      [ challenge, code ]
     end
   end
 
@@ -43,7 +43,7 @@ class OvertimeLoginCode < ApplicationRecord
 
   def self.sign(email, challenge, code)
     secret = Rails.application.key_generator.generate_key("overtime-review-code", 32)
-    OpenSSL::HMAC.hexdigest("SHA256", secret, [email, challenge, code].join(":"))
+    OpenSSL::HMAC.hexdigest("SHA256", secret, [ email, challenge, code ].join(":"))
   end
   private_class_method :sign
 end

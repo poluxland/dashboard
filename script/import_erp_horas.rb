@@ -5,9 +5,9 @@ target_url = ENV.fetch("ERP_HORAS_TARGET_URL")
 abort "Conecta bases distintas para origen y destino." if source_url == target_url
 
 fields = %w[fecha descripcion area personal inicio termino he ot traslado lugar mandante estado ep created_at updated_at]
-source_columns = ["id", *fields, "updated_at"].join(", ")
-target_columns = ["erp_id", *fields, "erp_updated_at"].join(", ")
-update_fields = (fields - ["created_at"] + ["erp_updated_at"]).map { |field| "#{field} = EXCLUDED.#{field}" }.join(", ")
+source_columns = [ "id", *fields, "updated_at" ].join(", ")
+target_columns = [ "erp_id", *fields, "erp_updated_at" ].join(", ")
+update_fields = (fields - [ "created_at" ] + [ "erp_updated_at" ]).map { |field| "#{field} = EXCLUDED.#{field}" }.join(", ")
 
 PG.connect(source_url) do |source|
   PG.connect(target_url) do |target|
@@ -60,7 +60,7 @@ PG.connect(source_url) do |source|
         SQL
         raise "Hay #{differences} filas que no coinciden con el ERP. La carga se revirtió." if differences.positive?
 
-        [total, writes, preserved_edits]
+        [ total, writes, preserved_edits ]
       end
     end
     puts "ERP: #{result[0]} registros. Escritos: #{result[1]}. Editados en Dashboard y preservados: #{result[2]}. Diferencias sin explicar: 0."

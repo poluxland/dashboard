@@ -1,7 +1,7 @@
 class OvertimeEntry < ApplicationRecord
   PENDING = "Pendiente revisión"
   DECISIONS = %w[Aprobada Rechazada].freeze
-  STATUSES = [PENDING, *DECISIONS].freeze
+  STATUSES = [ PENDING, *DECISIONS ].freeze
   INPUT_FIELDS = %i[fecha descripcion area personal inicio termino he ot traslado lugar mandante ep].freeze
   MANDANTES = [
     "Cesar Hernandez", "Carolina Vera", "Mario Santibañez", "Martin Llancafil",
