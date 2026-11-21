@@ -11,6 +11,7 @@ module OvertimeAccess
     "johnny.rute@meloncementos.cl" => "Johnny Rute",
     "carolina.vera@meloncementos.cl" => "Carolina Vera"
   }.freeze
+  GLOBAL_EXTERNAL_REVIEWERS = %w[joseignaciojerez@gmail.com].freeze
   RECIPIENTS = (STAFF + EXTERNAL.keys).freeze
 
   def self.normalize(email)
@@ -22,11 +23,16 @@ module OvertimeAccess
   end
 
   def self.external?(email)
-    EXTERNAL.key?(normalize(email))
+    normalized = normalize(email)
+    EXTERNAL.key?(normalized) || GLOBAL_EXTERNAL_REVIEWERS.include?(normalized)
+  end
+
+  def self.global_reviewer?(email)
+    staff?(email) || GLOBAL_EXTERNAL_REVIEWERS.include?(normalize(email))
   end
 
   def self.entries_for(email)
-    return OvertimeEntry.all if staff?(email)
+    return OvertimeEntry.all if global_reviewer?(email)
 
     mandante = EXTERNAL[normalize(email)]
     mandante ? OvertimeEntry.where(mandante: mandante) : OvertimeEntry.none

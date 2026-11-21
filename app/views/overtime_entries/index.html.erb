@@ -22,7 +22,7 @@
       <%= form.label :to, "Hasta", class: "form-label" %>
       <%= form.date_field :to, value: params[:to], class: "form-control" %>
     </div>
-    <% if @staff %>
+    <% if @global_review %>
       <div class="col-12 col-md-3">
         <%= form.label :mandante, "Mandante (ITO)", class: "form-label" %>
         <%= form.select :mandante, @mandantes, { include_blank: "Todos", selected: params[:mandante] }, class: "form-select" %>

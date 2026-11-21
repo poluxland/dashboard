@@ -4,7 +4,8 @@ class OvertimeEntriesController < ApplicationController
   before_action :require_staff, only: %i[new create edit update]
 
   def index
-    entries = OvertimeAccess.entries_for(@reviewer)
+    accessible_entries = OvertimeAccess.entries_for(@reviewer)
+    entries = accessible_entries
     @status = params[:estado].presence || OvertimeEntry::PENDING
     entries = case @status
     when "todos" then entries
@@ -15,7 +16,10 @@ class OvertimeEntriesController < ApplicationController
     filters = params.permit(:from, :to, :mandante)
     entries = entries.where("fecha >= ?", Date.iso8601(filters[:from])) if filters[:from].present?
     entries = entries.where("fecha <= ?", Date.iso8601(filters[:to])) if filters[:to].present?
-    @mandantes = OvertimeAccess.entries_for(@reviewer).where.not(mandante: [nil, ""]).distinct.order(:mandante).pluck(:mandante)
+    @global_review = OvertimeAccess.global_reviewer?(@reviewer)
+    if @global_review
+      @mandantes = accessible_entries.where.not(mandante: [nil, ""]).distinct.order(:mandante).pluck(:mandante)
+    end
     entries = entries.where(mandante: filters[:mandante]) if filters[:mandante].present?
     @pagy, @entries = pagy(entries.includes(:overtime_reviews).order(Arel.sql("fecha DESC NULLS LAST"), id: :desc), limit: 100)
   rescue Date::Error

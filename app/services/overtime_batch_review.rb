@@ -2,7 +2,8 @@ class OvertimeBatchReview
   class InvalidReview < StandardError; end
 
   def self.call(reviewer:, ids:, status:, reason:)
-    unless OvertimeAccess::RECIPIENTS.include?(reviewer) && OvertimeEntry::DECISIONS.include?(status)
+    authorized = OvertimeAccess.staff?(reviewer) || OvertimeAccess.external?(reviewer)
+    unless authorized && OvertimeEntry::DECISIONS.include?(status)
       raise InvalidReview, "Selecciona una decisión válida."
     end
     unless ids.is_a?(Array) && ids.size.between?(1, 200) && ids.all? { |id| id.to_s.match?(/\A[1-9]\d{0,17}\z/) }

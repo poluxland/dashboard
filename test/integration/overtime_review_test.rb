@@ -2,6 +2,7 @@ require "test_helper"
 
 class OvertimeReviewTest < ActionDispatch::IntegrationTest
   EMAIL = "carolina.vera@meloncementos.cl"
+  GLOBAL_REVIEW_EMAIL = "joseignaciojerez@gmail.com"
 
   setup do
     @first = entry("Carolina Vera", "Registro de Carolina")
@@ -47,6 +48,21 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_equal "Aprobada", @first.reload.estado
     get root_path
     assert_redirected_to login_path
+  end
+
+  test "the authorized Gmail account can review different mandantes using an emailed code" do
+    sign_in_for_review(email: GLOBAL_REVIEW_EMAIL)
+    get overtime_entries_path
+    assert_response :success
+    assert_select 'select[name="mandante"] option', text: "Johnny Rute"
+    assert_select 'input[name="ids[]"]', 3
+
+    assert_difference "OvertimeReview.count", 2 do
+      patch review_overtime_entries_path, params: { ids: [@first.id, @other.id], decision: "Aprobada" }
+    end
+    assert_equal ["Aprobada", "Aprobada"], [@first.reload.estado, @other.reload.estado]
+    assert_equal GLOBAL_REVIEW_EMAIL, @other.overtime_reviews.last.reviewer_email
+    assert_not_includes OvertimeAccess::RECIPIENTS, GLOBAL_REVIEW_EMAIL
   end
 
   test "corporate login grants overtime review only to the imported list" do
@@ -100,9 +116,9 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     OvertimeEntry.create!(fecha: Date.new(2026, 11, 19), descripcion: description, he: 3, mandante: mandante, estado: OvertimeEntry::PENDING)
   end
 
-  def sign_in_for_review
+  def sign_in_for_review(email: EMAIL)
     assert_difference -> { ActionMailer::Base.deliveries.size }, 1 do
-      post request_overtime_code_path, params: { email: EMAIL.upcase }
+      post request_overtime_code_path, params: { email: email.upcase }
     end
     code = ActionMailer::Base.deliveries.last.body.decoded[/\b\d{6}\b/]
     post verify_overtime_code_path, params: { overtime_code: code }
