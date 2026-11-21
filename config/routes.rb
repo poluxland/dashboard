@@ -1,6 +1,10 @@
 # config/routes.rb
 Rails.application.routes.draw do
   resources :pmm_trucks, path: "camiones", only: %i[index show new create edit update destroy] do
+    member do
+      get :departure, path: "salida"
+      patch :departure, action: :record_departure, path: "salida", as: nil
+    end
     collection do
       get :month, path: "mes"
       get :history, path: "historial"

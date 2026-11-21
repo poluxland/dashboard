@@ -9,9 +9,10 @@ class PmmTruck < ApplicationRecord
 
   belongs_to :pmm_material
   validates :patente, :fecha, :llegada, :tipo, presence: true, on: :capture
+  validates :llegada, :salida, presence: true, on: :departure
   normalizes :patente, with: ->(value) { value.strip.upcase }
 
-  before_validation :set_wait, on: :capture, if: -> { new_record? || will_save_change_to_llegada? || will_save_change_to_salida? }
+  before_validation :set_wait, on: %i[capture departure], if: :update_wait?
 
   scope :measured, -> { where(finished: true).or(where(finished: nil, wait: 1..)) }
   scope :on_site, ->(today) { where(finished: false).or(where(finished: nil, wait: ..1, fecha: today)) }
@@ -20,7 +21,15 @@ class PmmTruck < ApplicationRecord
     finished.nil? ? salida.nil? || wait.to_i <= 1 : !finished
   end
 
+  def on_site?(today)
+    finished == false || (finished.nil? && fecha == today && wait && wait <= 1)
+  end
+
   private
+
+  def update_wait?
+    validation_context == :departure || new_record? || will_save_change_to_llegada? || will_save_change_to_salida?
+  end
 
   def set_wait
     self.finished = salida.present?

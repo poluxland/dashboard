@@ -1,7 +1,9 @@
 class PmmTrucksController < ApplicationController
   EXPORT_LIMIT = 5000
-  skip_before_action :authenticate_user!, only: %i[index month]
+  skip_before_action :authenticate_user!, only: %i[index month new create departure record_departure]
+  rate_limit to: 30, within: 1.minute, only: %i[create record_departure]
   before_action :set_truck, only: %i[show edit update destroy]
+  before_action :set_on_site_truck, only: %i[departure record_departure]
   before_action :require_truck_admin!, only: :destroy
 
   def index
@@ -61,10 +63,30 @@ class PmmTrucksController < ApplicationController
   def create
     @truck = PmmTruck.new(truck_params)
     if @truck.save(context: :capture)
-      redirect_to pmm_truck_path(@truck), notice: "Camión registrado.", status: :see_other
+      destination = signed_in? ? pmm_truck_path(@truck) : pmm_trucks_path
+      redirect_to destination, notice: "Camión registrado.", status: :see_other
     else
       prepare_form
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def departure
+    @departure_time = Time.current.in_time_zone(PmmTruck::CHILE).strftime("%H:%M")
+  end
+
+  def record_departure
+    @truck.with_lock do
+      unless @truck.on_site?(today)
+        return redirect_to pmm_trucks_path, alert: "El camión ya no está en planta.", status: :see_other
+      end
+
+      @truck.salida = params.expect(pmm_truck: [ :salida ])[:salida]
+      if @truck.save(context: :departure)
+        redirect_to pmm_trucks_path, notice: "Salida registrada.", status: :see_other
+      else
+        render :departure, status: :unprocessable_entity
+      end
     end
   end
 
@@ -121,6 +143,11 @@ class PmmTrucksController < ApplicationController
 
   def set_truck
     @truck = PmmTruck.find(params.expect(:id))
+  end
+
+  def set_on_site_truck
+    @truck = PmmTruck.on_site(today).find_by(id: params.expect(:id))
+    redirect_to pmm_trucks_path, alert: "El camión ya no está en planta.", status: :see_other unless @truck
   end
 
   def truck_params

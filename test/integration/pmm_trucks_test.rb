@@ -9,7 +9,7 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
       tipo: "Plano", llegada: "08:00", salida: "00:00", wait: -480, motive: "=1+1")
   end
 
-  test "the public views render while the operating records require a corporate account" do
+  test "public views render while general editing and private reports require a corporate account" do
     get login_path
     assert_response :success
     assert_select ".login-card a[href=?]", pmm_trucks_path, text: "Camiones en planta", count: 1
@@ -20,15 +20,58 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     get month_pmm_trucks_path
     assert_response :success
 
-    [ new_pmm_truck_path, edit_pmm_truck_path(@legacy), pmm_truck_path(@legacy), history_pmm_trucks_path,
+    [ edit_pmm_truck_path(@legacy), pmm_truck_path(@legacy), history_pmm_trucks_path,
       report_pmm_trucks_path, annual_pmm_trucks_path, pmm_catalog_path("materias") ].each do |path|
       get path
       assert_redirected_to login_path
     end
-    assert_no_difference "PmmTruck.count" do
+    patch pmm_truck_path(@legacy), params: { pmm_truck: { salida: "09:00" } }
+    assert_redirected_to login_path
+    assert_equal(-480, @legacy.reload.wait)
+  end
+
+  test "a visitor can register an arrival and close it with only the departure time" do
+    get new_pmm_truck_path
+    assert_response :success
+
+    assert_difference "PmmTruck.count" do
       post pmm_trucks_path, params: { pmm_truck: valid_fields }
     end
-    assert_redirected_to login_path
+    truck = PmmTruck.find_by!(patente: "XY1234")
+    assert_redirected_to pmm_trucks_path
+    follow_redirect!
+    assert_select "section[aria-label='Camiones sin salida'] a[href=?]", departure_pmm_truck_path(truck), text: "Registrar salida"
+
+    get departure_pmm_truck_path(truck)
+    assert_response :success
+    assert_select "input[name='pmm_truck[salida]']", count: 1
+
+    patch departure_pmm_truck_path(truck), params: { pmm_truck: { salida: "" } }
+    assert_response :unprocessable_entity
+    assert truck.reload.pending?
+
+    patch departure_pmm_truck_path(truck), params: { pmm_truck: { salida: "00:10", patente: "ALTERADA" } }
+    assert_redirected_to pmm_trucks_path
+    assert_equal 20, truck.reload.wait
+    assert_equal "XY1234", truck.patente
+    refute truck.pending?
+
+    patch departure_pmm_truck_path(truck), params: { pmm_truck: { salida: "01:30" } }
+    assert_redirected_to pmm_trucks_path
+    assert_equal "00:10", truck.reload.salida.strftime("%H:%M")
+  end
+
+  test "a visitor can close an imported truck at midnight but cannot close archived arrivals" do
+    old = @legacy.dup
+    old.update!(pmm_id: 124, fecha: @today.yesterday)
+    patch departure_pmm_truck_path(old), params: { pmm_truck: { salida: "09:00" } }
+    assert_redirected_to pmm_trucks_path
+    assert_equal(-480, old.reload.wait)
+
+    patch departure_pmm_truck_path(@legacy), params: { pmm_truck: { salida: "00:00" } }
+    assert_redirected_to pmm_trucks_path
+    assert_equal 960, @legacy.reload.wait
+    refute @legacy.pending?
   end
 
   test "capturing and closing a truck computes minutes across midnight while retaining imported values" do

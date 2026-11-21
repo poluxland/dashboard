@@ -20,8 +20,13 @@
               <td><%= truck.cause %></td>
             <% end %>
             <td class="text-end text-nowrap">
-              <% if details %><%= link_to "Ver", pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary" %><% end %>
-              <%= link_to(truck.pending? ? "Registrar salida" : "Editar", edit_pmm_truck_path(truck), class: "btn btn-sm btn-outline-primary") %>
+              <% if truck.on_site?(PmmTruck::CHILE.today) %>
+                <%= link_to "Registrar salida", departure_pmm_truck_path(truck), class: "btn btn-sm btn-outline-primary" %>
+              <% end %>
+              <% if signed_in? %>
+                <% if details %><%= link_to "Ver", pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary" %><% end %>
+                <%= link_to "Editar", edit_pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary" %>
+              <% end %>
             </td>
           </tr>
         <% end %>

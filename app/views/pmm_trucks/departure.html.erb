@@ -1,0 +1,16 @@
+<% content_for :title, "Registrar salida de camión" %>
+<div class="container py-4">
+  <h1 class="h3 mb-3">Registrar salida</h1>
+  <p><strong><%= @truck.patente %></strong> · Llegada <%= @truck.fecha&.strftime("%d/%m/%Y") %> <%= pmm_time(@truck.llegada) %></p>
+  <% if @truck.errors.any? %>
+    <div class="alert alert-danger"><%= @truck.errors.full_messages.to_sentence %></div>
+  <% end %>
+  <%= form_with model: @truck, url: departure_pmm_truck_path(@truck), method: :patch do |form| %>
+    <div class="mb-3">
+      <%= form.label :salida, "Hora de salida", class: "form-label" %>
+      <%= form.time_field :salida, value: @departure_time, required: true, class: "form-control w-auto" %>
+    </div>
+    <%= form.submit "Registrar salida", class: "btn btn-primary" %>
+    <%= link_to "Volver", pmm_trucks_path, class: "btn btn-outline-secondary" %>
+  <% end %>
+</div>
