@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_040000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -547,6 +547,78 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_040000) do
     t.index ["name"], name: "index_people_on_name", unique: true
   end
 
+  create_table "pmm_bru_visits", force: :cascade do |t|
+    t.bigint "pmm_id", null: false
+    t.datetime "pmm_updated_at"
+    t.date "fecha"
+    t.time "ingreso"
+    t.time "salida"
+    t.string "patente"
+    t.string "mmpp"
+    t.string "comentarios"
+    t.integer "numero"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fecha"], name: "index_pmm_bru_visits_on_fecha"
+    t.index ["pmm_id"], name: "index_pmm_bru_visits_on_pmm_id", unique: true
+  end
+
+  create_table "pmm_materials", force: :cascade do |t|
+    t.bigint "pmm_id"
+    t.datetime "pmm_updated_at"
+    t.string "nombre"
+    t.string "descripcion"
+    t.integer "densidad"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pmm_id"], name: "index_pmm_materials_on_pmm_id", unique: true
+  end
+
+  create_table "pmm_truck_report_deliveries", force: :cascade do |t|
+    t.datetime "scheduled_at", null: false
+    t.datetime "sent_at"
+    t.index ["scheduled_at"], name: "index_pmm_truck_report_deliveries_on_scheduled_at", unique: true
+  end
+
+  create_table "pmm_trucks", force: :cascade do |t|
+    t.bigint "pmm_id"
+    t.datetime "pmm_updated_at"
+    t.bigint "pmm_material_id", null: false
+    t.date "fecha"
+    t.string "tipo"
+    t.time "llegada"
+    t.time "llamada"
+    t.time "salida"
+    t.string "patente"
+    t.integer "wait"
+    t.string "cause"
+    t.text "motive"
+    t.integer "number"
+    t.string "other"
+    t.boolean "finished"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at", "id"], name: "index_pmm_trucks_on_created_at_and_id"
+    t.index ["fecha"], name: "index_pmm_trucks_on_fecha"
+    t.index ["pmm_id"], name: "index_pmm_trucks_on_pmm_id", unique: true
+    t.index ["pmm_material_id", "fecha"], name: "index_pmm_trucks_on_pmm_material_id_and_fecha"
+    t.index ["pmm_material_id"], name: "index_pmm_trucks_on_pmm_material_id"
+  end
+
+  create_table "pmm_yards", force: :cascade do |t|
+    t.bigint "pmm_id"
+    t.datetime "pmm_updated_at"
+    t.bigint "pmm_material_id", null: false
+    t.string "nombre"
+    t.string "descripcion"
+    t.integer "capacidad"
+    t.boolean "operativa"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pmm_id"], name: "index_pmm_yards_on_pmm_id", unique: true
+    t.index ["pmm_material_id"], name: "index_pmm_yards_on_pmm_material_id"
+  end
+
   create_table "shift_reports", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "date", null: false
@@ -800,6 +872,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_040000) do
   add_foreign_key "maintenance_checklists", "mobile_assets"
   add_foreign_key "tpt_events", "tpt_imports"
   add_foreign_key "overtime_reviews", "overtime_entries"
+  add_foreign_key "pmm_trucks", "pmm_materials"
+  add_foreign_key "pmm_yards", "pmm_materials"
   add_foreign_key "ptm_events", "ptm_reports"
   add_foreign_key "task_comments", "tasks"
   add_foreign_key "task_items", "tasks"

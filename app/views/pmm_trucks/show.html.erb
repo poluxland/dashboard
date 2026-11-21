@@ -1,0 +1,20 @@
+<% content_for :title, "Registro de camión" %>
+<div class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="h3 mb-0">Camión <%= @truck.patente %></h1>
+    <%= link_to (@truck.pending? ? "Registrar salida" : "Editar"), edit_pmm_truck_path(@truck), class: "btn btn-primary" %>
+  </div>
+  <%= render "navigation" %>
+  <dl class="row card-body border rounded">
+    <% { "Fecha" => @truck.fecha&.strftime("%d/%m/%Y"), "Materia prima" => @truck.pmm_material.nombre, "Tipo" => @truck.tipo,
+          "Llegada" => pmm_time(@truck.llegada), "Llamada" => pmm_time(@truck.llamada), "Salida" => (@truck.pending? ? "En planta" : pmm_time(@truck.salida)),
+          "Espera (min)" => @truck.wait, "Causa" => @truck.cause, "Motivo u observaciones" => @truck.motive, "Número" => @truck.number,
+          "Otro" => @truck.other, "N.º PMM" => @truck.pmm_id }.each do |label, value| %>
+      <dt class="col-sm-4"><%= label %></dt>
+      <dd class="col-sm-8"><%= value.presence || "—" %></dd>
+    <% end %>
+  </dl>
+  <% if task_admin? %>
+    <%= button_to "Eliminar registro", pmm_truck_path(@truck), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "¿Eliminar este registro?" } } %>
+  <% end %>
+</div>

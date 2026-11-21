@@ -1,0 +1,13 @@
+<div class="row g-3 my-2" data-controller="pmm-truck-charts" data-pmm-truck-charts-charts-value="<%= charts.to_json %>">
+  <p class="text-danger" hidden data-pmm-truck-charts-target="error">No se pudieron cargar los gráficos.</p>
+  <% charts.each do |chart| %>
+    <section class="col-lg-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h2 class="h6"><%= chart[:title] %></h2>
+          <div style="height: 260px"><canvas role="img" aria-label="<%= chart[:title] %>" data-pmm-truck-charts-target="canvas"></canvas></div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+</div>

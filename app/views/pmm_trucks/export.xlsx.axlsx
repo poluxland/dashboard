@@ -1,0 +1,12 @@
+xlsx_package.workbook.add_worksheet(name: "Camiones") do |sheet|
+  sheet.add_row [ "ID PMM", "ID Dashboard", "Fecha", "Material", "Tipo", "Llegada", "Llamada", "Salida",
+                  "Patente", "Espera (min)", "Motivo", "Causa", "Número", "Otro" ]
+  @export_trucks.each do |truck|
+    sheet.add_row [
+      truck.pmm_id, truck.id, truck.fecha&.iso8601, truck.pmm_material.nombre, truck.tipo,
+      truck.llegada&.strftime("%H:%M:%S"), truck.llamada&.strftime("%H:%M:%S"), truck.salida&.strftime("%H:%M:%S"),
+      truck.patente, truck.wait, truck.motive, truck.cause, truck.number, truck.other
+    ], types: [ :integer, :integer, :string, :string, :string, :string, :string, :string, :string,
+               :integer, :string, :string, :integer, :string ], escape_formulas: true
+  end
+end

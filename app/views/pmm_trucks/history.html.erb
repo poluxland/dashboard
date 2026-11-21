@@ -1,0 +1,20 @@
+<% content_for :title, "Histórico de camiones" %>
+<div class="container-xl py-4">
+  <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-3">
+    <h1 class="h3 mb-0"><%= @filters[:period] == "year" ? "Camiones del año" : "Histórico de camiones" %></h1>
+    <%= link_to "Descargar Excel", history_pmm_trucks_path(@filters.to_h.merge(format: :xlsx)), class: "btn btn-outline-success", data: { turbo: false } %>
+  </div>
+  <%= render "navigation" %>
+  <%= form_with url: history_pmm_trucks_path, method: :get, class: "row g-2 align-items-end mb-3" do |form| %>
+    <% if @filters[:period].present? %><%= form.hidden_field :period, value: @filters[:period] %><% end %>
+    <div class="col-6 col-md-2"><%= form.label :from, "Desde", class: "form-label" %><%= form.date_field :from, value: @filters[:from], class: "form-control" %></div>
+    <div class="col-6 col-md-2"><%= form.label :to, "Hasta", class: "form-label" %><%= form.date_field :to, value: @filters[:to], class: "form-control" %></div>
+    <div class="col-6 col-md-2"><%= form.label :patente, "Patente", class: "form-label" %><%= form.search_field :patente, value: @filters[:patente], class: "form-control" %></div>
+    <div class="col-6 col-md-2"><%= form.label :pmm_material_id, "Materia prima", class: "form-label" %><%= form.collection_select :pmm_material_id, @materials, :id, :nombre, { include_blank: "Todas", selected: @filters[:pmm_material_id] }, class: "form-select" %></div>
+    <div class="col-6 col-md-2"><%= form.label :tipo, "Tipo", class: "form-label" %><%= form.select :tipo, PmmTruck::TYPES, { include_blank: "Todos", selected: @filters[:tipo] }, class: "form-select" %></div>
+    <div class="col-auto"><%= form.submit "Filtrar", class: "btn btn-primary" %></div>
+  <% end %>
+  <p class="text-body-secondary small"><%= number_with_delimiter(@pagy.count) %> registros · Excel hasta 5.000 por descarga</p>
+  <%= render "table", trucks: @trucks, details: true %>
+  <div class="mt-3"><%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %></div>
+</div>

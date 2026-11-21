@@ -35,7 +35,7 @@
 
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[estado_canchas envasadora_reports envasadora_dashboard haver_dashboard soplados].include?(controller_name) || (controller_name == 'ots' && action_name == 'graficos') %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[estado_canchas pmm_trucks pmm_catalogs envasadora_reports envasadora_dashboard haver_dashboard soplados].include?(controller_name) || (controller_name == 'ots' && action_name == 'graficos') %>"
             type="button"
             id="lcaDropdown"
             data-bs-toggle="dropdown"
@@ -45,6 +45,7 @@
           </button>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="lcaDropdown">
             <li><%= link_to "Materia Prima", estado_canchas_path, class: "dropdown-item" %></li>
+            <li><%= link_to "Camiones en planta", pmm_trucks_path, class: "dropdown-item" %></li>
             <li><%= link_to "Envasadora", envasadora_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Informe Haver", haver_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Soplado TC", soplados_path, class: "dropdown-item" %></li>

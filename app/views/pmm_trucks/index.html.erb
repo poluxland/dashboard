@@ -1,0 +1,18 @@
+<% content_for :title, "Camiones en planta · La Calera" %>
+<div class="container-xl py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="h3 mb-0">Camiones en planta · La Calera</h1>
+    <%= link_to "Registrar camión", new_pmm_truck_path, class: "btn btn-primary" %>
+  </div>
+  <%= render "navigation" %>
+  <section class="mb-4" aria-label="Camiones sin salida">
+    <%= render "table", trucks: @on_site, details: false %>
+  </section>
+  <section>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+      <h2 class="h5 mb-0">Últimos registros</h2>
+      <%= link_to "Descargar Excel", pmm_trucks_path(format: :xlsx), class: "btn btn-sm btn-outline-success", data: { turbo: false } %>
+    </div>
+    <%= render "table", trucks: @trucks, details: true %>
+  </section>
+</div>

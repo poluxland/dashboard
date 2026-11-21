@@ -1,0 +1,2 @@
+class PmmBruVisit < ApplicationRecord
+end

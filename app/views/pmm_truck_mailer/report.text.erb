@@ -1,0 +1,13 @@
+Reporte de camiones · La Calera
+<%= @truck_url %>
+
+<% @periods.each do |label, period| %>
+<% count, average, within = period[:totals] %>
+<%= label %>
+<%= count %> camiones · <%= pmm_metric(average) %> min de espera promedio · <%= pmm_compliance(count, within) %> hasta 60 min
+BRU <%= period[:bru] %> de <%= period[:bru_eligible] %> · <%= pmm_compliance(period[:bru_eligible], period[:bru]) %>
+<% period[:results].each do |material, quantity, wait| %>
+<%= material %> · <%= quantity %> camiones · <%= pmm_metric(wait) %> min
+<% end %>
+
+<% end %>

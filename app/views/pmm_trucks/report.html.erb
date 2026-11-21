@@ -1,0 +1,34 @@
+<% content_for :title, "Reporte de camiones" %>
+<div class="container-xl py-4">
+  <h1 class="h3 mb-3">Reporte de camiones</h1>
+  <%= render "navigation" %>
+  <%= form_with url: report_pmm_trucks_path, method: :get, class: "d-flex flex-wrap align-items-center gap-2 mb-3" do |form| %>
+    <%= form.label :date, "Fecha del reporte", class: "form-label mb-0" %>
+    <%= form.date_field :date, value: @report.today, class: "form-control w-auto" %>
+    <%= form.submit "Consultar", class: "btn btn-primary" %>
+  <% end %>
+  <div class="row g-3">
+    <% @report.periods.each do |label, period| %>
+      <% total, average, within = period[:totals] %>
+      <section class="col-lg-6">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="h5"><%= label %></h2>
+            <p class="text-body-secondary"><%= total %> camiones · <%= pmm_metric(average) %> min de espera promedio · <%= pmm_compliance(total, within) %> hasta 60 min</p>
+            <div class="table-responsive">
+              <table class="table table-sm mb-0">
+                <thead><tr><th>Materia prima</th><th>Camiones</th><th>Espera (min)</th><th>Hasta 60 min</th></tr></thead>
+                <tbody>
+                  <% period[:results].each do |material, count, wait, in_time| %>
+                    <tr><td><%= material %></td><td><%= count %></td><td><%= pmm_metric(wait) %></td><td><%= pmm_compliance(count, in_time) %></td></tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    <% end %>
+  </div>
+  <%= render "charts", charts: @report.report_charts %>
+</div>

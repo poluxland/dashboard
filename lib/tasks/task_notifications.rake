@@ -32,6 +32,11 @@ namespace :tasks do
       rescue StandardError => error
         Rails.logger.error("Overtime report scheduler failed: #{error.class}")
       end
+      begin
+        PmmTruckReportDelivery.dispatch_due
+      rescue StandardError => error
+        Rails.logger.error("PMM truck report scheduler failed: #{error.class}")
+      end
       sleep 60
     end
   end

@@ -1,0 +1,10 @@
+<nav class="d-flex flex-wrap gap-2 mb-4" aria-label="Camiones">
+  <%= link_to "En planta", pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Mes", month_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Año", history_pmm_trucks_path(period: "year"), class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Histórico", history_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Reporte", report_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Informe anual", annual_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Canchas", pmm_catalog_path("canchas"), class: "btn btn-outline-secondary btn-sm" %>
+  <%= link_to "Materias primas", pmm_catalog_path("materias"), class: "btn btn-outline-secondary btn-sm" %>
+</nav>

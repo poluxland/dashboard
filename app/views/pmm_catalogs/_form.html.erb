@@ -1,0 +1,19 @@
+<% content_for :title, @catalog[:title] %>
+<div class="container py-4">
+  <h1 class="h3 mb-3"><%= @catalog[:title] %></h1>
+  <%= form_with model: @record, scope: :record, url: (@record.persisted? ? pmm_catalog_entry_path(@kind, @record) : pmm_catalog_path(@kind)) do |form| %>
+    <% if @record.errors.any? %><div class="alert alert-danger"><% @record.errors.full_messages.each do |message| %><p class="mb-0"><%= message %></p><% end %></div><% end %>
+    <% @catalog[:fields].each do |field, label| %>
+      <div class="mb-3">
+        <%= form.label field, label, class: "form-label" %>
+        <% case field
+           when :pmm_material_id %><%= form.collection_select field, @materials, :id, :nombre, { include_blank: "Seleccionar" }, required: true, class: "form-select" %>
+        <% when :operativa %><%= form.select field, [ ["Sí", true], ["No", false] ], { include_blank: "Sin estado" }, class: "form-select" %>
+        <% when :densidad, :capacidad %><%= form.number_field field, min: 0, class: "form-control" %>
+        <% else %><%= form.text_field field, class: "form-control", required: field == :nombre %><% end %>
+      </div>
+    <% end %>
+    <%= form.submit "Guardar", class: "btn btn-primary" %>
+    <%= link_to "Volver", pmm_catalog_path(@kind), class: "btn btn-outline-secondary" %>
+  <% end %>
+</div>

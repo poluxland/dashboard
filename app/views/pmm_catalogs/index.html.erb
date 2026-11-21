@@ -1,0 +1,31 @@
+<% content_for :title, @catalog[:title] %>
+<div class="container-lg py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0"><%= @catalog[:title] %></h1>
+    <%= link_to "Agregar registro", new_pmm_catalog_entry_path(@kind), class: "btn btn-primary" %>
+  </div>
+  <%= render "pmm_trucks/navigation" %>
+  <div class="table-responsive border rounded">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light"><tr><% @catalog[:fields].each_value do |label| %><th><%= label %></th><% end %><th>Acciones</th></tr></thead>
+      <tbody>
+        <% @records.each do |record| %>
+          <tr>
+            <% @catalog[:fields].each_key do |field| %>
+              <td>
+                <% case field
+                   when :pmm_material_id %><%= record.pmm_material.nombre %>
+                <% when :operativa %><%= { true => "Sí", false => "No" }.fetch(record.operativa, "—") %>
+                <% else %><%= record[field] %><% end %>
+              </td>
+            <% end %>
+            <td class="text-nowrap">
+              <%= link_to "Editar", edit_pmm_catalog_entry_path(@kind, record), class: "btn btn-sm btn-outline-primary" %>
+              <% if task_admin? %><%= button_to "Eliminar", pmm_catalog_entry_path(@kind, record), method: :delete, class: "btn btn-sm btn-outline-danger", form: { class: "d-inline", data: { turbo_confirm: "¿Eliminar este registro?" } } %><% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

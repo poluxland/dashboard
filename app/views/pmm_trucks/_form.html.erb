@@ -1,0 +1,19 @@
+<%= form_with model: @truck do |form| %>
+  <% if @truck.errors.any? %><div class="alert alert-danger"><ul class="mb-0"><% @truck.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
+  <div class="row g-3">
+    <div class="col-sm-4"><%= form.label :fecha, "Fecha", class: "form-label" %><%= form.date_field :fecha, required: true, class: "form-control" %></div>
+    <div class="col-sm-4"><%= form.label :patente, "Patente", class: "form-label" %><%= form.text_field :patente, required: true, class: "form-control", autocapitalize: "characters" %></div>
+    <div class="col-sm-4"><%= form.label :pmm_material_id, "Materia prima", class: "form-label" %><%= form.collection_select :pmm_material_id, @materials, :id, :nombre, { include_blank: "Seleccionar" }, required: true, class: "form-select" %></div>
+    <div class="col-sm-4"><%= form.label :tipo, "Tipo", class: "form-label" %><%= form.select :tipo, (PmmTruck::TYPES + [ @truck.tipo ]).compact_blank.uniq, { include_blank: "Seleccionar" }, required: true, class: "form-select" %></div>
+    <div class="col-sm-4"><%= form.label :llegada, "Llegada", class: "form-label" %><%= form.time_field :llegada, value: pmm_time(@truck.llegada), required: true, class: "form-control" %></div>
+    <div class="col-sm-4"><%= form.label :salida, "Salida", class: "form-label" %><%= form.time_field :salida, value: (pmm_time(@truck.salida) unless @truck.pending?), class: "form-control" %></div>
+    <div class="col-sm-4"><%= form.label :llamada, "Llamada", class: "form-label" %><%= form.time_field :llamada, value: pmm_time(@truck.llamada), class: "form-control" %></div>
+    <div class="col-sm-4"><%= form.label :cause, "Causa", class: "form-label" %><%= form.select :cause, (PmmTruck::CAUSES + [ @truck.cause ]).compact_blank.uniq, { include_blank: "Seleccionar" }, class: "form-select" %></div>
+    <div class="col-sm-4"><%= form.label :number, "Número", class: "form-label" %><%= form.number_field :number, class: "form-control" %></div>
+    <div class="col-sm-6"><%= form.label :other, "Otro", class: "form-label" %><%= form.text_field :other, class: "form-control" %></div>
+    <div class="col-sm-6"><%= form.label :motive, "Motivo u observaciones", class: "form-label" %><%= form.text_area :motive, rows: 3, class: "form-control" %></div>
+  </div>
+  <p class="small text-body-secondary mt-3">Si el camión sigue en planta, deja la salida sin hora.</p>
+  <%= form.submit "Guardar", class: "btn btn-primary" %>
+  <%= link_to "Volver", pmm_trucks_path, class: "btn btn-outline-secondary" %>
+<% end %>

@@ -1,0 +1,26 @@
+<% content_for :title, "Informe anual de camiones" %>
+<div class="container-xl py-4">
+  <h1 class="h3 mb-3">Informe anual de camiones</h1>
+  <%= render "navigation" %>
+  <%= form_with url: annual_pmm_trucks_path, method: :get, class: "d-flex align-items-center gap-2 mb-4" do |form| %>
+    <%= form.label :year, "Año", class: "form-label mb-0" %>
+    <%= form.select :year, @years, { selected: @year }, class: "form-select w-auto" %>
+    <%= form.submit "Ver informe", class: "btn btn-primary" %>
+  <% end %>
+  <div class="row g-3">
+    <% { "Todos los camiones" => @annual[:totals], "Camiones planos" => @annual[:flatbed] }.each do |label, (count, average, within)| %>
+      <section class="col-lg-6">
+        <div class="card card-body shadow-sm">
+          <h2 class="h5"><%= label %></h2>
+          <p class="mb-0"><strong><%= number_with_delimiter(count) %></strong> camiones · <%= pmm_metric(average) %> min de espera promedio · <%= pmm_compliance(count, within) %> hasta 60 min</p>
+          <% if label == "Camiones planos" %>
+            <p class="small text-body-secondary mt-2 mb-0">Mediana <%= pmm_metric(@annual[:flatbed_stats][1]) %> min · Desviación <%= pmm_metric(@annual[:flatbed_stats][2]) %> min · Registros atípicos <%= @annual[:flatbed_outliers] || "—" %></p>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </div>
+  <%= render "charts", charts: @annual[:charts] %>
+  <%= render "monthly_metrics", title: "Cantidad y espera promedio por materia prima", row_label: "Materia prima", groups: @annual[:materials] %>
+  <%= render "monthly_metrics", title: "Conchuela por tipo de camión", row_label: "Tipo", groups: @annual[:conchuela] %>
+</div>

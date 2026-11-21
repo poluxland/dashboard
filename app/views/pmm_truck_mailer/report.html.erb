@@ -1,0 +1,25 @@
+<h1 style="font-size:22px">Reporte de camiones · La Calera</h1>
+<p><%= link_to "Ver camiones en planta", @truck_url, style: "display:inline-block;background:#2457a6;color:#fff;padding:10px 14px;text-decoration:none;border-radius:4px" %></p>
+<h2 style="font-size:18px">Resumen BRU</h2>
+<table cellpadding="6" style="border-collapse:collapse;text-align:left">
+  <thead><tr><th>Período</th><th>BRU y bateas</th><th>BRU</th><th>Porcentaje BRU</th></tr></thead>
+  <tbody>
+    <% @periods.each do |label, period| %>
+      <tr><td><%= label %></td><td><%= period[:bru_eligible] %></td><td><%= period[:bru] %></td><td><%= pmm_compliance(period[:bru_eligible], period[:bru]) %></td></tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% @periods.each do |label, period| %>
+  <% count, average, within = period[:totals] %>
+  <h2 style="font-size:18px"><%= label %></h2>
+  <p><%= count %> camiones · <%= pmm_metric(average) %> min de espera promedio · <%= pmm_compliance(count, within) %> hasta 60 min</p>
+  <table cellpadding="6" style="border-collapse:collapse;text-align:left">
+    <thead><tr><th>Materia prima</th><th>Camiones</th><th>Espera promedio (min)</th></tr></thead>
+    <tbody>
+      <% period[:results].each do |material, quantity, wait| %>
+        <tr><td><%= material %></td><td><%= quantity %></td><td><%= pmm_metric(wait) %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

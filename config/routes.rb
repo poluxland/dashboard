@@ -1,5 +1,19 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  resources :pmm_trucks, path: "camiones", only: %i[index show new create edit update destroy] do
+    collection do
+      get :month, path: "mes"
+      get :history, path: "historial"
+      get :report, path: "reporte"
+      get :annual, path: "informe"
+    end
+  end
+  get "camiones/catalogos/:kind", to: "pmm_catalogs#index", as: :pmm_catalog
+  post "camiones/catalogos/:kind", to: "pmm_catalogs#create"
+  get "camiones/catalogos/:kind/nuevo", to: "pmm_catalogs#new", as: :new_pmm_catalog_entry
+  get "camiones/catalogos/:kind/:id/editar", to: "pmm_catalogs#edit", as: :edit_pmm_catalog_entry
+  patch "camiones/catalogos/:kind/:id", to: "pmm_catalogs#update", as: :pmm_catalog_entry
+  delete "camiones/catalogos/:kind/:id", to: "pmm_catalogs#destroy"
   resources :trabajos, only: %i[index show new create edit update]
   get "horas/revision/ingresar", to: "overtime_sessions#new", as: :overtime_login
   post "horas/revision/codigo", to: "overtime_sessions#request_code", as: :request_overtime_code

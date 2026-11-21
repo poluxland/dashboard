@@ -1,0 +1,24 @@
+<section class="mt-4">
+  <h2 class="h5"><%= title %></h2>
+  <div class="table-responsive border rounded">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light"><tr><th><%= row_label %></th><% PmmTruckReport::MONTHS.each do |month| %><th><%= month %></th><% end %></tr></thead>
+      <tbody>
+        <% groups.sort_by { |name, _| name.to_s }.each do |name, months| %>
+          <tr>
+            <th scope="row" class="text-nowrap"><%= name.presence || "Sin registro" %></th>
+            <% (1..12).each do |month| %>
+              <% values = months[month] %>
+              <td class="text-nowrap">
+                <% if values %>
+                  <strong><%= values[:count] %></strong>
+                  <div class="small text-body-secondary"><%= pmm_metric(values[:average]) %> min</div>
+                <% else %>—<% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

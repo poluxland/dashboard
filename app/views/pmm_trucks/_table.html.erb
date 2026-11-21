@@ -1,0 +1,33 @@
+<% if trucks.any? %>
+  <div class="table-responsive border rounded">
+    <table class="table table-hover table-sm align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Fecha</th><th>Patente</th><th>Materia prima</th><th>Tipo</th><th>Llegada</th>
+          <% if details %><th>Salida</th><th>Espera (min)</th><th>Causa</th><% end %>
+          <th><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% trucks.each do |truck| %>
+          <tr id="<%= dom_id(truck) %>">
+            <td class="text-nowrap"><%= truck.fecha&.strftime("%d/%m/%Y") %></td>
+            <td class="fw-semibold text-nowrap"><%= truck.patente %></td><td><%= truck.pmm_material.nombre %></td>
+            <td><%= truck.tipo %></td><td><%= pmm_time(truck.llegada) %></td>
+            <% if details %>
+              <td><%= pmm_time(truck.salida) unless truck.pending? %></td>
+              <td><%= truck.pending? ? "En planta" : truck.wait %></td>
+              <td><%= truck.cause %></td>
+            <% end %>
+            <td class="text-end text-nowrap">
+              <% if details %><%= link_to "Ver", pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary" %><% end %>
+              <%= link_to(truck.pending? ? "Registrar salida" : "Editar", edit_pmm_truck_path(truck), class: "btn btn-sm btn-outline-primary") %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="text-body-secondary">No hay registros.</p>
+<% end %>
