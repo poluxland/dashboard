@@ -9,21 +9,14 @@ class OvertimeReportDelivery < ApplicationRecord
     return unless scheduled_at >= Time.iso8601(start_at)
     return unless (scheduled_at...(scheduled_at + RETRY_WINDOW)).cover?(reference_time)
 
-    OvertimeAccess::RECIPIENTS.each do |email|
-      begin
-        find_or_create_by!(scheduled_at: scheduled_at, recipient: email).deliver!
-      rescue StandardError => error
-        Rails.logger.error("Overtime pending report failed: #{error.class}")
-      end
-    end
-  end
+    recipients = OvertimeAccess::RECIPIENTS
+    transaction do
+      deliveries = where(scheduled_at: scheduled_at, recipient: recipients)
+      insert_all(recipients.map { |recipient| { scheduled_at: scheduled_at, recipient: recipient } }, unique_by: %i[scheduled_at recipient])
+      next if deliveries.order(:id).lock.any?(&:sent_at?)
 
-  def deliver!
-    with_lock do
-      return if sent_at?
-
-      OvertimeMailer.pending_report(recipient: recipient).deliver_now
-      update!(sent_at: Time.current)
+      OvertimeMailer.pending_report.deliver_now
+      deliveries.update_all(sent_at: Time.current)
     end
   end
 end

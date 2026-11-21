@@ -91,23 +91,30 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_equal OvertimeEntry::PENDING, entry.estado
   end
 
-  test "a report link keeps the reviewer scope and points to the approval page" do
-    email = OvertimeMailer.pending_report(recipient: EMAIL).message
-    assert_equal [ EMAIL ], email.to
+  test "the report includes every pending entry and addresses the eight recipients together" do
+    reviewed = entry("Carolina Vera", "Registro ya aprobado")
+    reviewed.update!(estado: "Aprobada")
+
+    email = OvertimeMailer.pending_report.message
+    assert_equal OvertimeAccess::RECIPIENTS, email.to
     assert_includes email.html_part.decoded, "http://example.com/horas"
     assert_includes email.text_part.decoded, @first.descripcion
-    assert_not_includes email.html_part.decoded, @other.descripcion
+    assert_includes email.html_part.decoded, @other.descripcion
+    assert_not_includes email.html_part.decoded, reviewed.descripcion
   end
 
-  test "the same slot sends one report per recipient after enablement" do
+  test "the same slot sends a single report to all recipients after enablement" do
     scheduled = Time.utc(2026, 11, 21, 11, 30)
     assert_no_difference -> { ActionMailer::Base.deliveries.size } do
       OvertimeReportDelivery.dispatch_due(reference_time: scheduled - 1.minute, start_at: scheduled.iso8601)
     end
-    assert_difference -> { ActionMailer::Base.deliveries.size }, 8 do
+    assert_difference -> { ActionMailer::Base.deliveries.size }, 1 do
       2.times { OvertimeReportDelivery.dispatch_due(reference_time: scheduled + 1.minute, start_at: scheduled.iso8601) }
     end
-    assert_equal OvertimeAccess::RECIPIENTS.sort, OvertimeReportDelivery.where(scheduled_at: scheduled).where.not(sent_at: nil).pluck(:recipient).sort
+    assert_equal OvertimeAccess::RECIPIENTS, ActionMailer::Base.deliveries.last.to
+    delivered = OvertimeReportDelivery.where(scheduled_at: scheduled).where.not(sent_at: nil)
+    assert_equal OvertimeAccess::RECIPIENTS.sort, delivered.pluck(:recipient).sort
+    assert_equal 1, delivered.distinct.count(:sent_at)
   end
 
   private
