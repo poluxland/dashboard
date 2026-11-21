@@ -6,10 +6,8 @@ class SopladosTest < ActionDispatch::IntegrationTest
   test "the login links to the public form below the operator checklist" do
     get login_path
     assert_response :success
-    assert_select ".login-card .border-top a", count: 2 do |links|
-      assert_equal [ new_equipment_checklist_path, new_soplado_path ], links.map { |link| link["href"] }
-      assert_equal "Registro soplado TC", links.last.text
-    end
+    assert_select ".login-card .border-top a[href=?] + a[href=?]", new_equipment_checklist_path, new_soplado_path,
+      text: "Registro soplado TC", count: 1
 
     get new_soplado_path
     assert_response :success

@@ -10,6 +10,10 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
   end
 
   test "the public views render while the operating records require a corporate account" do
+    get login_path
+    assert_response :success
+    assert_select ".login-card a[href=?]", pmm_trucks_path, text: "Camiones en planta", count: 1
+
     get pmm_trucks_path
     assert_response :success
     assert_select "section[aria-label='Camiones sin salida']", text: /ABC123/
