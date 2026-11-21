@@ -1,0 +1,35 @@
+<%= form_with model: entry, data: { turbo: false } do |form| %>
+  <% if entry.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% entry.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="row g-3">
+    <% { fecha: ["Fecha", :date_field], ot: ["OT", :number_field], inicio: ["Inicio", :time_field],
+          termino: ["Término", :time_field], he: ["Horas extra", :number_field], personal: ["Personal", :text_field],
+          area: ["Área", :text_field], lugar: ["Lugar", :text_field], traslado: ["Traslado", :text_field] }.each do |field, (label, input)| %>
+      <div class="col-sm-6 col-lg-4">
+        <%= form.label field, label, class: "form-label" %>
+        <%= form.public_send(input, field, class: "form-control", **(field == :he ? { step: :any, min: 0 } : {})) %>
+      </div>
+    <% end %>
+    <div class="col-sm-6">
+      <%= form.label :mandante, "Mandante (ITO)", class: "form-label" %>
+      <%= form.select :mandante, (OvertimeEntry::MANDANTES + [entry.mandante]).compact_blank.uniq, { include_blank: "Seleccionar" }, required: true, class: "form-select" %>
+    </div>
+    <div class="col-sm-6">
+      <%= form.label :ep, "Estado de pago", class: "form-label" %>
+      <%= form.text_field :ep, class: "form-control" %>
+    </div>
+    <div class="col-12">
+      <%= form.label :descripcion, "Descripción", class: "form-label" %>
+      <%= form.text_area :descripcion, rows: 3, required: true, class: "form-control" %>
+    </div>
+  </div>
+  <div class="d-flex gap-2 mt-4">
+    <%= form.submit "Guardar", class: "btn btn-primary" %>
+    <%= link_to "Volver", overtime_entries_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

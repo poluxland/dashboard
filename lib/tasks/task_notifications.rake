@@ -27,6 +27,11 @@ namespace :tasks do
       rescue StandardError => error
         Rails.logger.error("Operator checklist report scheduler failed: #{error.class}")
       end
+      begin
+        OvertimeReportDelivery.dispatch_due
+      rescue StandardError => error
+        Rails.logger.error("Overtime report scheduler failed: #{error.class}")
+      end
       sleep 60
     end
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -485,6 +485,56 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_030000) do
     t.index ["ot_asignada"], name: "index_ots_on_ot_asignada", unique: true
   end
 
+  create_table "overtime_entries", force: :cascade do |t|
+    t.bigint "erp_id"
+    t.datetime "erp_updated_at"
+    t.date "fecha"
+    t.string "descripcion"
+    t.string "area"
+    t.string "personal"
+    t.time "inicio"
+    t.time "termino"
+    t.float "he"
+    t.integer "ot"
+    t.string "traslado"
+    t.string "lugar"
+    t.string "mandante"
+    t.string "estado"
+    t.string "ep"
+    t.string "author_email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["erp_id"], name: "index_overtime_entries_on_erp_id", unique: true
+    t.index ["estado", "mandante", "fecha"], name: "index_overtime_entries_on_estado_and_mandante_and_fecha"
+  end
+
+  create_table "overtime_login_codes", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "challenge", null: false
+    t.string "digest", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "issued_at", null: false
+    t.datetime "used_at"
+    t.index ["email"], name: "index_overtime_login_codes_on_email", unique: true
+  end
+
+  create_table "overtime_report_deliveries", force: :cascade do |t|
+    t.datetime "scheduled_at", null: false
+    t.string "recipient", null: false
+    t.datetime "sent_at"
+    t.index ["scheduled_at", "recipient"], name: "index_overtime_report_deliveries_on_scheduled_at_and_recipient", unique: true
+  end
+
+  create_table "overtime_reviews", force: :cascade do |t|
+    t.bigint "overtime_entry_id", null: false
+    t.string "reviewer_email", null: false
+    t.string "previous_status", null: false
+    t.string "status", null: false
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.index ["overtime_entry_id"], name: "index_overtime_reviews_on_overtime_entry_id"
+  end
+
   create_table "people", force: :cascade do |t|
     t.string "area"
     t.datetime "created_at", null: false
@@ -749,6 +799,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_030000) do
   add_foreign_key "indicator_readings", "people"
   add_foreign_key "maintenance_checklists", "mobile_assets"
   add_foreign_key "tpt_events", "tpt_imports"
+  add_foreign_key "overtime_reviews", "overtime_entries"
   add_foreign_key "ptm_events", "ptm_reports"
   add_foreign_key "task_comments", "tasks"
   add_foreign_key "task_items", "tasks"

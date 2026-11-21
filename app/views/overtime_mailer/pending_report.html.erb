@@ -1,0 +1,25 @@
+<h1 style="font-size: 22px">Horas extras pendientes de revisión PTM</h1>
+<p><%= link_to "Revisar y aprobar horas extras", @review_url, style: "display:inline-block;background:#174b88;color:#fff;padding:11px 16px;border-radius:4px;text-decoration:none" %></p>
+<% if @entries.any? %>
+  <ul>
+    <% @by_mandante.each do |mandante, entries| %>
+      <li><strong><%= mandante.presence || "Sin mandante" %></strong> · <%= entries.size %> pendientes · <%= overtime_quantity(entries.sum { |entry| entry.he.to_f }) %> HE</li>
+    <% end %>
+  </ul>
+  <table cellpadding="6" style="width:100%;border-collapse:collapse;text-align:left;font-size:13px">
+    <thead style="background:#eaf0f7">
+      <tr><th>Fecha</th><th>OT</th><th>Área</th><th>Personal</th><th>Inicio</th><th>Término</th><th>HE</th><th>Lugar</th><th>Mandante</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <% @entries.each do |entry| %>
+        <tr style="border-bottom:1px solid #e0e4ea">
+          <td><%= entry.fecha&.strftime("%d-%m-%Y") %></td><td><%= entry.ot %></td><td><%= entry.area %></td><td><%= entry.personal %></td>
+          <td><%= overtime_time(entry.inicio) %></td><td><%= overtime_time(entry.termino) %></td><td><%= overtime_quantity(entry.he) %></td>
+          <td><%= entry.lugar %></td><td><%= entry.mandante %></td><td><%= entry.descripcion %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No hay horas pendientes de revisión.</p>
+<% end %>

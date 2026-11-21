@@ -95,6 +95,8 @@
     <% end %>
 
     <div class="login-domain">Dashboard para cuentas @msindustrial.cl</div>
+    <%= link_to "Revisión de horas extra", overtime_login_path,
+                class: "btn btn-outline-primary w-100 mt-3" %>
     <div class="border-top mt-4 pt-3">
       <%= link_to "Checklist Operador", new_equipment_checklist_path,
                   class: "btn btn-outline-primary w-100" %>

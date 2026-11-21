@@ -1,0 +1,16 @@
+Horas extras pendientes de revisión PTM
+
+Revisar y aprobar horas extras
+<%= @review_url %>
+
+<% if @entries.any? %>
+<% @by_mandante.each do |mandante, entries| %>
+<%= mandante.presence || "Sin mandante" %> · <%= entries.size %> pendientes · <%= overtime_quantity(entries.sum { |entry| entry.he.to_f }) %> HE
+<% end %>
+
+<% @entries.each do |entry| %>
+<%= [entry.fecha&.strftime("%d-%m-%Y"), ("OT #{entry.ot}" if entry.ot), entry.area, entry.personal, [overtime_time(entry.inicio), overtime_time(entry.termino)].compact.join(" a ").presence, ("#{overtime_quantity(entry.he)} HE" if entry.he), entry.lugar, entry.mandante, entry.descripcion].compact.join(" · ") %>
+<% end %>
+<% else %>
+No hay horas pendientes de revisión.
+<% end %>

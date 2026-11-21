@@ -1,6 +1,13 @@
 # config/routes.rb
 Rails.application.routes.draw do
   resources :trabajos, only: %i[index show new create edit update]
+  get "horas/revision/ingresar", to: "overtime_sessions#new", as: :overtime_login
+  post "horas/revision/codigo", to: "overtime_sessions#request_code", as: :request_overtime_code
+  post "horas/revision/verificar", to: "overtime_sessions#verify", as: :verify_overtime_code
+  delete "horas/revision/salir", to: "overtime_sessions#destroy", as: :overtime_logout
+  resources :overtime_entries, path: "horas", only: %i[index new create edit update] do
+    patch :review, on: :collection, path: "revision"
+  end
   resources :soplados do
     get :graficos, on: :collection
   end

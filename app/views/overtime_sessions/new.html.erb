@@ -1,0 +1,21 @@
+<% content_for :title, "Revisión de horas extra" %>
+<div class="container py-5">
+  <div class="card shadow-sm mx-auto" style="max-width: 32rem">
+    <div class="card-body p-4">
+      <h1 class="h4 mb-3">Revisión de horas extra</h1>
+      <% if @code_requested %>
+        <%= form_with url: verify_overtime_code_path, method: :post, class: "mb-4", data: { turbo: false } do |form| %>
+          <%= form.label :overtime_code, "Código de seis dígitos", class: "form-label" %>
+          <%= form.text_field :overtime_code, class: "form-control mb-3", inputmode: "numeric", autocomplete: "one-time-code", pattern: "[0-9]{6}", maxlength: 6, required: true %>
+          <%= form.submit "Ver mis horas pendientes", class: "btn btn-primary w-100" %>
+        <% end %>
+      <% end %>
+      <%= form_with url: request_overtime_code_path, method: :post, data: { turbo: false } do |form| %>
+        <%= form.label :email, "Correo autorizado", class: "form-label" %>
+        <%= form.email_field :email, class: "form-control mb-3", autocomplete: "email", maxlength: 254, required: true %>
+        <%= form.submit "Solicitar código", class: "btn #{@code_requested ? 'btn-outline-primary' : 'btn-primary'} w-100" %>
+      <% end %>
+      <%= link_to "Ingresar con cuenta corporativa", login_path, class: "d-block mt-3" %>
+    </div>
+  </div>
+</div>

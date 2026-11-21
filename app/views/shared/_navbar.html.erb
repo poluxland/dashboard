@@ -58,7 +58,7 @@
 
         <li class="nav-item dropdown">
           <button
-            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[operation_activities clinker_transfers ptm_reports shift_reports].include?(controller_name) || (controller_name == 'mantenciones' && action_name == 'graficos') %>"
+            class="nav-link dropdown-toggle border-0 bg-transparent <%= 'active' if %w[operation_activities clinker_transfers ptm_reports shift_reports overtime_entries].include?(controller_name) || (controller_name == 'mantenciones' && action_name == 'graficos') %>"
             type="button"
             id="ptmDropdown"
             data-bs-toggle="dropdown"
@@ -69,6 +69,9 @@
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="ptmDropdown">
             <li><%= link_to "Envasadora", ptm_reports_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Informe semanal de operaciones", operation_activities_path, class: "dropdown-item" %></li>
+            <% if OvertimeAccess.staff?(current_user[:email]) %>
+              <li><%= link_to "Horas extra", overtime_entries_path, class: "dropdown-item" %></li>
+            <% end %>
             <li><%= link_to "Traslado de clínker", clinker_transfers_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Mantenciones", graficos_mantenciones_path, class: "dropdown-item", data: { turbo: false } %></li>
             <li><%= link_to "Cierre de turno", shift_reports_path, class: "dropdown-item" %></li>
