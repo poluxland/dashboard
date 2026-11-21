@@ -8,7 +8,15 @@ class OperatorChecklistMailer < ApplicationMailer
   ].freeze
 
   RECIPIENTS = {
-    "LCA" => (COMMON_RECIPIENTS + %w[fernando.gonzalez@msindustrial.cl]).freeze,
+    "LCA" => (COMMON_RECIPIENTS + %w[
+      fernando.gonzalez@msindustrial.cl
+      marisela.alvarado@msindustrial.cl
+      claudio.tapia@msindustrial.cl
+      diego.castillo@msindustrial.cl
+      alejandro.olivares@msindustrial.cl
+      claudio.villanueva@msindustrial.cl
+      hernan.martinez@msindustrial.cl
+    ]).freeze,
     "PTM" => (COMMON_RECIPIENTS + %w[
       julio.alvear@msindustrial.cl
       victor.gallardo@msindustrial.cl

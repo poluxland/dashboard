@@ -20,9 +20,20 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
     email = OperatorChecklistMailer.report(plant: "LCA", scheduled_at: cutoff)
     html = Nokogiri::HTML(email.html_part.decoded)
 
-    assert_equal 6, email.to.size
-    assert_includes email.to, "fernando.gonzalez@msindustrial.cl"
-    assert_not_includes email.to, "julio.alvear@msindustrial.cl"
+    assert_equal %w[
+      alejandro.olivares@msindustrial.cl
+      claudio.tapia@msindustrial.cl
+      claudio.villanueva@msindustrial.cl
+      diego.castillo@msindustrial.cl
+      fernando.gonzalez@msindustrial.cl
+      hernan.martinez@msindustrial.cl
+      jose.jerez@msindustrial.cl
+      marcos.prospero@msindustrial.cl
+      marisela.alvarado@msindustrial.cl
+      maryorie.fajardo@msindustrial.cl
+      simon.rojas@msindustrial.cl
+      supervisor.envasadora@msindustrial.cl
+    ], email.to.sort
     assert_equal [ "Equipo", "Fecha y hora", "H", "Operador", "%", "Graves", "Leves", "Detalle graves",
                   "Detalle leves", "Comentarios" ], html.css("th").map(&:text)
     assert_equal [
