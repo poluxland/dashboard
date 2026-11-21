@@ -107,6 +107,14 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     assert_includes message.html_part.decoded, "Resumen BRU"
   end
 
+  test "the annual report compares integer waits to a fractional outlier threshold" do
+    [ *Array.new(19, 60), 300 ].each do |wait|
+      PmmTruck.create!(pmm_material: @material, fecha: @today, tipo: "Plano", wait: wait, finished: true)
+    end
+
+    assert_equal 1, PmmTruckReport.new(@today).annual(@today.year).fetch(:flatbed_outliers)
+  end
+
   private
 
   def valid_fields

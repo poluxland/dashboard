@@ -73,7 +73,7 @@ class PmmTruckReport
     flatbed_avg = flatbed.group(Arel.sql(MONTH_EXPR)).average(:wait)
     flatbed_stats = flatbed.pluck(Arel.sql("AVG(wait)"), Arel.sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY wait)"), Arel.sql("STDDEV_SAMP(wait)")).first
     average, _, deviation = flatbed_stats
-    outliers = flatbed.where("wait > ?", average + 3 * deviation).count if average && deviation
+    outliers = flatbed.where("wait > ?", (average + 3 * deviation).floor).count if average && deviation
     {
       totals: scope.pluck(*WAIT_SUMMARY).first, flatbed: flatbed.pluck(*WAIT_SUMMARY).first,
       flatbed_stats: flatbed_stats, flatbed_outliers: outliers,
