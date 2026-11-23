@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-ruby "3.4.13"
+ruby "4.0.10"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.0", ">= 8.1.4.1"
@@ -76,6 +76,9 @@ group :development do
 end
 
 group :test do
+  # Controller tests use minitest/mock, which Minitest 5 provides.
+  gem "minitest", "~> 5.27"
+
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
