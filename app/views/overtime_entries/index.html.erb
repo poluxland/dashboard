@@ -2,11 +2,15 @@
 <div class="container-xl pb-4 pt-3">
   <header class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0">Horas extra PTM</h1>
-    <% if @staff %>
-      <%= link_to "Registrar horas", new_overtime_entry_path, class: "btn btn-primary" %>
-    <% else %>
-      <%= button_to "Cerrar sesión", overtime_logout_path, method: :delete, class: "btn btn-outline-secondary" %>
-    <% end %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Descargar Excel", overtime_entries_path(@filters.to_h.symbolize_keys.merge(estado: @status, format: :xlsx)),
+                  class: "btn btn-outline-success", data: { turbo: false } %>
+      <% if @staff %>
+        <%= link_to "Registrar horas", new_overtime_entry_path, class: "btn btn-primary" %>
+      <% else %>
+        <%= button_to "Cerrar sesión", overtime_logout_path, method: :delete, class: "btn btn-outline-secondary" %>
+      <% end %>
+    </div>
   </header>
 
   <%= form_with url: overtime_entries_path, method: :get, class: "row g-2 align-items-end mb-4", data: { turbo: false } do |form| %>

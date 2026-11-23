@@ -13,15 +13,25 @@ class OvertimeEntriesController < ApplicationController
     when *OvertimeEntry::STATUSES then entries.where(estado: @status)
     else return redirect_to overtime_entries_path, alert: "Elige un estado válido."
     end
-    filters = params.permit(:from, :to, :mandante)
-    entries = entries.where("fecha >= ?", Date.iso8601(filters[:from])) if filters[:from].present?
-    entries = entries.where("fecha <= ?", Date.iso8601(filters[:to])) if filters[:to].present?
-    @global_review = OvertimeAccess.global_reviewer?(@reviewer)
-    if @global_review
-      @mandantes = accessible_entries.where.not(mandante: [ nil, "" ]).distinct.order(:mandante).pluck(:mandante)
+    @filters = params.permit(:from, :to, :mandante)
+    entries = entries.where("fecha >= ?", Date.iso8601(@filters[:from])) if @filters[:from].present?
+    entries = entries.where("fecha <= ?", Date.iso8601(@filters[:to])) if @filters[:to].present?
+    entries = entries.where(mandante: @filters[:mandante]) if @filters[:mandante].present?
+    entries = entries.includes(:overtime_reviews).order(Arel.sql("fecha DESC NULLS LAST"), id: :desc)
+
+    respond_to do |format|
+      format.html do
+        @global_review = OvertimeAccess.global_reviewer?(@reviewer)
+        if @global_review
+          @mandantes = accessible_entries.where.not(mandante: [ nil, "" ]).distinct.order(:mandante).pluck(:mandante)
+        end
+        @pagy, @entries = pagy(entries, limit: 100)
+      end
+      format.xlsx do
+        @entries = entries
+        response.headers["Content-Disposition"] = 'attachment; filename="horas-extra-ptm.xlsx"'
+      end
     end
-    entries = entries.where(mandante: filters[:mandante]) if filters[:mandante].present?
-    @pagy, @entries = pagy(entries.includes(:overtime_reviews).order(Arel.sql("fecha DESC NULLS LAST"), id: :desc), limit: 100)
   rescue Date::Error
     redirect_to overtime_entries_path, alert: "Usa fechas válidas."
   end

@@ -1,4 +1,5 @@
 require "test_helper"
+require "zip"
 
 class OvertimeReviewTest < ActionDispatch::IntegrationTest
   EMAIL = "carolina.vera@meloncementos.cl"
@@ -103,6 +104,50 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_not_includes email.html_part.decoded, reviewed.descripcion
   end
 
+  test "the Excel link keeps the selected filters and exports numeric hours across result pages" do
+    @first.update!(estado: "Aprobada", he: 3.5, descripcion: "=1+1")
+    @second.update!(estado: "Aprobada", fecha: @first.fecha.yesterday, descripcion: "Fuera de la fecha")
+    @other.update!(estado: "Aprobada")
+    filters = { estado: "Aprobada", mandante: "Carolina Vera", from: @first.fecha.iso8601, to: @first.fecha.iso8601 }
+
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+    get overtime_entries_path, params: filters
+    assert_response :success
+    assert_select "a", text: "Descargar Excel", count: 1 do |links|
+      download = URI.parse(links.first["href"])
+      assert_equal overtime_entries_path(format: :xlsx), download.path
+      assert_equal filters.stringify_keys, Rack::Utils.parse_query(download.query)
+    end
+
+    get overtime_entries_path(format: :xlsx), params: filters.merge(page: 2)
+    assert_response :success
+    assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response.media_type
+    assert_includes response.headers["Content-Disposition"], "horas-extra-ptm.xlsx"
+    assert_includes response.headers["Cache-Control"], "no-store"
+
+    worksheet = downloaded_worksheet
+    assert_equal 2, worksheet.css("sheetData row").size
+    assert_equal "Carolina Vera", worksheet.at_css('c[r="D2"]').text
+    assert_equal "3.5", worksheet.at_css('c[r="K2"] v').text
+    assert_empty worksheet.css("f")
+  end
+
+  test "the Excel download enforces the same access and mandante scope as the page" do
+    get overtime_entries_path(format: :xlsx)
+    assert_redirected_to overtime_login_path
+
+    sign_in_for_review
+    get overtime_entries_path(format: :xlsx), params: { estado: "todos" }
+    assert_response :success
+    assert_equal 3, downloaded_worksheet.css("sheetData row").size
+    assert_includes downloaded_worksheet.text, @first.descripcion
+    assert_not_includes downloaded_worksheet.text, @other.descripcion
+
+    get overtime_entries_path(format: :xlsx), params: { mandante: "Johnny Rute" }
+    assert_response :success
+    assert_equal 1, downloaded_worksheet.css("sheetData row").size
+  end
+
   test "the same slot sends a single report to all recipients after enablement" do
     scheduled = Time.utc(2026, 11, 21, 11, 30)
     assert_no_difference -> { ActionMailer::Base.deliveries.size } do
@@ -118,6 +163,14 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def downloaded_worksheet
+    xml = nil
+    Zip::File.open_buffer(response.body) do |workbook|
+      xml = workbook.read("xl/worksheets/sheet1.xml")
+    end
+    Nokogiri::XML(xml).remove_namespaces!
+  end
 
   def entry(mandante, description)
     OvertimeEntry.create!(fecha: Date.new(2026, 11, 19), descripcion: description, he: 3, mandante: mandante, estado: OvertimeEntry::PENDING)
