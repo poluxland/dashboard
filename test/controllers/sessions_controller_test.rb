@@ -27,6 +27,29 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".login-domain", text: /@msindustrial\.cl/
   end
 
+  test "older Android browsers can open the login and public forms" do
+    android = "Mozilla/5.0 (Linux; Android 7.1.1) AppleWebKit/537.36 (KHTML, like Gecko)"
+    user_agents = [
+      "#{android} Chrome/119.0.0.0 Mobile Safari/537.36",
+      "#{android} Chrome/118.0.0.0 Mobile Safari/537.36 OPR/105.0.0.0"
+    ]
+
+    user_agents.each do |agent|
+      headers = { "User-Agent" => agent }
+      get root_path, headers: headers
+      assert_redirected_to login_path
+
+      follow_redirect!(headers: headers)
+      assert_response :success
+      assert_select "form[action='/auth/google_oauth2'][method='post']"
+
+      [ new_pmm_truck_path, new_equipment_checklist_path, new_soplado_path ].each do |path|
+        get path, headers: headers
+        assert_response :success
+      end
+    end
+  end
+
   test "signs in a verified Workspace account and returns to requested page" do
     get ots_url
     assert_redirected_to login_url
