@@ -13,6 +13,6 @@
       <h2 class="h5 mb-0">Últimos registros</h2>
       <%= link_to "Descargar Excel", pmm_trucks_path(format: :xlsx), class: "btn btn-sm btn-outline-success", data: { turbo: false } %>
     </div>
-    <%= render "table", trucks: @trucks, details: true %>
+    <%= render "table", trucks: @trucks, details: true, native_export: true %>
   </section>
 </div>

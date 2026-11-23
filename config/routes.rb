@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  post "exportar-tabla", to: "table_exports#create", as: :table_export
   resources :pmm_trucks, path: "camiones", only: %i[index show new create edit update destroy] do
     member do
       get :departure, path: "salida"

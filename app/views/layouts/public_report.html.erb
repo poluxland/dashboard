@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow,noarchive">
     <meta name="referrer" content="no-referrer">
+    <%= csrf_meta_tags %>
+    <%= tag.meta name: "table-export-url", content: table_export_path %>
     <%= stylesheet_link_tag "application", media: "all" %>
+    <%= javascript_include_tag "table_exports", defer: true %>
   </head>
   <body class="bg-light">
     <main class="container py-4" style="max-width: 1000px;">
