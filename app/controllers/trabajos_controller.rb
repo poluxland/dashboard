@@ -5,8 +5,19 @@ class TrabajosController < ApplicationController
   def index
     @filters = params.permit(:planta, :avance, :mes, :op, :q).to_h
     scope = filtered_trabajos
-    @total = scope.sum(:total)
-    @pagy, @trabajos = pagy(scope.order(created_at: :desc, id: :desc), limit: 30)
+    ordered = scope.order(created_at: :desc, id: :desc)
+
+    respond_to do |format|
+      format.html do
+        @total = scope.sum(:total)
+        @pagy, @trabajos = pagy(ordered, limit: 30)
+      end
+      format.xlsx do
+        @trabajos = ordered
+        response.headers["Content-Disposition"] = 'attachment; filename="cotizaciones-impromaq.xlsx"'
+        response.headers["Cache-Control"] = "no-store"
+      end
+    end
   end
 
   def show

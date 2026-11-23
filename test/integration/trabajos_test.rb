@@ -1,4 +1,5 @@
 require "test_helper"
+require "zip"
 
 class TrabajosTest < ActionDispatch::IntegrationTest
   test "home report and its drill-downs use the same pending and monthly amounts" do
@@ -123,17 +124,57 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     assert_equal email, Trabajo.last.author_email
   end
 
+  test "the Excel export keeps the filters and stored totals and includes each quotation item" do
+    Trabajo.insert!({ erp_id: 901, planta: "La Calera", descripcion: "Reparación horno", avance: "Facturado",
+      fecha_termino: Date.new(2026, 10, 15), op: 0, total: 500, i12: "=1+1", q12: 2, v12: 300 })
+    Trabajo.create!(planta: "La Calera", descripcion: "Reparación fuera del mes", avance: "Terminado", fecha_termino: "2026-11-01")
+    Trabajo.create!(planta: "La Calera", descripcion: "Reparación con OP", avance: "Terminado", fecha_termino: "2026-10-13", op: 123)
+    Trabajo.create!(planta: "La Calera", descripcion: "Inspección", avance: "Terminado", fecha_termino: "2026-10-12")
+    filters = { planta: "La Calera", avance: "finalizados", mes: "2026-10", q: "Reparación", op: "sin" }
+
+    sign_in_with_google(email: "claudio.gutierrez@msindustrial.cl")
+    get trabajos_path, params: filters
+    assert_response :success
+    assert_select "a", text: "Descargar Excel", count: 1 do |links|
+      download = URI.parse(links.first["href"])
+      assert_equal trabajos_path(format: :xlsx), download.path
+      assert_equal filters.stringify_keys, Rack::Utils.parse_query(download.query)
+    end
+
+    get trabajos_path(format: :xlsx), params: filters.merge(page: 2)
+    assert_response :success
+    assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response.media_type
+    assert_includes response.headers["Content-Disposition"], "cotizaciones-impromaq.xlsx"
+    assert_includes response.headers["Cache-Control"], "no-store"
+
+    Zip::File.open_buffer(response.body) do |workbook|
+      quotations, items = [ 1, 2 ].map do |number|
+        Nokogiri::XML(workbook.read("xl/worksheets/sheet#{number}.xml")).remove_namespaces!
+      end
+      assert_equal 2, quotations.css("sheetData row").size
+      assert_equal "901", quotations.at_css('c[r="A2"]').text
+      assert_equal "500", quotations.at_css('c[r="J2"] v').text
+      assert_equal 2, items.css("sheetData row").size
+      assert_equal "901", items.at_css('c[r="A2"]').text
+      assert_equal "12", items.at_css('c[r="B2"] v').text
+      assert_equal "600", items.at_css('c[r="F2"] v').text
+      assert_empty items.css("f")
+    end
+  end
+
   test "unlisted accounts cannot open or submit any jobs or quotations" do
     imported = Trabajo.create!(erp_id: 567, descripcion: "Trabajo histórico")
     own = Trabajo.create!(author_email: "usuario@msindustrial.cl", descripcion: "Cotización anterior")
     get trabajos_path
+    assert_redirected_to login_path
+    get trabajos_path(format: :xlsx)
     assert_redirected_to login_path
     sign_in_with_google
 
     get root_path
     assert_select "#resumen-trabajos", count: 0
     assert_select ".navbar a", text: "Cotizaciones", count: 0
-    [ trabajos_path, new_trabajo_path, trabajo_path(imported), trabajo_path(own), edit_trabajo_path(own) ].each do |path|
+    [ trabajos_path, trabajos_path(format: :xlsx), new_trabajo_path, trabajo_path(imported), trabajo_path(own), edit_trabajo_path(own) ].each do |path|
       get path
       assert_response :forbidden
     end
