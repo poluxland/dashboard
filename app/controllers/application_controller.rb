@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
     jose.jerez@msindustrial.cl
     fernando.gonzalez@msindustrial.cl
   ].freeze
-  TRABAJOS_USER_EMAILS = %w[
+  TRABAJOS_SUMMARY_USER_EMAILS = %w[
     administracion@msindustrial.cl
     elizabeth.zuniga@msindustrial.cl
     fernando.gonzalez@msindustrial.cl
@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
     simon.rojas@msindustrial.cl
     susana.molina@msindustrial.cl
   ].freeze
+  TRABAJOS_USER_EMAILS = (TRABAJOS_SUMMARY_USER_EMAILS + %w[claudio.gutierrez@msindustrial.cl]).freeze
 
   allow_browser versions: { ie: false }
   include Pagy::Backend
@@ -46,6 +47,10 @@ class ApplicationController < ActionController::Base
 
   def trabajos_access?
     signed_in? && TRABAJOS_USER_EMAILS.include?(current_user[:email].to_s.strip.downcase)
+  end
+
+  def trabajos_summary_access?
+    signed_in? && TRABAJOS_SUMMARY_USER_EMAILS.include?(current_user[:email].to_s.strip.downcase)
   end
 
   def authenticate_user!

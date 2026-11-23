@@ -102,6 +102,27 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  test "Claudio can create quotations without seeing the home summary" do
+    email = "claudio.gutierrez@msindustrial.cl"
+    sign_in_with_google(email: email)
+
+    get root_path
+    assert_response :success
+    assert_select "#resumen-trabajos", count: 0
+    assert_select 'ul[aria-labelledby="lcaDropdown"] a[href=?]', trabajos_path(planta: "La Calera"), text: "Cotizaciones"
+    assert_select 'ul[aria-labelledby="ptmDropdown"] a[href=?]', trabajos_path(planta: "P.Montt"), text: "Cotizaciones"
+
+    get trabajos_path
+    assert_response :success
+    get new_trabajo_path
+    assert_response :success
+    assert_difference "Trabajo.count", 1 do
+      post trabajos_path, params: { trabajo: { planta: "La Calera", descripcion: "Cotización de Claudio", q1: 2, v1: 250 } }
+      assert_redirected_to trabajo_path(Trabajo.last)
+    end
+    assert_equal email, Trabajo.last.author_email
+  end
+
   test "unlisted accounts cannot open or submit any jobs or quotations" do
     imported = Trabajo.create!(erp_id: 567, descripcion: "Trabajo histórico")
     own = Trabajo.create!(author_email: "usuario@msindustrial.cl", descripcion: "Cotización anterior")
