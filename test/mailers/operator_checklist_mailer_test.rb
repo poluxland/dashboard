@@ -27,6 +27,7 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
       diego.castillo@msindustrial.cl
       fernando.gonzalez@msindustrial.cl
       hernan.martinez@msindustrial.cl
+      hernan.martinezg@msindustrial.cl
       jose.jerez@msindustrial.cl
       marcos.prospero@msindustrial.cl
       marisela.alvarado@msindustrial.cl
@@ -53,7 +54,8 @@ class OperatorChecklistMailerTest < ActionMailer::TestCase
     email = OperatorChecklistMailer.report(plant: "PTM", scheduled_at: cutoff)
     html = Nokogiri::HTML(email.html_part.decoded)
 
-    assert_equal 10, email.to.size
+    assert_equal 11, email.to.size
+    assert_includes email.to, "hernan.martinezg@msindustrial.cl"
     assert_includes email.to, "julio.alvear@msindustrial.cl"
     assert_equal "Checklist de operador · Puerto Montt · 18/11/2026", email.subject
     assert_equal [ "Último", "Primero" ], html.css("tbody tr").map { |row| row.css("td").last.text }

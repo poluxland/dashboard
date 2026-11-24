@@ -5,6 +5,7 @@ class OperatorChecklistMailer < ApplicationMailer
     marcos.prospero@msindustrial.cl
     supervisor.envasadora@msindustrial.cl
     maryorie.fajardo@msindustrial.cl
+    hernan.martinezg@msindustrial.cl
   ].freeze
 
   RECIPIENTS = {
