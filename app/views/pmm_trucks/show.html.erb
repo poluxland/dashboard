@@ -19,7 +19,4 @@
       <dd class="col-sm-8"><%= value.presence || "—" %></dd>
     <% end %>
   </dl>
-  <% if task_admin? %>
-    <%= button_to "Eliminar registro", pmm_truck_path(@truck), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "¿Eliminar este registro?" } } %>
-  <% end %>
 </div>

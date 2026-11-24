@@ -113,6 +113,29 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "only administrators have a confirmed delete action in the truck edit page" do
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+    get pmm_truck_path(@legacy)
+    assert_response :success
+    assert_select "button", text: "Eliminar registro", count: 0
+
+    get edit_pmm_truck_path(@legacy)
+    assert_response :success
+    assert_select "form[data-turbo-confirm][action=?]", pmm_truck_path(@legacy), count: 1 do
+      assert_select "input[name='_method'][value='delete']", count: 1
+      assert_select "button", text: "Eliminar registro", count: 1
+    end
+
+    sign_in_with_google
+    get edit_pmm_truck_path(@legacy)
+    assert_response :success
+    assert_select "button", text: "Eliminar registro", count: 0
+    assert_no_difference "PmmTruck.count" do
+      delete pmm_truck_path(@legacy)
+    end
+    assert_response :forbidden
+  end
+
   test "reports include completed waits and BRU visits, and catalogs reference the imported material" do
     PmmTruck.create!(pmm_id: 126, fecha: @today, pmm_material: @material, patente: "FIN123",
       tipo: "Plano", llegada: "08:00", salida: "09:00", wait: 60)
