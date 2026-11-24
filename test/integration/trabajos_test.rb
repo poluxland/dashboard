@@ -162,6 +162,27 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "Dashboard quotations export the bare reference used by numeric search" do
+    quotation = Trabajo.create!(planta: "P.Montt", descripcion: "Cotización nueva", i1: "Revisión", q1: 2, v1: 50)
+    reference = quotation.id.to_s
+    sign_in_with_google(email: "claudio.gutierrez@msindustrial.cl")
+
+    [ reference, quotation.referencia ].each do |query|
+      get trabajos_path, params: { planta: "P.Montt", q: query }
+      assert_response :success
+      assert_select "tbody a[href=?]", trabajo_path(quotation), count: 1
+    end
+
+    get trabajos_path(format: :xlsx), params: { planta: "P.Montt", q: reference }
+    assert_response :success
+    Zip::File.open_buffer(response.body) do |workbook|
+      [ 1, 2 ].each do |number|
+        sheet = Nokogiri::XML(workbook.read("xl/worksheets/sheet#{number}.xml")).remove_namespaces!
+        assert_equal reference, sheet.at_css('c[r="A2"]').text
+      end
+    end
+  end
+
   test "unlisted accounts cannot open or submit any jobs or quotations" do
     imported = Trabajo.create!(erp_id: 567, descripcion: "Trabajo histórico")
     own = Trabajo.create!(author_email: "usuario@msindustrial.cl", descripcion: "Cotización anterior")

@@ -73,7 +73,10 @@ class TrabajosController < ApplicationController
     match = "%#{Trabajo.sanitize_sql_like(query)}%"
     matches = scope.where("descripcion ILIKE :match OR ito ILIKE :match OR centro_costo ILIKE :match", match: match)
     if query.match?(/\A\d{1,18}\z/)
-      matches.or(scope.where(erp_id: query)).or(scope.where(op: query)).or(scope.where(factura: query))
+      matches.or(scope.where(erp_id: query))
+        .or(scope.where(id: query, erp_id: nil))
+        .or(scope.where(op: query))
+        .or(scope.where(factura: query))
     elsif query.match?(/\AD-\d{1,18}\z/i)
       matches.or(scope.where(id: query[2..], erp_id: nil))
     else

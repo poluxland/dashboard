@@ -24,6 +24,10 @@ class Trabajo < ApplicationRecord
   validates :op, :factura, *ITEM_AMOUNTS, numericality: { only_integer: true, in: (-2**31...2**31) }, allow_nil: true
   validates :total, numericality: { only_integer: true, in: (-2**63...2**63) }, allow_nil: true
 
+  def numero_referencia
+    erp_id || id
+  end
+
   def referencia
     erp_id || "D-#{id}"
   end
