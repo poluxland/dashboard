@@ -9,7 +9,7 @@ workbook.add_worksheet(name: "Cotizaciones", escape_formulas: true) do |sheet|
 
   @trabajos.each do |trabajo|
     sheet.add_row [
-      trabajo.numero_referencia.to_s, nombre_planta_trabajo(trabajo.planta), trabajo.descripcion, trabajo.ito,
+      trabajo.referencia.to_s, nombre_planta_trabajo(trabajo.planta), trabajo.descripcion, trabajo.ito,
       estado_trabajo(trabajo.avance), trabajo.fecha_termino, trabajo.op, trabajo.factura, trabajo.centro_costo,
       trabajo.total, trabajo.supervisor, trabajo.observaciones, trabajo.detalle, trabajo.otros
     ], types: [ :string, :string, :string, :string, :string, :date, :integer, :integer, :string, :integer,
@@ -34,7 +34,7 @@ workbook.add_worksheet(name: "Ítems", escape_formulas: true) do |sheet|
       item, quantity, price = trabajo.values_at("i#{number}", "q#{number}", "v#{number}")
       next unless [ item, quantity, price ].any?(&:present?)
 
-      sheet.add_row [ trabajo.numero_referencia.to_s, number, item, quantity, price, trabajo.subtotal(number) ],
+      sheet.add_row [ trabajo.referencia.to_s, number, item, quantity, price, trabajo.subtotal(number) ],
                     types: [ :string, :integer, :string, :integer, :integer, :integer ],
                     style: [ nil, nil, nil, nil, amount, amount ]
     end

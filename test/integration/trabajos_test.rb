@@ -95,6 +95,7 @@ class TrabajosTest < ActionDispatch::IntegrationTest
       assert_redirected_to trabajo_path(Trabajo.last)
     end
     assert_equal 500, Trabajo.last.total
+    assert_equal "Cotización #{Trabajo.last.id} creada.", flash[:notice]
     get trabajo_path(Trabajo.last)
     assert_response :success
     assert_select "button", "Imprimir cotización"
@@ -162,16 +163,25 @@ class TrabajosTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "Dashboard quotations export the bare reference used by numeric search" do
+  test "Dashboard quotations display and export the bare reference while legacy searches still work" do
     quotation = Trabajo.create!(planta: "P.Montt", descripcion: "Cotización nueva", i1: "Revisión", q1: 2, v1: 50)
     reference = quotation.id.to_s
     sign_in_with_google(email: "claudio.gutierrez@msindustrial.cl")
 
-    [ reference, quotation.referencia ].each do |query|
+    [ reference, "D-#{reference}" ].each do |query|
       get trabajos_path, params: { planta: "P.Montt", q: query }
       assert_response :success
-      assert_select "tbody a[href=?]", trabajo_path(quotation), count: 1
+      assert_select "tbody a[href=?]", trabajo_path(quotation), text: reference, count: 1
     end
+
+    get trabajo_path(quotation)
+    assert_response :success
+    assert_select "title", text: "Trabajo #{reference} · Impromaq"
+    assert_select "p", text: "Cotización #{reference}", count: 1
+
+    get edit_trabajo_path(quotation)
+    assert_response :success
+    assert_select "h1", text: "Editar trabajo #{reference}"
 
     get trabajos_path(format: :xlsx), params: { planta: "P.Montt", q: reference }
     assert_response :success
