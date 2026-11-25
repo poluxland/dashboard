@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       get :month, path: "mes"
       get :history, path: "historial"
       get :report, path: "reporte"
+      get :arrivals, path: "llegadas"
       get :annual, path: "informe"
     end
   end

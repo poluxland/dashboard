@@ -46,6 +46,15 @@ class PmmTrucksController < ApplicationController
     redirect_to report_pmm_trucks_path, alert: "Usa una fecha válida para el reporte."
   end
 
+  def arrivals
+    filters = params.permit(:from, :to, :range, :time_from, :time_to, :band, :group,
+      :observations, :q, :sort, material_ids: [], types: [], statuses: [])
+    @arrivals = PmmTruckArrivalReport.new(filters, today: today)
+    @pagy, @observations = pagy(@arrivals.observations, limit: 15)
+  rescue PmmTruckArrivalReport::InvalidFilter
+    redirect_to arrivals_pmm_trucks_path, alert: "Revisa las fechas y el horario de llegada de la consulta."
+  end
+
   def annual
     @reports = PmmTruckReport.new(today)
     @years = @reports.years

@@ -21,7 +21,7 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     [ edit_pmm_truck_path(@legacy), pmm_truck_path(@legacy), history_pmm_trucks_path,
-      report_pmm_trucks_path, annual_pmm_trucks_path, pmm_catalog_path("materias") ].each do |path|
+      report_pmm_trucks_path, arrivals_pmm_trucks_path, annual_pmm_trucks_path, pmm_catalog_path("materias") ].each do |path|
       get path
       assert_redirected_to login_path
     end
@@ -111,6 +111,46 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
       assert_includes worksheet, "-480"
       refute_match(/<f[ >]/, worksheet)
     end
+  end
+
+  test "arrivals report filters measured records and draws arrival bands and calendar totals" do
+    other = PmmMaterial.create!(nombre: "Fierro")
+    PmmTruck.create!(fecha: @today, llegada: "05:10", salida: "05:40", wait: 30, finished: true,
+      pmm_material: @material, tipo: "Plano", cause: "Normal", patente: "REP101", motive: "Ingreso por cancha norte")
+    PmmTruck.create!(fecha: @today, llegada: "05:45", salida: "07:15", wait: 90, finished: true,
+      pmm_material: @material, tipo: "Plano", cause: "sin BRU", patente: "REP102")
+    PmmTruck.create!(fecha: @today, llegada: "06:15", salida: "07:15", wait: 60, finished: true,
+      pmm_material: other, tipo: "Batea 20", cause: "Normal", patente: "REP103")
+    PmmTruck.create!(fecha: @today, llegada: "05:20", finished: false,
+      pmm_material: @material, tipo: "Plano", cause: "Normal", patente: "PEND01")
+    sign_in_with_google
+
+    get arrivals_pmm_trucks_path, params: { from: @today, to: @today, band: "30", group: "week", observations: "special" }
+    assert_response :success
+    assert_select "h1", "Llegada de camiones por materia prima"
+    assert_select "table[aria-label='Comentarios de camiones'] tbody tr", count: 2
+    assert_select "table[aria-label='Por materia prima'] tbody tr", count: 2
+    assert_select "[data-pmm-truck-charts-charts-value]", count: 1 do |elements|
+      hour, week = JSON.parse(elements.first["data-pmm-truck-charts-charts-value"])
+      assert_equal [ "05:00–05:30", "05:30–06:00", "06:00–06:30" ], hour["labels"]
+      assert_equal [ 30.0, 90.0, 60.0 ], hour["series"].last["data"]
+      assert_equal [ 3 ], week["series"].first["data"]
+      assert_equal [ 60.0 ], week["series"].last["data"]
+    end
+
+    get arrivals_pmm_trucks_path, params: { from: @today, to: @today, time_from: "300", time_to: "360",
+      material_ids: [ @material.id ], types: [ "Plano" ], statuses: [ "Normal" ], q: "cancha" }
+    assert_response :success
+    assert_select "table[aria-label='Comentarios de camiones'] tbody tr", count: 1, text: /REP101.*Ingreso por cancha norte/m
+    assert_select "table[aria-label='Por estado del registro'] tbody tr.table-primary", count: 1
+    assert_select "[data-pmm-truck-charts-charts-value]", count: 1 do |elements|
+      hourly = JSON.parse(elements.first["data-pmm-truck-charts-charts-value"]).first
+      assert_equal [ 1 ], hourly["series"].first["data"]
+      assert_equal [ 30.0 ], hourly["series"].last["data"]
+    end
+
+    get arrivals_pmm_trucks_path, params: { time_from: "720", time_to: "300" }
+    assert_redirected_to arrivals_pmm_trucks_path
   end
 
   test "only administrators have a confirmed delete action in the truck edit page" do

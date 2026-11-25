@@ -1,0 +1,83 @@
+<% query = report.query %>
+<% time_options = ((0..1440).step(30).to_a | [ report.time_from, report.time_to ]).sort.map { |time| [ report.clock(time), time ] } %>
+<%= form_with url: arrivals_pmm_trucks_path, method: :get, class: "card shadow-sm mb-4" do |form| %>
+  <div class="card-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <h2 class="h5 mb-0">Filtros de llegada</h2>
+      <%= link_to "Restablecer", arrivals_pmm_trucks_path, class: "btn btn-sm btn-outline-secondary" %>
+    </div>
+
+    <div class="d-flex flex-wrap gap-1 mb-3" aria-label="Períodos rápidos">
+      <% PmmTruckArrivalReport::RANGES.each do |key, label| %>
+        <% range = report.preset(key) %>
+        <% active = key == report.active_preset %>
+        <%= link_to label, arrivals_pmm_trucks_path(report.query(from: range.begin, to: range.end, range: key)),
+                    class: class_names("btn btn-sm", active ? "btn-primary" : "btn-outline-primary"),
+                    aria: { current: ("true" if active) } %>
+      <% end %>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= form.label :from, "Desde", class: "form-label" %>
+        <%= form.date_field :from, value: report.from, required: true, class: "form-control" %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= form.label :to, "Hasta", class: "form-label" %>
+        <%= form.date_field :to, value: report.to, required: true, class: "form-control" %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= form.label :time_from, "Ingreso desde", class: "form-label" %>
+        <%= form.select :time_from, time_options.reject { |_, time| time == 1440 }, { selected: report.time_from }, class: "form-select" %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= form.label :time_to, "Ingreso hasta", class: "form-label" %>
+        <%= form.select :time_to, time_options.reject { |_, time| time.zero? }, { selected: report.time_to }, class: "form-select" %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= form.label :band, "Ancho de banda", class: "form-label" %>
+        <%= form.select :band, PmmTruckArrivalReport::BANDS.invert.to_a, { selected: report.band }, class: "form-select" %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= form.label :group, "Agrupar fechas por", class: "form-label" %>
+        <%= form.select :group, PmmTruckArrivalReport::GROUPS.invert.to_a, { selected: report.group }, class: "form-select" %>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-1 mt-3" aria-label="Horarios rápidos">
+      <% PmmTruckArrivalReport::TIME_RANGES.each do |label, (from, to)| %>
+        <% active = from == report.time_from && to == report.time_to %>
+        <%= link_to label, arrivals_pmm_trucks_path(report.query(time_from: from, time_to: to)),
+                    class: class_names("btn btn-sm", active ? "btn-secondary" : "btn-outline-secondary"),
+                    aria: { current: ("true" if active) } %>
+      <% end %>
+    </div>
+
+    <div class="row g-2 mt-2">
+      <% PmmTruckArrivalReport::DIMENSIONS.each do |key, dimension| %>
+        <% selected_count = query.fetch(key).size %>
+        <div class="col-md-4">
+          <details class="border rounded p-2">
+            <summary class="fw-semibold"><%= dimension.fetch(:label) %> <span class="small fw-normal text-body-secondary">
+              <%= selected_count.positive? ? "· #{selected_count}" : "· Todas las opciones" %>
+            </span></summary>
+            <div class="mt-2 px-1">
+              <% report.options.fetch(key).each_with_index do |(label, value), index| %>
+                <% input_id = "arrival_#{key}_#{index}" %>
+                <div class="form-check">
+                  <%= check_box_tag "#{key}[]", value, report.selected?(key, value), id: input_id, class: "form-check-input" %>
+                  <%= label_tag input_id, label, class: "form-check-label" %>
+                </div>
+              <% end %>
+            </div>
+          </details>
+        </div>
+      <% end %>
+    </div>
+
+    <% query.slice(:range, :observations, :q, :sort).each do |key, value| %>
+      <%= hidden_field_tag key, value, id: nil %>
+    <% end %>
+    <%= form.submit "Aplicar filtros", class: "btn btn-primary mt-3" %>
+  </div>
+<% end %>

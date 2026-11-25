@@ -1,0 +1,40 @@
+<div class="col-lg-4">
+  <div class="card h-100 shadow-sm">
+    <div class="card-body">
+      <h2 class="h5"><%= ranking.fetch(:title) %></h2>
+      <% rows = ranking.fetch(:rows) %>
+      <% if rows.any? %>
+        <% maximum = [ rows.pluck(:count).max, 1 ].max %>
+        <p class="text-body-secondary small mb-2">Selecciona una categoría para filtrar.</p>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0" aria-label="<%= ranking.fetch(:title) %>">
+            <thead>
+              <tr><th scope="col"><%= ranking.fetch(:label) %></th><th scope="col" class="text-end">Camiones</th>
+                <th scope="col" class="text-end">Promedio (min)</th></tr>
+            </thead>
+            <tbody>
+              <% rows.each do |row| %>
+                <% selected = report.selected?(key, row[:value]) %>
+                <tr class="<%= "table-primary" if selected %>">
+                  <th scope="row">
+                    <%= link_to row[:label], arrivals_pmm_trucks_path(report.toggle(key, row[:value])),
+                                class: "text-decoration-none", aria: { current: ("true" if selected) } %>
+                  </th>
+                  <td class="text-end">
+                    <%= number_with_delimiter(row[:count]) %>
+                    <div class="progress mt-1" style="height: 3px;" aria-hidden="true">
+                      <div class="progress-bar" style="width: <%= row[:count] * 100.0 / maximum %>%;"></div>
+                    </div>
+                  </td>
+                  <td class="text-end"><%= pmm_metric(row[:average]) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="small text-body-secondary mb-0">No hay resultados para estos filtros.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

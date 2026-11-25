@@ -1,0 +1,37 @@
+<div class="row g-3 mb-4" data-controller="pmm-truck-charts"
+     data-pmm-truck-charts-charts-value="<%= charts.map { |chart| pmm_arrival_chart_data(chart) }.to_json %>">
+  <p class="text-danger" hidden data-pmm-truck-charts-target="error">No se pudieron cargar los gráficos.</p>
+  <% charts.each do |chart| %>
+    <section class="col-12 col-lg-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-1"><%= chart.fetch(:title) %></h2>
+          <p class="text-body-secondary small mb-2">Selecciona una barra para consultar ese intervalo.</p>
+          <div style="height: 290px;">
+            <canvas role="img" aria-label="<%= chart.fetch(:title) %>" data-pmm-truck-charts-target="canvas"></canvas>
+          </div>
+          <details class="border-top pt-2 mt-3">
+            <summary class="small fw-semibold">Ver datos del gráfico</summary>
+            <div class="table-responsive mt-2">
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr><th scope="col">Intervalo</th><th scope="col" class="text-end">Camiones</th>
+                    <th scope="col" class="text-end">Promedio (min)</th></tr>
+                </thead>
+                <tbody>
+                  <% chart.fetch(:rows).each do |row| %>
+                    <tr>
+                      <th scope="row"><%= link_to row[:label], arrivals_pmm_trucks_path(row[:query]), class: "text-decoration-none" %></th>
+                      <td class="text-end"><%= number_with_delimiter(row[:count]) %></td>
+                      <td class="text-end"><%= pmm_metric(row[:average]) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+  <% end %>
+</div>
