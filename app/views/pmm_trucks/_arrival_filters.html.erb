@@ -53,25 +53,18 @@
       <% end %>
     </div>
 
-    <div class="row g-2 mt-2">
+    <div class="d-grid gap-3 mt-3 pt-3 border-top">
       <% PmmTruckArrivalReport::DIMENSIONS.each do |key, dimension| %>
-        <% selected_count = query.fetch(key).size %>
-        <div class="col-md-4">
-          <details class="border rounded p-2">
-            <summary class="fw-semibold"><%= dimension.fetch(:label) %> <span class="small fw-normal text-body-secondary">
-              <%= selected_count.positive? ? "· #{selected_count}" : "· Todas las opciones" %>
-            </span></summary>
-            <div class="mt-2 px-1">
-              <% report.options.fetch(key).each_with_index do |(label, value), index| %>
-                <% input_id = "arrival_#{key}_#{index}" %>
-                <div class="form-check">
-                  <%= check_box_tag "#{key}[]", value, report.selected?(key, value), id: input_id, class: "form-check-input" %>
-                  <%= label_tag input_id, label, class: "form-check-label" %>
-                </div>
-              <% end %>
-            </div>
-          </details>
-        </div>
+        <fieldset>
+          <legend class="float-none small fw-semibold mb-2"><%= dimension.fetch(:label) %></legend>
+          <div class="d-flex flex-wrap gap-1">
+            <% report.options.fetch(key).each_with_index do |(label, value), index| %>
+              <% input_id = "arrival_#{key}_#{index}" %>
+              <%= check_box_tag "#{key}[]", value, report.selected?(key, value), id: input_id, class: "btn-check" %>
+              <%= label_tag input_id, label, class: "btn btn-sm btn-outline-primary" %>
+            <% end %>
+          </div>
+        </fieldset>
       <% end %>
     </div>
 

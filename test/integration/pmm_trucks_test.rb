@@ -128,6 +128,9 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     get arrivals_pmm_trucks_path, params: { from: @today, to: @today, band: "30", group: "week", observations: "special" }
     assert_response :success
     assert_select "h1", "Llegada de camiones por materia prima"
+    assert_select "nav[aria-label='Camiones'] a[href=?]", arrivals_pmm_trucks_path, text: "Informe"
+    assert_select "nav[aria-label='Camiones'] a[href=?]", annual_pmm_trucks_path, text: "Reporte"
+    assert_select "nav[aria-label='Camiones'] a[href=?]", report_pmm_trucks_path, text: "Reporte diario"
     assert_select "table[aria-label='Comentarios de camiones'] tbody tr", count: 2
     assert_select "table[aria-label='Por materia prima'] tbody tr", count: 2
     assert_select "[data-pmm-truck-charts-charts-value]", count: 1 do |elements|
@@ -141,6 +144,10 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     get arrivals_pmm_trucks_path, params: { from: @today, to: @today, time_from: "300", time_to: "360",
       material_ids: [ @material.id ], types: [ "Plano" ], statuses: [ "Normal" ], q: "cancha" }
     assert_response :success
+    assert_select "input.btn-check[checked][name='material_ids[]'][value=?] + label.btn-outline-primary",
+      @material.id.to_s, text: "Conchuela", count: 1
+    assert_select "input.btn-check[checked][name='types[]'][value='Plano']", count: 1
+    assert_select "input.btn-check[checked][name='statuses[]'][value='Normal']", count: 1
     assert_select "table[aria-label='Comentarios de camiones'] tbody tr", count: 1, text: /REP101.*Ingreso por cancha norte/m
     assert_select "table[aria-label='Por estado del registro'] tbody tr.table-primary", count: 1
     assert_select "[data-pmm-truck-charts-charts-value]", count: 1 do |elements|

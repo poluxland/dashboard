@@ -1,11 +1,11 @@
-<% content_for :title, "Informe anual de camiones" %>
+<% content_for :title, "Reporte anual de camiones" %>
 <div class="container-xl py-4">
-  <h1 class="h3 mb-3">Informe anual de camiones</h1>
+  <h1 class="h3 mb-3">Reporte anual de camiones</h1>
   <%= render "navigation" %>
   <%= form_with url: annual_pmm_trucks_path, method: :get, class: "d-flex align-items-center gap-2 mb-4" do |form| %>
     <%= form.label :year, "Año", class: "form-label mb-0" %>
     <%= form.select :year, @years, { selected: @year }, class: "form-select w-auto" %>
-    <%= form.submit "Ver informe", class: "btn btn-primary" %>
+    <%= form.submit "Ver reporte", class: "btn btn-primary" %>
   <% end %>
   <div class="row g-3">
     <% { "Todos los camiones" => @annual[:totals], "Camiones planos" => @annual[:flatbed] }.each do |label, (count, average, within)| %>

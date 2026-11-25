@@ -3,11 +3,13 @@
   <%= link_to "Mes", month_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
   <%= link_to "Año", history_pmm_trucks_path(period: "year"), class: "btn btn-outline-primary btn-sm" %>
   <%= link_to "Histórico", history_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
-  <%= link_to "Reporte", report_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
-  <%= link_to "Llegadas por materia prima", arrivals_pmm_trucks_path,
+  <%= link_to "Reporte diario", report_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Informe", arrivals_pmm_trucks_path,
               class: class_names("btn btn-sm", current_page?(arrivals_pmm_trucks_path) ? "btn-primary" : "btn-outline-primary"),
               aria: { current: ("page" if current_page?(arrivals_pmm_trucks_path)) } %>
-  <%= link_to "Informe anual", annual_pmm_trucks_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= link_to "Reporte", annual_pmm_trucks_path,
+              class: class_names("btn btn-sm", current_page?(annual_pmm_trucks_path) ? "btn-primary" : "btn-outline-primary"),
+              aria: { current: ("page" if current_page?(annual_pmm_trucks_path)) } %>
   <%= link_to "Canchas", pmm_catalog_path("canchas"), class: "btn btn-outline-secondary btn-sm" %>
   <%= link_to "Materias primas", pmm_catalog_path("materias"), class: "btn btn-outline-secondary btn-sm" %>
 </nav>
