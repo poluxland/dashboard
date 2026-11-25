@@ -3,47 +3,50 @@
   <h1 class="h3 mb-2">Llegada de camiones por materia prima</h1>
   <p class="text-body-secondary mb-3">La Calera · Cantidad de ingresos y minutos entre llegada y salida.</p>
   <%= render "navigation" %>
-  <%= render "arrival_filters", report: @arrivals %>
+  <%= turbo_frame_tag "pmm_arrival_report", class: "d-block", data: { turbo_action: "replace", controller: "pmm-arrival-filters",
+    action: "turbo:before-frame-render->pmm-arrival-filters#rememberFocus turbo:frame-render->pmm-arrival-filters#restoreFocus turbo:frame-missing->pmm-arrival-filters#visitPage" } do %>
+    <%= render "arrival_filters", report: @arrivals %>
 
-  <% totals = @arrivals.totals %>
-  <p class="small text-body-secondary mb-2">
-    <strong><%= l @arrivals.from %><%= " al #{l @arrivals.to}" if @arrivals.from != @arrivals.to %></strong>
-    · <%= @arrivals.clock(@arrivals.time_from) %> a <%= @arrivals.clock(@arrivals.time_to) %>
-    · Ingresos con espera registrada y válida
-  </p>
-  <section class="row g-2 mb-4" aria-label="Resumen de la consulta">
-    <% metrics = [
-      ["Camiones", number_with_delimiter(totals[:count]), "Ingresos", "primary"],
-      ["Espera promedio", pmm_metric(totals[:average]), "min", "success"],
-      ["Mediana", pmm_metric(totals[:median]), "min", nil],
-      ["Percentil 90", pmm_metric(totals[:p90]), "min", nil],
-      ["Espera máxima", pmm_metric(totals[:maximum]), "min", nil],
-      ["Con comentarios", number_with_delimiter(totals[:comments]), pmm_compliance(totals[:count], totals[:comments]), nil]
-    ] %>
-    <% metrics.each do |label, value, detail, accent| %>
-      <div class="col-6 col-md-4 col-lg-2">
-        <div class="<%= class_names("card h-100 shadow-sm", ("border-#{accent}" if accent)) %>">
-          <div class="card-body py-3">
-            <div class="small text-body-secondary"><%= label %></div>
-            <div class="<%= class_names("h4 fw-semibold my-1", ("text-#{accent}" if accent)) %>"><%= value %></div>
-            <div class="small text-body-secondary"><%= detail %></div>
+    <% totals = @arrivals.totals %>
+    <p class="small text-body-secondary mb-2">
+      <strong><%= l @arrivals.from %><%= " al #{l @arrivals.to}" if @arrivals.from != @arrivals.to %></strong>
+      · <%= @arrivals.clock(@arrivals.time_from) %> a <%= @arrivals.clock(@arrivals.time_to) %>
+      · Ingresos con espera registrada y válida
+    </p>
+    <section class="row g-2 mb-4" aria-label="Resumen de la consulta">
+      <% metrics = [
+        ["Camiones", number_with_delimiter(totals[:count]), "Ingresos", "primary"],
+        ["Espera promedio", pmm_metric(totals[:average]), "min", "success"],
+        ["Mediana", pmm_metric(totals[:median]), "min", nil],
+        ["Percentil 90", pmm_metric(totals[:p90]), "min", nil],
+        ["Espera máxima", pmm_metric(totals[:maximum]), "min", nil],
+        ["Con comentarios", number_with_delimiter(totals[:comments]), pmm_compliance(totals[:count], totals[:comments]), nil]
+      ] %>
+      <% metrics.each do |label, value, detail, accent| %>
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="<%= class_names("card h-100 shadow-sm", ("border-#{accent}" if accent)) %>">
+            <div class="card-body py-3">
+              <div class="small text-body-secondary"><%= label %></div>
+              <div class="<%= class_names("h4 fw-semibold my-1", ("text-#{accent}" if accent)) %>"><%= value %></div>
+              <div class="small text-body-secondary"><%= detail %></div>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
-  </section>
+      <% end %>
+    </section>
 
-  <% if totals[:count].positive? %>
-    <%= render "arrival_timeline", charts: @arrivals.charts %>
-  <% else %>
-    <p class="alert alert-light border">No hay camiones para las fechas, el horario y los filtros seleccionados.</p>
+    <% if totals[:count].positive? %>
+      <%= render "arrival_timeline", charts: @arrivals.charts %>
+    <% else %>
+      <p class="alert alert-light border">No hay camiones para las fechas, el horario y los filtros seleccionados.</p>
+    <% end %>
+
+    <section class="row g-3 mb-4" aria-label="Distribución de camiones">
+      <% @arrivals.rankings.each do |key, ranking| %>
+        <%= render "arrival_ranking", report: @arrivals, key: key, ranking: ranking %>
+      <% end %>
+    </section>
+
+    <%= render "arrival_observations", report: @arrivals, observations: @observations, pagy: @pagy %>
   <% end %>
-
-  <section class="row g-3 mb-4" aria-label="Distribución de camiones">
-    <% @arrivals.rankings.each do |key, ranking| %>
-      <%= render "arrival_ranking", report: @arrivals, key: key, ranking: ranking %>
-    <% end %>
-  </section>
-
-  <%= render "arrival_observations", report: @arrivals, observations: @observations, pagy: @pagy %>
 </div>

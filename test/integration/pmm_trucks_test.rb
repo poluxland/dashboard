@@ -131,6 +131,8 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     assert_select "nav[aria-label='Camiones'] a[href=?]", arrivals_pmm_trucks_path, text: "Informe"
     assert_select "nav[aria-label='Camiones'] a[href=?]", annual_pmm_trucks_path, text: "Reporte"
     assert_select "nav[aria-label='Camiones'] a[href=?]", report_pmm_trucks_path, text: "Reporte diario"
+    assert_select "turbo-frame#pmm_arrival_report form[data-pmm-arrival-filters-target='form'] fieldset.col-md-4", count: 3
+    assert_select "table[aria-label='Comentarios de camiones'] a[data-turbo-frame='_top']", count: 2
     assert_select "table[aria-label='Comentarios de camiones'] tbody tr", count: 2
     assert_select "table[aria-label='Por materia prima'] tbody tr", count: 2
     assert_select "[data-pmm-truck-charts-charts-value]", count: 1 do |elements|

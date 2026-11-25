@@ -33,7 +33,7 @@
 
     <% if observations.any? %>
       <p class="small text-body-secondary mb-2"><%= number_with_delimiter(pagy.count) %> registros en la consulta de comentarios</p>
-      <div class="table-responsive">
+      <div class="table-responsive position-relative">
         <table class="table table-sm table-hover align-middle mb-0" aria-label="Comentarios de camiones">
           <thead class="table-light">
             <tr><th scope="col">Fecha</th><th scope="col">Ingreso</th><th scope="col">Salida</th>
@@ -50,7 +50,8 @@
                 <td><%= truck.tipo.presence || "Sin registro" %></td>
                 <td class="text-end"><%= truck.wait %></td><td><%= truck.cause.presence || "Sin registro" %></td>
                 <td style="min-width: 14rem; white-space: pre-wrap;"><%= [truck.motive, truck.other].map { |value| value.to_s.strip.presence }.compact.join("\n").presence || "—" %></td>
-                <td><%= link_to "Ver", pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary", aria: { label: "Ver camión #{truck.patente}" } %></td>
+                <td><%= link_to "Ver", pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary",
+                                aria: { label: "Ver camión #{truck.patente}" }, data: { turbo_frame: "_top" } %></td>
               </tr>
             <% end %>
           </tbody>

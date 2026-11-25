@@ -1,6 +1,7 @@
 <% query = report.query %>
 <% time_options = ((0..1440).step(30).to_a | [ report.time_from, report.time_to ]).sort.map { |time| [ report.clock(time), time ] } %>
-<%= form_with url: arrivals_pmm_trucks_path, method: :get, class: "card shadow-sm mb-4" do |form| %>
+<%= form_with url: arrivals_pmm_trucks_path, method: :get, class: "card shadow-sm mb-4",
+              data: { pmm_arrival_filters_target: "form", action: "change->pmm-arrival-filters#apply submit->pmm-arrival-filters#guard" } do |form| %>
   <div class="card-body">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
       <h2 class="h5 mb-0">Filtros de llegada</h2>
@@ -53,9 +54,9 @@
       <% end %>
     </div>
 
-    <div class="d-grid gap-3 mt-3 pt-3 border-top">
+    <div class="row g-3 mt-2 pt-2 border-top">
       <% PmmTruckArrivalReport::DIMENSIONS.each do |key, dimension| %>
-        <fieldset>
+        <fieldset class="col-12 col-md-4">
           <legend class="float-none small fw-semibold mb-2"><%= dimension.fetch(:label) %></legend>
           <div class="d-flex flex-wrap gap-1">
             <% report.options.fetch(key).each_with_index do |(label, value), index| %>
@@ -71,6 +72,7 @@
     <% query.slice(:range, :observations, :q, :sort).each do |key, value| %>
       <%= hidden_field_tag key, value, id: nil %>
     <% end %>
-    <%= form.submit "Aplicar filtros", class: "btn btn-primary mt-3" %>
+    <p class="small text-danger mt-3 mb-0" role="status" data-pmm-arrival-filters-target="error" hidden></p>
+    <noscript><%= form.submit "Aplicar filtros", class: "btn btn-primary mt-3" %></noscript>
   </div>
 <% end %>
