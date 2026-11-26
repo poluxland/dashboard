@@ -61,6 +61,22 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     assert_equal "00:10", truck.reload.salida.strftime("%H:%M")
   end
 
+  test "outdated page links fall back to the last page of truck results" do
+    get month_pmm_trucks_path, params: { page: 2 }
+    assert_response :success
+    assert_select "tbody tr", text: /ABC123/
+
+    sign_in_with_google
+    get history_pmm_trucks_path, params: { page: 2, patente: "ABC" }
+    assert_response :success
+    assert_select "tbody tr", text: /ABC123/
+
+    @legacy.update!(wait: 60, finished: true)
+    get arrivals_pmm_trucks_path, params: { page: 2, observations: "comments" }
+    assert_response :success
+    assert_select "table[aria-label='Comentarios de camiones'] tbody tr", text: /ABC123/
+  end
+
   test "a visitor can close an imported truck at midnight but cannot close archived arrivals" do
     old = @legacy.dup
     old.update!(pmm_id: 124, fecha: @today.yesterday)

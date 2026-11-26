@@ -5,3 +5,5 @@ require "pagy/extras/bootstrap"   # habilita pagy_bootstrap_nav
 # Pagy::DEFAULT[:items] = 20
 # Paginate the merged production/TPT detail after applying shared filters.
 require "pagy/extras/array"
+require "pagy/extras/overflow"
+Pagy::DEFAULT[:overflow] = :exception

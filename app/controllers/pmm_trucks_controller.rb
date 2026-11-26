@@ -21,7 +21,8 @@ class PmmTrucksController < ApplicationController
 
   def month
     @title = "Camiones del mes"
-    @pagy, @trucks = pagy(PmmTruck.includes(:pmm_material).where(fecha: today.all_month).order(fecha: :desc, id: :desc), limit: 40)
+    @pagy, @trucks = pagy(PmmTruck.includes(:pmm_material).where(fecha: today.all_month).order(fecha: :desc, id: :desc),
+      limit: 40, overflow: :last_page)
   end
 
   def history
@@ -29,7 +30,7 @@ class PmmTrucksController < ApplicationController
     @materials = PmmMaterial.order(:nombre)
     scope = filtered_history
     respond_to do |format|
-      format.html { @pagy, @trucks = pagy(scope.includes(:pmm_material), limit: 50) }
+      format.html { @pagy, @trucks = pagy(scope.includes(:pmm_material), limit: 50, overflow: :last_page) }
       format.xlsx do
         if scope.limit(EXPORT_LIMIT + 1).count > EXPORT_LIMIT
           redirect_to history_pmm_trucks_path(@filters), alert: "Acota las fechas para descargar hasta 5.000 registros por archivo."
@@ -53,7 +54,7 @@ class PmmTrucksController < ApplicationController
     filters = params.permit(:from, :to, :range, :time_from, :time_to, :band, :group,
       :observations, :q, :sort, material_ids: [], types: [], statuses: [])
     @arrivals = PmmTruckArrivalReport.new(filters, today: today)
-    @pagy, @observations = pagy(@arrivals.observations, limit: 15)
+    @pagy, @observations = pagy(@arrivals.observations, limit: 15, overflow: :last_page)
   rescue PmmTruckArrivalReport::InvalidFilter
     redirect_to arrivals_pmm_trucks_path, alert: "Revisa las fechas y el horario de llegada de la consulta."
   end
