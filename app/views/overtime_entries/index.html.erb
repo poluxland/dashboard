@@ -62,6 +62,7 @@
               <th scope="col">Área y detalle</th><th scope="col">Inicio</th><th scope="col">Término</th><th scope="col">HE</th>
               <th scope="col">Estado de pago</th><th scope="col">Estado</th>
               <% if @staff && reviewable %><th scope="col"><span class="visually-hidden">Editar</span></th><% end %>
+              <%= record_author_headers %>
             </tr>
           </thead>
           <tbody>
@@ -97,6 +98,7 @@
                 <% if @staff && reviewable %>
                   <td><%= link_to "Editar", edit_overtime_entry_path(entry) if entry.estado == OvertimeEntry::PENDING %></td>
                 <% end %>
+                <%= record_author_cells(entry) %>
               </tr>
             <% end %>
           </tbody>

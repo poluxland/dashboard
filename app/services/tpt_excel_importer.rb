@@ -69,7 +69,11 @@ class TptExcelImporter
       report.imported_count = new_rows.length
       report.save!
       now = Time.current
-      TptEvent.insert_all!(new_rows.map { |row| row.merge(tpt_import_id: report.id, created_at: now, updated_at: now) }) if new_rows.any?
+      if new_rows.any?
+        TptEvent.insert_all!(new_rows.map do |row|
+          row.merge(tpt_import_id: report.id, created_at: now, updated_at: now, created_by_email: RecordAuthor.email)
+        end)
+      end
     end
     report
   ensure

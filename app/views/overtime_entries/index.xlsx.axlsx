@@ -2,9 +2,9 @@ workbook = xlsx_package.workbook
 header = workbook.styles.add_style(b: true, fg_color: "FFFFFF", bg_color: "183153", alignment: { wrap_text: true })
 date = workbook.styles.add_style(format_code: "dd-mm-yyyy")
 columns = [ "Fecha", "OT", "Personal", "Mandante", "Área", "Lugar", "Descripción", "Traslado", "Inicio", "Término",
-            "HE", "Estado de pago", "Estado", "Revisado por", "Fecha de revisión (Chile)", "Motivo de revisión" ]
+            "HE", "Estado de pago", "Estado", "Revisado por", "Fecha de revisión (Chile)", "Motivo de revisión", *record_author_labels ]
 types = [ :date, :integer, :string, :string, :string, :string, :string, :string, :string, :string,
-          :float, :string, :string, :string, :string, :string ]
+          :float, :string, :string, :string, :string, :string, *Array.new(record_author_labels.size, :string) ]
 
 workbook.add_worksheet(name: "Horas extra PTM", escape_formulas: true) do |sheet|
   sheet.add_row columns, style: header
@@ -14,11 +14,12 @@ workbook.add_worksheet(name: "Horas extra PTM", escape_formulas: true) do |sheet
     sheet.add_row [
       entry.fecha, entry.ot, entry.personal, entry.mandante, entry.area, entry.lugar, entry.descripcion, entry.traslado,
       overtime_time(entry.inicio), overtime_time(entry.termino), entry.he, entry.ep, entry.estado.presence || "Sin estado",
-      review&.reviewer_email, review&.created_at&.in_time_zone("America/Santiago")&.strftime("%d-%m-%Y %H:%M"), review&.reason
+      review&.reviewer_email, review&.created_at&.in_time_zone("America/Santiago")&.strftime("%d-%m-%Y %H:%M"), review&.reason,
+      *record_author_values(entry)
     ], types: types, style: [ date ]
   end
 
-  sheet.column_widths 14, 12, 30, 24, 18, 18, 55, 18, 12, 12, 12, 18, 23, 34, 26, 45
+  sheet.column_widths 14, 12, 30, 24, 18, 18, 55, 18, 12, 12, 12, 18, 23, 34, 26, 45, *Array.new(record_author_labels.size, 32)
   sheet.auto_filter = "A1:#{Axlsx.col_ref(columns.size - 1)}#{sheet.rows.size}"
   sheet.sheet_view.pane do |pane|
     pane.top_left_cell = "A2"

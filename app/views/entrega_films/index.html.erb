@@ -181,6 +181,7 @@
             <th>Operador bodega</th>
             <th>Observaciones</th>
             <th>Acciones</th>
+            <%= record_author_headers %>
           </tr>
         </thead>
 
@@ -220,11 +221,12 @@
                     <%= link_to "Editar", edit_entrega_film_path(entrega_film), class: "film-link" %>
                   </div>
                 </td>
+                <%= record_author_cells(entrega_film) %>
               </tr>
             <% end %>
           <% else %>
             <tr>
-              <td colspan="5" class="film-empty-row">
+              <td colspan="<%= 5 + record_author_labels.size %>" class="film-empty-row">
                 No hay entregas de films registradas.
               </td>
             </tr>

@@ -5,6 +5,7 @@
         <tr>
           <th scope="col">Fecha</th><th scope="col">Equipo</th><th scope="col">Planta</th>
           <th scope="col">Operador</th><th scope="col">Horómetro</th><th scope="col">Resultado</th><th scope="col">Comentarios</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +19,7 @@
             <td><%= record.hour_meter %></td>
             <td><span class="badge text-bg-<%= color %>"><%= label %></span></td>
             <td><%= truncate(record.comments, length: 110) %></td>
+            <%= record_author_cells(record) %>
           </tr>
         <% end %>
       </tbody>

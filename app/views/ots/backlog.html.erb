@@ -33,6 +33,7 @@
           <th class="text-end">Estado</th>
           <th class="text-end">Sem. ejec.</th>
           <th class="text-center">Acciones</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -82,6 +83,7 @@
                       class: "btn btn-outline-danger" %>
               </div>
             </td>
+            <%= record_author_cells(ot) %>
           </tr>
         <% end %>
       </tbody>
@@ -90,6 +92,7 @@
           <td colspan="4" class="text-end fw-semibold">Total:</td>
           
           <td class="text-end fw-bold"><%= number_to_currency(@ots.sum(:total), unit: "$", precision: 0, delimiter: ".") %></td>
+          <% if signed_in? %><td colspan="2"></td><% end %>
           
         </tr>
       </tfoot>

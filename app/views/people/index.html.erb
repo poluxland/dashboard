@@ -14,6 +14,7 @@
       <th>Participa en indicadores</th>
       <th>Disponible para cierre de turno</th>
       <th class="text-end">Acciones</th>
+      <%= record_author_headers %>
     </tr>
   </thead>
   <tbody>
@@ -29,6 +30,7 @@
           <%= link_to "Eliminar", p, class: "btn btn-sm btn-outline-danger ms-1",
                 data: { turbo_method: :delete, turbo_confirm: "¿Eliminar a #{p.name}?" } %>
         </td>
+        <%= record_author_cells(p) %>
       </tr>
     <% end %>
   </tbody>

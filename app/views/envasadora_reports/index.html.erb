@@ -6,8 +6,8 @@
   <div class="col-sm-3"><%= form.label :turno, "Turno", class: "form-label" %><%= form.select :turno, EnvasadoraReport::SHIFTS.keys, { include_blank: "Todos", selected: params[:turno] }, class: "form-select" %></div>
   <div class="col-sm-3 d-flex gap-2"><%= form.submit "Filtrar", class: "btn btn-primary" %><%= link_to "Limpiar", envasadora_reports_path, class: "btn btn-outline-secondary" %></div>
 <% end %>
-<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Fecha</th><th>Turno</th><th>Autor</th><th>Inventario (t)</th><th>Correo</th><th></th></tr></thead><tbody>
-<% @reports.each do |report| %><tr><td><%= report.date %></td><td><%= report.turno %></td><td><%= report.author_email %></td><td><%= report.inventory_for_display.nil? ? "—" : envasadora_number(report.inventory_for_display) %></td><td><%= report.historical? ? "Histórico importado" : report.sent_at? ? "Enviado" : "Pendiente" %></td><td><%= link_to "Ver reporte", report %></td></tr><% end %>
-<% if @reports.empty? %><tr><td colspan="6">Todavía no hay reportes.</td></tr><% end %>
+<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Fecha</th><th>Turno</th><th>Autor</th><th>Inventario (t)</th><th>Correo</th><th></th><%= record_author_headers %></tr></thead><tbody>
+<% @reports.each do |report| %><tr><td><%= report.date %></td><td><%= report.turno %></td><td><%= report.author_email %></td><td><%= report.inventory_for_display.nil? ? "—" : envasadora_number(report.inventory_for_display) %></td><td><%= report.historical? ? "Histórico importado" : report.sent_at? ? "Enviado" : "Pendiente" %></td><td><%= link_to "Ver reporte", report %></td><%= record_author_cells(report) %></tr><% end %>
+<% if @reports.empty? %><tr><td colspan="<%= 6 + record_author_labels.size %>">Todavía no hay reportes.</td></tr><% end %>
 </tbody></table></div>
 <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>

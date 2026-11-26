@@ -28,6 +28,9 @@ class MantencionImportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h2", text: "Resultado de la importación"
     assert_select ".text-success", text: "1"
+    imported = Mantencion.find_by!(actividad: "Inspección desde controlador")
+    assert_equal "jose.jerez@msindustrial.cl", imported.created_by_email
+    assert_nil imported.updated_by_email
   end
 
   test "rechaza la importación para otro usuario" do

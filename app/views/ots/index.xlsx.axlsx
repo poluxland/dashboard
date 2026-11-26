@@ -15,7 +15,7 @@ wb.add_worksheet(name: "OTs") do |sheet|
     "ESP", "Frecuencia", "Cód rep.", "Cant.", "$ Unitario", "$ Repuestos",
     "$ Servicio", "$ Total", "Cotización", "CC", "Responsable",
     "Contratista", "Tipo OT", "Estado", "Sem. ejec.", "N° Personas",
-    "Duración [hr]", "HH", "Causa", "Comentarios"
+    "Duración [hr]", "HH", "Causa", "Comentarios", *record_author_labels
   ], style: header
 
   # Filas
@@ -46,7 +46,8 @@ wb.add_worksheet(name: "OTs") do |sheet|
       ot.duracion_hr,           # int
       ot.hh,                    # int
       ot.causa,                 # text
-      ot.comentarios            # text (wrap)
+      ot.comentarios,           # text (wrap)
+      *record_author_values(ot)
     ], styles: [
       int,  # OT asignada
       int,  # Semana
@@ -73,7 +74,8 @@ wb.add_worksheet(name: "OTs") do |sheet|
       int,  # Duración [hr]
       int,  # HH
       text, # Causa
-      text  # Comentarios
+      text, # Comentarios
+      text, text
     ]
   end
 

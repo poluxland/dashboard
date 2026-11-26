@@ -33,11 +33,12 @@
         <th>Inspecciones y avance</th>
         <th>Fotos</th>
         <th class="text-end">Acciones</th>
+        <%= record_author_headers %>
       </tr>
     </thead>
     <tbody>
       <% if @works.empty? %>
-        <tr><td colspan="7" class="text-muted p-4">No hay trabajos para estos filtros.</td></tr>
+        <tr><td colspan="<%= 7 + record_author_labels.size %>" class="text-muted p-4">No hay trabajos para estos filtros.</td></tr>
       <% end %>
       <% @works.each do |work| %>
         <%= render partial: "row", locals: { work: work } %>

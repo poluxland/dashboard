@@ -27,12 +27,12 @@
   </div>
   <h2 class="h5">Últimas 30 cargas</h2>
   <div class="table-responsive"><table class="table table-striped align-middle">
-    <thead><tr><th>Carga</th><th>Archivo</th><th>Usuario</th><th>Nuevos</th><th>Duplicados</th><th>Revisar</th></tr></thead>
+    <thead><tr><th>Carga</th><th>Archivo</th><th>Usuario</th><th>Nuevos</th><th>Duplicados</th><th>Revisar</th><%= record_author_headers %></tr></thead>
     <tbody>
       <% @imports.each do |report| %>
-        <tr><td><%= report.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %></td><td><%= link_to report.filename, tpt_import_path(report) %></td><td><%= report.author_email %></td><td><%= report.imported_count %></td><td><%= report.duplicate_count %></td><td><%= report.issues.size %></td></tr>
+        <tr><td><%= report.created_at.in_time_zone("America/Santiago").strftime("%d/%m/%Y %H:%M") %></td><td><%= link_to report.filename, tpt_import_path(report) %></td><td><%= report.author_email %></td><td><%= report.imported_count %></td><td><%= report.duplicate_count %></td><td><%= report.issues.size %></td><%= record_author_cells(report) %></tr>
       <% end %>
-      <% if @imports.empty? %><tr><td colspan="6">Todavía no hay cargas. Selecciona el primer informe para comenzar.</td></tr><% end %>
+      <% if @imports.empty? %><tr><td colspan="<%= 6 + record_author_labels.size %>">Todavía no hay cargas. Selecciona el primer informe para comenzar.</td></tr><% end %>
     </tbody>
   </table></div>
 </div>

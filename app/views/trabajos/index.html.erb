@@ -58,6 +58,7 @@
           <th scope="col">Factura</th>
           <th scope="col">Centro de costo</th>
           <th scope="col" class="text-end">Total</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -73,6 +74,7 @@
             <td><%= trabajo.factura %></td>
             <td><%= trabajo.centro_costo %></td>
             <td class="text-end text-nowrap"><%= monto_trabajo(trabajo.total) %></td>
+            <%= record_author_cells(trabajo) %>
           </tr>
         <% end %>
       </tbody>

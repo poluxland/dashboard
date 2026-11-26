@@ -4,7 +4,7 @@ header = workbook.styles.add_style(b: true, fg_color: "FFFFFF", bg_color: "18315
 workbook.add_worksheet(name: "Checklists", escape_formulas: true) do |sheet|
   sheet.add_row [
     "N.º Dashboard", "N.º ERP", "Fecha (Chile)", "Equipo", "Código histórico", "Planta", "Operador", "Horómetro",
-    "Resultado", *EquipmentChecklist::QUESTIONS.values, "Comentarios"
+    "Resultado", *EquipmentChecklist::QUESTIONS.values, "Comentarios", *record_author_labels
   ], style: header
 
   @checklists.each do |record|
@@ -13,12 +13,12 @@ workbook.add_worksheet(name: "Checklists", escape_formulas: true) do |sheet|
       record.asset_label, record.legacy_code, record.plant_label, record.operator, record.hour_meter,
       EquipmentChecklist::STATUSES.fetch(record.status_key).first,
       *EquipmentChecklist::QUESTIONS.keys.map { |field| EquipmentChecklist::ANSWERS.fetch(record[field], record[field]) },
-      record.comments
+      record.comments, *record_author_values(record)
     ]
   end
 
-  sheet.column_widths 14, 14, 20, 20, 20, 22, 26, 14, 30, *Array.new(16, 20), 55
-  sheet.auto_filter = "A1:Z#{sheet.rows.size}"
+  sheet.column_widths 14, 14, 20, 20, 20, 22, 26, 14, 30, *Array.new(16, 20), 55, 32, 32
+  sheet.auto_filter = "A1:AB#{sheet.rows.size}"
   sheet.sheet_view.pane do |pane|
     pane.top_left_cell = "A2"
     pane.state = :frozen

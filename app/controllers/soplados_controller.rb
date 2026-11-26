@@ -86,9 +86,9 @@ class SopladosController < ApplicationController
 
   def soplados_csv(scope)
     CSV.generate(+"\uFEFF", col_sep: ";") do |csv|
-      csv << [ "N.º Dashboard", "N.º ERP", *Soplado::LABELS.values ]
+      csv << [ "N.º Dashboard", "N.º ERP", *Soplado::LABELS.values, *helpers.record_author_labels ]
       scope.each do |record|
-        cells = helpers.soplado_export_values(record).map do |value|
+        cells = [ *helpers.soplado_export_values(record), *helpers.record_author_values(record) ].map do |value|
           value.is_a?(String) && value.match?(/\A(?:[\t\r\n]|[[:space:]]*[=+\-@])/) ? "'#{value}" : value
         end
         csv << cells

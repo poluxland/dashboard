@@ -19,11 +19,17 @@ class ApplicationController < ActionController::Base
   allow_browser versions: { ie: false }
   include Pagy::Backend
 
+  around_action :track_record_author
   before_action :authenticate_user!
 
   helper_method :current_user, :signed_in?, :demo_user?, :task_admin?, :trabajos_access?
 
   private
+
+  def track_record_author(&action)
+    email = current_user[:email].to_s.strip.downcase.presence if signed_in?
+    RecordAuthor.set(tracking: true, email: email, &action)
+  end
 
   def current_user
     user = session[:user]

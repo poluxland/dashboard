@@ -6,6 +6,7 @@
           <th>Fecha</th><th>Patente</th><th>Materia prima</th><th>Tipo</th><th>Llegada</th>
           <% if details %><th>Salida</th><th>Espera (min)</th><th>Causa</th><% end %>
           <th><span class="visually-hidden">Acciones</span></th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -28,6 +29,7 @@
                 <%= link_to "Editar", edit_pmm_truck_path(truck), class: "btn btn-sm btn-outline-secondary" %>
               <% end %>
             </td>
+            <%= record_author_cells(truck) %>
           </tr>
         <% end %>
       </tbody>

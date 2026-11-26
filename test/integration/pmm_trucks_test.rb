@@ -39,6 +39,7 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     end
     truck = PmmTruck.find_by!(patente: "XY1234")
     assert_redirected_to pmm_trucks_path
+    assert_nil truck.created_by_email
     follow_redirect!
     assert_select "section[aria-label='Camiones sin salida'] a[href=?]", departure_pmm_truck_path(truck), text: "Registrar salida"
 
@@ -75,6 +76,51 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     get arrivals_pmm_trucks_path, params: { page: 2, observations: "comments" }
     assert_response :success
     assert_select "table[aria-label='Comentarios de camiones'] tbody tr", text: /ABC123/
+  end
+
+  test "registration and edits attribute the signed-in account without exposing emails to visitors" do
+    creator = "creador@msindustrial.cl"
+    editor = "editor@msindustrial.cl"
+    sign_in_with_google(email: creator)
+    post pmm_trucks_path, params: { pmm_truck: valid_fields.merge(created_by_email: editor) }
+    truck = PmmTruck.find_by!(patente: "XY1234")
+    assert_redirected_to pmm_truck_path(truck)
+    assert_equal creator, truck.created_by_email
+    assert_nil truck.updated_by_email
+
+    sign_in_with_google(email: editor)
+    patch pmm_truck_path(truck), params: { pmm_truck: { tipo: "BRU", updated_by_email: creator } }
+    assert_redirected_to pmm_truck_path(truck)
+    assert_equal [ creator, editor ], truck.reload.values_at(:created_by_email, :updated_by_email)
+    get pmm_trucks_path
+    assert_select "th", text: "Creado por"
+    assert_select "td", text: creator
+    assert_select "td", text: editor
+    get pmm_trucks_path(format: :xlsx)
+    assert_response :success
+    Zip::File.open_buffer(response.body) do |workbook|
+      contents = workbook.glob("xl/**/*.xml").map { |entry| entry.get_input_stream.read }.join
+      assert_includes contents, creator
+      assert_includes contents, editor
+    end
+
+    delete logout_path
+    get pmm_trucks_path
+    assert_select "th", text: "Creado por", count: 0
+    assert_not_includes response.body, creator
+    assert_not_includes response.body, editor
+    get pmm_trucks_path(format: :xlsx)
+    assert_response :success
+    Zip::File.open_buffer(response.body) do |workbook|
+      contents = workbook.glob("xl/**/*.xml").map { |entry| entry.get_input_stream.read }.join
+      assert_not_includes contents, creator
+      assert_not_includes contents, editor
+    end
+
+    patch departure_pmm_truck_path(truck), params: { pmm_truck: { salida: "00:10" } }
+    assert_redirected_to pmm_trucks_path
+    assert_equal creator, truck.reload.created_by_email
+    assert_nil truck.updated_by_email
   end
 
   test "a visitor can close an imported truck at midnight but cannot close archived arrivals" do

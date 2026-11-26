@@ -5,6 +5,7 @@
     <p class="small"><span class="badge text-bg-light"><%= Task::CATEGORIES[task.category] %></span> <span class="badge text-bg-light"><%= task.plant %></span></p>
     <% if !local_assigns[:compact] && task.description.present? %><div class="small text-muted mb-3" style="white-space: pre-wrap; overflow-wrap: anywhere"><%= task.description %></div><% end %>
     <p class="small mb-2 text-break"><i class="bi bi-person"></i> <%= task.assignee_email %></p>
+    <%= record_author_details(task) unless local_assigns[:compact] %>
     <p class="small <%= task.due_on && task.due_on < Time.current.in_time_zone('America/Santiago').to_date && task.status != 'done' ? 'text-danger' : 'text-muted' %>"><%= task.due_on ? "Fecha límite: #{task.due_on.strftime('%d/%m/%Y')}" : 'Sin fecha límite' %></p>
     <div class="<%= 'position-relative z-2' if local_assigns[:compact] %>"><%= render "tasks/checklist", task: task %></div>
     <% if task_admin? && !local_assigns[:compact] %><%= link_to "Editar tarea", edit_task_path(task), class: "btn btn-sm btn-outline-primary mt-2" %><% end %>

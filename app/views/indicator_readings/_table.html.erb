@@ -11,6 +11,7 @@
       <th class="text-end">HH %</th>
       <th class="text-end">Promedio %</th>
       <th></th>
+      <%= record_author_headers %>
     </tr>
   </thead>
   <tbody>
@@ -27,6 +28,7 @@
         <td class="text-nowrap">
           <%= link_to "Editar", edit_indicator_reading_path(r), class: "btn btn-sm btn-outline-primary" %>
         </td>
+        <%= record_author_cells(r) %>
       </tr>
     <% end %>
   </tbody>

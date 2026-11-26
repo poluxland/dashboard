@@ -183,6 +183,7 @@
             <th>F. Automático</th>
             <th>F. Tapa</th>
             <th>Acciones</th>
+            <%= record_author_headers %>
           </tr>
         </thead>
 
@@ -232,11 +233,12 @@
                     <%= link_to "Editar", edit_enfundado_path(enfundado), class: "enf-link" %>
                   </div>
                 </td>
+                <%= record_author_cells(enfundado) %>
               </tr>
             <% end %>
           <% else %>
             <tr>
-              <td colspan="9" class="enf-empty">No hay registros de enfundado todavía.</td>
+              <td colspan="<%= 9 + record_author_labels.size %>" class="enf-empty">No hay registros de enfundado todavía.</td>
             </tr>
           <% end %>
         </tbody>

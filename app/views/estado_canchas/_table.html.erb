@@ -8,6 +8,7 @@
             <th scope="col" class="text-end"><%= name %></th>
           <% end %>
           <th scope="col">Observaciones</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -19,6 +20,7 @@
               <td class="text-end text-nowrap"><%= value.nil? ? "—" : "#{value} %" %></td>
             <% end %>
             <td style="min-width: 12rem; white-space: pre-wrap;"><%= record.observaciones.presence || "—" %></td>
+            <%= record_author_cells(record) %>
           </tr>
         <% end %>
       </tbody>

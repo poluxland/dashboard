@@ -42,6 +42,8 @@ class OvertimeReviewTest < ActionDispatch::IntegrationTest
     assert_redirected_to overtime_entries_path
     assert_equal [ "Aprobada", "Aprobada" ], [ @first.reload.estado, @second.reload.estado ]
     assert_equal EMAIL, @first.overtime_reviews.last.reviewer_email
+    assert_equal EMAIL, @first.updated_by_email
+    assert_equal EMAIL, @first.overtime_reviews.last.created_by_email
 
     assert_no_difference "OvertimeReview.count" do
       patch review_overtime_entries_path, params: { ids: [ @first.id ], decision: "Rechazada", reason: "Corrección" }

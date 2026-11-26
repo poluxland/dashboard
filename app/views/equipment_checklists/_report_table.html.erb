@@ -5,6 +5,7 @@
         <tr>
           <th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Equipo</th><th scope="col">Planta</th>
           <th scope="col">Responsable</th><th scope="col">Horómetro</th><th scope="col">Resultado</th><th scope="col">Comentarios</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -20,6 +21,7 @@
             <td><%= row.meter_reading %></td>
             <td><span class="badge text-bg-<%= color %>"><%= status %></span></td>
             <td><%= truncate(row.report_comments, length: 110) %></td>
+            <%= record_author_cells(row) %>
           </tr>
         <% end %>
       </tbody>

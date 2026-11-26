@@ -10,6 +10,7 @@
     </div>
   </div>
   <%= render "navigation" %>
+  <%= record_author_details(@truck) %>
   <dl class="row card-body border rounded">
     <% { "Fecha" => @truck.fecha&.strftime("%d/%m/%Y"), "Materia prima" => @truck.pmm_material.nombre, "Tipo" => @truck.tipo,
           "Llegada" => pmm_time(@truck.llegada), "Llamada" => pmm_time(@truck.llamada), "Salida" => (@truck.pending? ? "En planta" : pmm_time(@truck.salida)),

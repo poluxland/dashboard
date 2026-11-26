@@ -35,6 +35,7 @@
           <th class="text-start">Causa</th>
           
           <th class="text-center">Acciones</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -90,6 +91,7 @@
                       class: "btn btn-outline-danger" %>
               </div>
             </td>
+            <%= record_author_cells(ot) %>
           </tr>
         <% end %>
       </tbody>

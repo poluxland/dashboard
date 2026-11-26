@@ -2,10 +2,10 @@ workbook = xlsx_package.workbook
 header = workbook.styles.add_style(b: true, fg_color: "FFFFFF", bg_color: "215A45", alignment: { wrap_text: true })
 
 workbook.add_worksheet(name: "Soplado TC", escape_formulas: true) do |sheet|
-  sheet.add_row [ "N.º Dashboard", "N.º ERP", *Soplado::LABELS.values ], style: header
-  @soplados.each { |record| sheet.add_row soplado_export_values(record) }
-  sheet.column_widths 14, 14, 21, 25, *Array.new(10, 15), 14, 20, 17, 17, 45
-  sheet.auto_filter = "A1:#{Axlsx.col_ref(Soplado::LABELS.size + 1)}#{sheet.rows.size}"
+  sheet.add_row [ "N.º Dashboard", "N.º ERP", *Soplado::LABELS.values, *record_author_labels ], style: header
+  @soplados.each { |record| sheet.add_row [ *soplado_export_values(record), *record_author_values(record) ] }
+  sheet.column_widths 14, 14, 21, 25, *Array.new(10, 15), 14, 20, 17, 17, 45, 32, 32
+  sheet.auto_filter = "A1:#{Axlsx.col_ref(Soplado::LABELS.size + 1 + record_author_labels.size)}#{sheet.rows.size}"
   sheet.sheet_view.pane do |pane|
     pane.top_left_cell = "A2"
     pane.state = :frozen

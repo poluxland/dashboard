@@ -50,7 +50,8 @@ class EquipmentInspectionReport
         *EquipmentChecklist::QUESTIONS.values.map { |question| "Operador · #{question}" },
         *HISTORICAL_OPERATOR_FIELDS.map { |field| "Operador · Campo histórico #{field}" },
         *MaintenanceChecklist::QUESTIONS.values.map { |question| "Mantenedor · #{question}" },
-        *MaintenanceChecklist::FLUIDS.values
+        *MaintenanceChecklist::FLUIDS.values,
+        "Creado por", "Última modificación por"
       ]
       scope.find_in_batches(cursor: %i[created_at kind id], order: %i[desc asc desc]) do |rows|
         operators = EquipmentChecklist.where(id: rows.select { |row| row.kind == "operador" }.map(&:id)).index_by(&:id)
@@ -65,7 +66,8 @@ class EquipmentInspectionReport
             *EquipmentChecklist::QUESTIONS.keys.map { |field| operator&.[](field) },
             *HISTORICAL_OPERATOR_FIELDS.map { |field| operator&.[](field) },
             *MaintenanceChecklist::QUESTIONS.keys.map { |field| MaintenanceChecklist::ANSWERS.fetch(maintainer[field]) if maintainer },
-            *MaintenanceChecklist::FLUIDS.keys.map { |field| maintainer&.[](field) }
+            *MaintenanceChecklist::FLUIDS.keys.map { |field| maintainer&.[](field) },
+            row.created_by_email, row.updated_by_email
           ]
           file << values.map { |value| safe_cell(value) }
         end
@@ -87,7 +89,8 @@ class EquipmentInspectionReport
              COALESCE(NULLIF(asset.code, ''), NULLIF(equipment_checklists.legacy_code, '')) AS asset_code,
              #{plant_code("equipment_checklists.c17")} AS report_plant,
              equipment_checklists.operator AS inspector, equipment_checklists.hour_meter::text AS meter_reading,
-             (#{EquipmentChecklist::STATUS_SQL}) AS report_status, equipment_checklists.comments AS report_comments
+             (#{EquipmentChecklist::STATUS_SQL}) AS report_status, equipment_checklists.comments AS report_comments,
+             equipment_checklists.created_by_email, equipment_checklists.updated_by_email
       FROM equipment_checklists
       #{asset_join("equipment_checklists")}
     SQL
@@ -105,7 +108,7 @@ class EquipmentInspectionReport
                WHEN 'Observaciones' THEN 'observaciones'
                WHEN 'Fuera de servicio' THEN 'fuera_servicio'
                ELSE 'sin_estado'
-             END AS report_status, NULL::text AS report_comments
+             END AS report_status, NULL::text AS report_comments, record.created_by_email, record.updated_by_email
       FROM maintenance_checklists AS record
       #{asset_join("record")}
     SQL

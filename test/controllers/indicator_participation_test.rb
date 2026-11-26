@@ -49,6 +49,27 @@ class IndicatorParticipationTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, @existing.name
   end
 
+  test "the monthly matrix records separate authors and preserves them on an unchanged submission" do
+    month = "2026-10"
+    rows = { @existing.id => { cuasi: 1, lvs: 2, cc: 3, hh: 4 } }
+    post matrix_save_indicator_readings_path, params: { month: month, rows: rows }
+    assert_redirected_to matrix_indicator_readings_path(month: month)
+    reading = @existing.indicator_readings.find_by!(period: Date.new(2026, 10, 1))
+    assert_equal "usuario@msindustrial.cl", reading.created_by_email
+    assert_nil reading.updated_by_email
+
+    sign_in_with_google(email: "editor@msindustrial.cl")
+    rows[@existing.id][:hh] = 5
+    post matrix_save_indicator_readings_path, params: { month: month, rows: rows }
+    assert_redirected_to matrix_indicator_readings_path(month: month)
+    assert_equal "usuario@msindustrial.cl", reading.reload.created_by_email
+    assert_equal "editor@msindustrial.cl", reading.updated_by_email
+
+    sign_in_with_google(email: "otro@msindustrial.cl")
+    post matrix_save_indicator_readings_path, params: { month: month, rows: rows }
+    assert_equal "editor@msindustrial.cl", reading.reload.updated_by_email
+  end
+
   test "roster migration matches accents preserves eligibility and is idempotent" do
     @existing.update!(name: "  Hector ampuero  ")
     migration = AssignPtmRoster.new

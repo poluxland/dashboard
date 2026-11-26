@@ -126,7 +126,7 @@ class MantencionExcelImporter
     pending_rows << record.attributes.symbolize_keys.slice(
       *FINGERPRINT_FIELDS,
       :source_fingerprint
-    ).merge(created_at: timestamp, updated_at: timestamp)
+    ).merge(created_at: timestamp, updated_at: timestamp, created_by_email: RecordAuthor.email)
     known_fingerprints << fingerprint
   end
 

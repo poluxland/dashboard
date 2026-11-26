@@ -1,5 +1,6 @@
 <section class="container-lg py-4">
   <h1 class="h2 mb-3">Checklist de mantenedor · <%= @checklist.asset_label %></h1>
+  <%= record_author_details(@checklist) %>
   <%= render "equipment_checklists/navigation" %>
   <div class="card card-body mb-4">
     <dl class="row mb-0">

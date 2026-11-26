@@ -9,8 +9,8 @@
   <% end %>
   <p class="small text-body-secondary">Hora de inicio tal como aparece en el informe, sin conversión de zona horaria. Las duraciones negativas se conservan y se excluyen de las horas acumuladas.</p>
   <div class="table-responsive"><table class="table table-striped">
-    <thead><tr><th>Fila Excel</th><th>Hora de inicio</th><th>Impacto</th><th>Estado de producción</th><th>Razón</th><th>Duración (s)</th></tr></thead>
-    <tbody><% @events.each do |event| %><tr class="<%= 'table-warning' if event.duration_seconds.negative? %>"><td><%= event.source_row %></td><td class="text-nowrap"><%= event.started_at.utc.strftime("%d/%m/%Y %H:%M:%S.%6N") %></td><td><%= event.impact %></td><td><%= event.production_state %></td><td><%= event.reason %></td><td><%= number_with_precision(event.duration_seconds, precision: 6) %></td></tr><% end %></tbody>
+    <thead><tr><th>Fila Excel</th><th>Hora de inicio</th><th>Impacto</th><th>Estado de producción</th><th>Razón</th><th>Duración (s)</th><%= record_author_headers %></tr></thead>
+    <tbody><% @events.each do |event| %><tr class="<%= 'table-warning' if event.duration_seconds.negative? %>"><td><%= event.source_row %></td><td class="text-nowrap"><%= event.started_at.utc.strftime("%d/%m/%Y %H:%M:%S.%6N") %></td><td><%= event.impact %></td><td><%= event.production_state %></td><td><%= event.reason %></td><td><%= number_with_precision(event.duration_seconds, precision: 6) %></td><%= record_author_cells(event) %></tr><% end %></tbody>
   </table></div>
   <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
 </div>

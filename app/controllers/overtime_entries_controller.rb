@@ -68,7 +68,9 @@ class OvertimeEntriesController < ApplicationController
   end
 
   def review
-    count = OvertimeBatchReview.call(reviewer: @reviewer, ids: params[:ids], status: params[:decision], reason: params[:reason])
+    count = RecordAuthor.set(email: @reviewer) do
+      OvertimeBatchReview.call(reviewer: @reviewer, ids: params[:ids], status: params[:decision], reason: params[:reason])
+    end
     redirect_to overtime_entries_path, notice: "#{count} #{count == 1 ? 'registro actualizado' : 'registros actualizados'}."
   rescue OvertimeBatchReview::InvalidReview => error
     redirect_to overtime_entries_path, alert: error.message

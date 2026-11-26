@@ -5,20 +5,20 @@ amount = workbook.styles.add_style(format_code: "#,##0")
 
 workbook.add_worksheet(name: "Cotizaciones", escape_formulas: true) do |sheet|
   sheet.add_row [ "Referencia", "Planta", "Descripción", "Solicitante", "Estado", "Fecha de término", "OP", "Factura",
-                  "Centro de costo", "Total (CLP)", "Clasificación", "Observaciones", "Detalle", "Otros antecedentes" ], style: header
+                  "Centro de costo", "Total (CLP)", "Clasificación", "Observaciones", "Detalle", "Otros antecedentes", *record_author_labels ], style: header
 
   @trabajos.each do |trabajo|
     sheet.add_row [
       trabajo.referencia.to_s, nombre_planta_trabajo(trabajo.planta), trabajo.descripcion, trabajo.ito,
       estado_trabajo(trabajo.avance), trabajo.fecha_termino, trabajo.op, trabajo.factura, trabajo.centro_costo,
-      trabajo.total, trabajo.supervisor, trabajo.observaciones, trabajo.detalle, trabajo.otros
+      trabajo.total, trabajo.supervisor, trabajo.observaciones, trabajo.detalle, trabajo.otros, *record_author_values(trabajo)
     ], types: [ :string, :string, :string, :string, :string, :date, :integer, :integer, :string, :integer,
-                :string, :string, :string, :string ],
+                :string, :string, :string, :string, :string, :string ],
        style: [ nil, nil, nil, nil, nil, date, nil, nil, nil, amount ]
   end
 
-  sheet.column_widths 15, 20, 50, 28, 20, 18, 14, 14, 18, 18, 22, 45, 45, 45
-  sheet.auto_filter = "A1:N#{sheet.rows.size}"
+  sheet.column_widths 15, 20, 50, 28, 20, 18, 14, 14, 18, 18, 22, 45, 45, 45, 32, 32
+  sheet.auto_filter = "A1:P#{sheet.rows.size}"
   sheet.sheet_view.pane do |pane|
     pane.top_left_cell = "A2"
     pane.state = :frozen

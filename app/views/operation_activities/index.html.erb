@@ -76,6 +76,7 @@
                 <th scope="col">Tipo</th>
                 <th scope="col" class="text-end">Estado</th>
                 <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                <%= record_author_headers %>
               </tr>
             </thead>
             <tbody>
@@ -87,6 +88,7 @@
                   <td><%= activity.tipo %></td>
                   <td class="text-end text-nowrap"><%= number_to_percentage(activity.estado, precision: 2, strip_insignificant_zeros: true) %></td>
                   <td class="text-end"><%= link_to "Editar", edit_operation_activity_path(activity), class: "btn btn-sm btn-outline-secondary" %></td>
+                  <%= record_author_cells(activity) %>
                 </tr>
               <% end %>
             </tbody>

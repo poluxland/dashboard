@@ -16,6 +16,7 @@
             <th>Duración del trabajo</th>
             <th>Comentarios</th>
             <th class="text-end">Acciones</th>
+            <%= record_author_headers %>
           </tr>
         </thead>
 
@@ -62,11 +63,12 @@
                   <%= link_to "Ver", mantencion_path(mantencion), class: "btn btn-sm btn-outline-secondary" %>
                   <%= link_to "Editar", edit_mantencion_path(mantencion), class: "btn btn-sm btn-outline-primary" %>
                 </td>
+                <%= record_author_cells(mantencion) %>
               </tr>
             <% end %>
           <% else %>
             <tr>
-              <td colspan="13" class="text-center text-body-secondary py-5">
+              <td colspan="<%= 13 + record_author_labels.size %>" class="text-center text-body-secondary py-5">
                 <%= @search_query.present? ? "No se encontraron mantenciones para “#{@search_query}”." : "No hay mantenciones registradas para esta vista." %>
               </td>
             </tr>

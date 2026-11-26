@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_182000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "author_email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["date"], name: "index_clinker_transfers_on_date", unique: true
   end
 
@@ -91,6 +93,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "operador"
     t.string "turno"
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "entrega_films", force: :cascade do |t|
@@ -100,6 +104,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "operador_bodega"
     t.integer "rollos_entregados"
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "envasadora_reports", force: :cascade do |t|
@@ -218,6 +224,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.jsonb "source_data", default: {}, null: false
     t.integer "sacos_no_reconocidos_vento"
     t.integer "sacos_descartados_vento"
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["source_fingerprint"], name: "index_envasadora_reports_on_source_fingerprint", unique: true
     t.index ["date", "turno"], name: "index_envasadora_reports_on_date_and_turno"
   end
@@ -261,6 +269,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.text "comments"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["created_at", "id"], name: "index_equipment_checklists_on_created_at_and_id"
     t.index ["erp_id"], name: "index_equipment_checklists_on_erp_id", unique: true
     t.index ["mobile_asset_id"], name: "index_equipment_checklists_on_mobile_asset_id"
@@ -285,6 +295,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.text "observaciones"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["created_at", "id"], name: "index_estado_canchas_on_created_at_and_id"
     t.index ["pmm_id"], name: "index_estado_canchas_on_pmm_id", unique: true
   end
@@ -305,6 +317,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "estado_ruedas"
     t.integer "estado_sistema_aire"
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "haver_daily_deliveries", force: :cascade do |t|
@@ -324,6 +338,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.date "period", null: false
     t.bigint "person_id", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["person_id", "period"], name: "idx_unique_person_period", unique: true
     t.index ["person_id"], name: "index_indicator_readings_on_person_id"
   end
@@ -362,6 +378,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "nuto_oil"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["created_at", "id"], name: "index_maintenance_checklists_on_created_at_and_id"
     t.index ["erp_id"], name: "index_maintenance_checklists_on_erp_id", unique: true
     t.index ["mobile_asset_id"], name: "index_maintenance_checklists_on_mobile_asset_id"
@@ -383,6 +401,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "source_fingerprint"
     t.string "tipo_mantencion", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["especialidad"], name: "index_mantenciones_on_especialidad"
     t.index ["fecha"], name: "index_mantenciones_on_fecha"
     t.index ["numero_ot"], name: "index_mantenciones_on_numero_ot"
@@ -401,6 +421,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["erp_id"], name: "index_mobile_assets_on_erp_id", unique: true
   end
 
@@ -422,6 +444,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "tiempo"
     t.datetime "updated_at", null: false
     t.integer "uso_jetin"
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "operation_activities", force: :cascade do |t|
@@ -432,6 +456,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.decimal "estado", precision: 5, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["fecha"], name: "index_operation_activities_on_fecha"
     t.check_constraint "estado >= 0::numeric AND estado <= 100::numeric", name: "operation_activities_estado_range"
   end
@@ -482,6 +508,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "total"
     t.integer "unitario"
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["ot_asignada"], name: "index_ots_on_ot_asignada", unique: true
   end
 
@@ -504,6 +532,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "author_email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["erp_id"], name: "index_overtime_entries_on_erp_id", unique: true
     t.index ["estado", "mandante", "fecha"], name: "index_overtime_entries_on_estado_and_mandante_and_fecha"
   end
@@ -532,6 +562,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "status", null: false
     t.text "reason"
     t.datetime "created_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["overtime_entry_id"], name: "index_overtime_reviews_on_overtime_entry_id"
   end
 
@@ -543,6 +575,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "planta"
     t.boolean "shift_report_enabled", default: true, null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["area"], name: "index_people_on_area"
     t.index ["name"], name: "index_people_on_name", unique: true
   end
@@ -559,6 +593,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "numero"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["fecha"], name: "index_pmm_bru_visits_on_fecha"
     t.index ["pmm_id"], name: "index_pmm_bru_visits_on_pmm_id", unique: true
   end
@@ -571,6 +607,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "densidad"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["pmm_id"], name: "index_pmm_materials_on_pmm_id", unique: true
   end
 
@@ -598,6 +636,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.boolean "finished"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["created_at", "id"], name: "index_pmm_trucks_on_created_at_and_id"
     t.index ["fecha"], name: "index_pmm_trucks_on_fecha"
     t.index ["pmm_id"], name: "index_pmm_trucks_on_pmm_id", unique: true
@@ -615,6 +655,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.boolean "operativa"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["pmm_id"], name: "index_pmm_yards_on_pmm_id", unique: true
     t.index ["pmm_material_id"], name: "index_pmm_yards_on_pmm_material_id"
   end
@@ -630,6 +672,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "signer_name", null: false
     t.text "statement", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "soplados", force: :cascade do |t|
@@ -653,6 +697,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.text "observaciones"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["erp_id"], name: "index_soplados_on_erp_id", unique: true
     t.index ["fecha", "id"], name: "index_soplados_on_fecha_and_id"
   end
@@ -664,6 +710,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "author_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["task_id"], name: "index_task_comments_on_task_id"
   end
 
@@ -674,6 +722,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.boolean "completed", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["task_id"], name: "index_task_items_on_task_id"
   end
 
@@ -702,6 +752,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "priority", default: "normal", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["assignee_email", "status", "due_on"], name: "index_tasks_on_assignee_email_and_status_and_due_on"
     t.check_constraint "category::text = ANY (ARRAY['safety'::character varying, 'people'::character varying, 'operations'::character varying]::text[])", name: "tasks_category_allowed"
   end
@@ -717,6 +769,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "source_fingerprint", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["source_fingerprint"], name: "index_tpt_events_on_source_fingerprint", unique: true
     t.index ["started_at"], name: "index_tpt_events_on_started_at"
     t.index ["tpt_import_id"], name: "index_tpt_events_on_tpt_import_id"
@@ -731,6 +785,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.jsonb "issues", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "trabajos", force: :cascade do |t|
@@ -787,6 +843,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "v12"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["author_email"], name: "index_trabajos_on_author_email"
     t.index ["avance", "planta", "fecha_termino"], name: "index_trabajos_on_avance_and_planta_and_fecha_termino"
     t.index ["erp_id"], name: "index_trabajos_on_erp_id", unique: true
@@ -800,6 +858,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.text "observations"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["work_inspection_id", "position"], name: "index_work_inspection_items_on_work_inspection_id_and_position", unique: true
     t.index ["work_inspection_id"], name: "index_work_inspection_items_on_work_inspection_id"
   end
@@ -811,6 +871,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["work_id", "template_key"], name: "index_work_inspections_on_work_id_and_template_key", unique: true
     t.index ["work_id"], name: "index_work_inspections_on_work_id"
   end
@@ -835,6 +897,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.string "supervisor"
     t.string "tag"
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
   end
 
   create_table "ptm_events", force: :cascade do |t|
@@ -847,6 +911,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.integer "source_row"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["ptm_report_id"], name: "index_ptm_events_on_ptm_report_id"
   end
 
@@ -861,6 +927,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_051000) do
     t.text "review_notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "created_by_email"
+    t.string "updated_by_email"
     t.index ["date", "shift"], name: "index_ptm_reports_on_date_and_shift", unique: true
     t.index ["source_key"], name: "index_ptm_reports_on_source_key", unique: true
   end

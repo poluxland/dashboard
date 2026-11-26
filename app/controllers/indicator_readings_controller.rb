@@ -180,7 +180,7 @@ end
     end
 
     now  = Time.current
-    upserts = rows.map do |pid, vals|
+    upserts = rows.each_pair.map do |pid, vals|
       {
         person_id: pid.to_i,
         period: month.beginning_of_month,
@@ -188,11 +188,17 @@ end
         lvs:   to_num(vals[:lvs]),
         cc:    to_num(vals[:cc]),
         hh:    to_num(vals[:hh]),
-        created_at: now, updated_at: now
+        created_at: now, updated_at: now, created_by_email: RecordAuthor.email
       }
     end
 
-    IndicatorReading.upsert_all(upserts, unique_by: :idx_unique_person_period)
+    updates = Arel.sql(<<~SQL)
+      cuasi = EXCLUDED.cuasi, lvs = EXCLUDED.lvs, cc = EXCLUDED.cc, hh = EXCLUDED.hh,
+      updated_at = EXCLUDED.updated_at, updated_by_email = EXCLUDED.created_by_email
+      WHERE (indicator_readings.cuasi, indicator_readings.lvs, indicator_readings.cc, indicator_readings.hh)
+        IS DISTINCT FROM (EXCLUDED.cuasi, EXCLUDED.lvs, EXCLUDED.cc, EXCLUDED.hh)
+    SQL
+    IndicatorReading.upsert_all(upserts, unique_by: :idx_unique_person_period, on_duplicate: updates)
     redirect_to matrix_indicator_readings_path(month: month.strftime("%Y-%m")), notice: "Planilla guardada."
   end
 

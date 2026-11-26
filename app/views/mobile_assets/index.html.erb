@@ -11,6 +11,7 @@
         <tr>
           <th scope="col">Código</th><th scope="col">Marca</th><th scope="col">Modelo</th>
           <th scope="col">Planta</th><th scope="col">Año</th><th scope="col">Otros</th>
+          <%= record_author_headers %>
         </tr>
       </thead>
       <tbody>
@@ -20,6 +21,7 @@
             <td><%= asset.brand %></td><td><%= asset.model %></td>
             <td><%= EquipmentChecklist::PLANTS[EquipmentChecklist.plant_code(asset.plant)] || "—" %></td>
             <td><%= asset.year %></td><td><%= truncate(asset.notes, length: 110) %></td>
+            <%= record_author_cells(asset) %>
           </tr>
         <% end %>
       </tbody>

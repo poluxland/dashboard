@@ -18,6 +18,7 @@
         <th>Servicios</th>
         <th>Despacho</th>
         <th></th>
+        <%= record_author_headers %>
       </tr>
     </thead>
     <tbody>
@@ -43,6 +44,7 @@
             <%= link_to "Editar", edit_monthly_record_path(r), class: "btn btn-sm btn-outline-primary" %>
             <%= link_to "Eliminar", r, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar?" }, class: "btn btn-sm btn-outline-danger" %>
           </td>
+          <%= record_author_cells(r) %>
         </tr>
       <% end %>
     </tbody>

@@ -6,6 +6,7 @@
           <th scope="col" class="text-nowrap"><%= label %></th>
         <% end %>
         <% if actions %><th scope="col">Acciones</th><% end %>
+        <%= record_author_headers %>
       </tr>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
               <%= link_to "Editar", edit_soplado_path(soplado), class: "btn btn-sm btn-outline-primary" %>
             </td>
           <% end %>
+          <%= record_author_cells(soplado) %>
         </tr>
       <% end %>
     </tbody>
