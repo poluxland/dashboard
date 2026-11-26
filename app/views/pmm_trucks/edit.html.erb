@@ -3,7 +3,7 @@
   <h1 class="h3 mb-3">Editar camión</h1>
   <%= render "form" %>
 
-  <% if task_admin? %>
+  <% if can_delete_truck? %>
     <div class="border-top mt-4 pt-3 d-flex justify-content-end">
       <%= button_to "Eliminar registro", pmm_truck_path(@truck), method: :delete,
                     class: "btn btn-sm btn-outline-danger",

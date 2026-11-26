@@ -162,7 +162,7 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
     assert_redirected_to arrivals_pmm_trucks_path
   end
 
-  test "only administrators have a confirmed delete action in the truck edit page" do
+  test "only authorized accounts can delete trucks through the edit page" do
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     get pmm_truck_path(@legacy)
     assert_response :success
@@ -183,6 +183,15 @@ class PmmTrucksTest < ActionDispatch::IntegrationTest
       delete pmm_truck_path(@legacy)
     end
     assert_response :forbidden
+
+    sign_in_with_google(email: "maria-jesus.ibanez@msindustrial.cl")
+    get edit_pmm_truck_path(@legacy)
+    assert_response :success
+    assert_select "button", text: "Eliminar registro", count: 1
+    assert_difference "PmmTruck.count", -1 do
+      delete pmm_truck_path(@legacy)
+    end
+    assert_redirected_to history_pmm_trucks_path
   end
 
   test "reports include completed waits and BRU visits, and catalogs reference the imported material" do

@@ -1,10 +1,13 @@
 class PmmTrucksController < ApplicationController
   EXPORT_LIMIT = 5000
+  ADDITIONAL_DELETE_EMAILS = %w[maria-jesus.ibanez@msindustrial.cl].freeze
+
+  helper_method :can_delete_truck?
   skip_before_action :authenticate_user!, only: %i[index month new create departure record_departure]
   rate_limit to: 30, within: 1.minute, only: %i[create record_departure]
   before_action :set_truck, only: %i[show edit update destroy]
   before_action :set_on_site_truck, only: %i[departure record_departure]
-  before_action :require_truck_admin!, only: :destroy
+  before_action :require_truck_delete_permission!, only: :destroy
 
   def index
     respond_to do |format|
@@ -163,7 +166,11 @@ class PmmTrucksController < ApplicationController
     params.expect(pmm_truck: PmmTruck::INPUTS)
   end
 
-  def require_truck_admin!
-    head :forbidden unless task_admin?
+  def can_delete_truck?
+    task_admin? || (signed_in? && ADDITIONAL_DELETE_EMAILS.include?(current_user[:email].to_s.downcase))
+  end
+
+  def require_truck_delete_permission!
+    head :forbidden unless can_delete_truck?
   end
 end
