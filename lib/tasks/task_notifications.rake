@@ -23,6 +23,11 @@ namespace :tasks do
         Rails.logger.error("Operations weekly report delivery failed: #{error.class}")
       end
       begin
+        AprWeeklyDelivery.dispatch_due
+      rescue StandardError => error
+        Rails.logger.error("APR weekly report delivery failed: #{error.class}")
+      end
+      begin
         OperatorChecklistReportDelivery.dispatch_due
       rescue StandardError => error
         Rails.logger.error("Operator checklist report scheduler failed: #{error.class}")

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_27_195000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_203000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_27_195000) do
     t.index ["plant", "date"], name: "index_apr_history_entries_on_plant_and_date"
     t.index ["source_file", "source_sheet", "source_row"], name: "index_apr_history_entries_on_source", unique: true
     t.check_constraint "end_date >= date", name: "apr_history_entries_valid_date_range"
+  end
+
+  create_table "apr_weekly_deliveries", force: :cascade do |t|
+    t.date "week_start", null: false
+    t.datetime "sent_at"
+    t.string "recipients", default: [], null: false, array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["week_start"], name: "index_apr_weekly_deliveries_on_week_start", unique: true
   end
 
   create_table "dashboard_users", force: :cascade do |t|

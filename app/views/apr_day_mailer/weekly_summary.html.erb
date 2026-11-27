@@ -1,0 +1,41 @@
+<h1>Resumen semanal de actividades APR</h1>
+<p><%= @report.start_date.strftime("%d-%m-%Y") %> al <%= @report.end_date.strftime("%d-%m-%Y") %></p>
+<p><strong><%= pluralize(@report.activities.size, "actividad", plural: "actividades") %> · <%= apr_duration(@report.total_minutes) %></strong></p>
+<p>Hallazgos graves <strong><%= @report.serious_count %></strong> · Seguimientos pendientes <strong><%= @report.pending.size %></strong></p>
+
+<% if @report.activities.empty? %>
+  <p>Sin actividades registradas en el período.</p>
+<% end %>
+<% @report.by_plant.each do |plant, activities| %>
+  <h2><%= AprDay::PLANTS.fetch(plant) %> · <%= apr_duration(activities.sum(&:duration_minutes)) %></h2>
+  <table style="border-collapse: collapse; width: 100%" cellpadding="6" border="1">
+    <thead>
+      <tr><th scope="col">Fecha</th><th scope="col">Sector</th><th scope="col">Actividad</th><th scope="col">Tiempo</th><th scope="col">Resultado</th></tr>
+    </thead>
+    <tbody>
+      <% activities.each do |record| %>
+        <tr>
+          <td><%= record.apr_day.date.strftime("%d-%m") %></td>
+          <td><%= record.sector %></td>
+          <td><%= link_to record.title, apr_activity_url(record) %><br><%= record.activity_type %></td>
+          <td><%= apr_duration(record.duration_minutes) %></td>
+          <td>
+            <%= AprActivity::OUTCOMES.fetch(record.outcome) %>
+            <% if record.severity %><br><strong><%= AprActivity::SEVERITIES.fetch(record.severity) %></strong><% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @report.pending.any? %>
+  <h2>Seguimientos pendientes</h2>
+  <ul>
+    <% @report.pending.each do |record| %>
+      <li><%= link_to record.title, apr_activity_url(record) %> · <%= record.responsible %> · Compromiso <%= record.due_on.strftime("%d-%m-%Y") %> · <%= AprActivity::FOLLOW_UP_STATUSES.fetch(record.follow_up_status) %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p><%= link_to "Abrir Registro de actividades", apr_activities_url(date: @report.end_date) %></p>

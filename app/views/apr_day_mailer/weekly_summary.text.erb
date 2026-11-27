@@ -1,0 +1,26 @@
+Resumen semanal de actividades APR
+<%= @report.start_date.strftime("%d-%m-%Y") %> al <%= @report.end_date.strftime("%d-%m-%Y") %>
+
+<%= pluralize(@report.activities.size, "actividad", plural: "actividades") %> · <%= apr_duration(@report.total_minutes) %>
+Hallazgos graves: <%= @report.serious_count %>
+Seguimientos pendientes: <%= @report.pending.size %>
+
+<% if @report.activities.empty? %>
+Sin actividades registradas en el período.
+<% end %>
+<% @report.by_plant.each do |plant, activities| %>
+<%= AprDay::PLANTS.fetch(plant) %> · <%= apr_duration(activities.sum(&:duration_minutes)) %>
+<% activities.each do |record| %>
+- <%= record.apr_day.date.strftime("%d-%m") %> · <%= record.sector %> · <%= record.activity_type %> · <%= record.title %> · <%= apr_duration(record.duration_minutes) %> · <%= AprActivity::OUTCOMES.fetch(record.outcome) %><%= " · #{AprActivity::SEVERITIES.fetch(record.severity)}" if record.severity %>
+  <%= apr_activity_url(record) %>
+<% end %>
+
+<% end %>
+<% if @report.pending.any? %>
+Seguimientos pendientes
+<% @report.pending.each do |record| %>
+- <%= record.title %> · <%= record.responsible %> · Compromiso <%= record.due_on.strftime("%d-%m-%Y") %> · <%= AprActivity::FOLLOW_UP_STATUSES.fetch(record.follow_up_status) %>
+<% end %>
+
+<% end %>
+Registro de actividades: <%= apr_activities_url(date: @report.end_date) %>
