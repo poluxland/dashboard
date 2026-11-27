@@ -60,9 +60,9 @@ por planta, configura `APR_ACTIVITY_REPORT_RECIPIENTS_PTM`,
 El correo del APR se utiliza para las respuestas.
 
 El proceso `task_notifications` envía el resumen semanal los lunes, desde las
-08:00 en America/Santiago. Incluye las actividades del registro diario de la
-semana anterior, aunque el APR todavía tenga el día abierto. Configura
-`APR_WEEKLY_REPORT_RECIPIENTS` con los correos separados por comas.
+08:00 en America/Santiago. Incluye las actividades de la semana anterior del
+registro diario, aunque el APR todavía tenga el día abierto, y del Histórico.
+Configura `APR_WEEKLY_REPORT_RECIPIENTS` con los correos separados por comas.
 
 **Histórico** conserva las actividades y los comentarios de Seguridad PTM
 en una vista de consulta. Los administradores del Dashboard tienen acceso y se

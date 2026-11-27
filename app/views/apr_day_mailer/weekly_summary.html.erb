@@ -1,9 +1,11 @@
 <h1>Resumen semanal de actividades APR</h1>
 <p><%= @report.start_date.strftime("%d-%m-%Y") %> al <%= @report.end_date.strftime("%d-%m-%Y") %></p>
-<p><strong><%= pluralize(@report.activities.size, "actividad", plural: "actividades") %> · <%= apr_duration(@report.total_minutes) %></strong></p>
+<p><strong><%= pluralize(@report.activity_count, "actividad", plural: "actividades") %></strong>
+  <% if @report.activities.any? %> · Tiempo informado <%= apr_duration(@report.total_minutes) %><% end %>
+</p>
 <p>Hallazgos graves <strong><%= @report.serious_count %></strong> · Seguimientos pendientes <strong><%= @report.pending.size %></strong></p>
 
-<% if @report.activities.empty? %>
+<% if @report.activity_count.zero? %>
   <p>Sin actividades registradas en el período.</p>
 <% end %>
 <% @report.by_plant.each do |plant, activities| %>
@@ -27,6 +29,16 @@
       <% end %>
     </tbody>
   </table>
+<% end %>
+
+<% if @report.historical_entries.any? %>
+  <h2>Actividades del Histórico</h2>
+  <% @report.historical_entries.each do |entry| %>
+    <h3><%= link_to apr_history_period(entry), apr_history_entry_url(entry) %> · <%= AprDay::PLANTS.fetch(entry.plant) %></h3>
+    <ul>
+      <% apr_history_activity_summaries(entry).each do |summary| %><li><%= summary %></li><% end %>
+    </ul>
+  <% end %>
 <% end %>
 
 <% if @report.pending.any? %>

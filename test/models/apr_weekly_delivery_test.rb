@@ -67,6 +67,41 @@ class AprWeeklyDeliveryTest < ActiveSupport::TestCase
     assert_includes ActionMailer::Base.deliveries.last.text_part.body.decoded, "Sin actividades registradas en el período."
   end
 
+  test "the weekly message combines the daily register and overlapping history with summaries of archived activities" do
+    history = AprHistoryEntry.create!(
+      date: Date.new(2026, 11, 22), end_date: Date.new(2026, 11, 24), plant: "PTM",
+      source_file: "Histórico de prueba.xlsx", source_sheet: "Informe", source_date: "22 a 24",
+      source_row: 3, source_end_row: 3, source_fingerprint: "weekly-history",
+      activities: [ "Actividad con una nota reservada" ], observations: "Comentario reservado del histórico",
+      activity_details: { "1" => { "type" => "Capacitación", "place" => "Sala de capacitación" } }
+    )
+    outside = history.dup
+    outside.update!(date: Date.new(2026, 11, 20), end_date: Date.new(2026, 11, 22), source_row: 4, source_end_row: 4,
+      activity_details: { "1" => { "type" => "Actividad fuera de semana" } })
+    rest = history.dup
+    rest.update!(date: Date.new(2026, 11, 25), end_date: Date.new(2026, 11, 25), source_row: 5, source_end_row: 5,
+      day_status: "Descanso compensatorio")
+
+    travel_to @monday do
+      activity_on(1, "VTS", "Actividad del registro diario", duration_minutes: 20)
+      dispatch(@monday)
+    end
+
+    message = ActionMailer::Base.deliveries.last
+    [ message.text_part, message.html_part ].each do |part|
+      content = part.body.decoded
+      assert_includes content, "2 actividades"
+      assert_includes content, "Tiempo informado 20 min"
+      assert_includes content, "Actividad del registro diario"
+      assert_includes content, "Capacitación · Sala de capacitación"
+      assert_includes content, "/registro-actividades/historico/#{history.id}"
+      assert_not_includes content, "Sin actividades registradas"
+      assert_not_includes content, "Actividad fuera de semana"
+      assert_not_includes content, "Actividad con una nota reservada"
+      assert_not_includes content, "Comentario reservado del histórico"
+    end
+  end
+
   private
 
   def dispatch(time)
