@@ -1,0 +1,42 @@
+<% content_for :title, "Actividades históricas · APR" %>
+<div class="mx-auto" style="max-width: 960px">
+  <header class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h1 class="h3 mb-1"><%= apr_history_period(@entry) %></h1>
+      <p class="text-body-secondary mb-0"><%= AprDay::PLANTS.fetch(@entry.plant) %><%= " · #{@entry.day_status}" if @entry.day_status %></p>
+    </div>
+    <%= link_to "Volver al histórico", apr_history_entries_path, class: "btn btn-outline-secondary" %>
+  </header>
+  <section class="card card-body mb-3">
+    <h2 class="h5">Actividades</h2>
+    <% if @entry.activities.any? %>
+      <ul class="mb-0">
+        <% @entry.activities.each do |activity| %>
+          <li class="text-break mb-2" style="white-space: pre-wrap"><%= activity %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-body-secondary mb-0">No hay actividad registrada en la fila original.</p>
+    <% end %>
+  </section>
+  <% if @entry.observations.present? %>
+    <section class="card card-body mb-3">
+      <h2 class="h5">Comentarios de la fila</h2>
+      <p class="text-break mb-0" style="white-space: pre-wrap"><%= @entry.observations %></p>
+    </section>
+  <% end %>
+  <details class="card card-body">
+    <summary>Datos de origen</summary>
+    <p class="small text-body-secondary mt-2 mb-1">
+      <%= @entry.source_file %> · <%= @entry.source_sheet %> · fila <%= @entry.source_row %><%= " a #{@entry.source_end_row}" if @entry.source_end_row != @entry.source_row %>
+    </p>
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Fecha en Excel</dt>
+      <dd class="col-sm-9"><%= @entry.source_date %></dd>
+      <dt class="col-sm-3">Área en Excel</dt>
+      <dd class="col-sm-9"><%= @entry.source_area %></dd>
+      <dt class="col-sm-3">Actividad en Excel</dt>
+      <dd class="col-sm-9 text-break" style="white-space: pre-wrap"><%= @entry.source_activity %></dd>
+    </dl>
+  </details>
+</div>

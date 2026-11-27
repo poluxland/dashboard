@@ -7,4 +7,9 @@ module AprActivitiesHelper
   def apr_plant_options
     AprDay::PLANTS.map { |code, name| [ code == "CALBUCO" ? name : "#{code} · #{name}", code ] }
   end
+
+  def apr_history_period(entry)
+    start = l(entry.date, format: :short)
+    entry.date == entry.end_date ? start : "#{start} al #{l(entry.end_date, format: :short)}"
+  end
 end

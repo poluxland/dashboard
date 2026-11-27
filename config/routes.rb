@@ -44,6 +44,7 @@ Rails.application.routes.draw do
     post :close, path: "cerrar", on: :member
     post :send_email, path: "correo", on: :member
   end
+  resources :apr_history_entries, path: "registro-actividades/historico", only: %i[index show]
   resources :apr_activities, path: "registro-actividades", only: %i[index show new create edit update] do
     get :follow_ups, path: "seguimientos", on: :collection
     patch :follow_up, path: "seguimiento", on: :member

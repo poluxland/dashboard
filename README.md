@@ -59,6 +59,13 @@ por planta, configura `APR_ACTIVITY_REPORT_RECIPIENTS_PTM`,
 `APR_ACTIVITY_REPORT_RECIPIENTS_CALBUCO` con correos separados por comas.
 El correo del APR se utiliza para las respuestas.
 
+**Histórico Excel** conserva las actividades y los comentarios de Seguridad PTM
+en una vista de consulta. Los administradores del Dashboard tienen acceso y se
+pueden autorizar cuentas corporativas adicionales con
+`APR_ACTIVITY_HISTORY_READERS`. Para validar el archivo, ejecuta
+`APR_HISTORY_FILE=/ruta/al/archivo.xlsx bin/rails apr:import_history`.
+Agrega `APR_HISTORY_APPLY=1` para guardar las filas validadas.
+
 ## Inspecciones en Works
 
 Los trabajos nuevos usan la fecha actual de Chile, editable, y ofrecen Puerto Montt,

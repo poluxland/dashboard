@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_27_193000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_195000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,6 +91,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_27_193000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["apr_id", "plant", "date"], name: "index_apr_days_on_apr_id_and_plant_and_date", unique: true
+  end
+
+  create_table "apr_history_entries", force: :cascade do |t|
+    t.date "date", null: false
+    t.date "end_date", null: false
+    t.string "plant", null: false
+    t.string "day_status"
+    t.text "source_area"
+    t.text "source_date", null: false
+    t.text "source_activity"
+    t.text "observations"
+    t.text "activities", default: [], null: false, array: true
+    t.string "source_file", null: false
+    t.string "source_sheet", null: false
+    t.integer "source_row", null: false
+    t.integer "source_end_row", null: false
+    t.string "source_fingerprint", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["plant", "date"], name: "index_apr_history_entries_on_plant_and_date"
+    t.index ["source_file", "source_sheet", "source_row"], name: "index_apr_history_entries_on_source", unique: true
+    t.check_constraint "end_date >= date", name: "apr_history_entries_valid_date_range"
   end
 
   create_table "dashboard_users", force: :cascade do |t|

@@ -1,6 +1,6 @@
 class AprController < ApplicationController
   before_action :protect_apr_responses
-  helper_method :apr_day_owner?
+  helper_method :apr_day_owner?, :apr_history_access?
 
   private
 
@@ -24,6 +24,11 @@ class AprController < ApplicationController
 
   def apr_day_owner?(day)
     day.apr_id == current_apr.id
+  end
+
+  def apr_history_access?
+    readers = ENV.fetch("APR_ACTIVITY_HISTORY_READERS", "").downcase.split(/[,;\s]+/)
+    task_admin? || readers.include?(RecordAuthor.email)
   end
 
   def apr_date(value)
