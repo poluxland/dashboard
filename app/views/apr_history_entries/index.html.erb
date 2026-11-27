@@ -25,41 +25,39 @@
 <% end %>
 
 <% if @entries.any? %>
+  <% form_labels = apr_history_form_fields({}).keys %>
   <p class="text-body-secondary small mb-2"><%= pluralize(@pagy.count, "fila", plural: "filas") %></p>
   <div class="table-responsive border rounded">
     <table class="table table-sm table-hover align-middle mb-0" aria-label="Actividades del histórico" data-table-export="off">
       <thead class="table-light">
         <tr>
-          <th scope="col">Fecha o período</th><th scope="col">Planta</th><th scope="col">Área en Excel</th>
-          <th scope="col">Actividad</th>
-          <% AprHistoryEntry::ACTIVITY_DETAIL_LABELS.values.each do |label| %>
+          <th scope="col">Fecha</th><th scope="col">Planta</th>
+          <% form_labels.first(2).each do |label| %>
             <th scope="col"><%= label %></th>
           <% end %>
-          <th scope="col">Observaciones de la jornada</th>
+          <th scope="col">Actividad</th><th scope="col">Observaciones</th>
+          <% form_labels.drop(2).each do |label| %>
+            <th scope="col"><%= label %></th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
         <% @entries.each do |entry| %>
           <tr>
-            <% anchor = ("actividad-#{entry.listed_position}" if entry.listed_position) %>
+            <% detail_path = entry.listed_position ? activity_apr_history_entry_path(entry, position: entry.listed_position) : apr_history_entry_path(entry) %>
             <td class="text-nowrap">
-              <%= link_to apr_history_period(entry), apr_history_entry_path(entry, anchor: anchor), class: "fw-semibold" %>
-              <% if entry.day_status.present? && entry.listed_activity.present? %>
-                <div class="small text-body-secondary"><%= entry.day_status %></div>
-              <% end %>
+              <%= link_to apr_history_period(entry), detail_path, class: "fw-semibold" %>
             </td>
             <td><%= AprDay::PLANTS.fetch(entry.plant) %></td>
-            <td><%= entry.source_area&.strip %></td>
+            <% fields = apr_history_form_fields(entry.listed_details || {}).values %>
+            <% fields.first(2).each do |value| %><td><%= value %></td><% end %>
             <td class="apr-history-activity" style="min-width: 20rem">
               <%= render "expandable_text", text: entry.listed_activity.presence || entry.day_status %>
             </td>
-            <% details = entry.listed_details || {} %>
-            <% AprHistoryEntry::ACTIVITY_DETAIL_LABELS.each_key do |field| %>
-              <td class="text-break"><%= details[field] %></td>
-            <% end %>
             <td class="apr-history-observations" style="min-width: 15rem">
-              <%= render "expandable_text", text: entry.observations %>
+              <%= render "expandable_text", text: entry.listed_observations %>
             </td>
+            <% fields.drop(2).each do |value| %><td class="text-break"><%= value %></td><% end %>
           </tr>
         <% end %>
       </tbody>

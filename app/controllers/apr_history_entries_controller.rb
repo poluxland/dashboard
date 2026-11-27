@@ -18,6 +18,10 @@ class AprHistoryEntriesController < AprController
 
   def show
     @entry = AprHistoryEntry.find(params[:id])
+    return unless params[:position]
+
+    @position = Integer(params[:position].to_s, 10, exception: false)
+    raise ActiveRecord::RecordNotFound unless @position&.between?(1, @entry.activities.size)
   end
 
   private
@@ -30,9 +34,14 @@ class AprHistoryEntriesController < AprController
     if @query.present?
       pattern = "%#{AprHistoryEntry.sanitize_sql_like(@query)}%"
       scope = scope.where(<<~SQL, pattern: pattern)
-        source_area ILIKE :pattern OR activity_item.text ILIKE :pattern OR observations ILIKE :pattern
+        activity_item.text ILIKE :pattern
+        OR (cardinality(activities) = 1 AND observations ILIKE :pattern)
         OR day_status ILIKE :pattern
-        OR CAST(activity_details -> activity_item.position::text AS text) ILIKE :pattern
+        OR EXISTS (
+          SELECT 1 FROM jsonb_each_text(activity_details -> activity_item.position::text) AS field
+          WHERE field.key IN ('type', 'sector', 'observations', 'outcome', 'severity', 'responsible', 'due_on', 'duration_minutes')
+            AND field.value ILIKE :pattern
+        )
       SQL
     end
     scope

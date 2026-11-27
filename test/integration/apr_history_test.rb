@@ -72,23 +72,30 @@ class AprHistoryTest < ActionDispatch::IntegrationTest
     get apr_history_entry_path(record)
     assert_response :success
     assert_select "li", text: "Revisar señalización"
-    assert_select "p", text: "Comentario de la fila"
+    assert_select "p", text: "Comentario de la fila", count: 0
+    assert_equal "Comentario de la fila", record.reload.observations
+
+    calbuco = AprHistoryEntry.find_by!(plant: "CALBUCO")
+    calbuco.update!(observations: "Observación de una sola actividad")
+    get apr_history_entries_path(q: "Observación de una sola actividad")
+    assert_select "tbody tr", count: 1
+    assert_select "td.apr-history-observations", text: "Observación de una sola actividad"
   end
 
   test "shows reviewed activity fields alongside the original text and finds them in search" do
     with_workbook(@rows) { |path| AprHistoryImporter.new(path).call(apply: true) }
     record = AprHistoryEntry.find_by!(source_row: 3)
-    record.update!(activity_details: { "2" => { "type" => "Entrega de EPP", "sector" => "Granel", "result" => "Entregado al personal" } })
+    record.update!(activity_details: { "2" => { "type" => "Entrega de EPP", "sector" => "Granel", "outcome" => "corrected" } })
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
 
     get apr_history_entries_path(q: "Granel")
     assert_select "tbody tr", count: 1
-    assert_select "tbody a[href=?]", apr_history_entry_path(record, anchor: "actividad-2")
+    assert_select "tbody a[href=?]", activity_apr_history_entry_path(record, position: 2)
     assert_select "tbody td.apr-history-activity", text: "Entregar EPP"
     get apr_history_entry_path(record)
     assert_select "li", text: /Validar AST/, count: 1
-    assert_select "li", text: /Entregar EPP.*Entrega de EPP.*Granel.*Entregado al personal/m, count: 1
-    assert_select "dt", text: "Duración", count: 0
+    assert_select "li#actividad-2", text: /Entregar EPP.*Granel.*Entrega de EPP.*Corregido en el momento/m, count: 1
+    assert_select "dt", text: "Tiempo dedicado", count: 0
     assert_equal [ "Validar AST", "Entregar EPP", "Revisar señalización" ], record.reload.activities
   end
 
@@ -96,10 +103,10 @@ class AprHistoryTest < ActionDispatch::IntegrationTest
     with_workbook(@rows) { |path| AprHistoryImporter.new(path).call(apply: true) }
     record = AprHistoryEntry.find_by!(source_row: 3)
     long_activity = "Revisar señalización " + ("de la zona de trabajo " * 8) + "en acceso norte."
-    long_observations = ("Observación de la jornada. " * 6) + "Fin del comentario."
+    long_observations = ("Observación de la actividad. " * 6) + "Fin del comentario."
     details = {
       "2" => { "type" => "Entrega de EPP", "sector" => "Granel" },
-      "3" => { "equipment" => "Silo 2000", "platform" => "PREVSIS", "result" => "Señalización revisada" }
+      "3" => { "equipment" => "Silo 2000", "platform" => "PREVSIS", "result" => "Señalización revisada", "observations" => long_observations }
     }
     record.update!(activities: [ "Validar AST", "Entregar EPP", long_activity ], observations: long_observations, activity_details: details)
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
@@ -107,16 +114,30 @@ class AprHistoryTest < ActionDispatch::IntegrationTest
     get apr_history_entries_path(from: "2025-08-04", to: "2025-08-04")
     assert_response :success
     assert_select "tbody tr", count: 3
-    assert_select "th", text: "Resultado documentado"
+    assert_select "th" do |headers|
+      assert_equal [
+        "Fecha", "Planta", "Sector", "Tipo de actividad", "Actividad", "Observaciones",
+        "Tiempo dedicado", "Resultado de la actividad", "Gravedad", "Responsable", "Fecha compromiso"
+      ], headers.map(&:text)
+    end
     assert_select "td.apr-history-activity > span", text: "Validar AST"
     assert_select "td.apr-history-activity details:not([open]) summary", text: /Ver detalle/
     assert_select "td.apr-history-activity details p", text: long_activity
-    assert_select "td.apr-history-observations details p", text: long_observations, count: 3
+    assert_select "td.apr-history-observations details p", text: long_observations, count: 1
+    assert_select "tbody tr:nth-child(3) td.apr-history-observations details p", text: long_observations
     assert_select "tbody tr:nth-child(2) td", text: "Granel"
-    assert_select "tbody tr:nth-child(3) td", text: "PREVSIS"
-    assert_select "tbody tr:nth-child(3) a[href=?]", apr_history_entry_path(record, anchor: "actividad-3")
-    get apr_history_entry_path(record)
+    assert_not_includes response.body, "PREVSIS"
+    assert_select "tbody tr:nth-child(3) a[href=?]", activity_apr_history_entry_path(record, position: 3)
+    get apr_history_entries_path(q: "Fin del comentario")
+    assert_select "tbody tr", count: 1
+    assert_select "tbody td.apr-history-activity details p", text: long_activity
+    get activity_apr_history_entry_path(record, position: 3)
     assert_select "#actividad-3", text: /en acceso norte/
+    assert_select "#actividad-3 p", text: long_observations
+    assert_select "#actividad-1", count: 0
+    assert_not_includes response.body, "PREVSIS"
+    get activity_apr_history_entry_path(record, position: 4)
+    assert_response :not_found
   end
 
   test "paginates individual activities within a single date" do

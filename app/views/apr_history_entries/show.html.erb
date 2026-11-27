@@ -3,52 +3,36 @@
   <header class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
     <div>
       <h1 class="h3 mb-1"><%= apr_history_period(@entry) %></h1>
-      <p class="text-body-secondary mb-0"><%= AprDay::PLANTS.fetch(@entry.plant) %><%= " · #{@entry.day_status}" if @entry.day_status %></p>
+      <p class="text-body-secondary mb-0"><%= AprDay::PLANTS.fetch(@entry.plant) %></p>
     </div>
     <%= link_to "Volver al histórico", apr_history_entries_path, class: "btn btn-outline-secondary" %>
   </header>
   <section class="card card-body mb-3">
-    <h2 class="h5">Actividades</h2>
+    <h2 class="h5"><%= @position ? "Actividad" : "Actividades" %></h2>
     <% if @entry.activities.any? %>
       <ul class="mb-0">
-        <% @entry.activities.each.with_index(1) do |activity, position| %>
-          <% details = @entry.activity_details.fetch(position.to_s, {}) %>
+        <% positions = @position ? [ @position ] : (1..@entry.activities.size) %>
+        <% positions.each do |position| %>
+          <% activity = @entry.activities.fetch(position - 1) %>
+          <% fields = apr_history_form_fields(@entry.activity_details.fetch(position.to_s, {})).compact_blank %>
           <li class="text-break mb-3" id="actividad-<%= position %>">
             <p class="mb-1" style="white-space: pre-wrap"><%= activity %></p>
-            <% if details.any? %>
+            <% if fields.any? %>
               <dl class="d-flex flex-wrap gap-3 small text-body-secondary mb-0">
-                <% AprHistoryEntry::ACTIVITY_DETAIL_LABELS.each do |field, label| %>
-                  <% if details[field].present? %>
-                    <div><dt><%= label %></dt><dd class="mb-0"><%= details[field] %></dd></div>
-                  <% end %>
+                <% fields.each do |label, value| %>
+                  <div><dt><%= label %></dt><dd class="mb-0"><%= value %></dd></div>
                 <% end %>
               </dl>
+            <% end %>
+            <% if (observations = @entry.activity_observations(position)).present? %>
+              <h3 class="h6 mt-3 mb-1">Observaciones</h3>
+              <p class="mb-0" style="white-space: pre-wrap"><%= observations %></p>
             <% end %>
           </li>
         <% end %>
       </ul>
     <% else %>
-      <p class="text-body-secondary mb-0">No hay actividad registrada en la fila original.</p>
+      <p class="text-body-secondary mb-0"><%= @entry.day_status.presence || "No hay actividad registrada." %></p>
     <% end %>
   </section>
-  <% if @entry.observations.present? %>
-    <section class="card card-body mb-3">
-      <h2 class="h5">Comentarios de la fila</h2>
-      <p class="text-break mb-0" style="white-space: pre-wrap"><%= @entry.observations %></p>
-    </section>
-  <% end %>
-  <details class="card card-body">
-    <summary>Datos de origen</summary>
-    <p class="small text-body-secondary mt-2 mb-1">
-      <%= @entry.source_file %> · <%= @entry.source_sheet %> · fila <%= @entry.source_row %><%= " a #{@entry.source_end_row}" if @entry.source_end_row != @entry.source_row %>
-    </p>
-    <dl class="row mb-0">
-      <dt class="col-sm-3">Fecha en Excel</dt>
-      <dd class="col-sm-9"><%= @entry.source_date %></dd>
-      <dt class="col-sm-3">Área en Excel</dt>
-      <dd class="col-sm-9"><%= @entry.source_area %></dd>
-      <dt class="col-sm-3">Actividad en Excel</dt>
-      <dd class="col-sm-9 text-break" style="white-space: pre-wrap"><%= @entry.source_activity %></dd>
-    </dl>
-  </details>
 </div>

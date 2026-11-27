@@ -21,4 +21,16 @@ module AprActivitiesHelper
       [ type, *fields.compact_blank ].join(" · ")
     end
   end
+
+  def apr_history_form_fields(details)
+    {
+      "Sector" => details["sector"],
+      "Tipo de actividad" => details["type"],
+      "Tiempo dedicado" => (apr_duration(details["duration_minutes"]) if details["duration_minutes"].is_a?(Integer)),
+      "Resultado de la actividad" => AprActivity::OUTCOMES[details["outcome"]],
+      "Gravedad" => AprActivity::SEVERITIES[details["severity"]],
+      "Responsable" => details["responsible"],
+      "Fecha compromiso" => details["due_on"]
+    }
+  end
 end
