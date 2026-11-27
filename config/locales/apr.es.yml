@@ -1,0 +1,15 @@
+es:
+  activerecord:
+    attributes:
+      apr_activity:
+        sector: "Sector"
+        activity_type: "Tipo de actividad"
+        title: "Actividad"
+        observations: "Observaciones"
+        duration_minutes: "Tiempo dedicado"
+        outcome: "Resultado"
+        severity: "Gravedad"
+        responsible: "Responsable"
+        due_on: "Fecha compromiso"
+        follow_up_status: "Estado del seguimiento"
+        resolution: "Solución aplicada"

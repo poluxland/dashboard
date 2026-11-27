@@ -1,0 +1,71 @@
+<% content_for :title, @activity.title %>
+<% day = @activity.apr_day %>
+<div class="mx-auto" style="max-width: 840px">
+  <header class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h1 class="h3 mb-1"><%= @activity.title %></h1>
+      <p class="text-body-secondary mb-0"><%= AprDay::PLANTS.fetch(day.plant) %> · <%= l(day.date, format: :long) %></p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Ver día", day, class: "btn btn-outline-secondary" %>
+      <% if apr_day_owner?(day) && !day.closed_at? %>
+        <%= link_to "Editar actividad", edit_apr_activity_path(@activity), class: "btn btn-outline-primary" %>
+      <% end %>
+    </div>
+  </header>
+  <%= render "errors", record: @activity %>
+
+  <section class="card card-body shadow-sm mb-3">
+    <dl class="row mb-0">
+      <% {
+        "Sector" => @activity.sector,
+        "Tipo de actividad" => @activity.activity_type,
+        "Tiempo dedicado" => apr_duration(@activity.duration_minutes),
+        "Resultado" => AprActivity::OUTCOMES.fetch(@activity.outcome),
+        "Gravedad" => AprActivity::SEVERITIES[@activity.severity]
+      }.compact.each do |label, value| %>
+        <dt class="col-sm-4"><%= label %></dt>
+        <dd class="col-sm-8"><%= value %></dd>
+      <% end %>
+    </dl>
+    <% if @activity.observations.present? %>
+      <h2 class="h6 mt-2 mb-1">Observaciones</h2>
+      <p class="mb-2 text-break" style="white-space: pre-wrap"><%= @activity.observations %></p>
+    <% end %>
+    <%= record_author_details(@activity) %>
+  </section>
+
+  <% if @activity.follow_up? %>
+    <section class="card card-body shadow-sm" aria-labelledby="apr-follow-up">
+      <h2 class="h5" id="apr-follow-up">Seguimiento</h2>
+      <dl class="row mb-1">
+        <dt class="col-sm-4">Estado</dt>
+        <dd class="col-sm-8"><%= AprActivity::FOLLOW_UP_STATUSES.fetch(@activity.follow_up_status) %></dd>
+        <dt class="col-sm-4">Responsable</dt>
+        <dd class="col-sm-8"><%= @activity.responsible %></dd>
+        <dt class="col-sm-4">Fecha compromiso</dt>
+        <dd class="col-sm-8"><%= l(@activity.due_on, format: :long) %></dd>
+        <% if @activity.follow_up_closed? %>
+          <dt class="col-sm-4">Cerrado por</dt>
+          <dd class="col-sm-8 text-break"><%= @activity.resolved_by_email %></dd>
+          <dt class="col-sm-4">Fecha de cierre</dt>
+          <dd class="col-sm-8"><%= l(@activity.resolved_at.in_time_zone(AprDay::ZONE), format: :short) %></dd>
+          <dt class="col-sm-4">Solución</dt>
+          <dd class="col-sm-8 text-break" style="white-space: pre-wrap"><%= @activity.resolution %></dd>
+        <% end %>
+      </dl>
+      <% if @activity.open_follow_up? && apr_day_owner?(day) %>
+        <% if @activity.follow_up_status == "pending" %>
+          <%= button_to "Marcar en seguimiento", follow_up_apr_activity_path(@activity), method: :patch,
+                params: { status: "in_progress" }, class: "btn btn-outline-primary mb-3" %>
+        <% end %>
+        <%= form_with url: follow_up_apr_activity_path(@activity), method: :patch, class: "border-top pt-3" do %>
+          <%= hidden_field_tag :status, "closed", id: nil %>
+          <%= label_tag :resolution, "Solución aplicada", class: "form-label" %>
+          <%= text_area_tag :resolution, @activity.resolution, required: true, maxlength: 5000, rows: 3, class: "form-control mb-2" %>
+          <%= submit_tag "Cerrar seguimiento", class: "btn btn-primary" %>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+</div>

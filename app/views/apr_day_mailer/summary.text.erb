@@ -1,0 +1,21 @@
+Cierre diario de actividades APR · <%= @plant %>
+Fecha <%= @day.date.strftime("%d-%m-%Y") %>
+Cerrado por <%= @day.closed_by_email %>
+
+<%= pluralize(@summary.fetch("count"), "actividad", plural: "actividades") %> · <%= apr_duration(@summary.fetch("minutes")) %>
+Hallazgos graves: <%= @summary.fetch("severe") %>
+
+Resumen por sector
+<% @summary.fetch("sectors").each do |sector| %>
+- <%= sector.fetch("sector") %> · <%= pluralize(sector.fetch("count"), "actividad", plural: "actividades") %> · <%= apr_duration(sector.fetch("minutes")) %> · <%= pluralize(sector.fetch("severe"), "grave", plural: "graves") %>
+<% end %>
+Acciones pendientes al cierre
+<% if @summary.fetch("pending").empty? %>
+Sin acciones pendientes.
+<% else %>
+<% @summary.fetch("pending").each do |item| %>
+- <%= item.fetch("sector") %> · <%= item.fetch("activity_type") %> · <%= AprActivity::SEVERITIES.fetch(item.fetch("severity")) %> · Compromiso <%= Date.iso8601(item.fetch("due_on")).strftime("%d-%m-%Y") %>
+<% end %>
+<% end %>
+
+Ver el detalle en el Dashboard: <%= apr_day_url(@day) %>

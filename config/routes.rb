@@ -40,6 +40,14 @@ Rails.application.routes.draw do
     get :report, on: :collection, path: "informe"
   end
   resources :operation_activities, path: "operaciones-ptm", only: %i[index new create edit update]
+  resources :apr_days, path: "registro-actividades/cierres", only: :show do
+    post :close, path: "cerrar", on: :member
+    post :send_email, path: "correo", on: :member
+  end
+  resources :apr_activities, path: "registro-actividades", only: %i[index show new create edit update] do
+    get :follow_ups, path: "seguimientos", on: :collection
+    patch :follow_up, path: "seguimiento", on: :member
+  end
   resources :tasks, only: [ :index, :show, :new, :create, :edit, :update ] do
     resources :comments, only: :create, controller: "task_comments"
   end

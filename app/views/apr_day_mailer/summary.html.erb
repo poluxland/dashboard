@@ -1,0 +1,27 @@
+<h1>Cierre diario de actividades APR</h1>
+<p><%= @plant %> · <%= @day.date.strftime("%d-%m-%Y") %> · <%= @day.closed_by_email %></p>
+<p><strong><%= pluralize(@summary.fetch("count"), "actividad", plural: "actividades") %> · <%= apr_duration(@summary.fetch("minutes")) %></strong></p>
+<p><strong>Hallazgos graves:</strong> <%= @summary.fetch("severe") %></p>
+
+<h2>Resumen por sector</h2>
+<table style="border-collapse: collapse; width: 100%" cellpadding="8" border="1">
+  <thead><tr><th scope="col">Sector</th><th scope="col">Actividades</th><th scope="col">Tiempo</th><th scope="col">Graves</th></tr></thead>
+  <tbody>
+    <% @summary.fetch("sectors").each do |sector| %>
+      <tr><th scope="row"><%= sector.fetch("sector") %></th><td><%= sector.fetch("count") %></td><td><%= apr_duration(sector.fetch("minutes")) %></td><td><%= sector.fetch("severe") %></td></tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h2>Acciones pendientes al cierre</h2>
+<% if @summary.fetch("pending").empty? %>
+  <p>Sin acciones pendientes.</p>
+<% else %>
+  <ul>
+    <% @summary.fetch("pending").each do |item| %>
+      <li><%= item.fetch("sector") %> · <%= item.fetch("activity_type") %> · <strong><%= AprActivity::SEVERITIES.fetch(item.fetch("severity")) %></strong> · Compromiso <%= Date.iso8601(item.fetch("due_on")).strftime("%d-%m-%Y") %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p><%= link_to "Ver el detalle en el Dashboard", apr_day_url(@day) %></p>

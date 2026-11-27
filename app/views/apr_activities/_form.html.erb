@@ -1,0 +1,79 @@
+<% content_for :title, title %>
+<div class="mx-auto" style="max-width: 760px">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0"><%= title %></h1>
+    <%= link_to "Volver al registro", apr_activities_path(date: @date, plant: @plant), class: "btn btn-outline-secondary" %>
+  </div>
+
+  <%= form_with model: @activity, class: "card card-body shadow-sm p-4", data: { controller: "apr-finding" } do |form| %>
+    <%= render "errors", record: @activity %>
+    <div class="row g-3">
+      <div class="col-sm-5">
+        <%= form.label :date, "Fecha", class: "form-label" %>
+        <%= form.date_field :date, value: @date, max: AprDay.today, class: "form-control", required: true %>
+      </div>
+      <div class="col-sm-7">
+        <%= form.label :plant, "Planta", class: "form-label" %>
+        <%= form.select :plant, apr_plant_options, { prompt: "Selecciona una planta", selected: @plant }, class: "form-select", required: true %>
+      </div>
+      <div class="col-sm-6">
+        <%= form.label :sector, "Sector", class: "form-label" %>
+        <%= form.select :sector, AprActivity::SECTORS, { prompt: "Selecciona un sector" }, class: "form-select", required: true %>
+      </div>
+      <div class="col-sm-6">
+        <%= form.label :activity_type, "Tipo de actividad", class: "form-label" %>
+        <%= form.select :activity_type, AprActivity::ACTIVITY_TYPES, { prompt: "Selecciona un tipo" }, class: "form-select", required: true %>
+      </div>
+      <div class="col-12">
+        <%= form.label :title, "Actividad", class: "form-label" %>
+        <%= form.text_field :title, class: "form-control", maxlength: 180, required: true %>
+      </div>
+      <div class="col-12">
+        <%= form.label :observations, "Observaciones", class: "form-label" %>
+        <%= form.text_area :observations, class: "form-control", rows: 3, maxlength: 5000 %>
+      </div>
+      <fieldset class="col-12">
+        <legend class="form-label fs-6 mb-1">Tiempo dedicado</legend>
+        <div class="row g-2">
+          <div class="col-6 col-sm-3">
+            <%= form.label :duration_hours, "Horas", class: "form-label small mb-1" %>
+            <%= form.number_field :duration_hours, class: "form-control", min: 0, max: 24, placeholder: "0", inputmode: "numeric" %>
+          </div>
+          <div class="col-6 col-sm-3">
+            <%= form.label :duration_remainder, "Minutos", class: "form-label small mb-1" %>
+            <%= form.number_field :duration_remainder, class: "form-control", min: 0, max: 59, placeholder: "0", inputmode: "numeric" %>
+          </div>
+        </div>
+      </fieldset>
+      <div class="col-sm-6">
+        <%= form.label :outcome, "Resultado de la actividad", class: "form-label" %>
+        <%= form.select :outcome, AprActivity::OUTCOMES.invert.to_a, {}, class: "form-select", required: true,
+              data: { apr_finding_target: "outcome", action: "change->apr-finding#update" } %>
+      </div>
+      <fieldset class="col-sm-6" data-apr-finding-target="severityFields">
+        <%= form.label :severity, "Gravedad", class: "form-label" %>
+        <%= form.select :severity, AprActivity::SEVERITIES.invert.to_a, { prompt: "Selecciona la gravedad" },
+              class: "form-select", data: { apr_finding_target: "severity" } %>
+      </fieldset>
+      <fieldset class="col-12" data-apr-finding-target="followUpFields">
+        <legend class="fs-6">Seguimiento</legend>
+        <div class="row g-3">
+          <div class="col-sm-7">
+            <%= form.label :responsible, "Responsable", class: "form-label" %>
+            <%= form.text_field :responsible, class: "form-control", maxlength: 150, data: { apr_finding_target: "responsible" } %>
+          </div>
+          <div class="col-sm-5">
+            <%= form.label :due_on, "Fecha compromiso", class: "form-label" %>
+            <%= form.date_field :due_on, class: "form-control", data: { apr_finding_target: "dueOn" } %>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <%= form.submit "Guardar actividad", class: "btn btn-primary" %>
+      <% if @activity.new_record? %>
+        <%= form.button "Guardar y agregar otra", name: "commit_action", value: "add_another", class: "btn btn-outline-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

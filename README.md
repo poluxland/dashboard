@@ -51,6 +51,14 @@ heroku config:set GOOGLE_CLIENT_ID="..." GOOGLE_CLIENT_SECRET="..." GOOGLE_WORKS
 
 No publiques ni guardes `GOOGLE_CLIENT_SECRET` en el repositorio.
 
+## Registro de actividades APR
+
+El cierre diario envía el resumen al APR que lo cierra. Para agregar destinatarios
+por planta, configura `APR_ACTIVITY_REPORT_RECIPIENTS_PTM`,
+`APR_ACTIVITY_REPORT_RECIPIENTS_LCA`, `APR_ACTIVITY_REPORT_RECIPIENTS_VTS` o
+`APR_ACTIVITY_REPORT_RECIPIENTS_CALBUCO` con correos separados por comas.
+El correo del APR se utiliza para las respuestas.
+
 ## Inspecciones en Works
 
 Los trabajos nuevos usan la fecha actual de Chile, editable, y ofrecen Puerto Montt,

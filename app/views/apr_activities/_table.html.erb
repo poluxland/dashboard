@@ -1,0 +1,45 @@
+<% if activities.any? %>
+  <div class="table-responsive border rounded">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <% if local_assigns[:follow_ups] %><th scope="col">Fecha</th><th scope="col">Planta</th><% end %>
+          <th scope="col">Actividad</th><th scope="col">Sector</th><th scope="col">Tipo</th>
+          <th scope="col">Tiempo</th><th scope="col">Resultado</th><th scope="col">Gravedad</th>
+          <th scope="col">Seguimiento</th><th scope="col">Responsable</th><th scope="col">Compromiso</th>
+          <%= record_author_headers %>
+        </tr>
+      </thead>
+      <tbody>
+        <% activities.each do |activity| %>
+          <tr>
+            <% if local_assigns[:follow_ups] %>
+              <td class="text-nowrap"><%= l(activity.apr_day.date, format: :short) %></td>
+              <td><%= AprDay::PLANTS.fetch(activity.apr_day.plant) %></td>
+            <% end %>
+            <td><%= link_to activity.title, activity, class: "fw-semibold" %></td>
+            <td><%= activity.sector %></td>
+            <td><%= activity.activity_type %></td>
+            <td class="text-nowrap"><%= apr_duration(activity.duration_minutes) %></td>
+            <td><%= AprActivity::OUTCOMES.fetch(activity.outcome) %></td>
+            <td>
+              <% if activity.severity == "grave" %>
+                <span class="badge text-bg-danger">Grave</span>
+              <% else %>
+                <%= AprActivity::SEVERITIES[activity.severity] %>
+              <% end %>
+            </td>
+            <td class="text-nowrap"><%= AprActivity::FOLLOW_UP_STATUSES[activity.follow_up_status] %></td>
+            <td><%= activity.responsible %></td>
+            <td class="text-nowrap <%= 'text-danger fw-semibold' if activity.open_follow_up? && activity.due_on < AprDay.today %>">
+              <%= l(activity.due_on, format: :short) if activity.due_on %>
+            </td>
+            <%= record_author_cells(activity) %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="text-body-secondary">No hay actividades para esta consulta.</p>
+<% end %>

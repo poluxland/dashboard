@@ -246,7 +246,7 @@
         <!-- APR -->
         <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle <%= 'active' if %w[monthly_records indicator_readings people].include?(controller_name) || current_page?(monthly_records_path) %>"
+            class="nav-link dropdown-toggle <%= 'active' if %w[monthly_records indicator_readings people apr_activities apr_days].include?(controller_name) || current_page?(monthly_records_path) %>"
             href="#"
             id="aprDropdown"
             role="button"
@@ -257,6 +257,7 @@
           </a>
 
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="aprDropdown">
+            <li><%= link_to "Registro de actividades", apr_activities_path, class: class_names("dropdown-item", active: %w[apr_activities apr_days].include?(controller_name)) %></li>
             <li>
               <%= link_to "Documentos",
                           "https://drive.google.com/drive/folders/1kWvGZk_45IAC_g0_ue5yeubsosJX203N?usp=share_link",

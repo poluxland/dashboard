@@ -1,0 +1,32 @@
+<%= form_with url: path, method: :get, class: "row g-2 align-items-end mb-4" do %>
+  <% if local_assigns[:daily] %>
+    <div class="col-6 col-md-auto">
+      <%= label_tag :date, "Fecha", class: "form-label mb-1" %>
+      <%= date_field_tag :date, @date, max: AprDay.today, class: "form-control", required: true %>
+    </div>
+  <% else %>
+    <div class="col-6 col-md-auto">
+      <%= label_tag :status, "Estado", class: "form-label mb-1" %>
+      <%= select_tag :status, options_for_select([["Pendientes y en seguimiento", "open"], *AprActivity::FOLLOW_UP_STATUSES.invert.to_a, ["Todos", "all"]], @status),
+            class: "form-select" %>
+    </div>
+  <% end %>
+  <div class="col-6 col-md-auto">
+    <%= label_tag :plant, "Planta", class: "form-label mb-1" %>
+    <%= select_tag :plant, options_for_select(apr_plant_options, @plant),
+          include_blank: (local_assigns[:daily] ? false : "Todas"), class: "form-select" %>
+  </div>
+  <div class="col-6 col-md-auto">
+    <%= label_tag :sector, "Sector", class: "form-label mb-1" %>
+    <%= select_tag :sector, options_for_select(AprActivity::SECTORS, @filters[:sector]), include_blank: "Todos", class: "form-select" %>
+  </div>
+  <div class="col-6 col-md-auto">
+    <%= label_tag :activity_type, "Tipo de actividad", class: "form-label mb-1" %>
+    <%= select_tag :activity_type, options_for_select(AprActivity::ACTIVITY_TYPES, @filters[:activity_type]), include_blank: "Todos", class: "form-select" %>
+  </div>
+  <div class="col-8 col-md">
+    <%= label_tag :q, "Buscar", class: "form-label mb-1" %>
+    <%= search_field_tag :q, @query, class: "form-control", maxlength: 120, placeholder: "Actividad u observación" %>
+  </div>
+  <div class="col-auto"><%= submit_tag "Consultar", class: "btn btn-outline-primary" %></div>
+<% end %>

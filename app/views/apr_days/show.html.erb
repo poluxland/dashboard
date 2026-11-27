@@ -1,0 +1,29 @@
+<% content_for :title, "Cierre diario de actividades · APR" %>
+<header class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1"><%= @day.closed_at? ? "Cierre diario de actividades" : "Revisar cierre diario" %></h1>
+    <p class="text-body-secondary mb-0"><%= AprDay::PLANTS.fetch(@day.plant) %> · <%= l(@day.date, format: :long) %></p>
+  </div>
+  <%= link_to "Volver al registro", apr_activities_path(date: @day.date, plant: @day.plant), class: "btn btn-outline-secondary" %>
+</header>
+
+<section class="card card-body mb-3" aria-label="Resumen del día">
+  <p class="mb-2"><strong><%= pluralize(@activities.size, "actividad", plural: "actividades") %> · <%= apr_duration(@activities.sum(&:duration_minutes)) %></strong></p>
+  <% if @day.closed_at? %>
+    <p class="mb-2">Cerrado por <strong><%= @day.closed_by_email %></strong> · <%= l(@day.closed_at.in_time_zone(AprDay::ZONE), format: :short) %></p>
+  <% end %>
+  <% if apr_day_owner?(@day) %>
+    <p class="mb-2 text-break"><strong>Destinatarios</strong> <%= @recipients.join(", ") %></p>
+    <% if @day.sent_at? %>
+      <p class="mb-0 text-success">Correo enviado · <%= l(@day.sent_at.in_time_zone(AprDay::ZONE), format: :short) %></p>
+    <% elsif @day.closed_at? %>
+      <%= button_to "Reintentar envío del correo", send_email_apr_day_path(@day), class: "btn btn-primary", data: { turbo_submits_with: "Enviando…" } %>
+    <% elsif @activities.any? %>
+      <%= button_to "Cerrar día y enviar correo", close_apr_day_path(@day), class: "btn btn-primary",
+            form: { data: { turbo_confirm: "¿Cerrar este día y enviar el resumen a los destinatarios indicados?" } },
+            data: { turbo_submits_with: "Cerrando…" } %>
+    <% end %>
+  <% end %>
+</section>
+
+<%= render "apr_activities/table", activities: @activities %>

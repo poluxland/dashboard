@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_182000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_193000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_182000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "apr_activities", force: :cascade do |t|
+    t.bigint "apr_day_id", null: false
+    t.string "sector", null: false
+    t.string "activity_type", null: false
+    t.string "title", null: false
+    t.text "observations"
+    t.integer "duration_minutes", null: false
+    t.string "outcome", null: false
+    t.string "severity"
+    t.string "responsible"
+    t.date "due_on"
+    t.string "follow_up_status"
+    t.text "resolution"
+    t.datetime "resolved_at"
+    t.string "resolved_by_email"
+    t.string "created_by_email"
+    t.string "updated_by_email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["apr_day_id"], name: "index_apr_activities_on_apr_day_id"
+    t.check_constraint "duration_minutes >= 1 AND duration_minutes <= 1440", name: "apr_activities_valid_duration"
+  end
+
+  create_table "apr_days", force: :cascade do |t|
+    t.bigint "apr_id", null: false
+    t.date "date", null: false
+    t.string "plant", null: false
+    t.datetime "closed_at"
+    t.string "closed_by_email"
+    t.string "recipients", default: [], null: false, array: true
+    t.jsonb "email_summary", default: {}, null: false
+    t.datetime "sent_at"
+    t.string "created_by_email"
+    t.string "updated_by_email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["apr_id", "plant", "date"], name: "index_apr_days_on_apr_id_and_plant_and_date", unique: true
   end
 
   create_table "dashboard_users", force: :cascade do |t|
@@ -933,6 +972,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_182000) do
     t.index ["source_key"], name: "index_ptm_reports_on_source_key", unique: true
   end
 
+  add_foreign_key "apr_activities", "apr_days"
+  add_foreign_key "apr_days", "dashboard_users", column: "apr_id"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "equipment_checklists", "mobile_assets"

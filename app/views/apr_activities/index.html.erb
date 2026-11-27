@@ -1,0 +1,42 @@
+<% content_for :title, "Registro de actividades · APR" %>
+<header class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1">Registro de actividades</h1>
+    <p class="text-body-secondary mb-0">APR · <%= AprDay::PLANTS.fetch(@plant) %> · <%= l(@date, format: :long) %></p>
+  </div>
+  <nav class="d-flex flex-wrap gap-2" aria-label="Registro APR">
+    <%= link_to "Seguimientos", follow_ups_apr_activities_path(plant: @plant), class: "btn btn-outline-primary" %>
+    <% unless @day&.closed_at? %>
+      <%= link_to "Registrar actividad", new_apr_activity_path(date: @date, plant: @plant), class: "btn btn-primary" %>
+    <% end %>
+  </nav>
+</header>
+
+<%= render "filters", path: apr_activities_path, daily: true %>
+
+<section class="mb-4" aria-labelledby="my-apr-activities">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div>
+      <h2 class="h5 mb-1" id="my-apr-activities">Mis actividades del día</h2>
+      <p class="small text-body-secondary mb-0"><%= pluralize(@day_count, "actividad", plural: "actividades") %> · <%= apr_duration(@day_minutes) %></p>
+    </div>
+    <% if @day && @day_count.positive? %>
+      <%= link_to (@day.closed_at? ? "Ver cierre" : "Revisar cierre"), @day, class: "btn btn-outline-primary" %>
+    <% end %>
+  </div>
+  <%= render "table", activities: @activities %>
+  <% if @filtered && @activities.any? %>
+    <p class="small text-body-secondary mt-2 mb-0">Selección · <%= pluralize(@activities.size, "actividad", plural: "actividades") %> · <%= apr_duration(@activities.sum(&:duration_minutes)) %></p>
+  <% end %>
+</section>
+
+<% if @reported_days.any? %>
+  <section aria-labelledby="shared-apr-reports">
+    <h2 class="h5" id="shared-apr-reports">Cierres de otros APR</h2>
+    <ul class="list-group">
+      <% @reported_days.each do |day| %>
+        <li class="list-group-item"><%= link_to day.closed_by_email, day %></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
