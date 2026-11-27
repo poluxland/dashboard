@@ -28,7 +28,10 @@ class AprHistoryEntriesController < AprController
     scope = scope.where(date: ..@to) if @to
     if @query.present?
       pattern = "%#{AprHistoryEntry.sanitize_sql_like(@query)}%"
-      scope = scope.where("source_area ILIKE :pattern OR source_activity ILIKE :pattern OR observations ILIKE :pattern", pattern: pattern)
+      scope = scope.where(<<~SQL, pattern: pattern)
+        source_area ILIKE :pattern OR source_activity ILIKE :pattern OR observations ILIKE :pattern
+        OR day_status ILIKE :pattern OR CAST(activity_details AS text) ILIKE :pattern
+      SQL
     end
     scope
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_27_203000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_204500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_27_203000) do
     t.string "source_fingerprint", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "activity_details", default: {}, null: false
     t.index ["plant", "date"], name: "index_apr_history_entries_on_plant_and_date"
     t.index ["source_file", "source_sheet", "source_row"], name: "index_apr_history_entries_on_source", unique: true
     t.check_constraint "end_date >= date", name: "apr_history_entries_valid_date_range"

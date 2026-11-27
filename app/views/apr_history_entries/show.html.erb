@@ -11,8 +11,20 @@
     <h2 class="h5">Actividades</h2>
     <% if @entry.activities.any? %>
       <ul class="mb-0">
-        <% @entry.activities.each do |activity| %>
-          <li class="text-break mb-2" style="white-space: pre-wrap"><%= activity %></li>
+        <% @entry.activities.each.with_index(1) do |activity, position| %>
+          <% details = @entry.activity_details.fetch(position.to_s, {}) %>
+          <li class="text-break mb-3">
+            <p class="mb-1" style="white-space: pre-wrap"><%= activity %></p>
+            <% if details.any? %>
+              <dl class="d-flex flex-wrap gap-3 small text-body-secondary mb-0">
+                <% AprHistoryEntry::ACTIVITY_DETAIL_LABELS.each do |field, label| %>
+                  <% if details[field].present? %>
+                    <div><dt><%= label %></dt><dd class="mb-0"><%= details[field] %></dd></div>
+                  <% end %>
+                <% end %>
+              </dl>
+            <% end %>
+          </li>
         <% end %>
       </ul>
     <% else %>

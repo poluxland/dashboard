@@ -75,6 +75,22 @@ class AprHistoryTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "Comentario de la fila"
   end
 
+  test "shows reviewed activity fields alongside the original text and finds them in search" do
+    with_workbook(@rows) { |path| AprHistoryImporter.new(path).call(apply: true) }
+    record = AprHistoryEntry.find_by!(source_row: 3)
+    record.update!(activity_details: { "2" => { "type" => "Entrega de EPP", "sector" => "Granel", "result" => "Entregado al personal" } })
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+
+    get apr_history_entries_path(q: "Granel")
+    assert_select "tbody tr", count: 1
+    assert_select "tbody a[href=?]", apr_history_entry_path(record)
+    get apr_history_entry_path(record)
+    assert_select "li", text: /Validar AST/, count: 1
+    assert_select "li", text: /Entregar EPP.*Entrega de EPP.*Granel.*Entregado al personal/m, count: 1
+    assert_select "dt", text: "Duración", count: 0
+    assert_equal [ "Validar AST", "Entregar EPP", "Revisar señalización" ], record.reload.activities
+  end
+
   private
 
   def with_workbook(rows)
