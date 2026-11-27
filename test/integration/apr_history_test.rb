@@ -63,7 +63,7 @@ class AprHistoryTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     sign_in_with_google(email: "jose.jerez@msindustrial.cl")
     get apr_activities_path
-    assert_select "a[href=?]", apr_history_entries_path, text: "Histórico Excel"
+    assert_select "a[href=?]", apr_history_entries_path, text: "Histórico"
     get apr_history_entries_path(from: "2026-03-10", to: "2026-03-11")
     assert_response :success
     assert_select "tbody tr", count: 1, text: /Vacaciones/

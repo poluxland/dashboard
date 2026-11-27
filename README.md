@@ -59,7 +59,7 @@ por planta, configura `APR_ACTIVITY_REPORT_RECIPIENTS_PTM`,
 `APR_ACTIVITY_REPORT_RECIPIENTS_CALBUCO` con correos separados por comas.
 El correo del APR se utiliza para las respuestas.
 
-**Histórico Excel** conserva las actividades y los comentarios de Seguridad PTM
+**Histórico** conserva las actividades y los comentarios de Seguridad PTM
 en una vista de consulta. Los administradores del Dashboard tienen acceso y se
 pueden autorizar cuentas corporativas adicionales con
 `APR_ACTIVITY_HISTORY_READERS`. Para validar el archivo, ejecuta

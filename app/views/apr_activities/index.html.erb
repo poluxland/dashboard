@@ -7,7 +7,7 @@
   <nav class="d-flex flex-wrap gap-2" aria-label="Registro APR">
     <%= link_to "Seguimientos", follow_ups_apr_activities_path(plant: @plant), class: "btn btn-outline-primary" %>
     <% if apr_history_access? %>
-      <%= link_to "Histórico Excel", apr_history_entries_path, class: "btn btn-outline-secondary" %>
+      <%= link_to "Histórico", apr_history_entries_path, class: "btn btn-outline-secondary" %>
     <% end %>
     <% unless @day&.closed_at? %>
       <%= link_to "Registrar actividad", new_apr_activity_path(date: @date, plant: @plant), class: "btn btn-primary" %>
