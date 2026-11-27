@@ -19,36 +19,47 @@
   </div>
   <div class="col-8 col-md">
     <%= label_tag :q, "Buscar", class: "form-label mb-1" %>
-    <%= search_field_tag :q, @query, placeholder: "Actividad u observación", maxlength: 120, class: "form-control" %>
+    <%= search_field_tag :q, @query, placeholder: "Actividad, tipo, sector u observación", maxlength: 120, class: "form-control" %>
   </div>
   <div class="col-auto"><%= submit_tag "Consultar", class: "btn btn-outline-primary" %></div>
 <% end %>
 
 <% if @entries.any? %>
-  <p class="text-body-secondary small mb-2"><%= pluralize(@pagy.count, "registro") %></p>
+  <p class="text-body-secondary small mb-2"><%= pluralize(@pagy.count, "fila", plural: "filas") %></p>
   <div class="table-responsive border rounded">
-    <table class="table table-sm table-hover align-middle mb-0" data-table-export="off">
+    <table class="table table-sm table-hover align-middle mb-0" aria-label="Actividades del histórico" data-table-export="off">
       <thead class="table-light">
         <tr>
           <th scope="col">Fecha o período</th><th scope="col">Planta</th><th scope="col">Área en Excel</th>
-          <th scope="col">Actividad</th><th scope="col">Observaciones</th>
+          <th scope="col">Actividad</th>
+          <% AprHistoryEntry::ACTIVITY_DETAIL_LABELS.values.each do |label| %>
+            <th scope="col"><%= label %></th>
+          <% end %>
+          <th scope="col">Observaciones de la jornada</th>
         </tr>
       </thead>
       <tbody>
         <% @entries.each do |entry| %>
           <tr>
-            <td class="text-nowrap"><%= link_to apr_history_period(entry), entry, class: "fw-semibold" %></td>
-            <td><%= AprDay::PLANTS.fetch(entry.plant) %></td>
-            <td><%= entry.source_area&.strip %></td>
-            <td>
-              <% if entry.day_status.present? %>
-                <span class="fw-semibold"><%= entry.day_status %></span>
-              <% elsif entry.activities.any? %>
-                <%= truncate(entry.activities.first, length: 140) %>
-                <% if entry.activities.size > 1 %><span class="small text-body-secondary">(+<%= entry.activities.size - 1 %>)</span><% end %>
+            <% anchor = ("actividad-#{entry.listed_position}" if entry.listed_position) %>
+            <td class="text-nowrap">
+              <%= link_to apr_history_period(entry), apr_history_entry_path(entry, anchor: anchor), class: "fw-semibold" %>
+              <% if entry.day_status.present? && entry.listed_activity.present? %>
+                <div class="small text-body-secondary"><%= entry.day_status %></div>
               <% end %>
             </td>
-            <td><%= "Ver detalle" if entry.observations.present? %></td>
+            <td><%= AprDay::PLANTS.fetch(entry.plant) %></td>
+            <td><%= entry.source_area&.strip %></td>
+            <td class="apr-history-activity" style="min-width: 20rem">
+              <%= render "expandable_text", text: entry.listed_activity.presence || entry.day_status %>
+            </td>
+            <% details = entry.listed_details || {} %>
+            <% AprHistoryEntry::ACTIVITY_DETAIL_LABELS.each_key do |field| %>
+              <td class="text-break"><%= details[field] %></td>
+            <% end %>
+            <td class="apr-history-observations" style="min-width: 15rem">
+              <%= render "expandable_text", text: entry.observations %>
+            </td>
           </tr>
         <% end %>
       </tbody>

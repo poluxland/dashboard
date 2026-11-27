@@ -1,0 +1,13 @@
+<% if text.present? %>
+  <% if text.length > 120 || text.lines.size > 3 %>
+    <details>
+      <summary>
+        <%= truncate(text.squish, length: 120) %>
+        <span class="text-primary text-nowrap">Ver detalle</span>
+      </summary>
+      <p class="mt-2 mb-0 text-break" style="white-space: pre-wrap"><%= text %></p>
+    </details>
+  <% else %>
+    <span class="text-break" style="white-space: pre-wrap"><%= text %></span>
+  <% end %>
+<% end %>

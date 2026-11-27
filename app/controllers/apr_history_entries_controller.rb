@@ -12,7 +12,8 @@ class AprHistoryEntriesController < AprController
     else
       scope = filtered_history
     end
-    @pagy, @entries = pagy(scope.order(date: :desc, source_row: :desc), limit: 30, overflow: :last_page)
+    order = scope.order(date: :desc, source_row: :desc, id: :desc).order(Arel.sql("activity_item.position"))
+    @pagy, @entries = pagy(order, limit: 30, overflow: :last_page)
   end
 
   def show
@@ -22,15 +23,16 @@ class AprHistoryEntriesController < AprController
   private
 
   def filtered_history
-    scope = AprHistoryEntry.all
+    scope = AprHistoryEntry.with_listed_activities
     scope = scope.where(plant: @plant) if @plant
     scope = scope.where(end_date: @from..) if @from
     scope = scope.where(date: ..@to) if @to
     if @query.present?
       pattern = "%#{AprHistoryEntry.sanitize_sql_like(@query)}%"
       scope = scope.where(<<~SQL, pattern: pattern)
-        source_area ILIKE :pattern OR source_activity ILIKE :pattern OR observations ILIKE :pattern
-        OR day_status ILIKE :pattern OR CAST(activity_details AS text) ILIKE :pattern
+        source_area ILIKE :pattern OR activity_item.text ILIKE :pattern OR observations ILIKE :pattern
+        OR day_status ILIKE :pattern
+        OR CAST(activity_details -> activity_item.position::text AS text) ILIKE :pattern
       SQL
     end
     scope

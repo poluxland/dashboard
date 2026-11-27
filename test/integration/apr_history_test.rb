@@ -83,12 +83,56 @@ class AprHistoryTest < ActionDispatch::IntegrationTest
 
     get apr_history_entries_path(q: "Granel")
     assert_select "tbody tr", count: 1
-    assert_select "tbody a[href=?]", apr_history_entry_path(record)
+    assert_select "tbody a[href=?]", apr_history_entry_path(record, anchor: "actividad-2")
+    assert_select "tbody td.apr-history-activity", text: "Entregar EPP"
     get apr_history_entry_path(record)
     assert_select "li", text: /Validar AST/, count: 1
     assert_select "li", text: /Entregar EPP.*Entrega de EPP.*Granel.*Entregado al personal/m, count: 1
     assert_select "dt", text: "Duración", count: 0
     assert_equal [ "Validar AST", "Entregar EPP", "Revisar señalización" ], record.reload.activities
+  end
+
+  test "lists every activity in its own row and expands long activity text and observations" do
+    with_workbook(@rows) { |path| AprHistoryImporter.new(path).call(apply: true) }
+    record = AprHistoryEntry.find_by!(source_row: 3)
+    long_activity = "Revisar señalización " + ("de la zona de trabajo " * 8) + "en acceso norte."
+    long_observations = ("Observación de la jornada. " * 6) + "Fin del comentario."
+    details = {
+      "2" => { "type" => "Entrega de EPP", "sector" => "Granel" },
+      "3" => { "equipment" => "Silo 2000", "platform" => "PREVSIS", "result" => "Señalización revisada" }
+    }
+    record.update!(activities: [ "Validar AST", "Entregar EPP", long_activity ], observations: long_observations, activity_details: details)
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+
+    get apr_history_entries_path(from: "2025-08-04", to: "2025-08-04")
+    assert_response :success
+    assert_select "tbody tr", count: 3
+    assert_select "th", text: "Resultado documentado"
+    assert_select "td.apr-history-activity > span", text: "Validar AST"
+    assert_select "td.apr-history-activity details:not([open]) summary", text: /Ver detalle/
+    assert_select "td.apr-history-activity details p", text: long_activity
+    assert_select "td.apr-history-observations details p", text: long_observations, count: 3
+    assert_select "tbody tr:nth-child(2) td", text: "Granel"
+    assert_select "tbody tr:nth-child(3) td", text: "PREVSIS"
+    assert_select "tbody tr:nth-child(3) a[href=?]", apr_history_entry_path(record, anchor: "actividad-3")
+    get apr_history_entry_path(record)
+    assert_select "#actividad-3", text: /en acceso norte/
+  end
+
+  test "paginates individual activities within a single date" do
+    with_workbook(@rows) { |path| AprHistoryImporter.new(path).call(apply: true) }
+    record = AprHistoryEntry.find_by!(source_row: 3)
+    record.update!(activities: (1..32).map { |position| "Actividad #{position}" })
+    sign_in_with_google(email: "jose.jerez@msindustrial.cl")
+
+    get apr_history_entries_path(from: "2025-08-04", to: "2025-08-04")
+    assert_select "p", text: "32 filas"
+    assert_select "tbody tr", count: 30
+    assert_select "td.apr-history-activity", text: "Actividad 30"
+    get apr_history_entries_path(from: "2025-08-04", to: "2025-08-04", page: 2)
+    assert_select "tbody tr", count: 2
+    assert_select "tbody tr:first-child td.apr-history-activity", text: "Actividad 31"
+    assert_select "tbody tr:last-child td.apr-history-activity", text: "Actividad 32"
   end
 
   private

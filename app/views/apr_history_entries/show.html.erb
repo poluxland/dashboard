@@ -13,7 +13,7 @@
       <ul class="mb-0">
         <% @entry.activities.each.with_index(1) do |activity, position| %>
           <% details = @entry.activity_details.fetch(position.to_s, {}) %>
-          <li class="text-break mb-3">
+          <li class="text-break mb-3" id="actividad-<%= position %>">
             <p class="mb-1" style="white-space: pre-wrap"><%= activity %></p>
             <% if details.any? %>
               <dl class="d-flex flex-wrap gap-3 small text-body-secondary mb-0">
